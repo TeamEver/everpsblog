@@ -1,0 +1,75 @@
+/*Default blog page*/
+#module-everpsblog-blog .article, #module-everpsblog-blog .evercategory,
+#module-everpsblog-category .article, #module-everpsblog-category .evercategory,
+#module-everpsblog-tag .article, #module-everpsblog-tag .evercategory{
+    border: 1px solid #D3D3D3;
+    margin-top: 1%;
+    margin-bottom: 1%;
+}
+#module-everpsblog-blog .article h3, #module-everpsblog-blog .evercategory h3,
+#module-everpsblog-category .article, #module-everpsblog-category .evercategory h3,
+#module-everpsblog-tag .article, #module-everpsblog-tag .evercategory h3{
+    text-align: left;
+}
+#module-everpsblog-blog .article a, #module-everpsblog-blog .evercategory a,
+#module-everpsblog-category .article, #module-everpsblog-category .evercategory a,
+#module-everpsblog-tag .article, #module-everpsblog-tag .evercategory a{
+    text-decoration: none;
+}
+#module-everpsblog-blog .article-content,
+#module-everpsblog-category .article-content,
+#module-everpsblog-tag .article-content{
+    padding-top: 1rem;
+    padding-bottom: : 1rem;
+}
+/*Posts*/
+#module-everpsblog-post .postcontent{
+    border: 1px solid #D3D3D3;
+    padding: 2%;
+    margin-bottom: 2%; 
+}
+#module-everpsblog-post .postcontent img{
+    width: auto!important;
+}
+#module-everpsblog-post .leaveComment{
+    border: 1px solid #D3D3D3;
+    padding: 2%;
+    margin-bottom: 3%; 
+}
+#module-everpsblog-post .zoomed img {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+    -webkit-transition: .3s ease-in-out;
+    transition: .3s ease-in-out;
+}
+#module-everpsblog-post .zoomed img:hover {
+    -webkit-transform: scale(1.3);
+    transform: scale(1.3);
+}
+/*Comment zone*/
+#module-everpsblog-post #leaveComment {
+    font-size: 1.3rem;
+}
+#module-everpsblog-post #commentsTitle {
+    font-size: 1.3rem;
+}
+#module-everpsblog-post .commentcontainer {
+    margin-top: 3%;
+}
+#module-everpsblog-post .commentblock {
+    border: 1px solid #eee;
+    border-color: rgba(0,0,0,.05);
+    padding: 10px;
+    margin-bottom: 3%;
+    font-size: 0.9rem;
+}
+#module-everpsblog-post .comment{
+    padding-top: 8px;
+}
+#module-everpsblog-post .commentdate{
+    text-align: right;
+}
+/*Linked products*/
+#module-everpsblog-post #postProducts {
+    font-size: 1.3rem;
+}

@@ -1,0 +1,9 @@
+
+ 
+
+Un nouveau commentaire a été passé par {email}
+Commentaire : 
+
+Merci de vous rendre sur {shop_name} afin de le valider ou le supprimer
+
+{shop_name} 
