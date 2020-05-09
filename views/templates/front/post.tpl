@@ -15,16 +15,16 @@
             <p class="postpublished" itemprop="datePublished">{l s='Published on' mod='everpsblog'} {$post->date_add|escape:htmlall:'UTF-8'}</p>
             <div class="row">
             {if isset($errors) && $errors}
-            <div class="col-xs-12 col-md-12 alert alert-danger" role="alert">
+            <div class="col-12 col-xs-12 col-md-12 alert alert-danger" role="alert">
             {foreach from=$errors item=error}
-              <p>{$error}</p>              
+              <p>{$error}</p>
             {/foreach}
             </div>
             {/if}
             {if isset($successes) && $successes}
-            <div class="col-xs-12 col-md-12 alert alert-success" role="alert">
+            <div class="col-12 col-xs-12 col-md-12 alert alert-success" role="alert">
             {foreach from=$successes item=success}
-              <p>{$success}</p>              
+              <p>{$success}</p>
             {/foreach}
             </div>
             {/if}
@@ -88,48 +88,48 @@
         {foreach from=$comments item=comment}
             <div class="container commentblock" id="{$comment->id|escape:htmlall:'UTF-8'}">
                 <div class="row">
-                    <div class="col-xs-12 col-md-8 commentname">
+                    <div class="col-12 col-xs-12 col-md-8 commentname">
                         {$comment->name|escape:htmlall:'UTF-8'}
                     </div>
-                    <div class="col-xs-12 col-md-4 commentdate">
+                    <div class="col-12 col-xs-12 col-md-4 commentdate">
                         {$comment->date_upd|escape:htmlall:'UTF-8'}
                     </div>
-                    <div class="col-xs-12 col-md-12 comment">
+                    <div class="col-12 col-xs-12 col-md-12 comment">
                         <div class="rte">
                             {$comment->comment nofilter}
                         </div>
                     </div>
                 </div>
-            </div>    
+            </div>
         {/foreach}
     </div>
 </section>
 {/if}
 <section class="featured-products container clearfix carousel slide">
-    <span id="postProducts">{l s='Linked products' mod='everpsblog'}</span>
-    <div class="postproducts products carousel-inner">
+    <span id="postProducts" class="col-12 col-xs-12 my-2">{l s='Linked products' mod='everpsblog'}</span>
+    <div class="row postproducts products carousel-inner">
         {assign var=counter value=0}
         {foreach from=$products item=product}
         {* {$product|var_dump} *}
         <article class="product-miniature js-product-miniature{if $counter == 0} active{/if}" data-id-product="{$product->id|escape:htmlall:'UTF-8'}" data-slide-to="{$counter|escape:htmlall:'UTF-8'}" itemscope itemtype="http://schema.org/Product">
-        <div class="thumbnail-container">
-            <img src="{$link->getImageLink($product->link_rewrite, $product->id, 'home_default')}" class="img-fluid mx-auto d-block">
-        </div>
-        <div class="product-description">
-            <h3 class="h3 product-title" itemprop="name">
-                <a href="{$link->getProductLink($product)}">
-                {$product->name|escape:'htmlall':'UTF-8'}
-                </a>
-            </h3>
-{*             <div class="product-price-and-shipping">
-                {hook h='displayProductPriceBlock' product=$product type="before_price"}
-                <span itemprop="price" class="price">{Tools::displayPrice($product->price)|escape:'htmlall':'UTF-8'} {l s='without taxes' mod='everpsblog'}</span>
+            <a href="{$link->getProductLink($product)}">
+                <div class="thumbnail-container">
+                    <img src="{$link->getImageLink($product->link_rewrite, $product->cover, 'home_default')}" class="img-fluid mx-auto d-block">
+                </div>
+                <div class="product-description">
+                    <h3 class="h3 product-title" itemprop="name">
+                        {$product->name|escape:'htmlall':'UTF-8'}
+                    </h3>
+                    <div class="product-price-and-shipping">
+                        {hook h='displayProductPriceBlock' product=$product type="before_price"}
+                        <span itemprop="price" class="price">{Tools::displayPrice($product->price)|escape:'htmlall':'UTF-8'}</span>
 
-                {hook h='displayProductPriceBlock' product=$product type='unit_price'}
+                        {hook h='displayProductPriceBlock' product=$product type='unit_price'}
 
-                {hook h='displayProductPriceBlock' product=$product type='weight'}
-            </div> *}
-        </div>
+                        {hook h='displayProductPriceBlock' product=$product type='weight'}
+                    </div>
+                </div>
+            </a>
         </article>
         {$counter=$counter+1}
         {/foreach}

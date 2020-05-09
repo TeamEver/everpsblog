@@ -181,16 +181,24 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 }
             }
             // Now prepare template and show it
-            $post_tags = json_decode($this->post->post_tags);
             $post_products = json_decode($this->post->post_products);
             $products = array();
-            foreach ($post_products as $post_product) {
-                $products[] = new Product(
-                    (int)$post_product,
-                    (int)$this->context->shop->id,
-                    (int)$this->context->language->id
-                );
+            $link = new Link();
+            if (isset($post_products) && !empty($post_products)) {
+                foreach ($post_products as $post_product) {
+                    $pproduct = new Product(
+                        (int)$post_product,
+                        (int)$this->context->shop->id,
+                        (int)$this->context->language->id
+                    );
+                    $pproduct_cover = Product::getCover(
+                        (int)$pproduct->id
+                    );
+                    $pproduct->cover = (int)$pproduct_cover['id_image'];
+                    $products[] = $pproduct;
+                }
             }
+            $post_tags = json_decode($this->post->post_tags);
             $tags = array();
             if (isset($post_tags) && !empty($post_tags)) {
                 foreach ($post_tags as $post_tag) {

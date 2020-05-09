@@ -53,22 +53,22 @@
 {assign var=postcounter value=1}
 {foreach from=$everpsblog item=item}
         <div class="carousel-item {if $postcounter == 1} active{/if} article everpsblog" id="everpsblog-{$item.id_ever_post|escape:'html'}">
-            <div class="d-block w-100">
-                <div class="col-xs-12 article-img">
-                    <img src="{$blogImg_dir|escape:'html'}posts/post_image_{$item.id_ever_post|escape:'html'}.jpg" class="col-xs-12 {if $animate}animate flipSideBySide zoomed{/if}" alt="{$item.title nofilter}" alt="{$item.title nofilter}" />
-                </div>
-                <div class="col-xs-12">
-                    <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item.id_ever_post|escape:'html'}">
-                        <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])|escape:'html'}" title="{$item.title nofilter}">
-                            {$item.title nofilter}
-                        </a>
-                    </h3>
-                    <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item.id_ever_post|escape:'html'}">
-                        {$item.content|strip_tags|truncate:150:"..."}
+            <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])|escape:'html'}" title="{$item.title nofilter}">
+                <div class="d-block w-100">
+                    <div class="col-12 col-xs-12 article-img">
+                        <img src="{$blogImg_dir|escape:'html'}posts/post_image_{$item.id_ever_post|escape:'html'}.jpg" class="col-12 col-xs-12 {if $animate}animate flipSideBySide zoomed{/if}" alt="{$item.title nofilter}" alt="{$item.title nofilter}" />
                     </div>
-                    <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])|escape:'html'}" class="btn btn-primary" title="{l s='Read more' mod='everpsblog'} {$item.title nofilter}">{l s='Read more' mod='everpsblog'}</a>
+                    <div class="col-12 col-xs-12">
+                        <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item.id_ever_post|escape:'html'}">
+                                {$item.title|strip_tags|truncate:20:"..." nofilter}
+                        </h3>
+                        <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item.id_ever_post|escape:'html'}">
+                            {$item.content|strip_tags|truncate:100:"..."}
+                        </div>
+                        <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])|escape:'html'}" class="btn btn-primary" title="{l s='Read more' mod='everpsblog'} {$item.title nofilter}">{l s='Read more' mod='everpsblog'}</a>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
 {$postcounter = $postcounter+1}
 {/foreach}

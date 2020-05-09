@@ -6,23 +6,23 @@
 * @link https://www.team-ever.com
 *}
 
-<div class="container bloghometitle">
+<div class="row bloghometitle">
     <a href="{$blogUrl|escape:'html'}" title="{l s='Latest posts from the blog' mod='everpsblog'}">
         <h2 class="h2 products-section-title text-uppercase text-center">{l s='Latest posts from the blog' mod='everpsblog'}</h2>
     </a>
 </div>
-<div class="container bloghome carousel slide">
+<div class="row bloghome carousel slide mt-2">
     <div class="carousel-inner">
     {assign var=counter value=0}
     {foreach from=$everpsblog item=item}
-        <div class="col-xs-12 col-md-3 article everpsblog{if $counter == 0} active{/if}" data-slide-to="{$counter}" id="everpsblog-{$item.id_ever_post|escape:'html'}">
-                <div class="col-xs-12 article-img">
-                    <img src="{$blogImg_dir|escape:'html'}posts/post_image_{$item.id_ever_post|escape:'html'}.jpg" class="img-fluid col-xs-12 {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item.title nofilter}" />
+        <div class="col-12 col-xs-12 col-md-3 article everpsblog{if $counter == 0} active{/if}" data-slide-to="{$counter}" id="everpsblog-{$item.id_ever_post|escape:'html'}">
+                <div class="col-12 col-xs-12 article-img">
+                    <img src="{$blogImg_dir|escape:'html'}posts/post_image_{$item.id_ever_post|escape:'html'}.jpg" class="img-fluid col-12 col-xs-12 {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item.title nofilter}" />
                 </div>
-                <div class="col-xs-12">
+                <div class="col-12 col-xs-12">
                     <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item.id_ever_post|escape:'html'}">
                         <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])|escape:'html'}" title="{$item.title nofilter}">
-                            {$item.title nofilter}
+                            {$item.title|strip_tags|truncate:25:"..." nofilter}
                         </a>
                     </h3>
                     <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item.id_ever_post|escape:'html'}">
