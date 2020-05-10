@@ -16,7 +16,7 @@ require_once(dirname(__FILE__).'/../EverPsBlogTag.php');
 class EverPsBlogModuleFrontController extends ModuleFrontController
 {
     protected $page = 1;
-    protected $resultsPerPage = 10;
+    protected $totalPerPage = 10;
 
     public function getTemplateVarPage()
     {
@@ -105,7 +105,7 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
                     'link_rewrite' => $this->post->link_rewrite
                 );
             break;
-            
+
             case 'category':
                 if (!$this->category) {
                     $this->category = new EverPsBlogCategory(
@@ -134,7 +134,7 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
                 );
             break;
         }
-        
+
         if ($param) {
             $canonical_url = $this->context->link->getModuleLink(
                 'everpsblog',
@@ -145,32 +145,51 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
         }
     }
 
-    protected function getTemplateVarPagination($resultCount = 0)
+    protected function getTemplateVarPagination($total = 0)
     {
-        $totalItems = (int)$resultCount;
-        $page = (int)$this->page;
-        $resultsPerPage = $this->resultsPerPage ? (int)$this->resultsPerPage : 10;
+        $totalItems = (int)$total;
+        $page = (int)Tools::getValue('page');
+        $page = (int)Tools::getValue('page') ? (int)Tools::getValue('page') : 1;
+        $totalPerPage = $this->totalPerPage ? (int)$this->totalPerPage : 10;
         $pagination = new Pagination();
         $pagination
             ->setPage($page)
             ->setPagesCount(
-                (int)ceil((int)$totalItems / (int)$resultsPerPage)
+                (int)ceil((int)$totalItems / $totalPerPage)
             )
         ;
-        $itemsShownFrom = ($resultsPerPage * ($page - 1)) + 1;
-        $itemsShownTo = $resultsPerPage * $page;
+        $pages = array_map(function ($link) {
+            $link['url'] = $this->updateQueryString(array(
+                'page' => $link['page'] > 1 ? $link['page'] : null,
+            ));
+
+            return $link;
+        }, $pagination->buildLinks());
+
+        //Filter next/previous link on first/last page
+        $pages = array_filter($pages, function ($page) use ($pagination) {
+            if ('previous' === $page['type'] && 1 === $pagination->getPage()) {
+                return false;
+            }
+            if ('next' === $page['type'] && $pagination->getPagesCount() === $pagination->getPage()) {
+                return false;
+            }
+
+            return true;
+        });
+
+        $itemsShownFrom = ($totalPerPage * ($page - 1)) + 1;
+        $itemsShownTo = $totalPerPage * $page;
 
         return array(
             'total_items' => $totalItems,
             'items_shown_from' => $itemsShownFrom,
             'items_shown_to' => ($itemsShownTo <= $totalItems) ? $itemsShownTo : $totalItems,
-            'pages' => array_map(function ($link) {
-                $link['url'] = $this->updateQueryString(array(
-                    'page' => $link['page'],
-                ));
-
-                return $link;
-            }, $pagination->buildLinks()),
+            'current_page' => $pagination->getPage(),
+            'pages_count' => $pagination->getPagesCount(),
+            'pages' => $pages,
+            // Compare to 3 because there are the next and previous links
+            'should_be_displayed' => (count($pagination->buildLinks()) > 3),
         );
     }
 

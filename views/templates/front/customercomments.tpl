@@ -23,10 +23,10 @@
 <div class="content">
     <div class="row">
 {foreach from=$cust_comments item=comment}
-        <div class="col-xs-12 col-md-3 article everpsblog bordered" id="comment-{$comment.post->id|escape:'html'}" style="border:1px solid black;">
+        <div class="col-xs-12 col-12 col-md-3 article everpsblog bordered" id="comment-{$comment.post->id|escape:'html'}" style="border:1px solid black;">
             <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $comment.post->id , 'link_rewrite' => $comment.post->link_rewrite])|escape:'html'}">
-                <div class="col-xs-12 article-img">
-                    <img src="{$blogImg_dir|escape:'html'}posts/post_image_{$comment.post->id|escape:'html'}.jpg" class="col-xs-12 {if $animated}animated flipSideBySide zoomed{/if}"/>
+                <div class="col-xs-12 col-12 article-img">
+                    <img src="{$blogImg_dir|escape:'html'}posts/post_image_{$comment.post->id|escape:'html'}.jpg" class="col-xs-12 col-12 img img-fluid mt-2 {if $animated}animated flipSideBySide zoomed{/if}"/>
                 </div>
                 <div class="col-xs-12">
                     <h3>{$comment.post->title}</h3>

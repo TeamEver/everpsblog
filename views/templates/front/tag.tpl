@@ -43,16 +43,7 @@
     </div>
 {/foreach}
 </div>
-{if isset($previous_page) && $previous_page}
-{if $previous_page == 1}
-<a href="{$link->getModuleLink('everpsblog', 'tag', ['id_ever_tag'=>$tag->id, 'link_rewrite'=>$tag->link_rewrite])|escape:'html'}" class="btn btn-primary float-xs-left" id="previousPage">{l s='Previous page' mod='everpsblog'}</a>
-{else}
-<a href="{$link->getModuleLink('everpsblog', 'tag', ['id_ever_tag'=>$tag->id, 'link_rewrite'=>$tag->link_rewrite])|escape:'html'}?page={$previous_page}" class="btn btn-primary float-xs-left" id="previousPage" rel="nofollow">{l s='Previous page' mod='everpsblog'}</a>
-{/if}
-{/if}
-{if isset($next_page) && $next_page}
-<a href="{$link->getModuleLink('everpsblog', 'tag', ['id_ever_tag'=>$tag->id, 'link_rewrite'=>$tag->link_rewrite])|escape:'html'}?page={$next_page}" class="btn btn-primary float-xs-right" id="nextPage" rel="nofollow">{l s='Next page' mod='everpsblog'}</a>
-{/if}
+{include file='_partials/pagination.tpl' pagination=$pagination}
 {else}
 <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>
 {/if}

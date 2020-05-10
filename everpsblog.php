@@ -771,6 +771,9 @@ class EverPsBlog extends Module
             $this->context->controller->addCSS(
                 _PS_MODULE_DIR_.'everpsblog/views/css/everpsblog.css', 'all'
             );
+            $this->context->controller->addJs(
+                $this->_path.'views/js/everpsblog.js'
+            );
             if ($controller_name == 'post') {
                 if ((int)Configuration::get('EVERBLOG_FANCYBOX')) {
                     if ($controller_name != 'order') {
@@ -783,9 +786,6 @@ class EverPsBlog extends Module
                         $this->_path.'views/js/plugins/ckeditor.js'
                     );
                 }
-                $this->context->controller->addJs(
-                    $this->_path.'views/js/everpsblog.js'
-                );
             }
         } else {
             $this->context->controller->addCSS(

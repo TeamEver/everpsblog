@@ -6,6 +6,11 @@
  * @link https://team-ever.com
  */
 $(document).ready(function(){
+    $('.pagination a:not(.disabled)').on('click', function(event) {
+        event.preventDefault();
+        window.location.href = $(this).prop('href');
+        return false;
+    });
     if ($('#ever_ck_mark').length) {
         CKEDITOR.replace( 'evercomment' );
     }

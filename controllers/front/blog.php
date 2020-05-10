@@ -52,55 +52,17 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             (int)$this->context->language->id,
             (int)$this->context->shop->id
         );
+        // pagination
+        $pagination = $this->getTemplateVarPagination($this->post_number);
         // SEO title and meta desc
         $everblog_title = Configuration::getInt('EVERBLOG_TITLE');
         $meta_title = $everblog_title[(int)Context::getContext()->language->id];
         $everblog_desc = Configuration::getInt('EVERBLOG_META_DESC');
         $meta_desc = $everblog_desc[(int)Context::getContext()->language->id];
-
-        if ($this->isSeven) {
-            $page = $this->context->controller->getTemplateVarPage();
-            $page['meta']['title'] = $meta_title;
-            $page['meta']['description'] = $meta_desc;
-            $this->context->smarty->assign('page', $page);
-        } else {
-            $this->context->smarty->assign($meta_title, true);
-            $this->context->smarty->assign($meta_desc, true);
-        }
-        // Pagination only if there is still some posts
-        $pagination = $this->getTemplateVarPagination($this->post_number);
-        if (Tools::getValue('page')
-            && (int)$this->post_number > $pagination['total_items']
-        ) {
-            Tools::redirect('index.php');
-        }
-        if (Tools::getValue('page')) {
-            if ((int)Tools::getValue('page') > 1) {
-                if ($pagination['items_shown_to'] >= $pagination['total_items']) {
-                    $this->context->smarty->assign(
-                        array(
-                            'previous_page' => (int)Tools::getValue('page') - 1,
-                        )
-                    );
-                } else {
-                    $this->context->smarty->assign(
-                        array(
-                            'previous_page' => (int)Tools::getValue('page') - 1,
-                            'next_page' => (int)Tools::getValue('page') + 1,
-                        )
-                    );
-                }
-            }
-        } else {
-            if ($this->post_number > $pagination['total_items']) {
-                $this->context->smarty->assign(
-                    array(
-                        'next_page' => 2,
-                    )
-                );
-            }
-        }
-        // end pagination
+        $page = $this->context->controller->getTemplateVarPage();
+        $page['meta']['title'] = $meta_title;
+        $page['meta']['description'] = $meta_desc;
+        $this->context->smarty->assign('page', $page);
         $everpsblogposts = EverPsBlogPost::getPosts(
             (int)$this->context->language->id,
             (int)$this->context->shop->id,
@@ -125,11 +87,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
                 'animated' => $animate,
             )
         );
-        if ($this->isSeven) {
-            $this->setTemplate('module:everpsblog/views/templates/front/blog.tpl');
-        } else {
-            $this->setTemplate('blog.tpl');
-        }
+        $this->setTemplate('module:everpsblog/views/templates/front/blog.tpl');
     }
 
     public function getBreadcrumbLinks()
