@@ -75,18 +75,11 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             } else {
                 $seo_follow = 'nofollow';
             }
-            if ($this->isSeven) {
-                $page = $this->context->controller->getTemplateVarPage();
-                $page['meta']['robots'] = $seo_index . ', ' . $seo_follow;
-                $page['meta']['title'] = $this->post->meta_title;
-                $page['meta']['description'] = $this->post->meta_description;
-                $this->context->smarty->assign('page', $page);
-            } else {
-                $this->context->smarty->assign($index, $this->post->index);
-                $this->context->smarty->assign($follow, $this->post->follow);
-                $this->context->smarty->assign($this->post->meta_title, true);
-                $this->context->smarty->assign($this->post->meta_description, true);
-            }
+            $page = $this->context->controller->getTemplateVarPage();
+            $page['meta']['robots'] = $seo_index . ', ' . $seo_follow;
+            $page['meta']['title'] = $this->post->meta_title;
+            $page['meta']['description'] = $this->post->meta_description;
+            $this->context->smarty->assign('page', $page);
 
             // So we have a post, then let's check comments submitted
             if (Tools::isSubmit('everpostcomment')) {
@@ -355,5 +348,11 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             Configuration::get('PS_SHOP_NAME')
         );
         return $mail;
+    }
+
+    public function getTemplateVarPage() {
+        $page = parent::getTemplateVarPage();
+        $page['body_classes']['page-everblog-post'] = true;
+        return $page;
     }
 }

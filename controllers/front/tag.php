@@ -71,34 +71,6 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
             ) {
                 Tools::redirect('index.php');
             }
-            if ($pagination['total_items'] > 10) {
-                if (Tools::getValue('page')) {
-                    if ((int)Tools::getValue('page') > 1) {
-                        if ($pagination['items_shown_to'] >= $pagination['total_items']) {
-                            $this->context->smarty->assign(
-                                array(
-                                    'previous_page' => (int)Tools::getValue('page') - 1,
-                                )
-                            );
-                        } else {
-                            $this->context->smarty->assign(
-                                array(
-                                    'previous_page' => (int)Tools::getValue('page') - 1,
-                                    'next_page' => (int)Tools::getValue('page') + 1,
-                                )
-                            );
-                        }
-                    }
-                } else {
-                    if ($this->post_number > $pagination['total_items']) {
-                        $this->context->smarty->assign(
-                            array(
-                                'next_page' => 2,
-                            )
-                        );
-                    }
-                }
-            }
             // end pagination
             $animate = Configuration::get(
                 'EVERBLOG_ANIMATE'
@@ -113,18 +85,15 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
             } else {
                 $seo_follow = 'nofollow';
             }
-            if ($this->isSeven) {
-                $page = $this->context->controller->getTemplateVarPage();
-                $page['meta']['robots'] = $seo_index . ', ' . $seo_follow;
-                $page['meta']['title'] = $this->tag->meta_title;
-                $page['meta']['description'] = $this->tag->meta_description;
-                $this->context->smarty->assign('page', $page);
+            $page = $this->context->controller->getTemplateVarPage();
+            if (!Tools::getValue('page')) {
+                $page['meta']['robots'] = $seo_index.', '.$seo_follow;
             } else {
-                $this->context->smarty->assign($index, $this->tag->index);
-                $this->context->smarty->assign($follow, $this->tag->follow);
-                $this->context->smarty->assign($this->tag->meta_title, true);
-                $this->context->smarty->assign($this->tag->meta_description, true);
+                $page['meta']['robots'] = 'noindex, follow';
             }
+            $page['meta']['title'] = $this->tag->meta_title;
+            $page['meta']['description'] = $this->tag->meta_description;
+            $this->context->smarty->assign('page', $page);
             $posts = EverPsBlogPost::getPostsByTag(
                 (int)$this->context->language->id,
                 (int)$this->context->shop->id,
@@ -134,6 +103,7 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
 
             $this->context->smarty->assign(
                 array(
+                    'paginated' => Tools::getValue('page'),
                     'post_number' => (int)$this->post_number,
                     'pagination' => $pagination,
                     'tag' => $this->tag,
@@ -188,5 +158,11 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
             ),
         );
         return $breadcrumb;
+    }
+
+    public function getTemplateVarPage() {
+        $page = parent::getTemplateVarPage();
+        $page['body_classes']['page-everblog-tag'] = true;
+        return $page;
     }
 }

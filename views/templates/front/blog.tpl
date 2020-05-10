@@ -9,7 +9,7 @@
 {extends file='page.tpl'}
 
 {block name="page_content"}
-{if $pagination.items_shown_from == 1}
+{if isset($paginated) && !$paginated}
 <div class="row">
 {foreach from=$evercategory item=item}
     {if !$item.is_root_category}

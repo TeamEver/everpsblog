@@ -10,6 +10,7 @@
 
 {block name="page_content"}
 <h1>{$category->title|escape:htmlall:'UTF-8'}</h1>
+{if isset($paginated) && !$paginated}
 <img src="{$blogImg_dir}categories/category_image_{$category->id}.jpg" class="col-xs-12 img-fluid mx-auto d-block" alt="{$category->title|escape:htmlall:'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}">
 <div class="container">
     <div class="row categoryinfos">
@@ -19,7 +20,7 @@
         {$category->content nofilter}
     </div>
 </div>
-
+{/if}
 {if isset($post_number) && $post_number > 0}
 <div class="container">
 {foreach from=$posts item=item}

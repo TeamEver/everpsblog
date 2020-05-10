@@ -62,7 +62,13 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         $page = $this->context->controller->getTemplateVarPage();
         $page['meta']['title'] = $meta_title;
         $page['meta']['description'] = $meta_desc;
+        if (!Tools::getValue('page')) {
+            $page['meta']['robots'] = 'index, follow';
+        } else {
+            $page['meta']['robots'] = 'noindex, follow';
+        }
         $this->context->smarty->assign('page', $page);
+        // die(var_dump($page));
         $everpsblogposts = EverPsBlogPost::getPosts(
             (int)$this->context->language->id,
             (int)$this->context->shop->id,
@@ -77,6 +83,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         );
         $this->context->smarty->assign(
             array(
+                'paginated' => Tools::getValue('page'),
                 'post_number' => (int)$this->post_number,
                 'pagination' => $pagination,
                 'everpsblog' => $everpsblogposts,
@@ -90,6 +97,14 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         $this->setTemplate('module:everpsblog/views/templates/front/blog.tpl');
     }
 
+    public function getCanonicalURL()
+    {
+        return $this->context->link->getModuleLink(
+            'everpsblog',
+            'blog'
+        );
+    }
+
     public function getBreadcrumbLinks()
     {
         $breadcrumb = parent::getBreadcrumbLinks();
@@ -101,5 +116,11 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             ),
         );
         return $breadcrumb;
+    }
+
+    public function getTemplateVarPage() {
+        $page = parent::getTemplateVarPage();
+        $page['body_classes']['page-everblog'] = true;
+        return $page;
     }
 }
