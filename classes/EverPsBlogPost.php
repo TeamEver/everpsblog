@@ -142,11 +142,12 @@ class EverPsBlogPost extends ObjectModel
             'bp',
             'bp.id_ever_post = bpl.id_ever_post'
         );
-        $sql->where('bp.post_status = "'.(string)$post_status.'"');
+        $sql->where('bp.post_status = "'.pSQL($post_status).'"');
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
         $sql->limit((int)$limit, (int)$start);
         $sql->orderBy('bp.date_add DESC');
+        $sql->orderBy('bp.id_ever_post DESC');
         $posts = Db::getInstance()->executeS($sql);
         return $posts;
     }
@@ -197,7 +198,7 @@ class EverPsBlogPost extends ObjectModel
             'bp',
             'bp.id_ever_post = bpl.id_ever_post'
         );
-        $sql->where('bp.post_status = "'.(string)$post_status.'"');
+        $sql->where('bp.post_status = "'.pSQL($post_status).'"');
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
         $sql->limit((int)$limit, (int)$start);
@@ -212,6 +213,7 @@ class EverPsBlogPost extends ObjectModel
                 );
             }
         }
+        // die(var_dump($return));
         if ($return) {
             return $return;
         }
@@ -234,6 +236,7 @@ class EverPsBlogPost extends ObjectModel
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
         $sql->orderBy('bp.date_add DESC');
+        $sql->orderBy('bp.id_ever_post DESC');
         $sql->limit((int)$limit, (int)$start);
         $posts = Db::getInstance()->executeS($sql);
         $return = array();

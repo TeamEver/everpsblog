@@ -230,7 +230,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                     'products' => $products,
                     'default_lang' => (int)$this->context->language->id,
                     'id_lang' => (int)$this->context->language->id,
-                    'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'/modules/everpsblog/views/img/',
+                    'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'modules/everpsblog/views/img/',
                     'allow_comments' => (bool)Configuration::get('EVERBLOG_ALLOW_COMMENTS'),
                     'animated' => (bool)$animate,
                     'logged' => (bool)$this->context->customer->isLogged(),

@@ -65,12 +65,6 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
             );
             // Pagination only if there is still some posts
             $pagination = $this->getTemplateVarPagination($this->post_number);
-            // Redirect if page value is too much
-            if (Tools::getValue('page')
-                && (int)$this->post_number > $pagination['total_items']
-            ) {
-                Tools::redirect('index.php');
-            }
             // end pagination
             $animate = Configuration::get(
                 'EVERBLOG_ANIMATE'
@@ -110,7 +104,7 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
                     'posts' => $posts,
                     'default_lang' => (int)$this->context->language->id,
                     'id_lang' => $this->context->language->id,
-                    'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'/modules/everpsblog/views/img/',
+                    'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'modules/everpsblog/views/img/',
                     'animated' => $animate,
                 )
             );

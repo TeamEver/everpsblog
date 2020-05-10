@@ -23,7 +23,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '1.9.2';
+        $this->version = '1.9.4';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -863,7 +863,8 @@ class EverPsBlog extends Module
             $post_number = 4;
         }
         $blogUrl = Context::getContext()->link->getModuleLink(
-            $this->name,'blog',
+            $this->name,
+            'blog',
             array(),
             true
         );
@@ -1092,24 +1093,25 @@ class EverPsBlog extends Module
 
     public function hookActionObjectEverPsBlogPostDeleteAfter($params)
     {
-        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.(int)$params->id.'.jpg')) {
-                $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$params->id.'.jpg';
+        die(var_dump());
+        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.(int)$params['object']->id.'.jpg')) {
+                $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$params['object']->id.'.jpg';
                 return unlink($old_img);
         }
     }
 
     public function hookActionObjectEverPsBlogCategoryDeleteAfter($params)
     {
-        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/categories/category_image_'.(int)$params->id.'.jpg')) {
-                $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/categories/category_image_'.$params->id.'.jpg';
+        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/categories/category_image_'.(int)$params['object']->id.'.jpg')) {
+                $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/categories/category_image_'.$params['object']->id.'.jpg';
                 return unlink($old_img);
         }
     }
 
     public function hookActionObjectEverPsBlogTagDeleteAfter($params)
     {
-        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.(int)$params->id.'.jpg')) {
-                $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.$params->id.'.jpg';
+        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.(int)$params['object']->id.'.jpg')) {
+                $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.$params['object']->id.'.jpg';
                 return unlink($old_img);
         }
     }

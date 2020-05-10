@@ -90,7 +90,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
                 'evercategory' => $evercategories,
                 'default_lang' => (int)$this->context->language->id,
                 'id_lang' => (int)$this->context->language->id,
-                'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'/modules/everpsblog/views/img/',
+                'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'modules/everpsblog/views/img/',
                 'animated' => $animate,
             )
         );

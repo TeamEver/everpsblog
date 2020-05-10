@@ -220,10 +220,13 @@ class AdminEverPsBlogPostController extends ModuleAdminController
 
         if ($obj) {
             $link = new Link();
+            $id_lang = (int)Context::getContext()->language->id;
             $objectUrl = $link->getModuleLink(
                 'everpsblog',
                 'post',
-                ['id_ever_post' => $obj->id_ever_post ,'link_rewrite' => $obj->link_rewrite]
+                array(
+                    'id_ever_post' => $obj->id_ever_post ,'link_rewrite' => $obj->link_rewrite[$id_lang]
+                )
             );
             $fields_form[] = array(
                 'form' => array(
