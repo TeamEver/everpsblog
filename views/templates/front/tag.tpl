@@ -14,7 +14,7 @@
     <div class="row">
         <h1>{$tag->title nofilter}</h1>
         {if isset($paginated) && !$paginated}
-        <img src="{$blogImg_dir}tags/tag_image_{$tag->id}.jpg" class="col-xs-12 img-fluid mx-auto d-block" alt="{$tag->title nofilter} {$shop.name|escape:htmlall:'UTF-8'}">
+        <img src="{$blogImg_dir}tags/tag_image_{$tag->id}.jpg" class="col-xs-12 img img-fluid mx-auto d-block" alt="{$tag->title nofilter} {$shop.name|escape:htmlall:'UTF-8'}">
         {/if}
     </div>
 </div>

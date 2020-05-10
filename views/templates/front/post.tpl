@@ -28,7 +28,7 @@
             {/foreach}
             </div>
             {/if}
-            <img src="{$blogImg_dir}posts/post_image_{$post->id}.jpg" alt="{$post->title|escape:htmlall:'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}">
+            <img class="img img-fluid" src="{$blogImg_dir}posts/post_image_{$post->id}.jpg" alt="{$post->title|escape:htmlall:'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}">
         </div>
     </div>
     <div class="container">
