@@ -23,7 +23,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '1.9.5';
+        $this->version = '1.9.6';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -1163,10 +1163,6 @@ class EverPsBlog extends Module
             '[start_contact_link]' => '<a href="'.$contactLink.'" rel="nofollow" target="_blank">',
             '[end_shop_link]' => '</a>',
             '[end_contact_link]' => '</a>',
-            'NULL' => '', // Useful : remove empty strings in case of NULL
-            'null' => '', // Useful : remove empty strings in case of null
-            'false' => '', // Useful : remove empty strings in case of false
-            '0' => '', // Useful : remove empty strings in case of false
         );
         $shortcodes = array_merge($entityShortcodes, $defaultShortcodes);
         foreach ($shortcodes as $key => $value) {

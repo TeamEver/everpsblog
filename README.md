@@ -1,15 +1,14 @@
 # Ever PS Blog
 
-Module pour Prestashop 1.7, mais surtout pour 1.7 parce que y'a des trucs super cool dans cette version
+Blog module for Prestashop 1.7 only
 
-C'est un WordPress, en gros, ce module.
+https://www.team-ever.com/produit/prestashop-module-de-blog-gratuit/
 
 #### Changelog :
 
 ***TODO***
 - allow change excerpt length
-- pagination bug
-- interprétation des shortcodes depuis la page blog et catégorie
+- change shortcodes on post listing
 - pending review admin email notification
 - custom text on blog page
 - cron task for scheduled publications
