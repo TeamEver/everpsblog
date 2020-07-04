@@ -105,6 +105,7 @@
     </div>
 </section>
 {/if}
+{if isset($count_products) && $count_products > 0}
 <section class="featured-products container clearfix carousel slide">
     <span id="postProducts" class="col-12 col-xs-12 my-2">{l s='Linked products' mod='everpsblog'}</span>
     <div class="row postproducts products carousel-inner">
@@ -135,4 +136,5 @@
         {/foreach}
     </div>
 </section>
+{/if}
 {/block}

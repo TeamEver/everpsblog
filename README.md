@@ -9,8 +9,5 @@ https://www.team-ever.com/produit/prestashop-module-de-blog-gratuit/
 ***TODO***
 - allow change excerpt length
 - change shortcodes on post listing
-- pending review admin email notification
-- custom text on blog page
-- cron task for scheduled publications
 - sharing buttons (Twitter, Facebook, etc)
 - rich snippets (@see Ever SEO)

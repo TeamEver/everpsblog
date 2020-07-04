@@ -2,9 +2,9 @@
 /**
  * Project : everpsblog
  * @author Team Ever
- * @link http://www.team-ever.com
- * @copyright Teamm Ever
+ * @copyright Team Ever
  * @license   Tous droits réservés / Le droit d'auteur s'applique (All rights reserved / French copyright law applies)
+ * @link https://www.team-ever.com
  */
 
 if (!defined('_PS_VERSION_')) {
@@ -147,7 +147,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                         $comment->name = Tools::getValue('name');
                     } else {
                         $customer = new Customer(
-                            (int)$this->context->customer->id
+                            (int)Context::getContext()->customer->id
                         );
                         $comment->user_email = $customer->email;
                         $comment->name = $customer->firstname;
@@ -174,7 +174,10 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 }
             }
             // Now prepare template and show it
-            $post_products = json_decode($this->post->post_products);
+            $post_products = EverPsBlogCleaner::convertToArray(
+                json_decode($this->post->post_products)
+            );
+            $count_products = count($post_products);
             $products = array();
             $link = new Link();
             if (isset($post_products) && !empty($post_products)) {
@@ -184,14 +187,18 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                         (int)$this->context->shop->id,
                         (int)$this->context->language->id
                     );
-                    $pproduct_cover = Product::getCover(
-                        (int)$pproduct->id
-                    );
-                    $pproduct->cover = (int)$pproduct_cover['id_image'];
-                    $products[] = $pproduct;
+                    if ((bool)$pproduct->active === true) {
+                        $pproduct_cover = Product::getCover(
+                            (int)$pproduct->id
+                        );
+                        $pproduct->cover = (int)$pproduct_cover['id_image'];
+                        $products[] = $pproduct;
+                    }
                 }
             }
-            $post_tags = json_decode($this->post->post_tags);
+            $post_tags = EverPsBlogCleaner::convertToArray(
+                json_decode($this->post->post_tags)
+            );
             $tags = array();
             if (isset($post_tags) && !empty($post_tags)) {
                 foreach ($post_tags as $post_tag) {
@@ -212,19 +219,18 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             );
             // Prepare shortcodes
             $everpsblog = Module::getInstanceByName('everpsblog');
-            if ((bool)$this->context->customer->isLogged()) {
-                $this->post->content = $everpsblog->changeShortcodes(
-                    (string)$this->post->content,
-                    (int)$this->context->customer->id
-                );
-            } else {
-                $this->post->content = $everpsblog->changeShortcodes(
-                    (string)$this->post->content
-                );
-            }
+            $this->post->content = EverPsBlogPost::changeShortcodes(
+                (string)$this->post->content,
+                (int)Context::getContext()->customer->id
+            );
+            $this->post->title = EverPsBlogPost::changeShortcodes(
+                (string)$this->post->title,
+                (int)Context::getContext()->customer->id
+            );
 
             $this->context->smarty->assign(
                 array(
+                    'count_products' => $count_products,
                     'post' => $this->post,
                     'tags' => $tags,
                     'products' => $products,
@@ -285,7 +291,10 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             }
         }
         $breadcrumb['links'][] = array(
-            'title' => $this->post->title,
+            'title' => EverPsBlogPost::changeShortcodes(
+                $this->post->title,
+                Context::getContext()->customer->id
+            ),
             'url' => $this->context->link->getModuleLink(
                 'everpsblog',
                 'post',

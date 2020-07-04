@@ -2,9 +2,9 @@
 /**
  * Project : everpsblog
  * @author Team Ever
- * @link https://www.team-ever.com
  * @copyright Team Ever
  * @license   Tous droits réservés / Le droit d'auteur s'applique (All rights reserved / French copyright law applies)
+ * @link https://www.team-ever.com
  */
 
 use PrestaShop\PrestaShop\Core\Product\Search\Pagination;

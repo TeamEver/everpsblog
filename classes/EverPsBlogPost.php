@@ -2,13 +2,15 @@
 /**
  * Project : everpsblog
  * @author Team Ever
- * @link http://www.team-ever.com
- * @copyright Teamm Ever
+ * @copyright Team Ever
  * @license   Tous droits réservés / Le droit d'auteur s'applique (All rights reserved / French copyright law applies)
+ * @link https://www.team-ever.com
  */
 
-if (!defined('_PS_VERSION_'))
+if (!defined('_PS_VERSION_')) {
     exit;
+}
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCleaner.php';
 
 class EverPsBlogPost extends ObjectModel
 {
@@ -128,7 +130,19 @@ class EverPsBlogPost extends ObjectModel
         $sql->where('bpl.id_lang = '.(int)$id_lang);
         $sql->limit((int)$limit, (int)$start);
         $posts = Db::getInstance()->executeS($sql);
-        return $posts;
+        $return = array();
+        foreach ($posts as $post) {
+            $post['content'] = self::changeShortcodes(
+                $post['content'],
+                (int)Context::getContext()->customer->id
+            );
+            $post['title'] = self::changeShortcodes(
+                $post['title'],
+                (int)Context::getContext()->customer->id
+            );
+            $return[] = $post;
+        }
+        return $return;
     }
 
     public static function getLatestPosts($id_lang, $id_shop, $start = 0, $limit = null, $post_status = 'published')
@@ -174,12 +188,24 @@ class EverPsBlogPost extends ObjectModel
         $posts = Db::getInstance()->executeS($sql);
         $return = array();
         foreach ($posts as $post) {
-            if (in_array($id_tag, json_decode($post['post_tags']))) {
-                $return[] = new self(
+            $post_tags = EverPsBlogCleaner::convertToArray(
+                json_decode($post['post_tags'])
+            );
+            if (in_array($id_tag, $post_tags)) {
+                $post = new self(
                     (int)$post['id_ever_post'],
                     (int)$id_lang,
                     (int)$id_shop
                 );
+                $post->title = self::changeShortcodes(
+                    $post->title,
+                    (int)Context::getContext()->customer->id
+                );
+                $post->content = self::changeShortcodes(
+                    $post->content,
+                    (int)Context::getContext()->customer->id
+                );
+                $return[] = $post;
             }
         }
         if ($return) {
@@ -207,12 +233,24 @@ class EverPsBlogPost extends ObjectModel
         $posts = Db::getInstance()->executeS($sql);
         $return = array();
         foreach ($posts as $post) {
-            if (in_array($id_category, json_decode($post['post_categories']))) {
-                $return[] = new self(
+            $post_categories = EverPsBlogCleaner::convertToArray(
+                json_decode($post['post_categories'])
+            );
+            if (in_array($id_category, $post_categories)) {
+                $post = new self(
                     (int)$post['id_ever_post'],
                     (int)$id_lang,
                     (int)$id_shop
                 );
+                $post->title = self::changeShortcodes(
+                    $post->title,
+                    (int)Context::getContext()->customer->id
+                );
+                $post->content = self::changeShortcodes(
+                    $post->content,
+                    (int)Context::getContext()->customer->id
+                );
+                $return[] = $post;
             }
         }
         // die(var_dump($return));
@@ -243,7 +281,10 @@ class EverPsBlogPost extends ObjectModel
         $posts = Db::getInstance()->executeS($sql);
         $return = array();
         foreach ($posts as $post) {
-            if (in_array($id_product, json_decode($post['post_products']))) {
+            $post_products = EverPsBlogCleaner::convertToArray(
+                json_decode($post['post_products'])
+            );
+            if (in_array((int)$id_product, $post_products)) {
                 $return[] = new self(
                     (int)$post['id_ever_post'],
                     (int)$id_lang,
@@ -310,7 +351,10 @@ class EverPsBlogPost extends ObjectModel
         $posts = Db::getInstance()->executeS($sql);
         $count = 0;
         foreach ($posts as $post) {
-            if (in_array($id_tag, json_decode($post['post_tags']))) {
+            $post_tags = EverPsBlogCleaner::convertToArray(
+                json_decode($post['post_tags'])
+            );
+            if (in_array($id_tag, $post_tags)) {
                 $count += 1;
             }
         }
@@ -335,12 +379,70 @@ class EverPsBlogPost extends ObjectModel
         $posts = Db::getInstance()->executeS($sql);
         $count = 0;
         foreach ($posts as $post) {
-            if (in_array($id_category, json_decode($post['post_categories']))) {
+            $post_categories = EverPsBlogCleaner::convertToArray(
+                json_decode($post['post_categories'])
+            );
+            if (in_array($id_category, $post_categories)) {
                 $count += 1;
             }
         }
         if ($count) {
             return $count;
         }
+    }
+
+    public static function changeShortcodes($message, $id_entity = false)
+    {
+        $link = new Link();
+        $contactLink = $link->getPageLink('contact');
+        if ($id_entity && $id_entity > 0) {
+            $entity = new Customer(
+                (int)$id_entity
+            );
+            $gender = new Gender(
+                (int)$entity->id_gender,
+                (int)$entity->id_lang
+            );
+            $entityShortcodes = array(
+                '[entity_lastname]' => $entity->lastname,
+                '[entity_firstname]' => $entity->firstname,
+                '[entity_company]' => $entity->company,
+                '[entity_siret]' => $entity->siret,
+                '[entity_ape]' => $entity->ape,
+                '[entity_birthday]' => $entity->birthday,
+                '[entity_website]' => $entity->website,
+                '[entity_gender]' => $gender->name,
+            );
+        } else {
+            $entityShortcodes = array(
+                '[entity_lastname]' => '',
+                '[entity_firstname]' => '',
+                '[entity_company]' => '',
+                '[entity_siret]' => '',
+                '[entity_ape]' => '',
+                '[entity_birthday]' => '',
+                '[entity_website]' => '',
+                '[entity_gender]' => '',
+            );
+        }
+        $defaultShortcodes = array(
+            '[shop_url]' => Tools::getShopDomainSsl(true),
+            '[shop_name]'=> (string)Configuration::get('PS_SHOP_NAME'),
+            '[start_cart_link]' => '<a href="'
+            .Tools::getShopDomainSsl(true)
+            .'/index.php?controller=cart&action=show" rel="nofollow" target="_blank">',
+            '[end_cart_link]' => '</a>',
+            '[start_shop_link]' => '<a href="'
+            .Tools::getShopDomainSsl(true)
+            .'" target="_blank">',
+            '[start_contact_link]' => '<a href="'.$contactLink.'" rel="nofollow" target="_blank">',
+            '[end_shop_link]' => '</a>',
+            '[end_contact_link]' => '</a>',
+        );
+        $shortcodes = array_merge($entityShortcodes, $defaultShortcodes);
+        foreach ($shortcodes as $key => $value) {
+            $message = str_replace($key, $value, $message);
+        }
+        return $message;
     }
 }

@@ -2,9 +2,9 @@
 /**
  * Project : everpsblog
  * @author Team Ever
- * @link http://www.team-ever.com
- * @copyright Teamm Ever
+ * @copyright Team Ever
  * @license   Tous droits réservés / Le droit d'auteur s'applique (All rights reserved / French copyright law applies)
+ * @link https://www.team-ever.com
  */
 
 if (!defined('_PS_VERSION_')) {
@@ -81,8 +81,15 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         $animate = Configuration::get(
             'EVERBLOG_ANIMATE'
         );
+        // Default blog text
+        $everblog_top_text = Configuration::getInt('EVERBLOG_TOP_TEXT');
+        $default_blog_top_text = $everblog_top_text[(int)Context::getContext()->language->id];
+        $everblog_bottom_text = Configuration::getInt('EVERBLOG_BOTTOM_TEXT');
+        $default_blog_bottom_text = $everblog_bottom_text[(int)Context::getContext()->language->id];
         $this->context->smarty->assign(
             array(
+                'default_blog_top_text' => $default_blog_top_text,
+                'default_blog_bottom_text' => $default_blog_bottom_text,
                 'paginated' => Tools::getValue('page'),
                 'post_number' => (int)$this->post_number,
                 'pagination' => $pagination,

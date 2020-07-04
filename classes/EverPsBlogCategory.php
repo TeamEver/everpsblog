@@ -2,9 +2,9 @@
 /**
  * Project : everpsblog
  * @author Team Ever
- * @link https://www.team-ever.com
  * @copyright Team Ever
  * @license   Tous droits réservés / Le droit d'auteur s'applique (All rights reserved / French copyright law applies)
+ * @link https://www.team-ever.com
  */
 
 if (!defined('_PS_VERSION_')) {
@@ -121,7 +121,7 @@ class EverPsBlogCategory extends ObjectModel
         $return = Db::getInstance()->getValue($sql);
         return $return;
     }
-    
+
     public static function getAllCategories($id_lang, $id_shop, $active = 1)
     {
         $sql = new DbQuery;
@@ -138,7 +138,7 @@ class EverPsBlogCategory extends ObjectModel
         $return = Db::getInstance()->executeS($sql);
         return $return;
     }
-    
+
     public static function getParentCategories($id_ever_category, $id_lang, $id_shop, $active = 1)
     {
         $category = new self((int)$id_ever_category);

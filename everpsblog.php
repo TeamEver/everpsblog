@@ -2,15 +2,16 @@
 /**
  * Project : everpsblog
  * @author Team Ever
- * @link https://www.team-ever.com
  * @copyright Team Ever
  * @license   Tous droits réservés / Le droit d'auteur s'applique (All rights reserved / French copyright law applies)
+ * @link https://www.team-ever.com
  */
 
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogPost.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCategory.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCleaner.php';
 
 class EverPsBlog extends Module
 {
@@ -23,7 +24,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '2.1.2';
+        $this->version = '2.2.4';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -88,7 +89,6 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERBLOG_ADMIN_EMAIL', 1)
             && Configuration::updateValue('EVERBLOG_EMPTY_TRASH', 7)
             && Configuration::updateValue('EVERBLOG_ALLOW_COMMENTS', 1)
-            && Configuration::updateValue('EVERBLOG_CK_EDITOR', 1)
             && Configuration::updateValue('EVERBLOG_CHECK_COMMENTS', 1)
             && Configuration::updateValue('EVERBLOG_BANNED_USERS', '')
             && Configuration::updateValue('EVERBLOG_BANNED_IP', '')
@@ -259,12 +259,6 @@ class EverPsBlog extends Module
                 $this->postErrors[] = $this->l('Error : The field "Allow comments" is not valid');
             }
 
-            if (Tools::getValue('EVERBLOG_CK_EDITOR')
-                && !Validate::isBool(Tools::getValue('EVERBLOG_CK_EDITOR'))
-            ) {
-                $this->postErrors[] = $this->l('Error : The field "CK Editor" is not valid');
-            }
-
             if (!Tools::getIsset('EVERBLOG_CHECK_COMMENTS')
                 || !Validate::isBool(Tools::getValue('EVERBLOG_CHECK_COMMENTS'))
             ) {
@@ -289,6 +283,9 @@ class EverPsBlog extends Module
                     'Error : The field "Fancybox" is not valid'
                 );
             }
+            foreach (Language::getLanguages(false) as $lang) {
+                // TODO : multilingual validation
+            }
         }
     }
 
@@ -304,6 +301,8 @@ class EverPsBlog extends Module
         Hook::exec('hookModuleRoutes');
         $everblog_title = array();
         $everblog_meta_desc = array();
+        $everblog_top_text = array();
+        $everblog_bottom_text = array();
         foreach (Language::getLanguages(false) as $lang) {
             $everblog_title[$lang['id_lang']] = (Tools::getValue(
                 'EVERBLOG_TITLE_'.$lang['id_lang']
@@ -314,6 +313,16 @@ class EverPsBlog extends Module
                 'EVERBLOG_META_DESC_'.$lang['id_lang']
             )) ? Tools::getValue(
                 'EVERBLOG_META_DESC_'.$lang['id_lang']
+            ) : '';
+            $everblog_top_text[$lang['id_lang']] = (Tools::getValue(
+                'EVERBLOG_TOP_TEXT_'.$lang['id_lang']
+            )) ? Tools::getValue(
+                'EVERBLOG_TOP_TEXT_'.$lang['id_lang']
+            ) : '';
+            $everblog_bottom_text[$lang['id_lang']] = (Tools::getValue(
+                'EVERBLOG_BOTTOM_TEXT_'.$lang['id_lang']
+            )) ? Tools::getValue(
+                'EVERBLOG_BOTTOM_TEXT_'.$lang['id_lang']
             ) : '';
         }
         foreach (array_keys($form_values) as $key) {
@@ -326,6 +335,16 @@ class EverPsBlog extends Module
                 Configuration::updateValue(
                     $key,
                     $everblog_meta_desc
+                );
+            } elseif ($key == 'EVERBLOG_TOP_TEXT') {
+                Configuration::updateValue(
+                    $key,
+                    $everblog_top_text
+                );
+            } elseif ($key == 'EVERBLOG_BOTTOM_TEXT') {
+                Configuration::updateValue(
+                    $key,
+                    $everblog_bottom_text
                 );
             } else {
                 Configuration::updateValue($key, Tools::getValue($key));
@@ -340,6 +359,8 @@ class EverPsBlog extends Module
         $formValues = array();
         $everblog_title = array();
         $everblog_meta_desc = array();
+        $everblog_top_text = array();
+        $everblog_bottom_text = array();
         foreach (Language::getLanguages(false) as $lang) {
             $everblog_title[$lang['id_lang']] = (Tools::getValue(
                 'EVERBLOG_TITLE_'.$lang['id_lang']
@@ -351,6 +372,16 @@ class EverPsBlog extends Module
             )) ? Tools::getValue(
                 'EVERBLOG_META_DESC_'.$lang['id_lang']
             ) : '';
+            $everblog_top_text[$lang['id_lang']] = (Tools::getValue(
+                'EVERBLOG_TOP_TEXT_'.$lang['id_lang']
+            )) ? Tools::getValue(
+                'EVERBLOG_TOP_TEXT_'.$lang['id_lang']
+            ) : '';
+            $everblog_top_text[$lang['id_lang']] = (Tools::getValue(
+                'EVERBLOG_BOTTOM_TEXT_'.$lang['id_lang']
+            )) ? Tools::getValue(
+                'EVERBLOG_BOTTOM_TEXT_'.$lang['id_lang']
+            ) : '';
         }
         $formValues[] = array(
             'EVERPSBLOG_ROUTE' => Configuration::get('EVERPSBLOG_ROUTE'),
@@ -359,7 +390,6 @@ class EverPsBlog extends Module
             'EVERPSBLOG_PRODUCT_NBR' => Configuration::get('EVERPSBLOG_PRODUCT_NBR'),
             'EVERBLOG_ADMIN_EMAIL' => Configuration::get('EVERBLOG_ADMIN_EMAIL'),
             'EVERBLOG_ALLOW_COMMENTS' => Configuration::get('EVERBLOG_ALLOW_COMMENTS'),
-            'EVERBLOG_CK_EDITOR' => Configuration::get('EVERBLOG_CK_EDITOR'),
             'EVERBLOG_CHECK_COMMENTS' => Configuration::get('EVERBLOG_CHECK_COMMENTS'),
             'EVERBLOG_BANNED_USERS' => Configuration::get('EVERBLOG_BANNED_USERS'),
             'EVERBLOG_BANNED_IP' => Configuration::get('EVERBLOG_BANNED_IP'),
@@ -379,6 +409,16 @@ class EverPsBlog extends Module
                 $everblog_meta_desc[(int)Configuration::get('PS_LANG_DEFAULT')]
             )) ? $everblog_meta_desc : Configuration::getInt(
                 'EVERBLOG_META_DESC'
+            ),
+            'EVERBLOG_TOP_TEXT' => (!empty(
+                $everblog_top_text[(int)Configuration::get('PS_LANG_DEFAULT')]
+            )) ? $everblog_top_text : Configuration::getInt(
+                'EVERBLOG_TOP_TEXT'
+            ),
+            'EVERBLOG_BOTTOM_TEXT' => (!empty(
+                $everblog_bottom_text[(int)Configuration::get('PS_LANG_DEFAULT')]
+            )) ? $everblog_bottom_text : Configuration::getInt(
+                'EVERBLOG_BOTTOM_TEXT'
             ),
 
         );
@@ -531,26 +571,6 @@ class EverPsBlog extends Module
                     ),
                     array(
                         'type' => 'switch',
-                        'label' => $this->l('Allow CK Editor on comments ?'),
-                        'desc' => $this->l('Will add a full HTML editor'),
-                        'hint' => $this->l('You can check comments before publishing'),
-                        'name' => 'EVERBLOG_CK_EDITOR',
-                        'is_bool' => true,
-                        'values' => array(
-                            array(
-                                'id' => 'active_on',
-                                'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
-                                'id' => 'active_off',
-                                'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
-                        'type' => 'switch',
                         'label' => $this->l('Check comments on posts before they are published ?'),
                         'desc' => $this->l('Set yes to check comments before publishing'),
                         'hint' => $this->l('In order to avoid spam'),
@@ -603,6 +623,28 @@ class EverPsBlog extends Module
                         'cols' => 36,
                         'rows' => 4,
                         'lang' => true,
+                    ),
+                    array(
+                        'type' => 'textarea',
+                        'label' => $this->l('Default blog top text'),
+                        'name' => 'EVERBLOG_TOP_TEXT',
+                        'desc' => $this->l('Will be shown on blog top default page'),
+                        'hint' => $this->l('Explain your blog purpose'),
+                        'cols' => 36,
+                        'rows' => 4,
+                        'lang' => true,
+                        'autoload_rte' => true
+                    ),
+                    array(
+                        'type' => 'textarea',
+                        'label' => $this->l('Default blog bottom text'),
+                        'name' => 'EVERBLOG_BOTTOM_TEXT',
+                        'desc' => $this->l('Will be shown on blog bottom default page'),
+                        'hint' => $this->l('Explain your blog purpose'),
+                        'cols' => 36,
+                        'rows' => 4,
+                        'lang' => true,
+                        'autoload_rte' => true
                     ),
                     array(
                         'type' => 'textarea',
@@ -783,11 +825,6 @@ class EverPsBlog extends Module
                         $this->context->controller->addJS(($this->_path).'views/js/jquery.fancybox.min.js', 'all');
                     }
                 }
-                if (Configuration::get('EVERBLOG_CK_EDITOR')) {
-                    $this->context->controller->addJs(
-                        $this->_path.'views/js/plugins/ckeditor.js'
-                    );
-                }
             }
         } else {
             $this->context->controller->addCSS(
@@ -820,7 +857,7 @@ class EverPsBlog extends Module
             (int)$this->context->language->id,
             (int)$this->context->shop->id
         );
-        $everpsblog = EverPsBlogPost::getLatestPosts(
+        $posts = EverPsBlogPost::getLatestPosts(
             (int)$this->context->language->id,
             (int)$this->context->shop->id,
             0,
@@ -838,6 +875,18 @@ class EverPsBlog extends Module
         $showTags = Configuration::get(
             'EVERBLOG_TAG_COLUMNS'
         );
+        $everpsblog = array();
+        foreach ($posts as $post) {
+            $post['title'] = EverPsBlogPost::changeShortcodes(
+                $post['title'],
+                (int)Context::getContext()->customer->id
+            );
+            $post['content'] = EverPsBlogPost::changeShortcodes(
+                $post['content'],
+                (int)Context::getContext()->customer->id
+            );
+            $everpsblog[] = $post;
+        }
         $this->context->smarty->assign(array(
             'everpsblog' => $everpsblog,
             'showArchives' => $showArchives,
@@ -870,13 +919,13 @@ class EverPsBlog extends Module
             array(),
             true
         );
-        $everpsblog = EverPsBlogPost::getLatestPosts(
+        $posts = EverPsBlogPost::getLatestPosts(
             (int)$this->context->language->id,
             (int)$this->context->shop->id,
             0,
             (int)$post_number
         );
-        if (!$everpsblog || !count($everpsblog)) {
+        if (!$posts || !count($posts)) {
             return;
         }
         $evercategories = EverPsBlogCategory::getAllCategories(
@@ -886,6 +935,18 @@ class EverPsBlog extends Module
         $animate = Configuration::get(
             'EVERBLOG_ANIMATE'
         );
+        $everpsblog = array();
+        foreach ($posts as $post) {
+            $post['title'] = EverPsBlogPost::changeShortcodes(
+                $post['title'],
+                (int)Context::getContext()->customer->id
+            );
+            $post['content'] = EverPsBlogPost::changeShortcodes(
+                $post['content'],
+                (int)Context::getContext()->customer->id
+            );
+            $everpsblog[] = $post;
+        }
         $this->context->smarty->assign(
             array(
                 'blogUrl' => $blogUrl,
@@ -923,15 +984,15 @@ class EverPsBlog extends Module
             array(),
             true
         );
-        $everpsblog = EverPsBlogPost::getPostsByProduct(
+        $posts = EverPsBlogPost::getPostsByProduct(
             (int)$this->context->language->id,
             (int)$this->context->shop->id,
             (int)Tools::getValue('id_product'),
             1,
             (int)$post_number
         );
-        if (!$everpsblog
-            || !count($everpsblog)
+        if (!$posts
+            || !count($posts)
         ) {
             return;
         }
@@ -942,6 +1003,18 @@ class EverPsBlog extends Module
         $animate = Configuration::get(
             'EVERBLOG_ANIMATE'
         );
+        $everpsblog = array();
+        foreach ($posts as $post) {
+            $post['title'] = EverPsBlogPost::changeShortcodes(
+                $post['title'],
+                (int)Context::getContext()->customer->id
+            );
+            $post['content'] = EverPsBlogPost::changeShortcodes(
+                $post['content'],
+                (int)Context::getContext()->customer->id
+            );
+            $everpsblog[] = $post;
+        }
         $this->context->smarty->assign(
             array(
                 'blogUrl' => $blogUrl,
@@ -971,7 +1044,6 @@ class EverPsBlog extends Module
                 $this->context->smarty->assign(
                     array(
                         'everfancybox' => (bool)Configuration::get('EVERBLOG_FANCYBOX'),
-                        'everckeditor' => (bool)Configuration::get('EVERBLOG_CK_EDITOR'),
                     )
                 );
                 return $this->display(__FILE__, 'views/templates/hook/footer.tpl');
@@ -1143,60 +1215,5 @@ class EverPsBlog extends Module
                 $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.$params['object']->id.'.jpg';
                 return unlink($old_img);
         }
-    }
-
-    public function changeShortcodes($message, $id_entity = false)
-    {
-        $link = new Link();
-        $contactLink = $link->getPageLink('contact');
-        if ($id_entity) {
-            $entity = new Customer(
-                (int)$id_entity
-            );
-            $gender = new Gender(
-                (int)$entity->id_gender,
-                (int)$entity->id_lang
-            );
-            $entityShortcodes = array(
-                '[entity_lastname]' => $entity->lastname,
-                '[entity_firstname]' => $entity->firstname,
-                '[entity_company]' => $entity->company,
-                '[entity_siret]' => $entity->siret,
-                '[entity_ape]' => $entity->ape,
-                '[entity_birthday]' => $entity->birthday,
-                '[entity_website]' => $entity->website,
-                '[entity_gender]' => $gender->name,
-            );
-        } else {
-            $entityShortcodes = array(
-                '[entity_lastname]' => '',
-                '[entity_firstname]' => '',
-                '[entity_company]' => '',
-                '[entity_siret]' => '',
-                '[entity_ape]' => '',
-                '[entity_birthday]' => '',
-                '[entity_website]' => '',
-                '[entity_gender]' => '',
-            );
-        }
-        $defaultShortcodes = array(
-            '[shop_url]' => Tools::getShopDomainSsl(true),
-            '[shop_name]'=> (string)Configuration::get('PS_SHOP_NAME'),
-            '[start_cart_link]' => '<a href="'
-            .Tools::getShopDomainSsl(true)
-            .'/index.php?controller=cart&action=show" rel="nofollow" target="_blank">',
-            '[end_cart_link]' => '</a>',
-            '[start_shop_link]' => '<a href="'
-            .Tools::getShopDomainSsl(true)
-            .'" target="_blank">',
-            '[start_contact_link]' => '<a href="'.$contactLink.'" rel="nofollow" target="_blank">',
-            '[end_shop_link]' => '</a>',
-            '[end_contact_link]' => '</a>',
-        );
-        $shortcodes = array_merge($entityShortcodes, $defaultShortcodes);
-        foreach ($shortcodes as $key => $value) {
-            $message = str_replace($key, $value, $message);
-        }
-        return $message;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Project : everpsseo
+ * Project : everpsblog
  * @author Team Ever
  * @copyright Team Ever
  * @license   Tous droits réservés / Le droit d'auteur s'applique (All rights reserved / French copyright law applies)

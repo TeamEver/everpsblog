@@ -11,7 +11,7 @@
 {block name="page_content"}
 <h1>{$category->title|escape:'htmlall':'UTF-8'}</h1>
 {if isset($paginated) && !$paginated}
-<img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$category->id}.jpg" class="col-xs-12 img img-fluid mx-auto d-block" alt="{$category->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
+<img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$category->id}.jpg" class="img img-fluid mx-auto d-block" alt="{$category->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
 <div class="container">
     <div class="row categoryinfos">
         {$category->date_add|escape:'htmlall':'UTF-8'}
@@ -27,7 +27,7 @@
     <div class="col-xs-12 article everpsblog" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
         <div class="col-md-12">
             <div class="col-xs-12 col-md-4 article-img">
-                <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$item->id_ever_post|escape:'htmlall':'UTF-8'}.jpg" class="col-xs-12 img-fluid mx-auto d-block {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item->title nofilter} {$shop.name|escape:'htmlall':'UTF-8'}" />
+                <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$item->id_ever_post|escape:'htmlall':'UTF-8'}.jpg" class="img-fluid mx-auto d-block {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item->title nofilter} {$shop.name|escape:'htmlall':'UTF-8'}" />
             </div>
             <div class="col-xs-12 col-md-8">
                 <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">

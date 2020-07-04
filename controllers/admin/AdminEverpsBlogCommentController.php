@@ -2,9 +2,9 @@
 /**
  * Project : everpsblog
  * @author Team Ever
- * @link https://www.team-ever.com
  * @copyright Team Ever
  * @license   Tous droits réservés / Le droit d'auteur s'applique (All rights reserved / French copyright law applies)
+ * @link https://www.team-ever.com
  */
 
 if (!defined('_PS_VERSION_')) {
@@ -19,7 +19,7 @@ require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
 class AdminEverPsBlogCommentController extends ModuleAdminController
 {
     private $html;
-    
+
     public function __construct()
     {
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
@@ -103,7 +103,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
 
         return parent::l($string, $class, $addslashes, $htmlentities);
     }
-    
+
     public function initPageHeaderToolbar()
     {
         $this->page_header_toolbar_btn['new'] = array(
@@ -299,7 +299,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
             }
             if (!count($this->errors)) {
                 $comment->save();
-            } else {    
+            } else {
                 foreach ($this->errors as $error) {
                     $this->html .= $this->displayError($error);
                 }
