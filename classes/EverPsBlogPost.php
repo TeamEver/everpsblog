@@ -62,11 +62,13 @@ class EverPsBlogPost extends ObjectModel
             ),
             'date_add' => array(
                 'type' => self::TYPE_DATE,
+                'lang' => false,
                 'validate' => 'isDate',
                 'required' => false
             ),
             'date_upd' => array(
                 'type' => self::TYPE_DATE,
+                'lang' => false,
                 'validate' => 'isDate',
                 'required' => false
             ),

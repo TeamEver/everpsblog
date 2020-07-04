@@ -14,7 +14,7 @@
     <div class="row">
         <p>{l s='Here is a list of all your comments on our blog.' mod='everpsblog'}</p>
         <p>
-            <a href="{$blogUrl|escape:'html'}">
+            <a href="{$blogUrl|escape:'htmlall':'UTF-8'}">
                 {l s='You can comment whenever on our blog.' mod='everpsblog'}
             </a>
         </p>
@@ -23,22 +23,22 @@
 <div class="content">
     <div class="row">
 {foreach from=$cust_comments item=comment}
-        <div class="col-xs-12 col-12 col-md-3 article everpsblog bordered" id="comment-{$comment.post->id|escape:'html'}" style="border:1px solid black;">
-            <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $comment.post->id , 'link_rewrite' => $comment.post->link_rewrite])|escape:'html'}">
+        <div class="col-xs-12 col-12 col-md-3 article everpsblog bordered" id="comment-{$comment.post->id|escape:'htmlall':'UTF-8'}" style="border:1px solid black;">
+            <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $comment.post->id , 'link_rewrite' => $comment.post->link_rewrite])|escape:'htmlall':'UTF-8'}">
                 <div class="col-xs-12 col-12 article-img">
-                    <img src="{$blogImg_dir|escape:'html'}posts/post_image_{$comment.post->id|escape:'html'}.jpg" class="col-xs-12 col-12 img img-fluid mt-2 {if $animated}animated flipSideBySide zoomed{/if}"/>
+                    <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$comment.post->id|escape:'htmlall':'UTF-8'}.jpg" class="col-xs-12 col-12 img img-fluid mt-2 {if $animated}animated flipSideBySide zoomed{/if}"/>
                 </div>
                 <div class="col-xs-12">
-                    <h3>{$comment.post->title}</h3>
+                    <h3>{$comment.post->title|escape:'htmlall':'UTF-8'}</h3>
                 </div>
                 <div class="col-xs-12">
-                    <div class="everpsblogcontent rte" id="everpsblog-post-content-{$comment.comment->id|escape:'html'}">
+                    <div class="everpsblogcontent rte" id="everpsblog-post-content-{$comment.comment->id|escape:'htmlall':'UTF-8'}">
                         <p>{l s='Your comment' mod='everpsblog'}</p>
                         {$comment.comment->comment nofilter}
                     </div>
                 </div>
             </a>
-            <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $comment.post->id , 'link_rewrite' => $comment.post->link_rewrite])|escape:'html'}" class="btn btn-primary">{l s='See post' mod='everpsblog'}</a>
+            <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $comment.post->id , 'link_rewrite' => $comment.post->link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary">{l s='See post' mod='everpsblog'}</a>
         </div>
 {/foreach}
     </div>
@@ -50,5 +50,5 @@
     </div>
 </div>
 {/if}
-<a href="{$link->getPageLink('my-account', true)|escape:'html'}" title="{l s='Back to my account' mod='everpsblog'}" class="account" rel="nofollow"><span>{l s='Back to my account' mod='everpsblog'}</span></a>
+<a href="{$link->getPageLink('my-account', true)|escape:'htmlall':'UTF-8'}" title="{l s='Back to my account' mod='everpsblog'}" class="account" rel="nofollow"><span>{l s='Back to my account' mod='everpsblog'}</span></a>
 {/block}

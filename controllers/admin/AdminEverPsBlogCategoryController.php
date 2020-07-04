@@ -266,8 +266,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                     'label' => $this->l('Category image'),
                     'name' => 'category_image',
                     'display_image' => true,
-                    'image' => $categoryImg,
-                    'delete_url' => 'index.php?controller=AdminEverPsBlogCategory&token='.$this->token.'&deleteLogoImage=1&ever_blog_obj='.(int)$category_id
+                    'image' => $categoryImg
                 ),
                 array(
                     'type' => 'switch',

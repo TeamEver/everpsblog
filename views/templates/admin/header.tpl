@@ -27,11 +27,15 @@
             </p>
             <p>
                 <strong>
-                    {l s='Don\'t forget to set this cron for schedules tasks' mod='everpsblog'} 
+                    {l s='Don\'t forget to set this cron for schedules tasks' mod='everpsblog'}
                 </strong>
                 <div class="alert alert-info">
                     <h4>{l s='Empty trash' mod='everpsblog'}</h4>
                     <a href="{$everpsblogcron|escape:'htmlall':'UTF-8'}" target="_blank">{$everpsblogcron|escape:'htmlall':'UTF-8'}</a>
+                </div>
+                <div class="alert alert-info">
+                    <h4>{l s='Publish planned posts' mod='everpsblog'}</h4>
+                    <a href="{$everpsblogcronplanned|escape:'htmlall':'UTF-8'}" target="_blank">{$everpsblogcronplanned|escape:'htmlall':'UTF-8'}</a>
                 </div>
                 <div class="alert alert-info">
                     <h4>{l s='Pending notifications' mod='everpsblog'}</h4>
@@ -51,4 +55,4 @@
             </form>
         </div>
     </div>
-</div> 
+</div>

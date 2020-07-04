@@ -26,7 +26,7 @@
 #module-everpsblog-post .postcontent{
     border: 1px solid #D3D3D3;
     padding: 2%;
-    margin-bottom: 2%; 
+    margin-bottom: 2%;
 }
 #module-everpsblog-post .postcontent img{
     width: auto!important;
@@ -34,7 +34,7 @@
 #module-everpsblog-post .leaveComment{
     border: 1px solid #D3D3D3;
     padding: 2%;
-    margin-bottom: 3%; 
+    margin-bottom: 3%;
 }
 #module-everpsblog-post .zoomed img {
     -webkit-transform: scale(1);
@@ -45,6 +45,22 @@
 #module-everpsblog-post .zoomed img:hover {
     -webkit-transform: scale(1.3);
     transform: scale(1.3);
+}
+/*Rewriting bad themes*/
+#module-everpsblog-post #evercomment{
+    display: block!important;
+}
+/*Posts : missing Bootstrap CSS*/
+#module-everpsblog-post .form-control {
+    display: block;
+    width: 100%;
+    padding: .5rem .75rem;
+    font-size: 1rem;
+    line-height: 1.25;
+    background-color: #fff;
+    background-image: none;
+    background-clip: padding-box;
+    border-radius: 0;
 }
 /*Comment zone*/
 #module-everpsblog-post #leaveComment {

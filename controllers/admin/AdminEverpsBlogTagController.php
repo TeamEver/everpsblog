@@ -231,8 +231,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                     'label' => $this->l('Tag image'),
                     'name' => 'tag_image',
                     'display_image' => true,
-                    'image' => $tagImg,
-                    'delete_url' => 'index.php?controller=AdminEverPsBlogTag&token='.$this->token.'&deleteLogoImage=1&ever_blog_obj='.(int)$tag_id
+                    'image' => $tagImg
                 ),
                 array(
                     'type' => 'switch',

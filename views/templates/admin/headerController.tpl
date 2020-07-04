@@ -21,11 +21,11 @@
                 </strong>
             </p>
             <p>
-                <a href="{$moduleConfUrl|escape:'html'}" class="btn btn-default">{l s='Direct link to module configuration' mod='everpsblog'}</a>
-                <a href="{$postUrl|escape:'html'}" class="btn btn-default">{l s='Direct link to posts' mod='everpsblog'}</a>
-                <a href="{$categoryUrl|escape:'html'}" class="btn btn-default">{l s='Direct link to categories' mod='everpsblog'}</a>
-                <a href="{$tagUrl}" class="btn btn-default">{l s='Direct link to tags' mod='everpsblog'}</a>
-                <a href="{$commentUrl|escape:'html'}" class="btn btn-default">{l s='Direct link to comments' mod='everpsblog'}</a>
+                <a href="{$moduleConfUrl|escape:'htmlall':'UTF-8'}" class="btn btn-default">{l s='Direct link to module configuration' mod='everpsblog'}</a>
+                <a href="{$postUrl|escape:'htmlall':'UTF-8'}" class="btn btn-default">{l s='Direct link to posts' mod='everpsblog'}</a>
+                <a href="{$categoryUrl|escape:'htmlall':'UTF-8'}" class="btn btn-default">{l s='Direct link to categories' mod='everpsblog'}</a>
+                <a href="{$tagUrl|escape:'htmlall':'UTF-8'}" class="btn btn-default">{l s='Direct link to tags' mod='everpsblog'}</a>
+                <a href="{$commentUrl|escape:'htmlall':'UTF-8'}" class="btn btn-default">{l s='Direct link to comments' mod='everpsblog'}</a>
                 <a href="https://www.team-ever.com/contact" target="_blank" class="btn btn-default">{l s='Ask for support' mod='everpsblog'}</a>
             </p>
         </div>

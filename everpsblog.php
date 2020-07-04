@@ -23,7 +23,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '1.9.6';
+        $this->version = '2.1.2';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -38,11 +38,13 @@ class EverPsBlog extends Module
         $id_shop = (int)$this->context->shop->id;
         $emptytrash = _PS_BASE_URL_._MODULE_DIR_.'everpsblog/emptytrash.php?token=';
         $pending = _PS_BASE_URL_._MODULE_DIR_.'everpsblog/pending.php?token=';
+        $planned = _PS_BASE_URL_._MODULE_DIR_.'everpsblog/planned.php?token=';
         $blogToken = Tools::substr(Tools::encrypt('everpsblog/cron'), 0, 10);
         $this->context->smarty->assign(array(
             'image_dir' => $this->_path.'views/img',
             'everpsblogcron' => $emptytrash.$blogToken.'&id_shop='.(int)$id_shop,
             'everpsblogcronpending' => $pending.$blogToken.'&id_shop='.(int)$id_shop,
+            'everpsblogcronplanned' => $planned.$blogToken.'&id_shop='.(int)$id_shop,
         ));
     }
 
@@ -415,7 +417,7 @@ class EverPsBlog extends Module
      */
     protected function getConfigForm()
     {
-        // TODO : add default blog text per lang
+        // TODO : add default blog text per lang ?
         $employees = Employee::getEmployeesByProfile(
             1,
             true
@@ -1051,13 +1053,15 @@ class EverPsBlog extends Module
         if (!count($posts)) {
             die('no pending posts');
         }
-        // Todo : all posts format HTML (title and id on a loop)
+        // Todo : test pending emails
+        $post_list = '';
         foreach ($posts as $pending) {
             $post = new EverPsBlogPost(
                 (int)$pending['id_ever_post'],
                 (int)$id_shop,
                 (int)$employee->id_lang
             );
+            $post_list .= '<br/><p>'.$post->title.'</p>';
         }
         $mailDir = _PS_MODULE_DIR_.'everpsblog/mails/';
         $everShopEmail = Configuration::get('PS_SHOP_EMAIL');
@@ -1073,7 +1077,7 @@ class EverPsBlog extends Module
                     null,
                     (int)$this->context->shop->id
                 ),
-                '{posts}' => (string)$comment->comment
+                '{posts}' => (string)$post_list
             ),
             (string)$employee->email,
             null,
@@ -1091,12 +1095,37 @@ class EverPsBlog extends Module
         return $mail;
     }
 
+    public function publishPlannedPosts($id_shop)
+    {
+        $context = Context::getContext();
+        $posts = EverPsBlogPost::getPosts(
+            (int)$context->language->id,
+            (int)$id_shop,
+            0,
+            0,
+            'planned'
+        );
+        if (!count($posts)) {
+            die('no planned posts');
+        }
+        foreach ($posts as $planned) {
+            $post = new EverPsBlogPost(
+                (int)$planned['id_ever_post'],
+                (int)$id_shop
+            );
+            if ($post->date_add <= date('Y-m-d H:i:s')) {
+                $post->post_status = 'published';
+                $post->save();
+            }
+        }
+        return true;
+    }
+
     public function hookActionObjectEverPsBlogPostDeleteAfter($params)
     {
-        die(var_dump());
         if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.(int)$params['object']->id.'.jpg')) {
                 $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$params['object']->id.'.jpg';
-                return unlink($old_img);
+                unlink($old_img);
         }
     }
 

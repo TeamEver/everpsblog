@@ -170,6 +170,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             'meta_description' => $obj->meta_description,
             'link_rewrite' => $obj->link_rewrite,
             'content' => $obj->content,
+            'date_add' => $obj->date_add,
+            'date_upd' => $obj->date_upd,
             'post_categories[]' => json_decode($obj->post_categories),
             'post_tags[]' => json_decode($obj->post_tags),
             'post_products[]' => json_decode($obj->post_products),
@@ -216,6 +218,10 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 'id_status' => 'trash',
                 'name' => $this->l('trash')
             ),
+            array(
+                'id_status' => 'planned',
+                'name' => $this->l('planned')
+            ),
         );
 
         if ($obj) {
@@ -240,6 +246,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 )
             );
             $id_ever_post = $obj->id_ever_post;
+            // die(var_dump($obj->date_add));
         } else {
             $id_ever_post = 0;
         }
@@ -267,8 +274,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     ),
                     array(
                         'type' => 'select',
-                        'label' => 'Associated categories',
-                        'hint' => 'Choose one or more categories',
+                        'label' => $this->l('Associated categories'),
+                        'desc' => $this->l('Please choose at least one category'),
+                        'hint' => $this->l('Choose one or more categories'),
                         'name' => 'post_categories[]',
                         'class' => 'chosen',
                         'identifier' => 'name',
@@ -284,8 +292,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     ),
                     array(
                         'type' => 'select',
-                        'label' => 'Associated tags',
-                        'hint' => 'Choose one or more tags',
+                        'label' => $this->l('Associated tags'),
+                        'desc' => $this->l('Please choose at least one tag'),
+                        'hint' => $this->l('Choose one or more tags'),
                         'name' => 'post_tags[]',
                         'class' => 'chosen',
                         'multiple' => true,
@@ -300,8 +309,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     ),
                     array(
                         'type' => 'select',
-                        'label' => 'Associated products',
-                        'hint' => 'Choose one or more product',
+                        'label' => $this->l('Associated products'),
+                        'desc' => $this->l('Please choose at least one product'),
+                        'hint' => $this->l('Choose one or more product'),
                         'name' => 'post_products[]',
                         'class' => 'chosen',
                         'multiple' => true,
@@ -321,6 +331,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'type' => 'text',
                         'label' => $this->l('Post meta title'),
                         'desc' => $this->l('Most of search engines do not accept more that 65 characters'),
+                        'hint' => $this->l('Important for your SEO !'),
                         'maxchar' => 65,
                         'required' => true,
                         'name' => 'meta_title',
@@ -333,6 +344,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'type' => 'text',
                         'label' => $this->l('Post meta description'),
                         'desc' => $this->l('Most of search engines do not accept more that 165 characters'),
+                        'hint' => $this->l('Important for your SEO !'),
                         'maxchar' => 165,
                         'required' => true,
                         'name' => 'meta_description',
@@ -344,8 +356,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     array(
                         'type' => 'text',
                         'label' => $this->l('Post link rewrite'),
-                        'desc' => $this->l('For rewrite rules'),
-                        'hint' => 'Will set post base URL',
+                        'desc' => $this->l('For rewrite rules, required for SEO'),
+                        'hint' => $this->l('Will set post base URL'),
                         'required' => true,
                         'name' => 'link_rewrite',
                         'lang' => true,
@@ -356,7 +368,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     array(
                         'type' => 'text',
                         'label' => $this->l('Post title'),
-                        'desc'      => $this->l('Add here post title'),
+                        'desc' => $this->l('Add here post title'),
+                        'hint' => $this->l('Will be shown on each pages'),
                         'required' => true,
                         'name' => 'title',
                         'lang' => true,
@@ -367,7 +380,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     array(
                         'type' => 'textarea',
                         'label' => $this->l('Post content'),
-                        'desc'      => $this->l('Add here post content'),
+                        'desc' => $this->l('Add here post content'),
+                        'hint' => $this->l('Will be shown on each pages'),
                         'required' => true,
                         'name' => 'content',
                         'lang' => true,
@@ -378,15 +392,18 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     array(
                         'type' => 'file',
                         'label' => $this->l('Post image'),
+                        'desc' => $this->l('Will be shown on post top'),
+                        'hint' => $this->l('Useful for sharing on social medias'),
                         'name' => 'post_image',
                         'display_image' => true,
-                        'image' => $post_img,
-                        'delete_url' => 'index.php?controller=AdminEverPsBlogPost&token='.$this->token.'&deleteLogoImage=1&ever_blog_obj='.(int)$id_ever_post
+                        'required' => true,
+                        'image' => $post_img
                     ),
                     array(
                         'type' => 'switch',
                         'label' => $this->l('SEO index post ?'),
                         'desc' => $this->l('Set yes to index, no to noindex'),
+                        'hint' => $this->l('Else post won\'t be available on Google'),
                         'name' => 'index',
                         'is_bool' => true,
                         'values' => array(
@@ -406,6 +423,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'type' => 'switch',
                         'label' => $this->l('SEO follow post ?'),
                         'desc' => $this->l('Set yes to follow, no to nofollow'),
+                        'hint' => $this->l('Nofollow will block search engines from following links on this post'),
                         'name' => 'follow',
                         'is_bool' => true,
                         'values' => array(
@@ -422,9 +440,21 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         ),
                     ),
                     array(
+                        'type' => 'datetime',
+                        'label' => $this->l('Date add'),
+                        'desc' => $this->l('Add here post date'),
+                        'hint' => $this->l('Default date add will date post has been created'),
+                        'required' => true,
+                        'name' => 'date_add',
+                        'lang' => false,
+                        'cols' => 60,
+                        'rows' => 30
+                    ),
+                    array(
                         'type' => 'select',
                         'label' => $this->l('Post status'),
-                        'hint' => $this->l('Select if published, draft or more'),
+                        'desc' => $this->l('Select if published, draft or more'),
+                        'hint' => $this->l('Pending is "waiting for review"'),
                         'name' => 'post_status',
                         'options' => array(
                             'query' => $post_status,
@@ -501,14 +531,26 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             } else {
                 $post->follow = Tools::getValue('follow');
             }
+            // Date add
+            if (!(int)Tools::getValue('date_add')) {
+                $post->date_add = date('Y-m-d H:i:s');
+            }
+            if (Tools::getValue('date_add')
+                && !Validate::isDate(Tools::getValue('date_add'))
+            ) {
+                 $this->errors[] = $this->l('Date add is not valid');
+            } else {
+                $post->date_add = Tools::getValue('date_add');
+            }
+            if ($post->date_add > date('Y-m-d H:i:s')) {
+                $post->post_status = 'planned';
+            } else {
+                $post->post_status = Tools::getValue('post_status');
+            }
 
-            $post->post_status = Tools::getValue('post_status');
             $post->post_categories = Tools::jsonEncode(Tools::getValue('post_categories'));
             $post->post_tags = Tools::jsonEncode(Tools::getValue('post_tags'));
             $post->post_products = Tools::jsonEncode(Tools::getValue('post_products'));
-            if (!(int)Tools::getValue('id_ever_post')) {
-                $post->date_add = date('Y-m-d H:i:s');
-            }
             $post->date_upd = date('Y-m-d H:i:s');
             // Multilingual fields
             foreach (Language::getLanguages(false) as $language) {

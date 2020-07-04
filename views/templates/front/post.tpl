@@ -12,23 +12,23 @@
 <div class="content" itemscope="itemscope" itemtype="http://schema.org/Blog">
     <div class="container" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
             <h1 itemprop="headline">{$post->title nofilter}</h1>
-            <p class="postpublished" itemprop="datePublished">{l s='Published on' mod='everpsblog'} {$post->date_add|escape:htmlall:'UTF-8'}</p>
+            <p class="postpublished" itemprop="datePublished">{l s='Published on' mod='everpsblog'} {$post->date_add|escape:'htmlall':'UTF-8'}</p>
             <div class="row">
             {if isset($errors) && $errors}
             <div class="col-12 col-xs-12 col-md-12 alert alert-danger" role="alert">
             {foreach from=$errors item=error}
-              <p>{$error}</p>
+              <p>{$error|escape:'htmlall':'UTF-8'}</p>
             {/foreach}
             </div>
             {/if}
             {if isset($successes) && $successes}
             <div class="col-12 col-xs-12 col-md-12 alert alert-success" role="alert">
             {foreach from=$successes item=success}
-              <p>{$success}</p>
+              <p>{$success|escape:'htmlall':'UTF-8'}</p>
             {/foreach}
             </div>
             {/if}
-            <img class="img img-fluid" src="{$blogImg_dir}posts/post_image_{$post->id}.jpg" alt="{$post->title|escape:htmlall:'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}">
+            <img class="img img-fluid" src="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$post->id|escape:'htmlall':'UTF-8'}.jpg" alt="{$post->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
         </div>
     </div>
     <div class="container">
@@ -42,7 +42,7 @@
         {if isset($tags) && $tags}
         <p class="taggedIn">{l s='Tagged in' mod='everpsblog'}
         {foreach from=$tags item=tag}
-            <a href="{$link->getModuleLink('everpsblog', 'tag', ['id_ever_tag'=>$tag->id, 'link_rewrite'=>$tag->link_rewrite])|escape:'html'}" title="{$tag->title|escape:htmlall:'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}">{$tag->title|escape:htmlall:'UTF-8'}</a>&nbsp;
+            <a href="{$link->getModuleLink('everpsblog', 'tag', ['id_ever_tag'=>$tag->id, 'link_rewrite'=>$tag->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$tag->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{$tag->title|escape:'htmlall':'UTF-8'}</a>&nbsp;
         {/foreach}
         </p>
         {/if}
@@ -54,7 +54,7 @@
     <div class="row">
         <form enctype="multipart/form-data" method="post">
             {if isset($logged) && $logged}
-            <input type="hidden" name="customerEmail" id="customerEmail" value="{$customer.email|escape:htmlall:'UTF-8'}">
+            <input type="hidden" name="customerEmail" id="customerEmail" value="{$customer.email|escape:'htmlall':'UTF-8'}">
             {else}
             <div class="form-group">
                 <label for="customerEmail">{l s='Email address' mod='everpsblog'}</label>
@@ -86,13 +86,13 @@
     <span id="commentsTitle">{$commentsCount} {l s='comment(s)' mod='everpsblog'}</span>
     <div class="commentcontainer row">
         {foreach from=$comments item=comment}
-            <div class="container commentblock" id="{$comment->id|escape:htmlall:'UTF-8'}">
+            <div class="container commentblock" id="{$comment->id|escape:'htmlall':'UTF-8'}">
                 <div class="row">
                     <div class="col-12 col-xs-12 col-md-8 commentname">
-                        {$comment->name|escape:htmlall:'UTF-8'}
+                        {$comment->name|escape:'htmlall':'UTF-8'}
                     </div>
                     <div class="col-12 col-xs-12 col-md-4 commentdate">
-                        {$comment->date_upd|escape:htmlall:'UTF-8'}
+                        {$comment->date_upd|escape:'htmlall':'UTF-8'}
                     </div>
                     <div class="col-12 col-xs-12 col-md-12 comment">
                         <div class="rte">
@@ -111,7 +111,7 @@
         {assign var=counter value=0}
         {foreach from=$products item=product}
         {* {$product|var_dump} *}
-        <article class="product-miniature js-product-miniature{if $counter == 0} active{/if}" data-id-product="{$product->id|escape:htmlall:'UTF-8'}" data-slide-to="{$counter|escape:htmlall:'UTF-8'}" itemscope itemtype="http://schema.org/Product">
+        <article class="product-miniature js-product-miniature{if $counter == 0} active{/if}" data-id-product="{$product->id|escape:'htmlall':'UTF-8'}" data-slide-to="{$counter|escape:'htmlall':'UTF-8'}" itemscope itemtype="http://schema.org/Product">
             <a href="{$link->getProductLink($product)}">
                 <div class="thumbnail-container">
                     <img src="{$link->getImageLink($product->link_rewrite, $product->cover, 'home_default')}" class="img-fluid mx-auto d-block">

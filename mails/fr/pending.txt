@@ -1,0 +1,6 @@
+Des articles sont en attente de relecture
+{posts}
+
+Merci de vous rendre sur {shop_name} afin de les valider ou les supprimer
+
+{shop_name}
