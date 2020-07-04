@@ -161,8 +161,6 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
 
     public function renderForm()
     {
-        $lang_options = Language::getLanguages();
-
         $categories = EverPsBlogCategory::getAllCategories(
             (int)$this->context->language->id,
             (int)$this->context->shop->id

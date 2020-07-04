@@ -151,15 +151,10 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
             (int)$this->context->language->id,
             (int)$this->context->shop->id
         );
-        foreach ($posts_published as $key => $value) {
-            // die(var_dump($value));
-        }
         if (!$posts_published) {
             $this->errors[] = $this->l('There is no post, please create at least one');
             return;
         }
-        $comment_id = Tools::getValue('id_ever_comment');
-
         // Building the Add/Edit form
         $this->fields_form = array(
             'tinymce' => true,

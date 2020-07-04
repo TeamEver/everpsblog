@@ -47,7 +47,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
         }
     }
 
-    protected function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
+    protected function l($string, $class = null, $addslashes = false, $htmlentities = true)
     {
         if ($this->isSeven) {
             return Context::getContext()->getTranslator()->trans($string);
@@ -179,7 +179,6 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             );
             $count_products = count($post_products);
             $products = array();
-            $link = new Link();
             if (isset($post_products) && !empty($post_products)) {
                 foreach ($post_products as $post_product) {
                     $pproduct = new Product(
@@ -218,7 +217,6 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 (int)$this->context->language->id
             );
             // Prepare shortcodes
-            $everpsblog = Module::getInstanceByName('everpsblog');
             $this->post->content = EverPsBlogPost::changeShortcodes(
                 (string)$this->post->content,
                 (int)Context::getContext()->customer->id

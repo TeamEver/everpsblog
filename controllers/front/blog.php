@@ -36,7 +36,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
     }
 
-    protected function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
+    protected function l($string, $class = null, $addslashes = false, $htmlentities = true)
     {
         if ($this->isSeven) {
             return Context::getContext()->getTranslator()->trans($string);

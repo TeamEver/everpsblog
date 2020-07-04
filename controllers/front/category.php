@@ -47,7 +47,7 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
         }
     }
 
-    protected function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
+    protected function l($string, $class = null, $addslashes = false, $htmlentities = true)
     {
         if ($this->isSeven) {
             return Context::getContext()->getTranslator()->trans($string);

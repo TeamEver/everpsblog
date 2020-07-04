@@ -24,7 +24,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '2.2.4';
+        $this->version = '2.2.5';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -284,7 +284,26 @@ class EverPsBlog extends Module
                 );
             }
             foreach (Language::getLanguages(false) as $lang) {
-                // TODO : multilingual validation
+                if (!Tools::getValue('EVERBLOG_TITLE_'.$lang['id_lang'])
+                    || !Validate::isString(Tools::getValue('EVERBLOG_TITLE_'.$language['id_lang']))
+                ) {
+                    $this->postErrors[] = $this->l('Error : Blog title is invalid for lang ').$lang['id_lang'];
+                }
+                if (!Tools::getValue('EVERBLOG_META_DESC_'.$lang['id_lang'])
+                    || !Validate::isCleanHtml(Tools::getValue('EVERBLOG_META_DESC_'.$language['id_lang']))
+                ) {
+                    $this->postErrors[] = $this->l('Error : Blog meta description is invalid for lang ').$lang['id_lang'];
+                }
+                if (!Tools::getValue('EVERBLOG_TOP_TEXT_'.$lang['id_lang'])
+                    || !Validate::isCleanHtml(Tools::getValue('EVERBLOG_TOP_TEXT_'.$language['id_lang']))
+                ) {
+                    $this->postErrors[] = $this->l('Error : Blog top text is invalid for lang ').$lang['id_lang'];
+                }
+                if (!Tools::getValue('EVERBLOG_BOTTOM_'.$lang['id_lang'])
+                    || !Validate::isCleanHtml(Tools::getValue('EVERBLOG_BOTTOM_'.$language['id_lang']))
+                ) {
+                    $this->postErrors[] = $this->l('Error : Blog bottom text is invalid for lang ').$lang['id_lang'];
+                }
             }
         }
     }
