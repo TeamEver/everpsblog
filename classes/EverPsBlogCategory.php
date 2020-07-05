@@ -155,6 +155,7 @@ class EverPsBlogCategory extends ObjectModel
         $sql->where('bcl.id_lang = '.(int)$id_lang);
         $sql->where('bc.id_parent_category = '.(int)$category->id_parent_category);
         $return = Db::getInstance()->executeS($sql);
+        $categories = array();
         if (!isset($return[0])) {
             $root = EverPsBlogCategory::getRootCategory();
             $categories[] = array(

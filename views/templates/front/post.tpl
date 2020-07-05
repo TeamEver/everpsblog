@@ -9,6 +9,7 @@
 {extends file='page.tpl'}
 
 {block name="page_content"}
+{hook h="displayBeforeEverPost"}
 <div class="content" itemscope="itemscope" itemtype="http://schema.org/Blog">
     <div class="container" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
             <h1 itemprop="headline">{$post->title nofilter}</h1>
@@ -82,8 +83,9 @@
 </section>
 {/if}
 {if isset($commentsCount) && $commentsCount > 0}
+{hook h="displayBeforeEverComment"}
 <section class="comments container clearfix">
-    <span id="commentsTitle">{$commentsCount} {l s='comment(s)' mod='everpsblog'}</span>
+    <span id="commentsTitle">{$commentsCount|escape:'htmlall':'UTF-8'} {l s='comment(s)' mod='everpsblog'}</span>
     <div class="commentcontainer row">
         {foreach from=$comments item=comment}
             <div class="container commentblock" id="{$comment->id|escape:'htmlall':'UTF-8'}">
@@ -104,6 +106,7 @@
         {/foreach}
     </div>
 </section>
+{hook h="displayAfterEverComment"}
 {/if}
 {if isset($count_products) && $count_products > 0}
 <section class="featured-products container clearfix carousel slide">
@@ -113,9 +116,9 @@
         {foreach from=$products item=product}
         {* {$product|var_dump} *}
         <article class="product-miniature js-product-miniature{if $counter == 0} active{/if}" data-id-product="{$product->id|escape:'htmlall':'UTF-8'}" data-slide-to="{$counter|escape:'htmlall':'UTF-8'}" itemscope itemtype="http://schema.org/Product">
-            <a href="{$link->getProductLink($product)}">
+            <a href="{$link->getProductLink($product)|escape:'htmlall':'UTF-8'}">
                 <div class="thumbnail-container">
-                    <img src="{$link->getImageLink($product->link_rewrite, $product->cover, 'home_default')}" class="img-fluid mx-auto d-block">
+                    <img src="{$link->getImageLink($product->link_rewrite, $product->cover, 'home_default')|escape:'htmlall':'UTF-8'}" class="img-fluid mx-auto d-block">
                 </div>
                 <div class="product-description">
                     <h3 class="h3 product-title" itemprop="name">
@@ -137,4 +140,5 @@
     </div>
 </section>
 {/if}
+{hook h="displayAfterEverPost"}
 {/block}

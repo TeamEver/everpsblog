@@ -9,7 +9,7 @@
 {extends file='page.tpl'}
 
 {block name="page_content"}
-
+{hook h="displayBeforeEverTag"}
 <div class="container">
     <div class="row">
         <h1>{$tag->title nofilter}</h1>
@@ -26,6 +26,7 @@
 
 {if isset($post_number) && $post_number > 0}
 <div class="container">
+{hook h="displayBeforeEverLoop"}
 {foreach from=$posts item=item}
     <div class="col-xs-12 article everpsblog" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
         <div class="col-md-12">
@@ -44,9 +45,11 @@
         </div>
     </div>
 {/foreach}
+{hook h="displayAfterEverLoop"}
 </div>
 {include file='_partials/pagination.tpl' pagination=$pagination}
 {else}
 <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>
 {/if}
+{hook h="displayAfterEverTag"}
 {/block}

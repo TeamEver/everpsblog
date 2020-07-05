@@ -24,7 +24,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '2.2.5';
+        $this->version = '2.3.2';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -53,6 +53,7 @@ class EverPsBlog extends Module
     {
         // Install SQL
         include(dirname(__FILE__).'/sql/install.php');
+        include(dirname(__FILE__).'/sql/hooks-install.php');
         // Creating root category
         $root_category = new EverPsBlogCategory();
         $root_category->is_root_category = 1;
@@ -100,6 +101,7 @@ class EverPsBlog extends Module
     public function uninstall()
     {
         include(dirname(__FILE__).'/sql/uninstall.php');
+        include(dirname(__FILE__).'/sql/hooks-uninstall.php');
         return $this->uninstallModuleTab('AdminEverPsBlog')
             && parent::uninstall();
     }
@@ -285,22 +287,22 @@ class EverPsBlog extends Module
             }
             foreach (Language::getLanguages(false) as $lang) {
                 if (!Tools::getValue('EVERBLOG_TITLE_'.$lang['id_lang'])
-                    || !Validate::isString(Tools::getValue('EVERBLOG_TITLE_'.$language['id_lang']))
+                    || !Validate::isString(Tools::getValue('EVERBLOG_TITLE_'.$lang['id_lang']))
                 ) {
                     $this->postErrors[] = $this->l('Error : Blog title is invalid for lang ').$lang['id_lang'];
                 }
                 if (!Tools::getValue('EVERBLOG_META_DESC_'.$lang['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('EVERBLOG_META_DESC_'.$language['id_lang']))
+                    || !Validate::isCleanHtml(Tools::getValue('EVERBLOG_META_DESC_'.$lang['id_lang']))
                 ) {
                     $this->postErrors[] = $this->l('Error : Blog meta description is invalid for lang ').$lang['id_lang'];
                 }
                 if (!Tools::getValue('EVERBLOG_TOP_TEXT_'.$lang['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('EVERBLOG_TOP_TEXT_'.$language['id_lang']))
+                    && !Validate::isCleanHtml(Tools::getValue('EVERBLOG_TOP_TEXT_'.$lang['id_lang']))
                 ) {
                     $this->postErrors[] = $this->l('Error : Blog top text is invalid for lang ').$lang['id_lang'];
                 }
                 if (!Tools::getValue('EVERBLOG_BOTTOM_'.$lang['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('EVERBLOG_BOTTOM_'.$language['id_lang']))
+                    && !Validate::isCleanHtml(Tools::getValue('EVERBLOG_BOTTOM_'.$lang['id_lang']))
                 ) {
                     $this->postErrors[] = $this->l('Error : Blog bottom text is invalid for lang ').$lang['id_lang'];
                 }

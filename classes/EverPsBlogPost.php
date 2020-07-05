@@ -311,7 +311,7 @@ class EverPsBlogPost extends ObjectModel
         $sql->where(
             'ep.active = '.(int)$active
         );
-        $sql->limit((int)$limit);
+        // $sql->limit((int)$limit);
         $post_categories = Db::getInstance()->getValue($sql);
         return json_decode($post_categories);
     }

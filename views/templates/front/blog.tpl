@@ -32,6 +32,7 @@
 
 {if isset($post_number) && $post_number > 0}
 <div class="row">
+{hook h="displayBeforeEverLoop"}
 {foreach from=$everpsblog item=item}
     <article class="col-xs-12 article everpsblog" id="everpsblog-{$item.id_ever_post|escape:'html'}">
         <div class="row">
@@ -52,6 +53,7 @@
         </div>
     </article>
 {/foreach}
+{hook h="displayAfterEverLoop"}
 </div>
 {else}
 <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>
