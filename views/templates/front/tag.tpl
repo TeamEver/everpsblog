@@ -9,7 +9,7 @@
 {extends file='page.tpl'}
 
 {block name="page_content"}
-{hook h="displayBeforeEverTag"}
+{hook h="displayBeforeEverTag" everblogtag=$tag}
 <div class="container">
     <div class="row">
         <h1>{$tag->title nofilter}</h1>
@@ -48,8 +48,8 @@
 {hook h="displayAfterEverLoop"}
 </div>
 {include file='_partials/pagination.tpl' pagination=$pagination}
+{hook h="displayAfterEverTag" everblogtag=$tag}
 {else}
 <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>
 {/if}
-{hook h="displayAfterEverTag"}
 {/block}

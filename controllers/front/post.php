@@ -225,7 +225,11 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 (string)$this->post->title,
                 (int)Context::getContext()->customer->id
             );
-
+            Hook::exec('beforeEverPostInitContent', array(
+                'blog_post' => $this->post,
+                'blog_tags' => $tags,
+                'blog_products' => $products
+            ));
             $this->context->smarty->assign(
                 array(
                     'count_products' => $count_products,
@@ -357,7 +361,8 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
         return $mail;
     }
 
-    public function getTemplateVarPage() {
+    public function getTemplateVarPage()
+    {
         $page = parent::getTemplateVarPage();
         $page['body_classes']['page-everblog-post'] = true;
         return $page;

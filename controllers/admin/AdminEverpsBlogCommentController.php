@@ -79,7 +79,8 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
         $commentUrl  = 'index.php?controller=AdminEverPsBlogComment&token=';
         $commentUrl .= Tools::getAdminTokenLite('AdminEverPsBlogComment');
         $blogUrl = Context::getContext()->link->getModuleLink(
-            'everpsblog','blog',
+            'everpsblog',
+            'blog',
             array(),
             true
         );
@@ -138,9 +139,13 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
 
         $lists = parent::renderList();
 
-        $this->html .= $this->context->smarty->fetch(_PS_MODULE_DIR_ . '/everpsblog/views/templates/admin/headerController.tpl');
+        $this->html .= $this->context->smarty->fetch(
+            _PS_MODULE_DIR_ . '/everpsblog/views/templates/admin/headerController.tpl'
+        );
         $this->html .= $lists;
-        $this->html .= $this->context->smarty->fetch(_PS_MODULE_DIR_ . '/everpsblog/views/templates/admin/footer.tpl');
+        $this->html .= $this->context->smarty->fetch(
+            _PS_MODULE_DIR_ . '/everpsblog/views/templates/admin/footer.tpl'
+        );
 
         return $this->html;
     }

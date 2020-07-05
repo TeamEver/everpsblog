@@ -8,6 +8,7 @@
  */
 
 use PrestaShop\PrestaShop\Core\Product\Search\Pagination;
+
 require_once(dirname(__FILE__).'/../../everpsblog.php');
 require_once(dirname(__FILE__).'/../EverPsBlogPost.php');
 require_once(dirname(__FILE__).'/../EverPsBlogCategory.php');
@@ -104,7 +105,7 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
                     'id_ever_post' => $this->post->id,
                     'link_rewrite' => $this->post->link_rewrite
                 );
-            break;
+                break;
 
             case 'category':
                 if (!$this->category) {
@@ -118,7 +119,7 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
                     'id_ever_category' => $this->category->id,
                     'link_rewrite' => $this->category->link_rewrite
                 );
-            break;
+                break;
 
             case 'tag':
                 if (!$this->tag) {
@@ -132,7 +133,7 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
                     'id_ever_tag' => $this->tag->id,
                     'link_rewrite' => $this->tag->link_rewrite
                 );
-            break;
+                break;
         }
 
         if ($param) {
@@ -250,7 +251,9 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
                 && _PS_MODE_DEV_
                 && $_SERVER['REQUEST_URI'] != __PS_BASE_URI__
             ) {
-                die('[Debug] This page has moved<br />Please use the following URL instead: <a href="'.$final_url.'">'.$final_url.'</a>');
+                die(
+                    '[Debug] This page has moved<br />Please use the following URL instead: <a href="'.$final_url.'">'.$final_url.'</a>'
+                );
             }
 
             header('HTTP/1.0 301 Moved');

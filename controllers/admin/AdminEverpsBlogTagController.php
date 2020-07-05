@@ -73,7 +73,8 @@ class AdminEverPsBlogTagController extends ModuleAdminController
         $commentUrl  = 'index.php?controller=AdminEverPsBlogComment&token=';
         $commentUrl .= Tools::getAdminTokenLite('AdminEverPsBlogComment');
         $blogUrl = Context::getContext()->link->getModuleLink(
-            'everpsblog','blog',
+            'everpsblog',
+            'blog',
             array(),
             true
         );
@@ -137,9 +138,13 @@ class AdminEverPsBlogTagController extends ModuleAdminController
 
         $lists = parent::renderList();
 
-        $this->html .= $this->context->smarty->fetch(_PS_MODULE_DIR_ . '/everpsblog/views/templates/admin/headerController.tpl');
+        $this->html .= $this->context->smarty->fetch(
+            _PS_MODULE_DIR_.'/everpsblog/views/templates/admin/headerController.tpl'
+        );
         $this->html .= $lists;
-        $this->html .= $this->context->smarty->fetch(_PS_MODULE_DIR_ . '/everpsblog/views/templates/admin/footer.tpl');
+        $this->html .= $this->context->smarty->fetch(
+            _PS_MODULE_DIR_ . '/everpsblog/views/templates/admin/footer.tpl'
+        );
 
         return $this->html;
     }
@@ -148,10 +153,19 @@ class AdminEverPsBlogTagController extends ModuleAdminController
     {
         $tag_id = Tools::getValue('id_ever_tag');
 
-        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.$tag_id.'.jpg')) {
-            $tag_img = Tools::getHttpHost(true).__PS_BASE_URI__.'modules/everpsblog/views/img/tags/tag_image_'.$tag_id.'.jpg';
+        if (file_exists(
+            _PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.$tag_id.'.jpg'
+        )) {
+            $tag_img = Tools::getHttpHost(true)
+            .__PS_BASE_URI__
+            .'modules/everpsblog/views/img/tags/tag_image_'
+            .(int)$tag_id
+            .'.jpg';
         } else {
-            $tag_img = Tools::getHttpHost(true).__PS_BASE_URI__.'/img/'.Configuration::get(
+            $tag_img = Tools::getHttpHost(true)
+            .__PS_BASE_URI__
+            .'/img/'
+            .Configuration::get(
                 'PS_LOGO'
             );
         }
@@ -386,35 +400,38 @@ class AdminEverPsBlogTagController extends ModuleAdminController
             if (!count($this->errors)) {
                 $tag->save();
                 /* upload the image */
-                if (isset($_FILES['tag_image']) && isset($_FILES['tag_image']['tmp_name']) && !empty($_FILES['tag_image']['tmp_name']))
-                {
+                $tag_img_destination = _PS_MODULE_DIR_
+                .'everpsblog/views/img/tags/tag_image_'
+                .(int)$tag->id
+                .'.jpg';
+                if (isset($_FILES['tag_image']) && isset($_FILES['tag_image']['tmp_name']) && !empty($_FILES['tag_image']['tmp_name'])) {
                     Configuration::set('PS_IMAGE_GENERATION_METHOD', 1);
-                    if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.$tag->id.'.jpg')) {
-                        unlink(_PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.$tag->id.'.jpg');
+                    if (file_exists($tag_img_destination)) {
+                        unlink($tag_img_destination);
                     }
                     if ($error = ImageManager::validateUpload($_FILES['tag_image'])) {
-                        $errors .= $error;
+                        $this->errors .= $error;
                     } elseif (!($tmp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS'))
                         || !move_uploaded_file($_FILES['tag_image']['tmp_name'], $tmp_name)
                     ) {
                         return false;
-                    } elseif (!ImageManager::resize($tmp_name, _PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.$tag->id.'.jpg')) {
-                        $errors .= $this->displayError($this->l('An error occurred while attempting to upload the image.'));
+                    } elseif (!ImageManager::resize($tmp_name, $tag_img_destination)) {
+                        $this->errors .= $this->l(
+                            'An error occurred while attempting to upload the image.'
+                        );
                     }
                     if (isset($tmp_name)) {
                         unlink($tmp_name);
                         return true;
                     }
                 } else {
-                    if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.$tag->id.'.jpg')) {
-                        unlink(_PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.$tag->id.'.jpg');
+                    if (file_exists($tag_img_destination)) {
+                        unlink($tag_img_destination);
                     }
                     $logo = _PS_ROOT_DIR_.'/img/'.Configuration::get(
                         'PS_LOGO'
                     );
-                    $tag_img = _PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.$tag->id.'.jpg';
-                    // die(var_dump($logo));
-                    if (copy($logo, $tag_img)) {
+                    if (copy($logo, $tag_img_destination)) {
                         return true;
                     }
                 }
@@ -460,7 +477,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
         if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.(int)$id_obj.'.jpg')) {
                 $old_img = _PS_MODULE_DIR_.'modules/everpsblog/views/img/tags/tag_image_'.$id_obj.'.jpg';
                 return unlink($old_img);
-            }
+        }
     }
 
     protected function displayError($message, $description = false)

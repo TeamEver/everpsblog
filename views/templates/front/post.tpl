@@ -9,7 +9,7 @@
 {extends file='page.tpl'}
 
 {block name="page_content"}
-{hook h="displayBeforeEverPost"}
+{hook h="displayBeforeEverPost" everblogpost=$post}
 <div class="content" itemscope="itemscope" itemtype="http://schema.org/Blog">
     <div class="container" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
             <h1 itemprop="headline">{$post->title nofilter}</h1>
@@ -140,5 +140,5 @@
     </div>
 </section>
 {/if}
-{hook h="displayAfterEverPost"}
+{hook h="displayAfterEverPost" everblogpost=$post}
 {/block}

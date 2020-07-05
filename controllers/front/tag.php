@@ -94,7 +94,10 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
                 (int)$this->tag->id,
                 (int)$pagination['items_shown_from'] - 1
             );
-
+            Hook::exec('beforeEverTagInitContent', array(
+                'blog_tag' => $this->tag,
+                'blog_posts' => $posts
+            ));
             $this->context->smarty->assign(
                 array(
                     'paginated' => Tools::getValue('page'),
@@ -154,7 +157,8 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
         return $breadcrumb;
     }
 
-    public function getTemplateVarPage() {
+    public function getTemplateVarPage()
+    {
         $page = parent::getTemplateVarPage();
         $page['body_classes']['page-everblog-tag'] = true;
         return $page;

@@ -7,6 +7,7 @@ https://www.team-ever.com/produit/prestashop-module-de-blog-gratuit/
 #### Changelog :
 
 ***TODO***
+- block empty objects saving
 - allow change excerpt length
 - change shortcodes on post listing
 - sharing buttons (Twitter, Facebook, etc)

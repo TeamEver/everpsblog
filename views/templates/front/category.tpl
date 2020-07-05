@@ -9,7 +9,7 @@
 {extends file='page.tpl'}
 
 {block name="page_content"}
-{hook h="displayBeforeEverCategory"}
+{hook h="displayBeforeEverCategory" everblogcategory=$category}
 <h1>{$category->title|escape:'htmlall':'UTF-8'}</h1>
 {if isset($paginated) && !$paginated}
 <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$category->id}.jpg" class="img img-fluid mx-auto d-block" alt="{$category->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
@@ -46,8 +46,8 @@
 {hook h="displayAfterEverLoop"}
 </div>
 {include file='_partials/pagination.tpl' pagination=$pagination}
+{hook h="displayAfterEverCategory" everblogcategory=$category}
 {else}
 <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>
 {/if}
-{hook h="displayAfterEverCategory"}
 {/block}

@@ -24,7 +24,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '2.3.2';
+        $this->version = '2.3.6';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -52,8 +52,9 @@ class EverPsBlog extends Module
     public function install()
     {
         // Install SQL
-        include(dirname(__FILE__).'/sql/install.php');
-        include(dirname(__FILE__).'/sql/hooks-install.php');
+        include(dirname(__FILE__).'/install/install.php');
+        // Create hooks
+        include(dirname(__FILE__).'/install/hooks-install.php');
         // Creating root category
         $root_category = new EverPsBlogCategory();
         $root_category->is_root_category = 1;
@@ -66,6 +67,7 @@ class EverPsBlog extends Module
         $root_category->save();
         // Install
         return parent::install()
+            && $this->registerHook('actionFrontControllerAfterInit')
             && $this->registerHook('header')
             && $this->registerHook('actionAdminControllerSetMedia')
             && $this->registerHook('displayHome')
@@ -76,7 +78,6 @@ class EverPsBlog extends Module
             && $this->registerHook('displayCustomerAccount')
             && $this->registerHook('moduleRoutes')
             && $this->registerHook('overrideLayoutTemplate')
-            && $this->registerHook('actionAdminControllerSetMedia')
             && $this->registerHook('backofficeHeader')
             && $this->registerHook('actionObjectEverPsBlogPostDeleteAfter')
             && $this->registerHook('actionObjectEverPsBlogCategoryDeleteAfter')
@@ -100,8 +101,8 @@ class EverPsBlog extends Module
 
     public function uninstall()
     {
-        include(dirname(__FILE__).'/sql/uninstall.php');
-        include(dirname(__FILE__).'/sql/hooks-uninstall.php');
+        include(dirname(__FILE__).'/install/uninstall.php');
+        include(dirname(__FILE__).'/install/hooks-uninstall.php');
         return $this->uninstallModuleTab('AdminEverPsBlog')
             && parent::uninstall();
     }
@@ -231,28 +232,28 @@ class EverPsBlog extends Module
             if (!Tools::getValue('EVERPSBLOG_PAGINATION')
                 && !Validate::isUnsignedInt(Tools::getValue('EVERPSBLOG_PAGINATION'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Posts per page" is not valid '.Tools::getValue('EVERPSBLOG_PAGINATION'));
+                $this->postErrors[] = $this->l('Error : The field "Posts per page" is not valid');
             }
             if (!Tools::getValue('EVERPSBLOG_HOME_NBR')
                 && !Validate::isUnsignedInt(Tools::getValue('EVERPSBLOG_HOME_NBR'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Posts for home" is not valid '.Tools::getValue('EVERPSBLOG_HOME_NBR'));
+                $this->postErrors[] = $this->l('Error : The field "Posts for home" is not valid');
             }
             if (!Tools::getValue('EVERPSBLOG_PRODUCT_NBR')
                 && !Validate::isUnsignedInt(Tools::getValue('EVERPSBLOG_PRODUCT_NBR'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Posts for product" is not valid '.Tools::getValue('EVERPSBLOG_PRODUCT_NBR'));
+                $this->postErrors[] = $this->l('Error : The field "Posts for product" is not valid');
             }
             if (!Tools::getIsset('EVERPSBLOG_ROUTE')
                 || !Validate::isLinkRewrite(Tools::getValue('EVERPSBLOG_ROUTE'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Blog route" is not valid '.Tools::getValue('EVERPSBLOG_ROUTE'));
+                $this->postErrors[] = $this->l('Error : The field "Blog route" is not valid');
             }
 
             if (!Tools::getIsset('EVERBLOG_ADMIN_EMAIL')
                 || !Validate::isUnsignedInt(Tools::getValue('EVERBLOG_ADMIN_EMAIL'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Admin email" is not valid '.Tools::getValue('EVERBLOG_ADMIN_EMAIL'));
+                $this->postErrors[] = $this->l('Error : The field "Admin email" is not valid');
             }
 
             if (!Tools::getIsset('EVERBLOG_ALLOW_COMMENTS')
@@ -289,22 +290,30 @@ class EverPsBlog extends Module
                 if (!Tools::getValue('EVERBLOG_TITLE_'.$lang['id_lang'])
                     || !Validate::isString(Tools::getValue('EVERBLOG_TITLE_'.$lang['id_lang']))
                 ) {
-                    $this->postErrors[] = $this->l('Error : Blog title is invalid for lang ').$lang['id_lang'];
+                    $this->postErrors[] = $this->l(
+                        'Error : Blog title is invalid'
+                    );
                 }
                 if (!Tools::getValue('EVERBLOG_META_DESC_'.$lang['id_lang'])
                     || !Validate::isCleanHtml(Tools::getValue('EVERBLOG_META_DESC_'.$lang['id_lang']))
                 ) {
-                    $this->postErrors[] = $this->l('Error : Blog meta description is invalid for lang ').$lang['id_lang'];
+                    $this->postErrors[] = $this->l(
+                        'Error : Blog meta description is invalid'
+                    );
                 }
                 if (!Tools::getValue('EVERBLOG_TOP_TEXT_'.$lang['id_lang'])
                     && !Validate::isCleanHtml(Tools::getValue('EVERBLOG_TOP_TEXT_'.$lang['id_lang']))
                 ) {
-                    $this->postErrors[] = $this->l('Error : Blog top text is invalid for lang ').$lang['id_lang'];
+                    $this->postErrors[] = $this->l(
+                        'Error : Blog top text is invalid'
+                    );
                 }
                 if (!Tools::getValue('EVERBLOG_BOTTOM_'.$lang['id_lang'])
                     && !Validate::isCleanHtml(Tools::getValue('EVERBLOG_BOTTOM_'.$lang['id_lang']))
                 ) {
-                    $this->postErrors[] = $this->l('Error : Blog bottom text is invalid for lang ').$lang['id_lang'];
+                    $this->postErrors[] = $this->l(
+                        'Error : Blog bottom text is invalid'
+                    );
                 }
             }
         }
@@ -834,7 +843,8 @@ class EverPsBlog extends Module
         $module_name = Tools::getValue('module');
         if ($module_name == 'everpsblog') {
             $this->context->controller->addCSS(
-                _PS_MODULE_DIR_.'everpsblog/views/css/everpsblog.css', 'all'
+                _PS_MODULE_DIR_.'everpsblog/views/css/everpsblog.css',
+                'all'
             );
             $this->context->controller->addJs(
                 $this->_path.'views/js/everpsblog.js'
@@ -849,11 +859,13 @@ class EverPsBlog extends Module
             }
         } else {
             $this->context->controller->addCSS(
-                _PS_MODULE_DIR_.'everpsblog/views/css/everpsblog-columns.css', 'all'
+                _PS_MODULE_DIR_.'everpsblog/views/css/everpsblog-columns.css',
+                'all'
             );
         }
         $this->context->controller->addCSS(
-            _PS_MODULE_DIR_.'everpsblog/views/css/everpsblog-all.css', 'all'
+            _PS_MODULE_DIR_.'everpsblog/views/css/everpsblog-all.css',
+            'all'
         );
     }
 
@@ -1085,7 +1097,7 @@ class EverPsBlog extends Module
             return $this->context->shop->theme->getLayoutRelativePathForPage(
                 $params['controller']->page_name
             );
-        }  else {
+        } else {
             return $params['default_layout'];
         }
     }
@@ -1093,11 +1105,12 @@ class EverPsBlog extends Module
     public function hookActionFrontControllerAfterInit()
     {
         foreach (Shop::getShops() as $shop) {
-            if (!$this->emptyTrash((int)$shop['id_shop'])) {
-                PrestashopLogger::addLog(
-                    'Trash has not been emptied for shop '.(int)$shop['id_shop']
-                );
-            }
+            $this->publishPlannedPosts(
+                (int)$shop['id_shop']
+            );
+            $this->emptyTrash(
+                (int)$shop['id_shop']
+            );
         }
     }
 
@@ -1199,7 +1212,7 @@ class EverPsBlog extends Module
             'planned'
         );
         if (!count($posts)) {
-            die('no planned posts');
+            return;
         }
         foreach ($posts as $planned) {
             $post = new EverPsBlogPost(
@@ -1216,25 +1229,25 @@ class EverPsBlog extends Module
 
     public function hookActionObjectEverPsBlogPostDeleteAfter($params)
     {
-        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.(int)$params['object']->id.'.jpg')) {
-                $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$params['object']->id.'.jpg';
-                unlink($old_img);
+        $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$params['object']->id.'.jpg';
+        if (file_exists($old_img)) {
+            unlink($old_img);
         }
     }
 
     public function hookActionObjectEverPsBlogCategoryDeleteAfter($params)
     {
-        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/categories/category_image_'.(int)$params['object']->id.'.jpg')) {
-                $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/categories/category_image_'.$params['object']->id.'.jpg';
-                return unlink($old_img);
+        $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/categories/category_image_'.$params['object']->id.'.jpg';
+        if (file_exists($old_img)) {
+            unlink($old_img);
         }
     }
 
     public function hookActionObjectEverPsBlogTagDeleteAfter($params)
     {
-        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.(int)$params['object']->id.'.jpg')) {
-                $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.$params['object']->id.'.jpg';
-                return unlink($old_img);
+        $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.$params['object']->id.'.jpg';
+        if (file_exists($old_img)) {
+            unlink($old_img);
         }
     }
 }

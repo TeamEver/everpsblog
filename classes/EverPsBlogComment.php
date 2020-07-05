@@ -92,8 +92,9 @@ class EverPsBlogComment extends ObjectModel
     {
         if ($res = Db::getInstance()->executeS(
             'SELECT * FROM `'._DB_PREFIX_.'everpsblog_comments`'
-        ))
-        return $res;
+        )) {
+            return $res;
+        }
     }
 
     public static function getCommentsByPost($id_ever_post, $id_lang, $active = 1)

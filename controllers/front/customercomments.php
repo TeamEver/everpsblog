@@ -109,7 +109,8 @@ class EverPsBlogcustomercommentsModuleFrontController extends EverPsBlogModuleFr
         return $breadcrumb;
     }
 
-    public function getTemplateVarPage() {
+    public function getTemplateVarPage()
+    {
         $page = parent::getTemplateVarPage();
         $page['body_classes']['page-everblog-customercomments'] = true;
         return $page;

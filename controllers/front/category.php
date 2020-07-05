@@ -99,7 +99,10 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                 (int)$this->category->id,
                 (int)$pagination['items_shown_from'] - 1
             );
-
+            Hook::exec('beforeEverCategoryInitContent', array(
+                'blog_category' => $this->category,
+                'blog_posts' => $posts
+            ));
             $this->context->smarty->assign(
                 array(
                     'paginated' => Tools::getValue('page'),
@@ -159,7 +162,8 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
         return $breadcrumb;
     }
 
-    public function getTemplateVarPage() {
+    public function getTemplateVarPage()
+    {
         $page = parent::getTemplateVarPage();
         $page['body_classes']['page-everblog-category'] = true;
         return $page;

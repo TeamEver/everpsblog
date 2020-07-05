@@ -117,6 +117,10 @@ class EverPsBlogPost extends ObjectModel
         if (!(int)$limit) {
             $limit = (int)Configuration::get('EVERPSBLOG_PAGINATION');
         }
+        $current_context = Context::getContext();
+        if ($current_context->controller->controller_type == 'front') {
+            # code...
+        }
         $sql = new DbQuery;
         $sql->select('*');
         $sql->from('ever_blog_post_lang', 'bpl');
@@ -131,16 +135,20 @@ class EverPsBlogPost extends ObjectModel
         $sql->limit((int)$limit, (int)$start);
         $posts = Db::getInstance()->executeS($sql);
         $return = array();
-        foreach ($posts as $post) {
-            $post['content'] = self::changeShortcodes(
-                $post['content'],
-                (int)Context::getContext()->customer->id
-            );
-            $post['title'] = self::changeShortcodes(
-                $post['title'],
-                (int)Context::getContext()->customer->id
-            );
-            $return[] = $post;
+        if ($current_context->controller->controller_type == 'front') {
+            foreach ($posts as $post) {
+                $post['content'] = self::changeShortcodes(
+                    $post['content'],
+                    (int)Context::getContext()->customer->id
+                );
+                $post['title'] = self::changeShortcodes(
+                    $post['title'],
+                    (int)Context::getContext()->customer->id
+                );
+                $return[] = $post;
+            }
+        } else {
+            $return = $posts;
         }
         return $return;
     }

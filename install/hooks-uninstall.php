@@ -70,3 +70,27 @@ if ($displayAfterEverLoop) {
     $hook = new Hook((int)$displayAfterEverLoop);
     $hook->delete();
 }
+// Hook before post init
+$beforeEverPostInitContent = Hook::getIdByName('beforeEverPostInitContent');
+if ($beforeEverPostInitContent) {
+    $hook = new Hook((int)$beforeEverPostInitContent);
+    $hook->delete();
+}
+// Hook category init
+$beforeEverCategoryInitContent = Hook::getIdByName('beforeEverCategoryInitContent');
+if ($beforeEverCategoryInitContent) {
+    $hook = new Hook((int)$beforeEverCategoryInitContent);
+    $hook->delete();
+}
+// Hook before tag init
+$beforeEverTagInitContent = Hook::getIdByName('beforeEverTagInitContent');
+if ($beforeEverTagInitContent) {
+    $hook = new Hook((int)$beforeEverTagInitContent);
+    $hook->delete();
+}
+// Hook before blog init
+$beforeEverBlogInitContent = Hook::getIdByName('beforeEverBlogInitContent');
+if ($beforeEverBlogInitContent) {
+    $hook = new Hook((int)$beforeEverBlogInitContent);
+    $hook->delete();
+}

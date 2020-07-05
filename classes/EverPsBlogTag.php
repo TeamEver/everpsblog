@@ -93,14 +93,13 @@ class EverPsBlogTag extends ObjectModel
 
     public static function getAllTags($id_lang, $id_shop, $active = 1)
     {
-        if ($res = Db::getInstance()->executeS(
+        return Db::getInstance()->executeS(
             'SELECT * FROM `'._DB_PREFIX_.'ever_blog_tag_lang` btl
             INNER JOIN `'._DB_PREFIX_.'ever_blog_tag` bt
             ON bt.id_ever_tag = btl.id_ever_tag
             WHERE bt.active = "'.(bool)$active.'"
             AND bt.id_shop = '.(int)$id_shop.'
             AND btl.id_lang = '.(int)$id_lang.''
-        ));
-        return $res;
+        );
     }
 }

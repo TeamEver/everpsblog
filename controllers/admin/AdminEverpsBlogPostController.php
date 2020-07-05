@@ -87,7 +87,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         $commentUrl  = 'index.php?controller=AdminEverPsBlogComment&token=';
         $commentUrl .= Tools::getAdminTokenLite('AdminEverPsBlogComment');
         $blogUrl = Context::getContext()->link->getModuleLink(
-            'everpsblog','blog',
+            'everpsblog',
+            'blog',
             array(),
             true
         );
@@ -153,9 +154,13 @@ class AdminEverPsBlogPostController extends ModuleAdminController
 
         $lists = parent::renderList();
 
-        $this->html .= $this->context->smarty->fetch(_PS_MODULE_DIR_ . '/everpsblog/views/templates/admin/headerController.tpl');
+        $this->html .= $this->context->smarty->fetch(
+            _PS_MODULE_DIR_ . '/everpsblog/views/templates/admin/headerController.tpl'
+        );
         $this->html .= $lists;
-        $this->html .= $this->context->smarty->fetch(_PS_MODULE_DIR_ . '/everpsblog/views/templates/admin/footer.tpl');
+        $this->html .= $this->context->smarty->fetch(
+            _PS_MODULE_DIR_ . '/everpsblog/views/templates/admin/footer.tpl'
+        );
 
         return $this->html;
     }
@@ -189,13 +194,19 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         $obj = new EverPsBlogPost(
             (int)Tools::getValue('id_ever_post')
         );
-        $values = $this->getConfigFormValues($obj);
         $fields_form = array();
 
         if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$post_id.'.jpg')) {
-            $post_img = Tools::getHttpHost(true).__PS_BASE_URI__.'modules/everpsblog/views/img/posts/post_image_'.$post_id.'.jpg';
+            $post_img = Tools::getHttpHost(true)
+            .__PS_BASE_URI__
+            .'modules/everpsblog/views/img/posts/post_image_'
+            .$post_id
+            .'.jpg';
         } else {
-            $post_img = Tools::getHttpHost(true).__PS_BASE_URI__.'/img/'.Configuration::get(
+            $post_img = Tools::getHttpHost(true)
+            .__PS_BASE_URI__
+            .'/img/'
+            .Configuration::get(
                 'PS_LOGO'
             );
         }
@@ -234,21 +245,22 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     'id_ever_post' => $obj->id_ever_post ,'link_rewrite' => $obj->link_rewrite[$id_lang]
                 )
             );
+            $object_html = '<a href="'
+            .$objectUrl
+            .'" target="_blank" class="btn btn-default">'
+            .$this->l('See post')
+            .'</a>';
             $fields_form[] = array(
                 'form' => array(
                     'input' => array(
                         array(
                             'type' => 'html',
                             'name' => 'view_obj',
-                            'html_content' => '<a href="'.$objectUrl.'" target="_blank" class="btn btn-default">'.$this->l('See post').'</a>',
+                            'html_content' => $object_html,
                         ),
                     ),
                 )
             );
-            $id_ever_post = $obj->id_ever_post;
-            // die(var_dump($obj->date_add));
-        } else {
-            $id_ever_post = 0;
         }
 
         $fields_form[] = array(
@@ -553,72 +565,76 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             $post->post_products = Tools::jsonEncode(Tools::getValue('post_products'));
             $post->date_upd = date('Y-m-d H:i:s');
             // Multilingual fields
-            foreach (Language::getLanguages(false) as $language) {
-                if (Tools::getValue('title_'.$language['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('title_'.$language['id_lang']))
+            foreach (Language::getLanguages(false) as $lang) {
+                if (Tools::getValue('title_'.$lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('title_'.$lang['id_lang']))
                 ) {
-                    $this->errors[] = $this->l('Title is not valid for lang ').$language['id_lang'];
+                    $this->errors[] = $this->l('Title is not valid for lang ').$lang['id_lang'];
                 } else {
-                    $post->title[$language['id_lang']] = Tools::getValue('title_'.$language['id_lang']);
+                    $post->title[$lang['id_lang']] = Tools::getValue('title_'.$lang['id_lang']);
                 }
-                if (Tools::getValue('content_'.$language['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('content_'.$language['id_lang']))
+                if (Tools::getValue('content_'.$lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('content_'.$lang['id_lang']))
                 ) {
-                    $this->errors[] = $this->l('Content is not valid for lang ').$language['id_lang'];
+                    $this->errors[] = $this->l('Content is not valid for lang ').$lang['id_lang'];
                 } else {
-                    $post->content[$language['id_lang']] = Tools::getValue('content_'.$language['id_lang']);
+                    $post->content[$lang['id_lang']] = Tools::getValue('content_'.$lang['id_lang']);
                 }
-                if (Tools::getValue('meta_title_'.$language['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('meta_title_'.$language['id_lang']))
+                if (Tools::getValue('meta_title_'.$lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('meta_title_'.$lang['id_lang']))
                 ) {
-                    $this->errors[] = $this->l('Meta title is not valid for lang ').$language['id_lang'];
+                    $this->errors[] = $this->l('Meta title is not valid for lang ').$lang['id_lang'];
                 } else {
-                    $post->meta_title[$language['id_lang']] = Tools::getValue('meta_title_'.$language['id_lang']);
+                    $post->meta_title[$lang['id_lang']] = Tools::getValue('meta_title_'.$lang['id_lang']);
                 }
-                if (Tools::getValue('meta_description_'.$language['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('meta_description_'.$language['id_lang']))
+                if (Tools::getValue('meta_description_'.$lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('meta_description_'.$lang['id_lang']))
                 ) {
-                    $this->errors[] = $this->l('Meta description is not valid for lang ').$language['id_lang'];
+                    $this->errors[] = $this->l('Meta description is not valid for lang ').$lang['id_lang'];
                 } else {
-                    $post->meta_description[$language['id_lang']] = Tools::getValue('meta_description_'.$language['id_lang']);
+                    $post->meta_description[$lang['id_lang']] = Tools::getValue('meta_description_'.$lang['id_lang']);
                 }
-                if (Tools::getValue('link_rewrite_'.$language['id_lang'])
-                    && !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$language['id_lang']))
+                if (Tools::getValue('link_rewrite_'.$lang['id_lang'])
+                    && !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$lang['id_lang']))
                 ) {
-                    $this->errors[] = $this->l('Link rewrite is not valid for lang ').$language['id_lang'];
+                    $this->errors[] = $this->l('Link rewrite is not valid for lang ').$lang['id_lang'];
                 } else {
-                    $post->link_rewrite[$language['id_lang']] = Tools::getValue('link_rewrite_'.$language['id_lang']);
+                    $post->link_rewrite[$lang['id_lang']] = Tools::getValue('link_rewrite_'.$lang['id_lang']);
                 }
             }
             if (!count($this->errors)) {
                 $post->save();
+                $post_img_destination = _PS_MODULE_DIR_
+                .'everpsblog/views/img/posts/post_image_'
+                .(int)$post->id
+                .'.jpg';
                 /* upload the image */
-                if (isset($_FILES['post_image']) && isset($_FILES['post_image']['tmp_name']) && !empty($_FILES['post_image']['tmp_name']))
-                {
+                if (isset($_FILES['post_image']) && isset($_FILES['post_image']['tmp_name']) && !empty($_FILES['post_image']['tmp_name'])) {
                     Configuration::set('PS_IMAGE_GENERATION_METHOD', 1);
-                    if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$post->id.'.jpg')) {
-                        unlink(_PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$post->id.'.jpg');
+                    if (file_exists($post_img_destination)) {
+                        unlink($post_img_destination);
                     }
                     if ($error = ImageManager::validateUpload($_FILES['post_image'])) {
-                        $errors .= $error;
+                        $this->errors .= $error;
                     } elseif (!($tmp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS')) || !move_uploaded_file($_FILES['post_image']['tmp_name'], $tmp_name)) {
                         return false;
-                    } elseif (!ImageManager::resize($tmp_name, _PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$post->id.'.jpg')) {
-                        $errors .= $this->displayError($this->l('An error occurred while attempting to upload the image.'));
+                    } elseif (!ImageManager::resize($tmp_name, $post_img_destination)) {
+                        $this->errors .= $this->l(
+                            'An error occurred while attempting to upload the image.'
+                        );
                     }
                     if (isset($tmp_name)) {
                         unlink($tmp_name);
                         return true;
                     }
                 } else {
-                    if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$post->id.'.jpg')) {
-                        unlink(_PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$post->id.'.jpg');
+                    if (file_exists($post_img_destination)) {
+                        unlink($post_img_destination);
                     }
                     $logo = _PS_ROOT_DIR_.'/img/'.Configuration::get(
                         'PS_LOGO'
                     );
-                    $post_img = _PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$post->id.'.jpg';
-                    if (copy($logo, $post_img)) {
+                    if (copy($logo, $post_img_destination)) {
                         return true;
                     }
                 }
@@ -687,7 +703,11 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         if ($new_everObj->save()) {
             $new_img = _PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$new_everObj->id.'.jpg';
             if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$id_ever_post.'.jpg')) {
-                $old_img = Tools::getHttpHost(true).__PS_BASE_URI__.'modules/everpsblog/views/img/posts/post_image_'.$id_ever_post.'.jpg';
+                $old_img = Tools::getHttpHost(true)
+                .__PS_BASE_URI__
+                .'modules/everpsblog/views/img/posts/post_image_'
+                .$id_ever_post
+                .'.jpg';
             } else {
                 $old_img = Tools::getHttpHost(true).__PS_BASE_URI__.'/img/'.Configuration::get(
                     'PS_LOGO'

@@ -86,6 +86,12 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         $default_blog_top_text = $everblog_top_text[(int)Context::getContext()->language->id];
         $everblog_bottom_text = Configuration::getInt('EVERBLOG_BOTTOM_TEXT');
         $default_blog_bottom_text = $everblog_bottom_text[(int)Context::getContext()->language->id];
+        Hook::exec('beforeEverBlogInitContent', array(
+            'blog_post_number' => $this->post_number,
+            'everpsblog' => $everpsblogposts,
+            'everpsblog' => $evercategories,
+            'blog_page' => Tools::getValue('page')
+        ));
         $this->context->smarty->assign(
             array(
                 'default_blog_top_text' => $default_blog_top_text,
@@ -125,7 +131,8 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         return $breadcrumb;
     }
 
-    public function getTemplateVarPage() {
+    public function getTemplateVarPage()
+    {
         $page = parent::getTemplateVarPage();
         $page['body_classes']['page-everblog'] = true;
         return $page;
