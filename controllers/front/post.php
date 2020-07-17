@@ -177,9 +177,22 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             $post_products = EverPsBlogCleaner::convertToArray(
                 json_decode($this->post->post_products)
             );
-            $products = array();
             $ps_products = array();
             if (isset($post_products) && !empty($post_products)) {
+                $showPrice = true;
+                $assembler = new ProductAssembler(Context::getContext());
+                $presenterFactory = new ProductPresenterFactory(Context::getContext());
+                $presentationSettings = $presenterFactory->getPresentationSettings();
+                $presenter = new ProductListingPresenter(
+                    new ImageRetriever(
+                        Context::getContext()->link
+                    ),
+                    Context::getContext()->link,
+                    new PriceFormatter(),
+                    new ProductColorsRetriever(),
+                    Context::getContext()->getTranslator()
+                );
+                $presentationSettings->showPrices = $showPrice;
                 foreach ($post_products as $post_product) {
                     if (!$post_product) {
                         continue;
@@ -194,20 +207,15 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                             (int)$pproduct->id
                         );
                         $pproduct->cover = (int)$pproduct_cover['id_image'];
-                        $products[] = $pproduct;
-                        $ps_products[] = EverPsBlogPost::convertProductToPsArray(
-                            $pproduct,
-                            Context::getContext()->language->id,
-                            Context::getContext()->shop->id
+                        $ps_products[] = $presenter->present(
+                            $presentationSettings,
+                            $assembler->assembleProduct(array('id_product' => $pproduct->id)),
+                            Context::getContext()->language
                         );
                     }
                 }
             }
-            $theme_products = Product::getProductsProperties(
-                Context::getContext()->language->id,
-                $ps_products
-            );
-            $count_products = count($products);
+            $count_products = count($ps_products);
             $post_tags = EverPsBlogCleaner::convertToArray(
                 json_decode($this->post->post_tags)
             );
@@ -241,7 +249,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             Hook::exec('beforeEverPostInitContent', array(
                 'blog_post' => $this->post,
                 'blog_tags' => $tags,
-                'blog_products' => $products
+                'blog_products' => $ps_products
             ));
             // die(var_dump($products));
             $this->context->smarty->assign(
@@ -249,8 +257,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                     'count_products' => $count_products,
                     'post' => $this->post,
                     'tags' => $tags,
-                    'products' => $products,
-                    'ps_products' => $theme_products,
+                    'ps_products' => $ps_products,
                     'default_lang' => (int)$this->context->language->id,
                     'id_lang' => (int)$this->context->language->id,
                     'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'modules/everpsblog/views/img/',
