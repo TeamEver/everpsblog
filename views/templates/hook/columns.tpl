@@ -60,10 +60,10 @@
                     </div>
                     <div class="col-12 col-xs-12">
                         <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
-                                {$item.title|strip_tags|truncate:20:"..." nofilter}
+                                {$item.title|strip_tags nofilter}
                         </h3>
                         <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
-                            {$item.content|strip_tags|truncate:100:"..."}
+                            {$item.content nofilter}
                         </div>
                         <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary" title="{l s='Read more' mod='everpsblog'} {$item.title nofilter}">{l s='Read more' mod='everpsblog'}</a>
                     </div>

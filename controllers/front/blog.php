@@ -89,7 +89,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         Hook::exec('beforeEverBlogInitContent', array(
             'blog_post_number' => $this->post_number,
             'everpsblog' => $everpsblogposts,
-            'everpsblog' => $evercategories,
+            'everpsblogcategories' => $evercategories,
             'blog_page' => Tools::getValue('page')
         ));
         $this->context->smarty->assign(

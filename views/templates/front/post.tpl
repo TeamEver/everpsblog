@@ -8,6 +8,15 @@
 
 {extends file='page.tpl'}
 
+{block name='head' append}
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{$urls.current_url|escape:'htmlall':'UTF-8'}">
+  <meta property="og:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
+  <meta property="og:site_name" content="{$shop.name|escape:'htmlall':'UTF-8'}">
+  <meta property="og:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
+  <meta property="og:image" content="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$post->id|escape:'htmlall':'UTF-8'}.jpg">
+{/block}
+
 {block name="page_content"}
 {hook h="displayBeforeEverPost" everblogpost=$post}
 <div class="content" itemscope="itemscope" itemtype="http://schema.org/Blog">
@@ -109,35 +118,14 @@
 {hook h="displayAfterEverComment"}
 {/if}
 {if isset($count_products) && $count_products > 0}
-<section class="featured-products container clearfix carousel slide">
-    <span id="postProducts" class="col-12 col-xs-12 my-2">{l s='Linked products' mod='everpsblog'}</span>
-    <div class="row postproducts products carousel-inner">
-        {assign var=counter value=0}
-        {foreach from=$products item=product}
-        {* {$product|var_dump} *}
-        <article class="product-miniature js-product-miniature{if $counter == 0} active{/if}" data-id-product="{$product->id|escape:'htmlall':'UTF-8'}" data-slide-to="{$counter|escape:'htmlall':'UTF-8'}" itemscope itemtype="http://schema.org/Product">
-            <a href="{$link->getProductLink($product)|escape:'htmlall':'UTF-8'}">
-                <div class="thumbnail-container">
-                    <img src="{$link->getImageLink($product->link_rewrite, $product->cover, 'home_default')|escape:'htmlall':'UTF-8'}" class="img-fluid mx-auto d-block">
-                </div>
-                <div class="product-description">
-                    <h3 class="h3 product-title" itemprop="name">
-                        {$product->name|escape:'htmlall':'UTF-8'}
-                    </h3>
-                    <div class="product-price-and-shipping">
-                        {hook h='displayProductPriceBlock' product=$product type="before_price"}
-                        <span itemprop="price" class="price">{Tools::displayPrice($product->price)|escape:'htmlall':'UTF-8'}</span>
 
-                        {hook h='displayProductPriceBlock' product=$product type='unit_price'}
-
-                        {hook h='displayProductPriceBlock' product=$product type='weight'}
-                    </div>
-                </div>
-            </a>
-        </article>
-        {$counter=$counter+1}
-        {/foreach}
-    </div>
+<section id="products" class="row">
+  <h2 class="text-center">{l s='Linked products' mod='everpsblog'}</h2>
+  <div class="products row">
+    {foreach from=$ps_products item="product"}
+      {include file="catalog/_partials/miniatures/product.tpl" product=$product}
+    {/foreach}
+  </div>
 </section>
 {/if}
 {hook h="displayAfterEverPost" everblogpost=$post}

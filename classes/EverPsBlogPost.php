@@ -135,7 +135,10 @@ class EverPsBlogPost extends ObjectModel
         $sql->limit((int)$limit, (int)$start);
         $posts = Db::getInstance()->executeS($sql);
         $return = array();
-        if ($current_context->controller->controller_type == 'front') {
+        // die(var_dump($current_context->controller->controller_type));
+        if ($current_context->controller->controller_type == 'front'
+            || $current_context->controller->controller_type == 'modulefront'
+        ) {
             foreach ($posts as $post) {
                 $post['content'] = self::changeShortcodes(
                     $post['content'],
@@ -144,6 +147,17 @@ class EverPsBlogPost extends ObjectModel
                 $post['title'] = self::changeShortcodes(
                     $post['title'],
                     (int)Context::getContext()->customer->id
+                );
+                // Length
+                $post['title'] = Tools::substr(
+                    $post['title'],
+                    0,
+                    (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
+                );
+                $post['content'] = Tools::substr(
+                    $post['content'],
+                    0,
+                    (int)Configuration::get('EVERPSBLOG_EXCERPT')
                 );
                 $return[] = $post;
             }
@@ -213,6 +227,17 @@ class EverPsBlogPost extends ObjectModel
                     $post->content,
                     (int)Context::getContext()->customer->id
                 );
+                // Length
+                $post->title = Tools::substr(
+                    $post->title,
+                    0,
+                    (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
+                );
+                $post->content = Tools::substr(
+                    $post->content,
+                    0,
+                    (int)Configuration::get('EVERPSBLOG_EXCERPT')
+                );
                 $return[] = $post;
             }
         }
@@ -258,10 +283,20 @@ class EverPsBlogPost extends ObjectModel
                     $post->content,
                     (int)Context::getContext()->customer->id
                 );
+                // Length
+                $post->title = Tools::substr(
+                    $post->title,
+                    0,
+                    (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
+                );
+                $post->content = Tools::substr(
+                    $post->content,
+                    0,
+                    (int)Configuration::get('EVERPSBLOG_EXCERPT')
+                );
                 $return[] = $post;
             }
         }
-        // die(var_dump($return));
         if ($return) {
             return $return;
         }
@@ -293,11 +328,31 @@ class EverPsBlogPost extends ObjectModel
                 json_decode($post['post_products'])
             );
             if (in_array((int)$id_product, $post_products)) {
-                $return[] = new self(
+                $post = new self(
                     (int)$post['id_ever_post'],
                     (int)$id_lang,
                     (int)$id_shop
                 );
+                $post->title = self::changeShortcodes(
+                    $post->title,
+                    (int)Context::getContext()->customer->id
+                );
+                $post->content = self::changeShortcodes(
+                    $post->content,
+                    (int)Context::getContext()->customer->id
+                );
+                // Length
+                $post->title = Tools::substr(
+                    $post->title,
+                    0,
+                    (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
+                );
+                $post->content = Tools::substr(
+                    $post->content,
+                    0,
+                    (int)Configuration::get('EVERPSBLOG_EXCERPT')
+                );
+                $return[] = $post;
             }
         }
         if ($return) {
@@ -310,11 +365,19 @@ class EverPsBlogPost extends ObjectModel
         $sql = new DbQuery();
         $sql->select('post_categories');
         $sql->from('ever_blog_post', 'ep');
+        $sql->leftJoin(
+            'ever_blog_post_lang',
+            'bpl',
+            'ep.id_ever_post = bpl.id_ever_post'
+        );
         $sql->where(
             'ep.id_ever_post = '.(int)$id_ever_post
         );
         $sql->where(
             'ep.id_shop = '.(int)$id_shop
+        );
+        $sql->where(
+            'ep.id_lang = '.(int)$id_lang
         );
         $sql->where(
             'ep.active = '.(int)$active
@@ -452,5 +515,176 @@ class EverPsBlogPost extends ObjectModel
             $message = str_replace($key, $value, $message);
         }
         return $message;
+    }
+
+    public function convertProductToPsArray($product, $id_lang, $id_shop)
+    {
+        $protocol = Tools::getCurrentUrlProtocolPrefix();
+        $link = new Link();
+        $url = $link->getProductLink(
+            (int)$product->id,
+            null,
+            null,
+            null,
+            (int)$id_lang,
+            (int)$id_shop
+        );
+        // Product image
+        $cover = Product::getCover(
+            (int)$product->id
+        );
+        $cover_obj = new Image(
+            (int)$cover['id_image'],
+            (int)$id_lang
+        );
+        $image_small = ImageType::getFormattedName('small');
+        $image_cart = ImageType::getFormattedName('cart');
+        $image_medium = ImageType::getFormattedName('medium');
+        $image_large = ImageType::getFormattedName('large');
+        $image_home = ImageType::getFormattedName('home');
+        $all_images = Image::getImages(
+            (int)$id_lang,
+            (int)$product->id
+        );
+        foreach ($all_images as $product_image) {
+            $cover_small = $link->getImageLink(
+                $product->link_rewrite,
+                (int)$product->id.'-'.(int)$product_image['id_image'],
+                $image_small
+            );
+            $cover_cart = $link->getImageLink(
+                $product->link_rewrite,
+                (int)$product->id.'-'.(int)$product_image['id_image'],
+                $image_cart
+            );
+            $cover_medium = $link->getImageLink(
+                $product->link_rewrite,
+                (int)$product->id.'-'.(int)$product_image['id_image'],
+                $image_medium
+            );
+            $cover_large = $link->getImageLink(
+                $product->link_rewrite,
+                (int)$product->id.'-'.(int)$product_image['id_image'],
+                $image_large
+            );
+            $cover_home = $link->getImageLink(
+                $product->link_rewrite,
+                (int)$product->id.'-'.(int)$product_image['id_image'],
+                $image_home
+            );
+            $cover_obj->bySize = array(
+                ImageType::getFormattedName('small') => array(
+                    'url' => $protocol.$cover_small
+                ),
+                ImageType::getFormattedName('cart') => array(
+                    'url' => $protocol.$cover_cart
+                ),
+                ImageType::getFormattedName('medium') => array(
+                    'url' => $protocol.$cover_medium
+                ),
+                ImageType::getFormattedName('large') => array(
+                    'url' => $protocol.$cover_large
+                ),
+                ImageType::getFormattedName('home') => array(
+                    'url' => $protocol.$cover_home
+                )
+            );
+        }
+        $cover_obj->large = array(
+            'url' => $cover_home
+        );
+        // Has discount
+        $product->has_discount = Product::isDiscounted(
+            (int)$product->id
+        );
+        // Product default category
+        $category = new Category(
+            (int)$product->id_category_default,
+            (int)$id_lang,
+            (int)$id_shop
+        );
+        // Manufacturer
+        $manufacturer = new Manufacturer(
+            (int)$product->id_manufacturer,
+            (int)$id_lang
+        );
+        // die(var_dump($cover_obj->bySize));
+        $array_product = array(
+            'id_product' => $product->id,
+            'id_supplier' => $product->id_supplier,
+            'id_manufacturer' => $product->id_manufacturer,
+            'id_category_default' => $product->id_category_default,
+            'id_shop_default' => $product->id_shop_default,
+            'id_tax_rules_group' => $product->id_tax_rules_group,
+            'on_sale' => $product->on_sale,
+            'online_only' => $product->online_only,
+            'ean13' => $product->ean13,
+            'isbn' => $product->isbn,
+            'upc' => $product->upc,
+            'ecotax' => $product->ecotax,
+            'quantity' => $product->quantity,
+            'minimal_quantity' => $product->minimal_quantity,
+            'low_stock_threshold' => $product->low_stock_threshold,
+            'low_stock_alert' => $product->low_stock_alert,
+            'wholesale_price' => $product->wholesale_price,
+            'unity' => $product->unity,
+            'unit_price_ratio' => $product->unit_price_ratio,
+            'additional_shipping_cost' => $product->additional_shipping_cost,
+            'reference' => $product->reference,
+            'supplier_reference' => $product->supplier_reference,
+            'location' => $product->location,
+            'width' => $product->width,
+            'height' => $product->height,
+            'depth' => $product->depth,
+            'weight' => $product->weight,
+            'out_of_stock' => $product->out_of_stock,
+            'additional_delivery_times' => $product->additional_delivery_times,
+            'quantity_discount' => $product->quantity_discount,
+            'customizable' => $product->customizable,
+            'uploadable_files' => $product->uploadable_files,
+            'text_fields' => $product->text_fields,
+            'active' => $product->active,
+            'redirect_type' => $product->redirect_type,
+            'id_type_redirected' => $product->id_type_redirected,
+            'available_for_order' => $product->available_for_order,
+            'available_date' => $product->available_date,
+            'show_condition' => $product->show_condition,
+            'condition' => $product->condition,
+            'show_price' => $product->show_price,
+            'indexed' => $product->indexed,
+            'visibility' => $product->visibility,
+            'cache_is_pack' => $product->cache_is_pack,
+            'cache_has_attachments' => $product->cache_has_attachments,
+            'is_virtual' => $product->is_virtual,
+            'cache_default_attribute' => $product->cache_default_attribute,
+            'date_add' => $product->date_add,
+            'advanced_stock_management' => $product->advanced_stock_management,
+            'pack_stock_type' => $product->pack_stock_type,
+            'state' => $product->state,
+            'id_shop' => $product->id_shop,
+            'id_product_attribute' => 0, //Set attribute to zero
+            'product_attribute_minimal_quantity' => 0, //Set attribute minimal qty to zero
+            'description' => $product->description,
+            'description_short' => $product->description_short,
+            'available_now' => $product->available_now,
+            'available_later' => $product->available_later,
+            'link_rewrite' => $product->link_rewrite,
+            'meta_description' => $product->meta_description,
+            'meta_keywords' => $product->meta_keywords,
+            'meta_title' => $product->meta_title,
+            'name' => $product->name,
+            'id_image' => $cover_obj->id, // TODO get cover
+            'legend' => $cover_obj->legend, // TODO cover legend
+            'manufacturer_name' => $manufacturer->name, // TODO cover manufacturer_name
+            'category_default' => $category, // TODO get category_default
+            'new' => $product->new, // TODO is new ?
+            'cover' => (array)$cover_obj, // TODO is new ?
+            'url' => $url, // TODO is new ?
+            'has_discount' => $product->has_discount,
+            'flags' => array(), // TODO wut ? where are flags stored ?
+            'main_variants' => false, // TODO wut ? where are main_variants stored ?
+            // 'orderprice' => $product->orderprice, // wut ? orderprice ?
+        );
+        return $array_product;
     }
 }

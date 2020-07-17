@@ -177,10 +177,13 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             $post_products = EverPsBlogCleaner::convertToArray(
                 json_decode($this->post->post_products)
             );
-            $count_products = count($post_products);
             $products = array();
+            $ps_products = array();
             if (isset($post_products) && !empty($post_products)) {
                 foreach ($post_products as $post_product) {
+                    if (!$post_product) {
+                        continue;
+                    }
                     $pproduct = new Product(
                         (int)$post_product,
                         (int)$this->context->shop->id,
@@ -192,9 +195,19 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                         );
                         $pproduct->cover = (int)$pproduct_cover['id_image'];
                         $products[] = $pproduct;
+                        $ps_products[] = EverPsBlogPost::convertProductToPsArray(
+                            $pproduct,
+                            Context::getContext()->language->id,
+                            Context::getContext()->shop->id
+                        );
                     }
                 }
             }
+            $theme_products = Product::getProductsProperties(
+                Context::getContext()->language->id,
+                $ps_products
+            );
+            $count_products = count($products);
             $post_tags = EverPsBlogCleaner::convertToArray(
                 json_decode($this->post->post_tags)
             );
@@ -230,12 +243,14 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 'blog_tags' => $tags,
                 'blog_products' => $products
             ));
+            // die(var_dump($products));
             $this->context->smarty->assign(
                 array(
                     'count_products' => $count_products,
                     'post' => $this->post,
                     'tags' => $tags,
                     'products' => $products,
+                    'ps_products' => $theme_products,
                     'default_lang' => (int)$this->context->language->id,
                     'id_lang' => (int)$this->context->language->id,
                     'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'modules/everpsblog/views/img/',

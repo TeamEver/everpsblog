@@ -8,6 +8,15 @@
 
 {extends file='page.tpl'}
 
+{block name='head' append}
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{$urls.current_url|escape:'htmlall':'UTF-8'}">
+  <meta property="og:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
+  <meta property="og:site_name" content="{$shop.name|escape:'htmlall':'UTF-8'}">
+  <meta property="og:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
+  <meta property="og:image" content="{$blogImg_dir|escape:'htmlall':'UTF-8'}tags/tag_image_{$tag->id|escape:'htmlall':'UTF-8'}.jpg">
+{/block}
+
 {block name="page_content"}
 {hook h="displayBeforeEverTag" everblogtag=$tag}
 <div class="container">
@@ -39,7 +48,7 @@
                         {$item->title nofilter}
                     </a>
                 </h3>
-                <div class="everpsblogcontent" id="everpsblog-post-content-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">{$item->content|truncate:350:"..." nofilter}</div>
+                <div class="everpsblogcontent" id="everpsblog-post-content-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">{$item->content nofilter}</div>
                 <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary" title="{$item->title nofilter} {$shop.name|escape:htmlall:'UTF-8'}">{l s='Read more' mod='everpsblog'}</a>
             </div>
         </div>

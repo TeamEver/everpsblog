@@ -1,6 +1,6 @@
 # Ever PS Blog
 
-Blog module for Prestashop 1.7 only
+Multilingual blog module for Prestashop 1.7 only
 
 https://www.team-ever.com/produit/prestashop-module-de-blog-gratuit/
 
@@ -8,7 +8,5 @@ https://www.team-ever.com/produit/prestashop-module-de-blog-gratuit/
 
 ***TODO***
 - block empty objects saving
-- allow change excerpt length
-- change shortcodes on post listing
 - sharing buttons (Twitter, Facebook, etc)
 - rich snippets (@see Ever SEO)

@@ -24,7 +24,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '2.3.6';
+        $this->version = '2.3.9';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -96,7 +96,9 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERBLOG_BANNED_IP', '')
             && Configuration::updateValue('EVERPSBLOG_PAGINATION', '10')
             && Configuration::updateValue('EVERPSBLOG_HOME_NBR', '4')
-            && Configuration::updateValue('EVERPSBLOG_PRODUCT_NBR', '4');
+            && Configuration::updateValue('EVERPSBLOG_PRODUCT_NBR', '4')
+            && Configuration::updateValue('EVERPSBLOG_EXCERPT', '150')
+            && Configuration::updateValue('EVERPSBLOG_TITLE_LENGTH', '15');
     }
 
     public function uninstall()
@@ -249,31 +251,36 @@ class EverPsBlog extends Module
             ) {
                 $this->postErrors[] = $this->l('Error : The field "Blog route" is not valid');
             }
-
+            if (!Tools::getValue('EVERPSBLOG_EXCERPT')
+                || !Validate::isInt(Tools::getValue('EVERPSBLOG_EXCERPT'))
+            ) {
+                $this->postErrors[] = $this->l('Error : The field "Excerpt length" is not valid');
+            }
+            if (!Tools::getValue('EVERPSBLOG_TITLE_LENGTH')
+                || !Validate::isInt(Tools::getValue('EVERPSBLOG_TITLE_LENGTH'))
+            ) {
+                $this->postErrors[] = $this->l('Error : The field "Title length" is not valid');
+            }
             if (!Tools::getIsset('EVERBLOG_ADMIN_EMAIL')
                 || !Validate::isUnsignedInt(Tools::getValue('EVERBLOG_ADMIN_EMAIL'))
             ) {
                 $this->postErrors[] = $this->l('Error : The field "Admin email" is not valid');
             }
-
             if (!Tools::getIsset('EVERBLOG_ALLOW_COMMENTS')
                 || !Validate::isBool(Tools::getValue('EVERBLOG_ALLOW_COMMENTS'))
             ) {
                 $this->postErrors[] = $this->l('Error : The field "Allow comments" is not valid');
             }
-
             if (!Tools::getIsset('EVERBLOG_CHECK_COMMENTS')
                 || !Validate::isBool(Tools::getValue('EVERBLOG_CHECK_COMMENTS'))
             ) {
                 $this->postErrors[] = $this->l('Error : The field "Check comments" is not valid');
             }
-
             if (!Tools::getIsset('EVERBLOG_BANNED_USERS')
                 || !Validate::isGenericName(Tools::getValue('EVERBLOG_BANNED_USERS'))
             ) {
                 $this->postErrors[] = $this->l('Error : The field "Banned users" is not valid');
             }
-
             if (!Tools::getIsset('EVERBLOG_BANNED_IP')
                 || !Validate::isGenericName(Tools::getValue('EVERBLOG_BANNED_IP'))
             ) {
@@ -415,6 +422,8 @@ class EverPsBlog extends Module
         }
         $formValues[] = array(
             'EVERPSBLOG_ROUTE' => Configuration::get('EVERPSBLOG_ROUTE'),
+            'EVERPSBLOG_EXCERPT' => Configuration::get('EVERPSBLOG_EXCERPT'),
+            'EVERPSBLOG_TITLE_LENGTH' => Configuration::get('EVERPSBLOG_TITLE_LENGTH'),
             'EVERPSBLOG_PAGINATION' => Configuration::get('EVERPSBLOG_PAGINATION'),
             'EVERPSBLOG_HOME_NBR' => Configuration::get('EVERPSBLOG_HOME_NBR'),
             'EVERPSBLOG_PRODUCT_NBR' => Configuration::get('EVERPSBLOG_PRODUCT_NBR'),
@@ -540,6 +549,22 @@ class EverPsBlog extends Module
                         'name' => 'EVERPSBLOG_ROUTE',
                         'desc' => $this->l('Leaving empty will set "blog"'),
                         'hint' => $this->l('Use a keyword associated to your shop'),
+                    ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('Post content excerpt'),
+                        'name' => 'EVERPSBLOG_EXCERPT',
+                        'desc' => $this->l('Post excerpt length for content on listing'),
+                        'hint' => $this->l('Please set post content excerpt'),
+                        'required' => true,
+                    ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('Post title length'),
+                        'name' => 'EVERPSBLOG_TITLE_LENGTH',
+                        'desc' => $this->l('Post title length for content on listing'),
+                        'hint' => $this->l('Please set post title length'),
+                        'required' => true,
                     ),
                     array(
                         'type' => 'text',
@@ -1038,12 +1063,12 @@ class EverPsBlog extends Module
         );
         $everpsblog = array();
         foreach ($posts as $post) {
-            $post['title'] = EverPsBlogPost::changeShortcodes(
-                $post['title'],
+            $post->title = EverPsBlogPost::changeShortcodes(
+                $post->title,
                 (int)Context::getContext()->customer->id
             );
-            $post['content'] = EverPsBlogPost::changeShortcodes(
-                $post['content'],
+            $post->content = EverPsBlogPost::changeShortcodes(
+                $post->content,
                 (int)Context::getContext()->customer->id
             );
             $everpsblog[] = $post;

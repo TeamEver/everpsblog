@@ -8,6 +8,15 @@
 
 {extends file='page.tpl'}
 
+{block name='head' append}
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{$urls.current_url|escape:'htmlall':'UTF-8'}">
+  <meta property="og:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
+  <meta property="og:site_name" content="{$shop.name|escape:'htmlall':'UTF-8'}">
+  <meta property="og:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
+  <meta property="og:image" content="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$category->id}.jpg">
+{/block}
+
 {block name="page_content"}
 {hook h="displayBeforeEverCategory" everblogcategory=$category}
 <h1>{$category->title|escape:'htmlall':'UTF-8'}</h1>
