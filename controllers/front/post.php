@@ -251,9 +251,26 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 'blog_tags' => $tags,
                 'blog_products' => $ps_products
             ));
+            $social_share_links = [];
+            $social_share_links['facebook'] = [
+                'label' => $this->trans('Share', [], 'Modules.Everpsblog.Shop'),
+                'class' => 'facebook',
+                'url' => 'https://www.facebook.com/sharer.php?u='.$page['canonical'],
+            ];
+            $social_share_links['twitter'] = [
+                'label' => $this->trans('Tweet', [], 'Modules.Everpsblog.Shop'),
+                'class' => 'twitter',
+                'url' => 'https://twitter.com/intent/tweet?text='.$this->post->title.' '.$page['canonical'],
+            ];
+            // $social_share_links['pinterest'] = [
+            //     'label' => $this->trans('Pinterest', [], 'Modules.Everpsblog.Shop'),
+            //     'class' => 'pinterest',
+            //     'url' => 'https://www.pinterest.com/pin/create/button/?media='.$sharing_img.'&url='.$page['canonical'],
+            // ];
             // die(var_dump($products));
             $this->context->smarty->assign(
                 array(
+                    'social_share_links' => $social_share_links,
                     'count_products' => $count_products,
                     'post' => $this->post,
                     'tags' => $tags,

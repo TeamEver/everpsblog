@@ -91,6 +91,9 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
         parent::init();
         $param = array();
         $page_name = Dispatcher::getInstance()->getController();
+        Hook::exec('beforeEverBlogInit', array(
+            'blog_page_name' => $page_name
+        ));
 
         switch ($page_name) {
             case 'post':
@@ -142,6 +145,10 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
                 $page_name,
                 $param
             );
+            Hook::exec('afterEverBlogInit', array(
+                'blog_page_name' => $page_name,
+                'param' => $param
+            ));
             $this->canonicalRedirection($canonical_url);
         }
     }

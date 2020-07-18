@@ -361,36 +361,36 @@ class AdminEverPsBlogTagController extends ModuleAdminController
             $tag->date_upd = date('Y-m-d H:i:s');
             // Multilingual fields
             foreach (Language::getLanguages(false) as $language) {
-                if (Tools::getValue('title_'.$language['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('title_'.$language['id_lang']))
+                if (!Tools::getValue('title_'.$language['id_lang'])
+                    || !Validate::isCleanHtml(Tools::getValue('title_'.$language['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Title is not valid for lang ').$language['id_lang'];
                 } else {
                     $tag->title[$language['id_lang']] = Tools::getValue('title_'.$language['id_lang']);
                 }
-                if (Tools::getValue('content_'.$language['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('content_'.$language['id_lang']))
+                if (!Tools::getValue('content_'.$language['id_lang'])
+                    || !Validate::isCleanHtml(Tools::getValue('content_'.$language['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Content is not valid for lang ').$language['id_lang'];
                 } else {
                     $tag->content[$language['id_lang']] = Tools::getValue('content_'.$language['id_lang']);
                 }
-                if (Tools::getValue('meta_title_'.$language['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('meta_title_'.$language['id_lang']))
+                if (!Tools::getValue('meta_title_'.$language['id_lang'])
+                    || !Validate::isCleanHtml(Tools::getValue('meta_title_'.$language['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Meta title is not valid for lang ').$language['id_lang'];
                 } else {
                     $tag->meta_title[$language['id_lang']] = Tools::getValue('meta_title_'.$language['id_lang']);
                 }
-                if (Tools::getValue('meta_description_'.$language['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('meta_description_'.$language['id_lang']))
+                if (!Tools::getValue('meta_description_'.$language['id_lang'])
+                    || !Validate::isCleanHtml(Tools::getValue('meta_description_'.$language['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Meta description is not valid for lang ').$language['id_lang'];
                 } else {
                     $tag->meta_description[$language['id_lang']] = Tools::getValue('meta_description_'.$language['id_lang']);
                 }
-                if (Tools::getValue('link_rewrite_'.$language['id_lang'])
-                    && !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$language['id_lang']))
+                if (!Tools::getValue('link_rewrite_'.$language['id_lang'])
+                    || !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$language['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Link rewrite is not valid for lang ').$language['id_lang'];
                 } else {
@@ -434,10 +434,6 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                     if (copy($logo, $tag_img_destination)) {
                         return true;
                     }
-                }
-            } else {
-                foreach ($this->errors as $error) {
-                    $this->html .= $this->displayError($error);
                 }
             }
         }

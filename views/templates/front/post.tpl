@@ -9,19 +9,47 @@
 {extends file='page.tpl'}
 
 {block name='head' append}
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="{$urls.current_url|escape:'htmlall':'UTF-8'}">
-  <meta property="og:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
-  <meta property="og:site_name" content="{$shop.name|escape:'htmlall':'UTF-8'}">
-  <meta property="og:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
-  <meta property="og:image" content="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$post->id|escape:'htmlall':'UTF-8'}.jpg">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{$urls.current_url|escape:'htmlall':'UTF-8'}">
+    <meta property="og:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
+    <meta property="og:site_name" content="{$shop.name|escape:'htmlall':'UTF-8'}">
+    <meta property="og:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
+    <meta property="og:image" content="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$post->id|escape:'htmlall':'UTF-8'}.jpg">
+    <script type="application/ld+json">
+    {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://google.com/article"
+    },
+    "headline": "{$post->title|escape:'htmlall':'UTF-8'}",
+    "image": [
+      "{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$post->id|escape:'htmlall':'UTF-8'}.jpg"
+     ],
+    "datePublished": "{$post->date_add|escape:'htmlall':'UTF-8'}",
+    "dateModified": "{$post->date_upd|escape:'htmlall':'UTF-8'}",
+    "author": {
+      "@type": "Person",
+      "name": "{$shop.name|escape:'htmlall':'UTF-8'}"
+    },
+     "publisher": {
+      "@type": "Organization",
+      "name": "{$shop.name|escape:'htmlall':'UTF-8'}",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "{$shop.logo|escape:'htmlall':'UTF-8'}"
+      }
+    }
+    }
+    </script>
 {/block}
 
 {block name="page_content"}
 {hook h="displayBeforeEverPost" everblogpost=$post}
 <div class="content" itemscope="itemscope" itemtype="http://schema.org/Blog">
     <div class="container" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
-            <h1 itemprop="headline">{$post->title nofilter}</h1>
+            <h1 itemprop="headline">{$post->title|escape:'htmlall':'UTF-8'}</h1>
             <p class="postpublished" itemprop="datePublished">{l s='Published on' mod='everpsblog'} {$post->date_add|escape:'htmlall':'UTF-8'}</p>
             <div class="row">
             {if isset($errors) && $errors}
@@ -58,6 +86,17 @@
         {/if}
     </div>
 </div>
+  {if $social_share_links}
+    <div class="social-sharing">
+      <span>{l s='Share' d='Shop.Theme.Actions'}</span>
+      <ul>
+        {foreach from=$social_share_links item='social_share_link'}
+          <li class="{$social_share_link.class} icon-gray"><a href="{$social_share_link.url}" class="text-hide" title="{$social_share_link.label}" target="_blank">{$social_share_link.label}</a></li>
+        {/foreach}
+      </ul>
+    </div>
+  {/if}
+
 {if isset($allow_comments) && $allow_comments}
 <section class="leaveComment container clearfix">
     <span id="leaveComment">{l s='Leave a comment' mod='everpsblog'}</span>

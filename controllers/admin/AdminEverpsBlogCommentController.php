@@ -240,14 +240,14 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
 
     public function postProcess()
     {
-        if (Tools::getIsset('deleteever_blog_comments')) {
+        if (Tools::getValue('deleteever_blog_comments')) {
             $everObj = new EverPsBlogComment(
                 (int)Tools::getValue('id_ever_comment')
             );
             (int)$everObj->active = !(int)$everObj->active;
             $everObj->delete();
         }
-        if (Tools::getIsset('statusever_blog_comments')) {
+        if (Tools::getValue('statusever_blog_comments')) {
             $everObj = new EverPsBlogComment(
                 (int)Tools::getValue('id_ever_comment')
             );
@@ -299,10 +299,6 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
             }
             if (!count($this->errors)) {
                 $comment->save();
-            } else {
-                foreach ($this->errors as $error) {
-                    $this->html .= $this->displayError($error);
-                }
             }
         }
         parent::postProcess();

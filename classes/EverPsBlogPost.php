@@ -141,6 +141,7 @@ class EverPsBlogPost extends ObjectModel
         $sql->where('bp.post_status = "'.(string)$post_status.'"');
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
+        $sql->orderBy('bp.date_add DESC');
         $sql->limit((int)$limit, (int)$start);
         $posts = Db::getInstance()->executeS($sql);
         $return = array();
@@ -215,6 +216,7 @@ class EverPsBlogPost extends ObjectModel
         $sql->where('bp.post_status = "'.(string)$post_status.'"');
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
+        $sql->orderBy('bp.date_add DESC');
         $sql->limit((int)$limit, (int)$start);
         $posts = Db::getInstance()->executeS($sql);
         $return = array();
@@ -271,6 +273,7 @@ class EverPsBlogPost extends ObjectModel
         $sql->where('bp.post_status = "'.pSQL($post_status).'"');
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
+        $sql->orderBy('bp.date_add DESC');
         $sql->limit((int)$limit, (int)$start);
         $posts = Db::getInstance()->executeS($sql);
         $return = array();
@@ -391,6 +394,7 @@ class EverPsBlogPost extends ObjectModel
         $sql->where(
             'ep.active = '.(int)$active
         );
+        $sql->orderBy('ep.date_add DESC');
         // $sql->limit((int)$limit);
         $post_categories = Db::getInstance()->getValue($sql);
         return json_decode($post_categories);
@@ -518,6 +522,88 @@ class EverPsBlogPost extends ObjectModel
             '[start_contact_link]' => '<a href="'.$contactLink.'" rel="nofollow" target="_blank">',
             '[end_shop_link]' => '</a>',
             '[end_contact_link]' => '</a>',
+            '1F600' => '😀',
+            '1F601' => '😁',
+            '1F602' => '😂',
+            '1F603' => '😃',
+            '1F604' => '😄',
+            '1F605' => '😅',
+            '1F606' => '😆',
+            '1F607' => '😇',
+            '1F608' => '😈',
+            '1F609' => '😉',
+            '1F60A' => '😊',
+            '1F60B' => '😋',
+            '1F60C' => '😌',
+            '1F60D' => '😍',
+            '1F60E' => '😎',
+            '1F60F' => '😏',
+            '1F610' => '😐',
+            '1F611' => '😑',
+            '1F612' => '😒',
+            '1F613' => '😓',
+            '1F614' => '😔',
+            '1F615' => '😕',
+            '1F616' => '😖',
+            '1F617' => '😗',
+            '1F618' => '😘',
+            '1F619' => '😙',
+            '1F61A' => '😚',
+            '1F61B' => '😛',
+            '1F61C' => '😜',
+            '1F61D' => '😝',
+            '1F61E' => '😞',
+            '1F61F' => '😟',
+            '1F620' => '😠',
+            '1F621' => '😡',
+            '1F622' => '😢',
+            '1F623' => '😣',
+            '1F624' => '😤',
+            '1F625' => '😥',
+            '1F626' => '😦',
+            '1F627' => '😧',
+            '1F628' => '😨',
+            '1F629' => '😩',
+            '1F62A' => '😪',
+            '1F62B' => '😫',
+            '1F62C' => '😬',
+            '1F62D' => '😭',
+            '1F62E' => '😮',
+            '1F62F' => '😯',
+            '1F630' => '😰',
+            '1F631' => '😱',
+            '1F632' => '😲',
+            '1F633' => '😳',
+            '1F634' => '😴',
+            '1F635' => '😵',
+            '1F636' => '😶',
+            '1F637' => '😷',
+            '1F641' => '🙁',
+            '1F642' => '🙂',
+            '1F643' => '🙃',
+            '1F644' => '🙄',
+            '1F910' => '🤐',
+            '1F911' => '🤑',
+            '1F912' => '🤒',
+            '1F913' => '🤓',
+            '1F914' => '🤔',
+            '1F915' => '🤕',
+            '1F920' => '🤠',
+            '1F921' => '🤡',
+            '1F922' => '🤢',
+            '1F923' => '🤣',
+            '1F924' => '🤤',
+            '1F925' => '🤥',
+            '1F927' => '🤧',
+            '1F928' => '🤨',
+            '1F929' => '🤩',
+            '1F92A' => '🤪',
+            '1F92B' => '🤫',
+            '1F92C' => '🤬',
+            '1F92D' => '🤭',
+            '1F92E' => '🤮',
+            '1F92F' => '🤯',
+            '1F9D0' => '🧐',
         );
         $shortcodes = array_merge($entityShortcodes, $defaultShortcodes);
         foreach ($shortcodes as $key => $value) {

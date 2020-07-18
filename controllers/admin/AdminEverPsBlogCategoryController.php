@@ -342,7 +342,6 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
 
     public function postProcess()
     {
-        parent::postProcess();
         if (Tools::getIsset('statusever_blog_category')) {
             $everObj = new EverPsBlogCategory(
                 (int)Tools::getValue('id_ever_category')
@@ -387,8 +386,8 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
             $category->date_upd = date('Y-m-d H:i:s');
             // Multilingual fields
             foreach (Language::getLanguages(false) as $lang) {
-                if (Tools::getValue('title_'.$lang['id_lang'])
-                    && !Validate::isString(Tools::getValue('title_'.$lang['id_lang']))
+                if (!Tools::getValue('title_'.$lang['id_lang'])
+                    || !Validate::isString(Tools::getValue('title_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l(
                         'Title is not valid for lang '
@@ -396,8 +395,8 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                 } else {
                     $category->title[$lang['id_lang']] = Tools::getValue('title_'.$lang['id_lang']);
                 }
-                if (Tools::getValue('content_'.$lang['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('content_'.$lang['id_lang']))
+                if (!Tools::getValue('content_'.$lang['id_lang'])
+                    || !Validate::isCleanHtml(Tools::getValue('content_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l(
                         'Content is not valid for lang '
@@ -405,8 +404,8 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                 } else {
                     $category->content[$lang['id_lang']] = Tools::getValue('content_'.$lang['id_lang']);
                 }
-                if (Tools::getValue('meta_title_'.$lang['id_lang'])
-                    && !Validate::isString(Tools::getValue('meta_title_'.$lang['id_lang']))
+                if (!Tools::getValue('meta_title_'.$lang['id_lang'])
+                    || !Validate::isString(Tools::getValue('meta_title_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l(
                         'Meta title is not valid for lang '
@@ -414,8 +413,8 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                 } else {
                     $category->meta_title[$lang['id_lang']] = Tools::getValue('meta_title_'.$lang['id_lang']);
                 }
-                if (Tools::getValue('meta_description_'.$lang['id_lang'])
-                    && !Validate::isString(Tools::getValue('meta_description_'.$lang['id_lang']))
+                if (!Tools::getValue('meta_description_'.$lang['id_lang'])
+                    || !Validate::isString(Tools::getValue('meta_description_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l(
                         'Meta description is not valid for lang '
@@ -425,8 +424,8 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                         'meta_description_'.$lang['id_lang']
                     );
                 }
-                if (Tools::getValue('link_rewrite_'.$lang['id_lang'])
-                    && !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$lang['id_lang']))
+                if (!Tools::getValue('link_rewrite_'.$lang['id_lang'])
+                    || !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l(
                         'Link rewrite is not valid for lang '
@@ -476,12 +475,9 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                         return true;
                     }
                 }
-            } else {
-                foreach ($this->errors as $error) {
-                    $this->html .= $this->displayError($error);
-                }
             }
         }
+        parent::postProcess();
     }
 
     protected function processBulkDisable()

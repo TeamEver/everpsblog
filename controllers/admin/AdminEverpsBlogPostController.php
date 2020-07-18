@@ -190,6 +190,13 @@ class AdminEverPsBlogPostController extends ModuleAdminController
 
     public function renderForm()
     {
+        if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP && Shop::isFeatureActive()) {
+            $this->errors[] = $this->l('You have to select a shop before creating or editing new backlink.');
+        }
+
+        if (count($this->errors)) {
+            return false;
+        }
         $post_id = Tools::getValue('id_ever_post');
         $obj = new EverPsBlogPost(
             (int)Tools::getValue('id_ever_post')
@@ -544,7 +551,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 $post->follow = Tools::getValue('follow');
             }
             // Date add
-            if (!(int)Tools::getValue('date_add')) {
+            if (!Tools::getValue('date_add')) {
                 $post->date_add = date('Y-m-d H:i:s');
             }
             if (Tools::getValue('date_add')
@@ -566,36 +573,36 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             $post->date_upd = date('Y-m-d H:i:s');
             // Multilingual fields
             foreach (Language::getLanguages(false) as $lang) {
-                if (Tools::getValue('title_'.$lang['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('title_'.$lang['id_lang']))
+                if (!Tools::getValue('title_'.$lang['id_lang'])
+                    || !Validate::isCleanHtml(Tools::getValue('title_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Title is not valid for lang ').$lang['id_lang'];
                 } else {
                     $post->title[$lang['id_lang']] = Tools::getValue('title_'.$lang['id_lang']);
                 }
-                if (Tools::getValue('content_'.$lang['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('content_'.$lang['id_lang']))
+                if (!Tools::getValue('content_'.$lang['id_lang'])
+                    || !Validate::isCleanHtml(Tools::getValue('content_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Content is not valid for lang ').$lang['id_lang'];
                 } else {
                     $post->content[$lang['id_lang']] = Tools::getValue('content_'.$lang['id_lang']);
                 }
-                if (Tools::getValue('meta_title_'.$lang['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('meta_title_'.$lang['id_lang']))
+                if (!Tools::getValue('meta_title_'.$lang['id_lang'])
+                    || !Validate::isCleanHtml(Tools::getValue('meta_title_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Meta title is not valid for lang ').$lang['id_lang'];
                 } else {
                     $post->meta_title[$lang['id_lang']] = Tools::getValue('meta_title_'.$lang['id_lang']);
                 }
-                if (Tools::getValue('meta_description_'.$lang['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('meta_description_'.$lang['id_lang']))
+                if (!Tools::getValue('meta_description_'.$lang['id_lang'])
+                    || !Validate::isCleanHtml(Tools::getValue('meta_description_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Meta description is not valid for lang ').$lang['id_lang'];
                 } else {
                     $post->meta_description[$lang['id_lang']] = Tools::getValue('meta_description_'.$lang['id_lang']);
                 }
-                if (Tools::getValue('link_rewrite_'.$lang['id_lang'])
-                    && !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$lang['id_lang']))
+                if (!Tools::getValue('link_rewrite_'.$lang['id_lang'])
+                    || !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Link rewrite is not valid for lang ').$lang['id_lang'];
                 } else {
@@ -637,10 +644,6 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     if (copy($logo, $post_img_destination)) {
                         return true;
                     }
-                }
-            } else {
-                foreach ($this->errors as $error) {
-                    $this->html .= $this->displayError($error);
                 }
             }
         }

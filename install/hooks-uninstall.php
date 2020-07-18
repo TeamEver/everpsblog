@@ -88,9 +88,21 @@ if ($beforeEverTagInitContent) {
     $hook = new Hook((int)$beforeEverTagInitContent);
     $hook->delete();
 }
-// Hook before blog init
+// Hook before blog init content
 $beforeEverBlogInitContent = Hook::getIdByName('beforeEverBlogInitContent');
 if ($beforeEverBlogInitContent) {
     $hook = new Hook((int)$beforeEverBlogInitContent);
+    $hook->delete();
+}
+// Hook before blog init
+$beforeEverBlogInit = Hook::getIdByName('beforeEverBlogInit');
+if ($beforeEverBlogInit) {
+    $hook = new Hook((int)$beforeEverBlogInit);
+    $hook->delete();
+}
+// Hook after blog init
+$beforeEverBlogInit = Hook::getIdByName('afterEverBlogInit');
+if ($afterEverBlogInit) {
+    $hook = new Hook((int)$afterEverBlogInit);
     $hook->delete();
 }
