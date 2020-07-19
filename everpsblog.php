@@ -26,7 +26,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '3.1.3';
+        $this->version = '3.1.6';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -113,6 +113,7 @@ class EverPsBlog extends Module
                 'AdminEverPsBlog',
                 $this->l('Authors')
             )
+            && Configuration::updateValue('EVERPSBLOG_ROUTE', 'blog')
             && Configuration::updateValue('EVERBLOG_ADMIN_EMAIL', 1)
             && Configuration::updateValue('EVERBLOG_EMPTY_TRASH', 7)
             && Configuration::updateValue('EVERBLOG_ALLOW_COMMENTS', 1)
@@ -123,7 +124,12 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERPSBLOG_HOME_NBR', '4')
             && Configuration::updateValue('EVERPSBLOG_PRODUCT_NBR', '4')
             && Configuration::updateValue('EVERPSBLOG_EXCERPT', '150')
-            && Configuration::updateValue('EVERPSBLOG_TITLE_LENGTH', '15');
+            && Configuration::updateValue('EVERPSBLOG_TITLE_LENGTH', '15')
+            && Configuration::updateValue('EVERPSBLOG_BLOG_LAYOUT', 'layouts/layout-right-column.tpl')
+            && Configuration::updateValue('EVERPSBLOG_POST_LAYOUT', 'layouts/layout-right-column.tpl')
+            && Configuration::updateValue('EVERPSBLOG_CAT_LAYOUT', 'layouts/layout-right-column.tpl')
+            && Configuration::updateValue('EVERPSBLOG_AUTHOR_LAYOUT', 'layouts/layout-right-column.tpl')
+            && Configuration::updateValue('EVERPSBLOG_TAG_LAYOUT', 'layouts/layout-right-column.tpl');
     }
 
     public function uninstall()
@@ -205,10 +211,6 @@ class EverPsBlog extends Module
      */
     public function hookModuleRoutes($params)
     {
-//         if (Tools::getValue('controller') == 'AdminModules') {
-//             return array();
-//         }
-
         $base_route = Configuration::get('EVERPSBLOG_ROUTE') ? Configuration::get('EVERPSBLOG_ROUTE') : 'blog';
 
         return array(
@@ -369,6 +371,7 @@ class EverPsBlog extends Module
                     'Error : The field "Fancybox" is not valid'
                 );
             }
+            // Multilingual fields
             foreach (Language::getLanguages(false) as $lang) {
                 if (!Tools::getValue('EVERBLOG_TITLE_'.$lang['id_lang'])
                     || !Validate::isString(Tools::getValue('EVERBLOG_TITLE_'.$lang['id_lang']))
@@ -399,12 +402,47 @@ class EverPsBlog extends Module
                     );
                 }
             }
+            // Layouts
+            if (Tools::getValue('EVERPSBLOG_BLOG_LAYOUT')
+                && !Validate::isString(Tools::getValue('EVERPSBLOG_BLOG_LAYOUT'))
+            ) {
+                $this->postErrors[] = $this->l(
+                    'Error : The field "Blog layout" is not valid'
+                );
+            }
+            if (Tools::getValue('EVERPSBLOG_POST_LAYOUT')
+                && !Validate::isString(Tools::getValue('EVERPSBLOG_POST_LAYOUT'))
+            ) {
+                $this->postErrors[] = $this->l(
+                    'Error : The field "Post layout" is not valid'
+                );
+            }
+            if (Tools::getValue('EVERPSBLOG_CAT_LAYOUT')
+                && !Validate::isString(Tools::getValue('EVERPSBLOG_CAT_LAYOUT'))
+            ) {
+                $this->postErrors[] = $this->l(
+                    'Error : The field "Category layout" is not valid'
+                );
+            }
+            if (Tools::getValue('EVERPSBLOG_AUTHOR_LAYOUT')
+                && !Validate::isString(Tools::getValue('EVERPSBLOG_AUTHOR_LAYOUT'))
+            ) {
+                $this->postErrors[] = $this->l(
+                    'Error : The field "Author layout" is not valid'
+                );
+            }
+            if (Tools::getValue('EVERPSBLOG_TAG_LAYOUT')
+                && !Validate::isString(Tools::getValue('EVERPSBLOG_TAG_LAYOUT'))
+            ) {
+                $this->postErrors[] = $this->l(
+                    'Error : The field "Tag layout" is not valid'
+                );
+            }
         }
     }
 
     protected function postProcess()
     {
-        $this->registerBlogHook();
         $form_values = $this->getConfigFormValues();
         // Reset hooks
         Configuration::deleteByName('PS_ROUTE_module-everpsblog-blog');
@@ -538,7 +576,11 @@ class EverPsBlog extends Module
             )) ? $everblog_bottom_text : Configuration::getInt(
                 'EVERBLOG_BOTTOM_TEXT'
             ),
-
+            'EVERPSBLOG_BLOG_LAYOUT' => Configuration::get('EVERPSBLOG_BLOG_LAYOUT'),
+            'EVERPSBLOG_POST_LAYOUT' => Configuration::get('EVERPSBLOG_POST_LAYOUT'),
+            'EVERPSBLOG_CAT_LAYOUT' => Configuration::get('EVERPSBLOG_CAT_LAYOUT'),
+            'EVERPSBLOG_AUTHOR_LAYOUT' => Configuration::get('EVERPSBLOG_AUTHOR_LAYOUT'),
+            'EVERPSBLOG_TAG_LAYOUT' => Configuration::get('EVERPSBLOG_TAG_LAYOUT'),
         );
         $values = call_user_func_array('array_merge', $formValues);
         // die(var_dump($values));
@@ -580,6 +622,25 @@ class EverPsBlog extends Module
             1,
             true
         );
+
+        $layouts = array(
+            array(
+                'layout' => 'layouts/layout-content-only.tpl',
+                'name' => $this->l('Full width')
+            ),
+            array(
+                'layout' => 'layouts/layout-left-column.tpl',
+                'name' => $this->l('Left column')
+            ),
+            array(
+                'layout' => 'layouts/layout-right-column.tpl',
+                'name' => $this->l('Right column')
+            ),
+            array(
+                'layout' => 'layouts/layout-both-columns.tpl',
+                'name' => $this->l('Both columns')
+            ),
+        );
         $trash_days = array(
             array(
                 'id_trash' => 0,
@@ -619,7 +680,7 @@ class EverPsBlog extends Module
             'form' => array(
                 'legend' => array(
                     'title' => $this->l('Blog default Settings'),
-                    'icon' => 'icon-download',
+                    'icon' => 'icon-smile',
                 ),
                 'input' => array(
                     array(
@@ -928,6 +989,85 @@ class EverPsBlog extends Module
                 ),
             )
         );
+        $form_fields[] = array(
+            'form' => array(
+                'legend' => array(
+                    'title' => $this->l('Blog layout settings'),
+                    'icon' => 'icon-smile',
+                ),
+                'input' => array(
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('Default blog layout'),
+                        'desc' => $this->l('Will add or remove columns from blog page'),
+                        'hint' => $this->l('You can add or remove modules from Prestashop positions'),
+                        'required' => true,
+                        'name' => 'EVERPSBLOG_BLOG_LAYOUT',
+                        'options' => array(
+                            'query' => $layouts,
+                            'id' => 'layout',
+                            'name' => 'name'
+                        )
+                    ),
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('Default post layout'),
+                        'desc' => $this->l('Will add or remove columns from post page'),
+                        'hint' => $this->l('You can add or remove modules from Prestashop positions'),
+                        'required' => true,
+                        'name' => 'EVERPSBLOG_POST_LAYOUT',
+                        'options' => array(
+                            'query' => $layouts,
+                            'id' => 'layout',
+                            'name' => 'name'
+                        )
+                    ),
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('Default category layout'),
+                        'desc' => $this->l('Will add or remove columns from category page'),
+                        'hint' => $this->l('You can add or remove modules from Prestashop positions'),
+                        'required' => true,
+                        'name' => 'EVERPSBLOG_CAT_LAYOUT',
+                        'options' => array(
+                            'query' => $layouts,
+                            'id' => 'layout',
+                            'name' => 'name'
+                        )
+                    ),
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('Default author layout'),
+                        'desc' => $this->l('Will add or remove columns from author page'),
+                        'hint' => $this->l('You can add or remove modules from Prestashop positions'),
+                        'required' => true,
+                        'name' => 'EVERPSBLOG_AUTHOR_LAYOUT',
+                        'options' => array(
+                            'query' => $layouts,
+                            'id' => 'layout',
+                            'name' => 'name'
+                        )
+                    ),
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('Default tag layout'),
+                        'desc' => $this->l('Will add or remove columns from tag page'),
+                        'hint' => $this->l('You can add or remove modules from Prestashop positions'),
+                        'required' => true,
+                        'name' => 'EVERPSBLOG_TAG_LAYOUT',
+                        'options' => array(
+                            'query' => $layouts,
+                            'id' => 'layout',
+                            'name' => 'name'
+                        )
+                    ),
+                ),
+                'submit' => array(
+                    'name' => 'submit',
+                    'title' => $this->l('Save'),
+                ),
+            )
+        );
         return $form_fields;
     }
 
@@ -961,12 +1101,11 @@ class EverPsBlog extends Module
                     }
                 }
             }
-        } else {
-            $this->context->controller->addCSS(
-                _PS_MODULE_DIR_.'everpsblog/views/css/everpsblog-columns.css',
-                'all'
-            );
         }
+        $this->context->controller->addCSS(
+            _PS_MODULE_DIR_.'everpsblog/views/css/everpsblog-columns.css',
+            'all'
+        );
         $this->context->controller->addCSS(
             _PS_MODULE_DIR_.'everpsblog/views/css/everpsblog-all.css',
             'all'

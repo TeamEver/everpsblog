@@ -111,6 +111,11 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         $this->setTemplate('module:everpsblog/views/templates/front/blog.tpl');
     }
 
+    public function getLayout()
+    {
+        return Configuration::get('EVERPSBLOG_BLOG_LAYOUT');
+    }
+
     public function getCanonicalURL()
     {
         return $this->context->link->getModuleLink(

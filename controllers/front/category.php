@@ -131,6 +131,11 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
         }
     }
 
+    public function getLayout()
+    {
+        return Configuration::get('EVERPSBLOG_CAT_LAYOUT');
+    }
+
     public function getCanonicalURL()
     {
         return $this->context->link->getModuleLink(
@@ -159,7 +164,9 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                     (int)$this->context->shop->id,
                     (int)$this->context->language->id
                 );
-                if (!$category->is_root_category) {
+                if ((bool)$category->is_root_category === false
+                    && (int)$category->id > 0
+                ) {
                     $breadcrumb['links'][] = array(
                         'title' => $category->title,
                         'url' => $this->context->link->getModuleLink(

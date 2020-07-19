@@ -17,7 +17,7 @@
     {foreach from=$everpsblog item=item}
         <div class="col-12 col-xs-12 col-md-3 article everpsblog{if $counter == 0} active{/if}" data-slide-to="{$counter|escape:'htmlall':'UTF-8'}" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
                 <div class="col-12 col-xs-12 article-img">
-                    <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$item->id_ever_post|escape:'htmlall':'UTF-8'}.jpg" class="img-fluid col-12 col-xs-12 {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item->title nofilter}" />
+                    <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$item->id_ever_post|escape:'htmlall':'UTF-8'}.jpg" class="img-fluid col-12 col-xs-12 {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item->title nofilter}" title="{$item->title nofilter}" />
                 </div>
                 <div class="col-12 col-xs-12">
                     <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">

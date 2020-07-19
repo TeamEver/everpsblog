@@ -115,23 +115,28 @@
     content: "";
     background-image: url(facebook.svg);
     background-size: cover;
+    background-position: center;
 }
 .linkedin:before {
     content: "";
     background-image: url(linkedin.svg);
     background-size: cover;
+    background-position: center;
 }
 .facebook.icon-gray {
     background-image: url(facebook.svg);
     background-size: cover;
+    background-position: center;
 }
 .twitter.icon-gray {
     background-image: url(twitter.svg);
     background-size: cover;
+    background-position: center;
 }
 .linkedin.icon-gray {
     background-image: url(linkedin.svg);
     background-size: cover;
+    background-position: center;
 }
 /* Missing Bootstrap */
 .d-flex{

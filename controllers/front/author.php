@@ -146,6 +146,11 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
         }
     }
 
+    public function getLayout()
+    {
+        return Configuration::get('EVERPSBLOG_AUTHOR_LAYOUT');
+    }
+
     public function getBreadcrumbLinks()
     {
         $this->author = new EverPsBlogAuthor(

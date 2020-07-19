@@ -122,6 +122,11 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
         }
     }
 
+    public function getLayout()
+    {
+        return Configuration::get('EVERPSBLOG_TAG_LAYOUT');
+    }
+
     public function getCanonicalURL()
     {
         return $this->context->link->getModuleLink(
