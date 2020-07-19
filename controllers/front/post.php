@@ -16,6 +16,8 @@ require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogPost.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCategory.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogAuthor.php';
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTaxonomy.php';
 
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
@@ -28,6 +30,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
     protected $tag;
     protected $post;
     protected $blog;
+    protected $author;
 
     public function init()
     {
@@ -37,6 +40,46 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             (int)Tools::getValue('id_ever_post'),
             (int)$this->context->shop->id,
             (int)$this->context->language->id
+        );
+        if (isset($this->post->id_author) && (int)$this->post->id_author > 0) {
+            $this->author = new EverPsBlogAuthor(
+                (int)$this->post->id_author,
+                (int)$this->context->shop->id,
+                (int)$this->context->language->id
+            );
+            $this->author->url = $this->context->link->getModuleLink(
+                'everpsblog',
+                'author',
+                array(
+                    'id_ever_author' => $this->author->id,
+                    'link_rewrite' => $this->author->link_rewrite
+                )
+        );
+        } else {
+            $this->author = new stdClass();
+            $this->author->id_ever_author = 0;
+            $this->author->id = 0;
+            $this->author->nickhandle = Configuration::get('PS_SHOP_NAME');
+            $this->author->url = Tools::getHttpHost(true).__PS_BASE_URI__;
+        }
+        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/authors/author_image_'.(int)$this->post->id_author.'.jpg')) {
+                $this->author_cover = Tools::getHttpHost(true).__PS_BASE_URI__.'modules/everpsblog/views/img/authors/author_image_'.(int)$this->post->id_author.'.jpg';
+        } else {
+            $this->author_cover = Tools::getHttpHost(true).__PS_BASE_URI__.'img/'.Configuration::get(
+                'PS_LOGO',
+                null,
+                null,
+                (int)$this->context->shop->id
+            );
+        }
+        $this->post_tags = EverPsBlogTaxonomy::getPostTagsTaxonomies(
+            (int)$this->post->id
+        );
+        $this->post_categories = EverPsBlogTaxonomy::getPostCategoriesTaxonomies(
+            (int)$this->post->id
+        );
+        $this->post_products = EverPsBlogTaxonomy::getPostProductsTaxonomies(
+            (int)$this->post->id
         );
         parent::init();
         // if inactive post or unexists, redirect
@@ -174,11 +217,8 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 }
             }
             // Now prepare template and show it
-            $post_products = EverPsBlogCleaner::convertToArray(
-                json_decode($this->post->post_products)
-            );
             $ps_products = array();
-            if (isset($post_products) && !empty($post_products)) {
+            if (isset($this->post_products) && !empty($this->post_products)) {
                 $showPrice = true;
                 $assembler = new ProductAssembler(Context::getContext());
                 $presenterFactory = new ProductPresenterFactory(Context::getContext());
@@ -193,12 +233,12 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                     Context::getContext()->getTranslator()
                 );
                 $presentationSettings->showPrices = $showPrice;
-                foreach ($post_products as $post_product) {
+                foreach ($this->post_products as $post_product) {
                     if (!$post_product) {
                         continue;
                     }
                     $pproduct = new Product(
-                        (int)$post_product,
+                        (int)$post_product['id_ever_post_product'],
                         (int)$this->context->shop->id,
                         (int)$this->context->language->id
                     );
@@ -216,14 +256,11 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 }
             }
             $count_products = count($ps_products);
-            $post_tags = EverPsBlogCleaner::convertToArray(
-                json_decode($this->post->post_tags)
-            );
             $tags = array();
-            if (isset($post_tags) && !empty($post_tags)) {
-                foreach ($post_tags as $post_tag) {
+            if (isset($this->post_tags) && !empty($this->post_tags)) {
+                foreach ($this->post_tags as $post_tag) {
                     $tags[] = new EverPsBlogTag(
-                        (int)$post_tag,
+                        (int)$post_tag['id_ever_post_tag'],
                         (int)$this->context->shop->id,
                         (int)$this->context->language->id
                     );
@@ -246,10 +283,11 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 (string)$this->post->title,
                 (int)Context::getContext()->customer->id
             );
-            Hook::exec('beforeEverPostInitContent', array(
+            Hook::exec('actionBeforeEverPostInitContent', array(
                 'blog_post' => $this->post,
                 'blog_tags' => $tags,
-                'blog_products' => $ps_products
+                'blog_products' => $ps_products,
+                'blog_author' => $this->author
             ));
             $social_share_links = [];
             $social_share_links['facebook'] = [
@@ -270,6 +308,8 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             // die(var_dump($products));
             $this->context->smarty->assign(
                 array(
+                    'author_cover' => $this->author_cover,
+                    'author' => $this->author,
                     'social_share_links' => $social_share_links,
                     'count_products' => $count_products,
                     'post' => $this->post,
@@ -308,11 +348,10 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 'blog'
             ),
         );
-        $categories = json_decode($this->post->post_categories);
-        if ($categories) {
-            foreach ($categories as $cat) {
+        if ($this->post_categories) {
+            foreach ($this->post_categories as $cat) {
                 $category = new EverPsBlogCategory(
-                    (int)$cat,
+                    (int)$cat['id_ever_post_category'],
                     (int)$this->context->shop->id,
                     (int)$this->context->language->id
                 );

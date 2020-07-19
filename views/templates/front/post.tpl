@@ -9,6 +9,14 @@
 {extends file='page.tpl'}
 
 {block name='head' append}
+    <!-- Twitter Card data -->
+    <meta name="twitter:card" content="summary">
+    {* <meta name="twitter:site" content="@publisher_handle"> *}
+    <meta name="twitter:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
+    <meta name="twitter:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
+    {* <meta name="twitter:creator" content="@author_handle"> *}
+    <meta name="twitter:image" content="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$post->id|escape:'htmlall':'UTF-8'}.jpg">
+    <!-- Open Graph Card data -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{$urls.current_url|escape:'htmlall':'UTF-8'}">
     <meta property="og:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
@@ -49,9 +57,14 @@
 {hook h="displayBeforeEverPost" everblogpost=$post}
 <div class="content" itemscope="itemscope" itemtype="http://schema.org/Blog">
     <div class="container" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
-            <h1 itemprop="headline">{$post->title|escape:'htmlall':'UTF-8'}</h1>
-            <p class="postpublished" itemprop="datePublished">{l s='Published on' mod='everpsblog'} {$post->date_add|escape:'htmlall':'UTF-8'}</p>
-            <div class="row">
+            <h1 itemprop="headline" class="text-center">{$post->title|escape:'htmlall':'UTF-8'}</h1>
+            <p itemscope="" itemprop="author" itemtype="http://schema.org/Person" class="text-center">
+                <a href="{$author->url|escape:'htmlall':'UTF-8'}" nickhandle="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
+                    <img src="{$author_cover|escape:'htmlall':'UTF-8'}" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" class="img-fluid author-icon rounded-circle">
+                    {l s='By' mod='everpsblog'} {$author->nickhandle|escape:'htmlall':'UTF-8'}
+                </a>
+            </p>
+            <div class="row post-header">
             {if isset($errors) && $errors}
             <div class="col-12 col-xs-12 col-md-12 alert alert-danger" role="alert">
             {foreach from=$errors item=error}
@@ -66,13 +79,14 @@
             {/foreach}
             </div>
             {/if}
-            <img class="img img-fluid" src="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$post->id|escape:'htmlall':'UTF-8'}.jpg" alt="{$post->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
+            <img class="img img-fluid post-featured-image featured-image" src="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$post->id|escape:'htmlall':'UTF-8'}.jpg" alt="{$post->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
         </div>
     </div>
     <div class="container">
         <div class="row postcontent {if $animated}zoomed{/if}" itemprop="articleBody">
             {$post->content nofilter}
         </div>
+        <p class="postpublished" itemprop="datePublished">{l s='Published on' mod='everpsblog'} {$post->date_add|escape:'htmlall':'UTF-8'}</p>
     </div>
 </div>
 <div class="container">

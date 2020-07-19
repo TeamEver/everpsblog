@@ -81,6 +81,8 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
         $moduleConfUrl .= Tools::getAdminTokenLite('AdminModules');
         $postUrl  = 'index.php?controller=AdminEverPsBlogPost&token=';
         $postUrl .= Tools::getAdminTokenLite('AdminEverPsBlogPost');
+        $authorUrl  = 'index.php?controller=AdminEverPsBlogAuthor&token=';
+        $authorUrl .= Tools::getAdminTokenLite('AdminEverPsBlogAuthor');
         $categoryUrl  = 'index.php?controller=AdminEverPsBlogCategory&token=';
         $categoryUrl .= Tools::getAdminTokenLite('AdminEverPsBlogCategory');
         $tagUrl  = 'index.php?controller=AdminEverPsBlogTag&token=';
@@ -95,6 +97,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
         );
         $this->context->smarty->assign(array(
             'moduleConfUrl' => $moduleConfUrl,
+            'authorUrl' => $authorUrl,
             'postUrl' => $postUrl,
             'categoryUrl' => $categoryUrl,
             'tagUrl' => $tagUrl,
@@ -166,13 +169,13 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
 
     public function renderForm()
     {
+        $category_id = (int)Tools::getValue('id_ever_category');
         $categories = EverPsBlogCategory::getAllCategories(
             (int)$this->context->language->id,
-            (int)$this->context->shop->id
+            (int)$this->context->shop->id,
+            1,
+            (int)$category_id
         );
-
-        $category_id = Tools::getValue('id_ever_category');
-
         if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/categories/category_image_'.$category_id.'.jpg')) {
             $category_img = Tools::getHttpHost(true)
             .__PS_BASE_URI__
@@ -199,6 +202,19 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                 'class' => 'button pull-right'
             ),
             'input' => array(
+                array(
+                    'type' => 'select',
+                    'label' => $this->l('Parent category'),
+                    'desc' => $this->l('Please choose parent category'),
+                    'hint' => $this->l('At least parent must be root category'),
+                    'name' => 'id_parent_category',
+                    'identifier' => 'name',
+                    'options' => array(
+                        'query' => $categories,
+                        'id' => 'id_ever_category',
+                        'name' => 'title',
+                    ),
+                ),
                 array(
                     'type' => 'text',
                     'label' => $this->l('Category meta title'),
@@ -236,18 +252,6 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                     'autoload_rte' => true,
                     'cols' => 60,
                     'rows' => 30
-                ),
-                array(
-                    'type' => 'hidden',
-                    'label' => 'Parent category',
-                    'hint' => 'Select parent category',
-                    'name' => 'id_parent_category',
-                    'identifier' => 'name',
-                    'options' => array(
-                        'query' => $categories,
-                        'id' => 'id_ever_category',
-                        'name' => 'title',
-                    ),
                 ),
                 array(
                     'type' => 'text',
@@ -357,7 +361,13 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                     (int)Tools::getValue('id_ever_category')
                 );
             }
-            $category->id_parent_category = 1;
+            if (!Tools::getValue('id_parent_category')
+                || !Validate::isInt(Tools::getValue('id_parent_category'))
+            ) {
+                $this->errors[] = $this->l('Parent category is not valid');
+            } else {
+                $category->id_parent_category = Tools::getValue('id_parent_category');
+            }
             if (Tools::getValue('index')
                 && !Validate::isBool(Tools::getValue('index'))
             ) {

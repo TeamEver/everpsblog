@@ -72,6 +72,8 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
         $moduleConfUrl .= Tools::getAdminTokenLite('AdminModules');
         $postUrl  = 'index.php?controller=AdminEverPsBlogPost&token=';
         $postUrl .= Tools::getAdminTokenLite('AdminEverPsBlogPost');
+        $authorUrl  = 'index.php?controller=AdminEverPsBlogAuthor&token=';
+        $authorUrl .= Tools::getAdminTokenLite('AdminEverPsBlogAuthor');
         $categoryUrl  = 'index.php?controller=AdminEverPsBlogCategory&token=';
         $categoryUrl .= Tools::getAdminTokenLite('AdminEverPsBlogCategory');
         $tagUrl  = 'index.php?controller=AdminEverPsBlogTag&token=';
@@ -86,6 +88,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
         );
         $this->context->smarty->assign(array(
             'moduleConfUrl' => $moduleConfUrl,
+            'authorUrl' => $authorUrl,
             'postUrl' => $postUrl,
             'categoryUrl' => $categoryUrl,
             'tagUrl' => $tagUrl,

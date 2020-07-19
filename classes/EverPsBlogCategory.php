@@ -122,7 +122,7 @@ class EverPsBlogCategory extends ObjectModel
         return $return;
     }
 
-    public static function getAllCategories($id_lang, $id_shop, $active = 1)
+    public static function getAllCategories($id_lang, $id_shop, $active = 1, $except = 0)
     {
         $sql = new DbQuery;
         $sql->select('*');
@@ -135,6 +135,10 @@ class EverPsBlogCategory extends ObjectModel
         $sql->where('bc.active = '.(int)$active);
         $sql->where('bc.id_shop = '.(int)$id_shop);
         $sql->where('bcl.id_lang = '.(int)$id_lang);
+        if ((int)$except > 0) {
+            $sql->where('bc.id_ever_category != '.(int)$except);
+            $sql->where('bc.id_parent_category != '.(int)$except);
+        }
         $return = Db::getInstance()->executeS($sql);
         return $return;
     }
@@ -164,7 +168,6 @@ class EverPsBlogCategory extends ObjectModel
                 'title' => $root->title,
                 'active' => $root->active
             );
-        } else {
         }
         if (!$return || $return[0]['id_parent_category'] == 0) {
             return $categories;

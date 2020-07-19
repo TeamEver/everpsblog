@@ -14,6 +14,7 @@ if (!defined('_PS_VERSION_')) {
 function upgrade_module_2_3_8()
 {
     set_time_limit(0);
+    $module = Module::getInstanceByName('everpsblog');
     $result = false;
     // Hook before blog init
     if (!Hook::getIdByName('beforeEverBlogInit')) {
@@ -22,6 +23,7 @@ function upgrade_module_2_3_8()
         $hook->title = 'Before blog init';
         $hook->description = 'This hook is triggered before main blog init';
         $result &= $hook->save();
+        $result &= $module->registerHook($hook->name);
     }
     // Hook after blog init
     if (!Hook::getIdByName('afterEverBlogInit')) {
@@ -30,6 +32,7 @@ function upgrade_module_2_3_8()
         $hook->title = 'After blog init';
         $hook->description = 'This hook is triggered after main blog init';
         $result &= $hook->save();
+        $result &= $module->registerHook($hook->name);
     }
     return $result;
 }

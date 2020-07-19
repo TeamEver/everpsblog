@@ -24,6 +24,7 @@ use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 
 class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
 {
+    protected $author;
     protected $category;
     protected $tag;
     protected $post;
@@ -94,7 +95,7 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
                 (int)$this->tag->id,
                 (int)$pagination['items_shown_from'] - 1
             );
-            Hook::exec('beforeEverTagInitContent', array(
+            Hook::exec('actionBeforeEverTagInitContent', array(
                 'blog_tag' => $this->tag,
                 'blog_posts' => $posts
             ));

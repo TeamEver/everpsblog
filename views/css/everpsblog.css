@@ -1,28 +1,41 @@
 /*Default blog page*/
 #module-everpsblog-blog .article, #module-everpsblog-blog .evercategory,
-#module-everpsblog-category .article, #module-everpsblog-category .evercategory,
+#module-everpsblog-category .article, #module-everpsblog-author .article, #module-everpsblog-category .evercategory,
 #module-everpsblog-tag .article, #module-everpsblog-tag .evercategory{
     border: 1px solid #D3D3D3;
     margin-top: 1%;
     margin-bottom: 1%;
 }
 #module-everpsblog-blog .article h3, #module-everpsblog-blog .evercategory h3,
-#module-everpsblog-category .article, #module-everpsblog-category .evercategory h3,
+#module-everpsblog-category .article, #module-everpsblog-author .article, #module-everpsblog-category .evercategory h3,
 #module-everpsblog-tag .article, #module-everpsblog-tag .evercategory h3{
     text-align: left;
 }
 #module-everpsblog-blog .article a, #module-everpsblog-blog .evercategory a,
-#module-everpsblog-category .article, #module-everpsblog-category .evercategory a,
+#module-everpsblog-category .article, #module-everpsblog-author .article, #module-everpsblog-category .evercategory a,
 #module-everpsblog-tag .article, #module-everpsblog-tag .evercategory a{
     text-decoration: none;
 }
 #module-everpsblog-blog .article-content,
 #module-everpsblog-category .article-content,
-#module-everpsblog-tag .article-content{
+#module-everpsblog-tag .article-content,
+#module-everpsblog-author .article-content{
     padding-top: 1rem;
     padding-bottom: : 1rem;
 }
+/* Listings */
+.article-img{
+    display: flex;
+    justify-content: center;
+}
 /*Posts*/
+#module-everpsblog-post .post-header,
+#module-everpsblog-category .category-header,
+#module-everpsblog-tag .tag-header,
+#module-everpsblog-author .author-header{
+    display: flex;
+    justify-content: center;
+}
 #module-everpsblog-post .postcontent{
     border: 1px solid #D3D3D3;
     padding: 2%;
@@ -45,6 +58,9 @@
 #module-everpsblog-post .zoomed img:hover {
     -webkit-transform: scale(1.3);
     transform: scale(1.3);
+}
+.author-icon{
+    max-width: 40px;
 }
 /*Rewriting bad themes*/
 #module-everpsblog-post #evercomment{
@@ -88,4 +104,42 @@
 /*Linked products*/
 #module-everpsblog-post #postProducts {
     font-size: 1.3rem;
+}
+/* Social links */
+.twitter:before {
+    content: "";
+    background-image: url(twitter.svg);
+    background-size: cover;
+}
+.facebook:before {
+    content: "";
+    background-image: url(facebook.svg);
+    background-size: cover;
+}
+.linkedin:before {
+    content: "";
+    background-image: url(linkedin.svg);
+    background-size: cover;
+}
+.facebook.icon-gray {
+    background-image: url(facebook.svg);
+    background-size: cover;
+}
+.twitter.icon-gray {
+    background-image: url(twitter.svg);
+    background-size: cover;
+}
+.linkedin.icon-gray {
+    background-image: url(linkedin.svg);
+    background-size: cover;
+}
+/* Missing Bootstrap */
+.d-flex{
+    display: flex;
+}
+.justify-content-center{
+    justify-content: center;
+}
+.rounded-circle {
+    border-radius: 50%;
 }

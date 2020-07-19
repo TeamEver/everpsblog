@@ -57,6 +57,15 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
                 ON ebtl.`id_ever_tag` = ebt.`id_ever_tag`
                 WHERE ebtl.`id_lang` = '.(int)$id_lang.'
                 AND ebtl.`id_ever_tag` = '.(int)$id_ever_tag;
+        } elseif ($page_name == 'module-everpsblog-author'
+            && ($id_ever_author = Tools::getValue('id_ever_author'))
+        ) {
+            $sql = 'SELECT `nickhandle`,`meta_title`, `meta_description`, `index`, `follow`
+                FROM `'._DB_PREFIX_.'ever_blog_author_lang` ebtl
+                LEFT JOIN `'._DB_PREFIX_.'ever_blog_author` ebt
+                ON ebtl.`id_ever_author` = ebt.`id_ever_author`
+                WHERE ebtl.`id_lang` = '.(int)$id_lang.'
+                AND ebtl.`id_ever_author` = '.(int)$id_ever_author;
         }
 
         // Set SEO metas per object
@@ -135,6 +144,20 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
                 $param = array(
                     'id_ever_tag' => $this->tag->id,
                     'link_rewrite' => $this->tag->link_rewrite
+                );
+                break;
+
+            case 'author':
+                if (!$this->author) {
+                    $this->author = new EverPsBlogAuthor(
+                        (int)Tools::getValue('id_ever_author'),
+                        (int)$this->context->language->id,
+                        (int)$this->context->shop->id
+                    );
+                }
+                $param = array(
+                    'id_ever_author' => $this->author->id,
+                    'link_rewrite' => $this->author->link_rewrite
                 );
                 break;
         }

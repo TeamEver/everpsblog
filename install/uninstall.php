@@ -19,6 +19,11 @@ $sql[] = 'DROP TABLE IF EXISTS `'._DB_PREFIX_.'ever_blog_category_lang`';
 $sql[] = 'DROP TABLE IF EXISTS `'._DB_PREFIX_.'ever_blog_tag`';
 $sql[] = 'DROP TABLE IF EXISTS `'._DB_PREFIX_.'ever_blog_tag_lang`';
 $sql[] = 'DROP TABLE IF EXISTS `'._DB_PREFIX_.'ever_blog_comments`';
+$sql[] = 'DROP TABLE IF EXISTS `'._DB_PREFIX_.'ever_blog_author`';
+$sql[] = 'DROP TABLE IF EXISTS `'._DB_PREFIX_.'ever_blog_author_lang`';
+$sql[] = 'DROP TABLE IF EXISTS `'._DB_PREFIX_.'ever_blog_post_category`';
+$sql[] = 'DROP TABLE IF EXISTS `'._DB_PREFIX_.'ever_blog_post_tag`';
+$sql[] = 'DROP TABLE IF EXISTS `'._DB_PREFIX_.'ever_blog_post_product`';
 
 foreach ($sql as $s) {
     if (!Db::getInstance()->execute($s)) {

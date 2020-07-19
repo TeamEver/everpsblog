@@ -17,6 +17,7 @@ $sql[] =
     'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_post` (
         `id_ever_post` int(10) unsigned NOT NULL auto_increment,
         `id_shop` int(10) unsigned NOT NULL,
+        `id_author` int(10) unsigned NOT NULL,
         `post_status` varchar(255) NOT NULL,
         `date_add` DATETIME DEFAULT NULL,
         `date_upd` DATETIME DEFAULT NULL,
@@ -103,6 +104,55 @@ $sql[] =
         `date_upd` DATETIME DEFAULT NULL,
         `active` int(10) DEFAULT NULL,
         PRIMARY KEY (`id_ever_comment`)
+    ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
+
+$sql[] =
+    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_author` (
+        `id_ever_author` int(10) unsigned NOT NULL auto_increment,
+        `id_employee` int(10) unsigned NOT NULL,
+        `id_shop` int(10) unsigned NOT NULL,
+        `nickhandle` varchar(255) NOT NULL,
+        `twitter` varchar(255) DEFAULT NULL,
+        `facebook` varchar(255) DEFAULT NULL,
+        `linkedin` varchar(255) DEFAULT NULL,
+        `date_add` DATETIME DEFAULT NULL,
+        `date_upd` DATETIME DEFAULT NULL,
+        `index` int(10) unsigned DEFAULT NULL,
+        `follow` int(10) unsigned DEFAULT NULL,
+        `active` int(10) unsigned DEFAULT NULL,
+        PRIMARY KEY (`id_ever_author`)
+    ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
+
+$sql[] =
+    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_author_lang` (
+        `id_ever_author` int(10) unsigned NOT NULL,
+        `meta_title` varchar(255) DEFAULT NULL,
+        `meta_description` varchar(255) DEFAULT NULL,
+        `link_rewrite` varchar(255) DEFAULT NULL,
+        `content` text NOT NULL,
+        `id_lang` int(10) unsigned NOT NULL,
+        PRIMARY KEY (`id_ever_author`, `id_lang`)
+    ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
+
+$sql[] =
+    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_post_category` (
+        `id_ever_post_category` int(10) NOT NULL,
+        `id_ever_post` int(10) unsigned NOT NULL,
+        PRIMARY KEY (`id_ever_post`, `id_ever_post_category`)
+    ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
+
+$sql[] =
+    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_post_tag` (
+        `id_ever_post_tag` int(10) NOT NULL,
+        `id_ever_post` int(10) unsigned NOT NULL,
+        PRIMARY KEY (`id_ever_post`, `id_ever_post_tag`)
+    ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
+
+$sql[] =
+    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_post_product` (
+        `id_ever_post_product` int(10) NOT NULL,
+        `id_ever_post` int(10) unsigned NOT NULL,
+        PRIMARY KEY (`id_ever_post`, `id_ever_post_product`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 foreach ($sql as $s) {

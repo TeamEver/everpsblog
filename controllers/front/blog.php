@@ -24,6 +24,7 @@ use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 
 class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontController
 {
+    protected $author;
     protected $category;
     protected $tag;
     protected $post;
@@ -86,7 +87,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         $default_blog_top_text = $everblog_top_text[(int)Context::getContext()->language->id];
         $everblog_bottom_text = Configuration::getInt('EVERBLOG_BOTTOM_TEXT');
         $default_blog_bottom_text = $everblog_bottom_text[(int)Context::getContext()->language->id];
-        Hook::exec('beforeEverBlogInitContent', array(
+        Hook::exec('actionBeforeEverBlogInitContent', array(
             'blog_post_number' => $this->post_number,
             'everpsblog' => $everpsblogposts,
             'everpsblogcategories' => $evercategories,

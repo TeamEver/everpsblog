@@ -12,6 +12,7 @@ require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCategory.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCleaner.php';
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTaxonomy.php';
 
 class EverPsBlog extends Module
 {
@@ -24,7 +25,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '2.4.1';
+        $this->version = '3.1.2';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -32,7 +33,7 @@ class EverPsBlog extends Module
         parent::__construct();
 
         $this->displayName = $this->l('Ever Blog');
-        $this->description = $this->l('Simply a blog :-)');
+        $this->description = $this->l('Simply a blog 😀');
         $this->confirmUninstall = $this->l('Do you really want to uninstall this module ?');
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
@@ -67,6 +68,7 @@ class EverPsBlog extends Module
         $root_category->save();
         // Install
         return parent::install()
+            && $this->registerBlogHook()
             && $this->registerHook('actionFrontControllerAfterInit')
             && $this->registerHook('header')
             && $this->registerHook('actionAdminControllerSetMedia')
@@ -79,15 +81,37 @@ class EverPsBlog extends Module
             && $this->registerHook('moduleRoutes')
             && $this->registerHook('overrideLayoutTemplate')
             && $this->registerHook('backofficeHeader')
-            && $this->registerHook('actionObjectEverPsBlogPostDeleteAfter')
-            && $this->registerHook('actionObjectEverPsBlogCategoryDeleteAfter')
-            && $this->registerHook('actionObjectEverPsBlogTagDeleteAfter')
-            && $this->registerHook('actionObjectEverPsBlogCommentDeleteAfter')
-            && $this->installModuleTab('AdminEverPsBlog', 'IMPROVE', 'Blog')
-            && $this->installModuleTab('AdminEverPsBlogPost', 'AdminEverPsBlog', 'Posts')
-            && $this->installModuleTab('AdminEverPsBlogCategory', 'AdminEverPsBlog', 'Categories')
-            && $this->installModuleTab('AdminEverPsBlogTag', 'AdminEverPsBlog', 'Tags')
-            && $this->installModuleTab('AdminEverPsBlogComment', 'AdminEverPsBlog', 'Comments')
+            && $this->registerHook('actionObjectProductDeleteAfter')
+            && $this->installModuleTab(
+                'AdminEverPsBlog',
+                'IMPROVE',
+                $this->l('Blog')
+            )
+            && $this->installModuleTab(
+                'AdminEverPsBlogPost',
+                'AdminEverPsBlog',
+                $this->l('Posts')
+            )
+            && $this->installModuleTab(
+                'AdminEverPsBlogCategory',
+                'AdminEverPsBlog',
+                'Categories'
+            )
+            && $this->installModuleTab(
+                'AdminEverPsBlogTag',
+                'AdminEverPsBlog',
+                $this->l('Tags')
+            )
+            && $this->installModuleTab(
+                'AdminEverPsBlogComment',
+                'AdminEverPsBlog',
+                $this->l('Comments')
+            )
+            && $this->installModuleTab(
+                'AdminEverPsBlogAuthor',
+                'AdminEverPsBlog',
+                $this->l('Authors')
+            )
             && Configuration::updateValue('EVERBLOG_ADMIN_EMAIL', 1)
             && Configuration::updateValue('EVERBLOG_EMPTY_TRASH', 7)
             && Configuration::updateValue('EVERBLOG_ALLOW_COMMENTS', 1)
@@ -105,8 +129,13 @@ class EverPsBlog extends Module
     {
         include(dirname(__FILE__).'/install/uninstall.php');
         include(dirname(__FILE__).'/install/hooks-uninstall.php');
-        return $this->uninstallModuleTab('AdminEverPsBlog')
-            && parent::uninstall();
+        return parent::uninstall()
+            && $this->uninstallModuleTab('AdminEverPsBlog')
+            && $this->uninstallModuleTab('AdminEverPsBlogPost')
+            && $this->uninstallModuleTab('AdminEverPsBlogCategory')
+            && $this->uninstallModuleTab('AdminEverPsBlogTag')
+            && $this->uninstallModuleTab('AdminEverPsBlogComment')
+            && $this->uninstallModuleTab('AdminEverPsBlogAuthor');
     }
 
     private function installModuleTab($tabClass, $parent, $tabName)
@@ -133,6 +162,37 @@ class EverPsBlog extends Module
         $tab = new Tab((int)Tab::getIdFromClassName($tabClass));
 
         return $tab->delete();
+    }
+
+    private function registerBlogHook()
+    {
+        return $this->registerHook('actionBeforeEverPostInitContent')
+            && $this->registerHook('actionBeforeEverCategoryInitContent')
+            && $this->registerHook('actionBeforeEverTagInitContent')
+            && $this->registerHook('actionBeforeEverBlogInitContent')
+            && $this->registerHook('actionBeforeEverBlogInit')
+            && $this->registerHook('displayBeforeEverPost')
+            && $this->registerHook('displayAfterEverPost')
+            && $this->registerHook('displayBeforeEverCategory')
+            && $this->registerHook('displayAfterEverCategory')
+            && $this->registerHook('displayBeforeEverTag')
+            && $this->registerHook('displayAfterEverTag')
+            && $this->registerHook('displayBeforeEverComment')
+            && $this->registerHook('displayAfterEverComment')
+            && $this->registerHook('displayBeforeEverLoop')
+            && $this->registerHook('displayAfterEverLoop')
+            && $this->registerHook('actionObjectEverPsBlogPostAddAfter')
+            && $this->registerHook('actionObjectEverPsBlogCategoryAddAfter')
+            && $this->registerHook('actionObjectEverPsBlogTagAddAfter')
+            && $this->registerHook('actionObjectEverPsBlogCommentAddAfter')
+            && $this->registerHook('actionObjectEverPsBlogCategoryDeleteAfter')
+            && $this->registerHook('actionObjectEverPsBlogTagDeleteAfter')
+            && $this->registerHook('actionObjectEverPsBlogCommentDeleteAfter')
+            && $this->registerHook('actionObjectEverPsBlogPostDeleteAfter')
+            && $this->registerHook('actionObjectEverPsBlogCategoryUpdateAfter')
+            && $this->registerHook('actionObjectEverPsBlogTagUpdateAfter')
+            && $this->registerHook('actionObjectEverPsBlogCommentUpdateAfter')
+            && $this->registerHook('actionObjectEverPsBlogPostUpdateAfter');
     }
 
     /**
@@ -188,6 +248,18 @@ class EverPsBlog extends Module
                 'rule' => $base_route.'/tag{/:id_ever_tag}-{:link_rewrite}',
                 'keywords' => array(
                     'id_ever_tag' => array('regexp' => '[0-9]+', 'param' => 'id_ever_tag'),
+                    'link_rewrite' => array('regexp' => '[_a-zA-Z0-9-\pL]*'),
+                ),
+                'params' => array(
+                    'fc' => 'module',
+                    'module' => 'everpsblog',
+                )
+            ),
+            'module-everpsblog-author' => array(
+                'controller' => 'author',
+                'rule' => $base_route.'/author{/:id_ever_author}-{:link_rewrite}',
+                'keywords' => array(
+                    'id_ever_author' => array('regexp' => '[0-9]+', 'param' => 'id_ever_author'),
                     'link_rewrite' => array('regexp' => '[_a-zA-Z0-9-\pL]*'),
                 ),
                 'params' => array(
@@ -328,14 +400,16 @@ class EverPsBlog extends Module
 
     protected function postProcess()
     {
+        $this->registerBlogHook();
         $form_values = $this->getConfigFormValues();
-
+        // Reset hooks
         Configuration::deleteByName('PS_ROUTE_module-everpsblog-blog');
         Configuration::deleteByName('PS_ROUTE_module-everpsblog-category');
         Configuration::deleteByName('PS_ROUTE_module-everpsblog-post');
         Configuration::deleteByName('PS_ROUTE_module-everpsblog-tag');
-
+        Configuration::deleteByName('PS_ROUTE_module-everpsblog-author');
         Hook::exec('hookModuleRoutes');
+        // Preparing multilingual datas
         $everblog_title = array();
         $everblog_meta_desc = array();
         $everblog_top_text = array();
@@ -362,6 +436,7 @@ class EverPsBlog extends Module
                 'EVERBLOG_BOTTOM_TEXT_'.$lang['id_lang']
             ) : '';
         }
+        // Save all datas
         foreach (array_keys($form_values) as $key) {
             if ($key == 'EVERBLOG_TITLE') {
                 Configuration::updateValue(
@@ -915,7 +990,7 @@ class EverPsBlog extends Module
             (int)$this->context->language->id,
             (int)$this->context->shop->id
         );
-        $posts = EverPsBlogPost::getLatestPosts(
+        $latest_posts = EverPsBlogPost::getLatestPosts(
             (int)$this->context->language->id,
             (int)$this->context->shop->id,
             0,
@@ -933,20 +1008,8 @@ class EverPsBlog extends Module
         $showTags = Configuration::get(
             'EVERBLOG_TAG_COLUMNS'
         );
-        $everpsblog = array();
-        foreach ($posts as $post) {
-            $post['title'] = EverPsBlogPost::changeShortcodes(
-                $post['title'],
-                (int)Context::getContext()->customer->id
-            );
-            $post['content'] = EverPsBlogPost::changeShortcodes(
-                $post['content'],
-                (int)Context::getContext()->customer->id
-            );
-            $everpsblog[] = $post;
-        }
         $this->context->smarty->assign(array(
-            'everpsblog' => $everpsblog,
+            'everpsblog' => $latest_posts,
             'showArchives' => $showArchives,
             'showCategories' => $showCategories,
             'showTags' => $showTags,
@@ -977,13 +1040,13 @@ class EverPsBlog extends Module
             array(),
             true
         );
-        $posts = EverPsBlogPost::getLatestPosts(
+        $latest_posts = EverPsBlogPost::getLatestPosts(
             (int)$this->context->language->id,
             (int)$this->context->shop->id,
             0,
             (int)$post_number
         );
-        if (!$posts || !count($posts)) {
+        if (!$latest_posts || !count($latest_posts)) {
             return;
         }
         $evercategories = EverPsBlogCategory::getAllCategories(
@@ -993,22 +1056,10 @@ class EverPsBlog extends Module
         $animate = Configuration::get(
             'EVERBLOG_ANIMATE'
         );
-        $everpsblog = array();
-        foreach ($posts as $post) {
-            $post['title'] = EverPsBlogPost::changeShortcodes(
-                $post['title'],
-                (int)Context::getContext()->customer->id
-            );
-            $post['content'] = EverPsBlogPost::changeShortcodes(
-                $post['content'],
-                (int)Context::getContext()->customer->id
-            );
-            $everpsblog[] = $post;
-        }
         $this->context->smarty->assign(
             array(
                 'blogUrl' => $blogUrl,
-                'everpsblog' => $everpsblog,
+                'everpsblog' => $latest_posts,
                 'evercategory' => $evercategories,
                 'default_lang' => (int)$this->context->language->id,
                 'id_lang' => (int)$this->context->language->id,
@@ -1046,7 +1097,7 @@ class EverPsBlog extends Module
             (int)$this->context->language->id,
             (int)$this->context->shop->id,
             (int)Tools::getValue('id_product'),
-            1,
+            0,
             (int)$post_number
         );
         if (!$posts
@@ -1252,27 +1303,151 @@ class EverPsBlog extends Module
         return true;
     }
 
+    public function hookActionObjectEverPsBlogPostAddAfter($params)
+    {
+        $post_categories = EverPsBlogCleaner::convertToArray(
+            json_decode($params['object']->post_categories, true)
+        );
+        $post_tags = EverPsBlogCleaner::convertToArray(
+            json_decode($params['object']->post_tags, true)
+        );
+        $post_products = EverPsBlogCleaner::convertToArray(
+            json_decode($params['object']->post_products, true)
+        );
+        // Insert into post_category, post_tag and post_product values
+        foreach ($post_categories as $id_post_category) {
+            EverPsBlogTaxonomy::updateTaxonomy(
+                (int)$id_post_category,
+                (int)$params['object']->id,
+                'category'
+            );
+        }
+        foreach ($post_tags as $id_post_tag) {
+            EverPsBlogTaxonomy::updateTaxonomy(
+                (int)$id_post_tag,
+                (int)$params['object']->id,
+                'tag'
+            );
+        }
+        foreach ($post_products as $id_post_product) {
+            EverPsBlogTaxonomy::updateTaxonomy(
+                (int)$id_post_product,
+                (int)$params['object']->id,
+                'product'
+            );
+        }
+        EverPsBlogTaxonomy::checkDefaultPostCategory(
+            $params['object']->id
+        );
+    }
+
+    public function hookActionObjectEverPsBlogPostUpdateAfter($params)
+    {
+        $post_categories = EverPsBlogCleaner::convertToArray(
+            json_decode($params['object']->post_categories, true)
+        );
+        $post_tags = EverPsBlogCleaner::convertToArray(
+            json_decode($params['object']->post_tags, true)
+        );
+        $post_products = EverPsBlogCleaner::convertToArray(
+            json_decode($params['object']->post_products, true)
+        );
+        // Update into post_category, post_tag and post_product values
+        foreach ($post_categories as $id_post_category) {
+            EverPsBlogTaxonomy::updateTaxonomy(
+                (int)$id_post_category,
+                (int)$params['object']->id,
+                'category'
+            );
+        }
+        foreach ($post_tags as $id_post_tag) {
+            EverPsBlogTaxonomy::updateTaxonomy(
+                (int)$id_post_tag,
+                (int)$params['object']->id,
+                'tag'
+            );
+        }
+        foreach ($post_products as $id_post_product) {
+            EverPsBlogTaxonomy::updateTaxonomy(
+                (int)$id_post_product,
+                (int)$params['object']->id,
+                'product'
+            );
+        }
+        EverPsBlogTaxonomy::checkDefaultPostCategory(
+            $params['object']->id
+        );
+    }
+
     public function hookActionObjectEverPsBlogPostDeleteAfter($params)
     {
-        $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$params['object']->id.'.jpg';
+        $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.(int)$params['object']->id.'.jpg';
         if (file_exists($old_img)) {
             unlink($old_img);
+        }
+        $post_categories = EverPsBlogCleaner::convertToArray(
+            json_decode($params['object']->post_categories, true)
+        );
+        $post_tags = EverPsBlogCleaner::convertToArray(
+            json_decode($params['object']->post_tags, true)
+        );
+        $post_products = EverPsBlogCleaner::convertToArray(
+            json_decode($params['object']->post_products, true)
+        );
+        // Update into post_category, post_tag and post_product values
+        foreach ($post_categories as $id_post_category) {
+            EverPsBlogTaxonomy::dropTaxonomy(
+                (int)$id_post_category,
+                (int)$params['object']->id,
+                'category'
+            );
+        }
+        foreach ($post_tags as $id_post_tag) {
+            EverPsBlogTaxonomy::dropTaxonomy(
+                (int)$id_post_tag,
+                (int)$params['object']->id,
+                'tag'
+            );
+        }
+        foreach ($post_products as $id_post_product) {
+            EverPsBlogTaxonomy::dropTaxonomy(
+                (int)$id_post_product,
+                (int)$params['object']->id,
+                'product'
+            );
         }
     }
 
     public function hookActionObjectEverPsBlogCategoryDeleteAfter($params)
     {
-        $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/categories/category_image_'.$params['object']->id.'.jpg';
+        $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/categories/category_image_'.(int)$params['object']->id.'.jpg';
         if (file_exists($old_img)) {
             unlink($old_img);
         }
+        EverPsBlogTaxonomy::dropCategoryTaxonomy(
+            (int)$params['object']->id
+        );
     }
 
     public function hookActionObjectEverPsBlogTagDeleteAfter($params)
     {
-        $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.$params['object']->id.'.jpg';
+        $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.(int)$params['object']->id.'.jpg';
         if (file_exists($old_img)) {
             unlink($old_img);
         }
+        EverPsBlogTaxonomy::dropTagTaxonomy(
+            (int)$params['object']->id
+        );
+    }
+
+    public function hookActionObjectProductDeleteAfter($params)
+    {
+        $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.(int)$params['object']->id.'.jpg';
+        if (file_exists($old_img)) {
+            unlink($old_img);
+        }
+        EverPsBlogTaxonomy::dropProductTaxonomy(
+            (int)$params['object']->id
+        );
     }
 }

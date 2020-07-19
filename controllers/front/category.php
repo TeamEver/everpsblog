@@ -16,6 +16,7 @@ require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogPost.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCategory.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTaxonomy.php';
 
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
@@ -24,6 +25,7 @@ use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 
 class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontController
 {
+    protected $author;
     protected $category;
     protected $tag;
     protected $post;
@@ -39,6 +41,9 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
             (int)$this->context->language->id
         );
         parent::init();
+        $this->parent_categories = EverPsBlogTaxonomy::getCategoryParentsTaxonomy(
+            (int)$this->category->id
+        );
         // if inactive category or unexists, redirect
         if (!$this->category->active
             || $this->category->is_root_category
@@ -99,7 +104,7 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                 (int)$this->category->id,
                 (int)$pagination['items_shown_from'] - 1
             );
-            Hook::exec('beforeEverCategoryInitContent', array(
+            Hook::exec('actionBeforeEverCategoryInitContent', array(
                 'blog_category' => $this->category,
                 'blog_posts' => $posts
             ));
@@ -148,6 +153,26 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                 'blog'
             ),
         );
+        foreach ($this->parent_categories as $parent_category) {
+                $category = new EverPsBlogCategory(
+                    (int)$parent_category,
+                    (int)$this->context->shop->id,
+                    (int)$this->context->language->id
+                );
+                if (!$category->is_root_category) {
+                    $breadcrumb['links'][] = array(
+                        'title' => $category->title,
+                        'url' => $this->context->link->getModuleLink(
+                            'everpsblog',
+                            'category',
+                            array(
+                                'id_ever_category' => $category->id,
+                                'link_rewrite' => $category->link_rewrite
+                            )
+                        ),
+                    );
+                }
+        }
         $breadcrumb['links'][] = array(
             'title' => $this->category->title,
             'url' => $this->context->link->getModuleLink(

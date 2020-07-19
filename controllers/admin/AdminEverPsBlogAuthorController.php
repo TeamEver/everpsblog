@@ -16,44 +16,33 @@ require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCategory.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogAuthor.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTaxonomy.php';
 
-class AdminEverPsBlogPostController extends ModuleAdminController
+class AdminEverPsBlogAuthorController extends ModuleAdminController
 {
     private $html;
     public $name;
 
     public function __construct()
     {
-        $this->name = 'AdminEverPsBlogPostController';
+        $this->name = 'AdminEverPsBlogAuthorController';
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         $this->bootstrap = true;
-        $this->display = 'Ever Blog Posts';
-        $this->meta_title = $this->l('Ever Blog Posts');
-        $this->table = 'ever_blog_post';
-        $this->className = 'EverPsBlogPost';
+        $this->display = 'Ever Blog Authors';
+        $this->meta_title = $this->l('Ever Blog Authors');
+        $this->table = 'ever_blog_author';
+        $this->className = 'EverPsBlogAuthor';
         $this->context = Context::getContext();
-        $this->identifier = "id_ever_post";
-        $this->_orderBy = 'id_ever_post';
+        $this->identifier = "id_ever_author";
+        $this->_orderBy = 'id_ever_author';
         $this->_orderWay = 'ASC';
         $this->fields_list = array(
-            'id_ever_post' => array(
+            'id_ever_author' => array(
                 'title' => $this->l('ID'),
                 'align' => 'left',
                 'width' => 25
             ),
-            'title' => array(
-                'title' => $this->l('Post title'),
-                'align' => 'left',
-                'width' => 25
-            ),
             'nickhandle' => array(
-                'title' => $this->l('Author'),
-                'align' => 'left',
-                'width' => 25
-            ),
-            'post_status' => array(
-                'title' => $this->l('Post status'),
+                'title' => $this->l('Author nickhandle'),
                 'align' => 'left',
                 'width' => 25
             ),
@@ -71,19 +60,22 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 'orderby' => false,
                 'class' => 'fixed-width-sm'
             ),
+            'active' => array(
+                'title' => $this->l('Active'),
+                'type' => 'bool',
+                'active' => 'status',
+                'orderby' => false,
+                'class' => 'fixed-width-sm'
+            ),
         );
 
         $this->colorOnBackground = true;
-        $this->_select = 'l.title, au.nickhandle';
+        // $this->_select = 'l.nickhandle';
 
         $this->_join =
-            'LEFT JOIN `'._DB_PREFIX_.'ever_blog_post_lang` l
+            'LEFT JOIN `'._DB_PREFIX_.'ever_blog_author_lang` l
                 ON (
-                    l.`id_ever_post` = a.`id_ever_post`
-                )
-            LEFT JOIN `'._DB_PREFIX_.'ever_blog_author` au
-                ON (
-                    au.`id_ever_author` = a.`id_author`
+                    l.`id_ever_author` = a.`id_ever_author`
                 )';
         $this->_where = 'AND a.id_shop = '.(int)$this->context->shop->id;
         $this->_where = 'AND l.id_lang = '.(int)$this->context->language->id;
@@ -141,24 +133,15 @@ class AdminEverPsBlogPostController extends ModuleAdminController
     {
         $this->addRowAction('edit');
         $this->addRowAction('delete');
-        $this->addRowAction('duplicate');
         $this->bulk_actions = array(
             'delete' => array(
                 'text' => $this->l('Delete selected items'),
                 'confirm' => $this->l('Delete selected items ?')
             ),
-            'duplicateall' => array(
-                'text' => $this->l('Duplicate selected items'),
-                'confirm' => $this->l('Duplicate selected items ?')
-            ),
         );
 
         if (Tools::isSubmit('submitBulkdelete'.$this->table)) {
             $this->processBulkDelete();
-        }
-
-        if (Tools::isSubmit('submitBulkduplicateall'.$this->table)) {
-            $this->processBulkDuplicate();
         }
         if ((bool)Tools::getValue('deleteLogoImage') && (int)Tools::getValue('ever_blog_obj')) {
             $this->processDeleteObjImage(
@@ -181,44 +164,22 @@ class AdminEverPsBlogPostController extends ModuleAdminController
 
     protected function getConfigFormValues($obj)
     {
-        $cat_taxonomies = EverPsBlogTaxonomy::getPostCategoriesTaxonomies(
-            (int)$obj->id
-        );
-        if (isset($cat_taxonomies) && count($cat_taxonomies) > 0) {
-            $cat_taxonomies = array_values(array_map('array_values', $cat_taxonomies));
-            $cat_taxonomies = call_user_func_array('array_merge', $cat_taxonomies);
-        }
-        $tag_taxonomies = EverPsBlogTaxonomy::getPostTagsTaxonomies(
-            (int)$obj->id
-        );
-        if (isset($tag_taxonomies) && count($tag_taxonomies) > 0) {
-            $tag_taxonomies = array_values(array_map('array_values', $tag_taxonomies));
-            $tag_taxonomies = call_user_func_array('array_merge', $tag_taxonomies);
-        }
-        $product_taxonomies = EverPsBlogTaxonomy::getPostProductsTaxonomies(
-            (int)$obj->id
-        );
-        if (isset($product_taxonomies) && count($product_taxonomies) > 0) {
-            $product_taxonomies = array_values(array_map('array_values', $product_taxonomies));
-            $product_taxonomies = call_user_func_array('array_merge', $product_taxonomies);
-        }
         $formValues = array();
         $formValues[] = array(
-            'id_ever_post' => $obj->id,
-            'title' => $obj->title,
-            'id_author' => $obj->id_author,
+            'id_ever_author' => $obj->id,
+            'nickhandle' => $obj->nickhandle,
             'meta_title' => $obj->meta_title,
             'meta_description' => $obj->meta_description,
             'link_rewrite' => $obj->link_rewrite,
+            'twitter' => $obj->twitter,
+            'facebook' => $obj->facebook,
+            'linkedin' => $obj->linkedin,
             'content' => $obj->content,
             'date_add' => $obj->date_add,
             'date_upd' => $obj->date_upd,
-            'post_categories[]' => $cat_taxonomies,
-            'post_tags[]' => $tag_taxonomies,
-            'post_products[]' => $product_taxonomies,
-            'index' => json_decode($obj->index),
-            'follow' => json_decode($obj->follow),
-            'post_status' => $obj->post_status,
+            'index' => $obj->index,
+            'follow' => $obj->follow,
+            'active' => $obj->active,
         );
         $values = call_user_func_array('array_merge', $formValues);
         return $values;
@@ -233,65 +194,42 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         if (count($this->errors)) {
             return false;
         }
-        $post_id = Tools::getValue('id_ever_post');
-        $obj = new EverPsBlogPost(
-            (int)Tools::getValue('id_ever_post')
+        $author_id = Tools::getValue('id_ever_author');
+        $obj = new EverPsBlogAuthor(
+            (int)Tools::getValue('id_ever_author')
         );
         $fields_form = array();
 
-        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$post_id.'.jpg')) {
-            $post_img = Tools::getHttpHost(true)
+        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/authors/author_image_'.$author_id.'.jpg')) {
+            $author_img = Tools::getHttpHost(true)
             .__PS_BASE_URI__
-            .'modules/everpsblog/views/img/posts/post_image_'
-            .$post_id
+            .'modules/everpsblog/views/img/authors/author_image_'
+            .$author_id
             .'.jpg';
         } else {
-            $post_img = Tools::getHttpHost(true)
+            $author_img = Tools::getHttpHost(true)
             .__PS_BASE_URI__
             .'/img/'
             .Configuration::get(
                 'PS_LOGO'
             );
         }
-        $post_img = '<image src="'.(string)$post_img.'" style="max-width:150px;"/>';
-
-        $post_status = array(
-            array(
-                'id_status' => 'draft',
-                'name' => $this->l('draft')
-            ),
-            array(
-                'id_status' => 'pending',
-                'name' => $this->l('pending')
-            ),
-            array(
-                'id_status' => 'published',
-                'name' => $this->l('published')
-            ),
-            array(
-                'id_status' => 'trash',
-                'name' => $this->l('trash')
-            ),
-            array(
-                'id_status' => 'planned',
-                'name' => $this->l('planned')
-            ),
-        );
+        $author_img = '<image src="'.(string)$author_img.'" style="max-width:150px;"/>';
 
         if ($obj) {
             $link = new Link();
             $id_lang = (int)Context::getContext()->language->id;
             $objectUrl = $link->getModuleLink(
                 'everpsblog',
-                'post',
+                'author',
                 array(
-                    'id_ever_post' => $obj->id_ever_post ,'link_rewrite' => $obj->link_rewrite[$id_lang]
+                    'id_ever_author' => $obj->id_ever_author ,'link_rewrite' => $obj->link_rewrite[$id_lang]
                 )
             );
             $object_html = '<a href="'
             .$objectUrl
             .'" target="_blank" class="btn btn-default">'
-            .$this->l('See post')
+            .$this->l('See author')
             .'</a>';
             $fields_form[] = array(
                 'form' => array(
@@ -309,7 +247,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         $fields_form[] = array(
             'form' => array(
                 'tinymce' => true,
-                'description' => $this->l('Please specify your post informations'),
+                'description' => $this->l('Please specify your author informations'),
                 'submit' => array(
                     'name' => 'save',
                     'title' => $this->l('Save'),
@@ -317,7 +255,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 ),
                 'buttons' => array(
                     array(
-                        'href' => Context::getContext()->link->getAdminLink('AdminEverPsBlogPost', true),
+                        'href' => Context::getContext()->link->getAdminLink('AdminEverPsBlogAuthor', true),
                         'title' => $this->l('Cancel'),
                         'icon' => 'process-icon-cancel'
                     )
@@ -325,81 +263,11 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 'input' => array(
                     array(
                         'type' => 'hidden',
-                        'name' => 'id_ever_post'
-                    ),
-                    array(
-                        'type' => 'select',
-                        'label' => $this->l('Associated categories'),
-                        'desc' => $this->l('Please choose at least one category'),
-                        'hint' => $this->l('Choose one or more categories'),
-                        'name' => 'post_categories[]',
-                        'class' => 'chosen',
-                        'identifier' => 'name',
-                        'multiple' => true,
-                        'options' => array(
-                            'query' => EverPsBlogCategory::getAllCategories(
-                                (int)$this->context->language->id,
-                                (int)$this->context->shop->id
-                            ),
-                            'id' => 'id_ever_category',
-                            'name' => 'title',
-                        ),
-                    ),
-                    array(
-                        'type' => 'select',
-                        'label' => $this->l('Associated tags'),
-                        'desc' => $this->l('Please choose at least one tag'),
-                        'hint' => $this->l('Choose one or more tags'),
-                        'name' => 'post_tags[]',
-                        'class' => 'chosen',
-                        'multiple' => true,
-                        'options' => array(
-                            'query' => EverPsBlogTag::getAllTags(
-                                (int)$this->context->language->id,
-                                (int)$this->context->shop->id
-                            ),
-                            'id' => 'id_ever_tag',
-                            'name' => 'title',
-                        ),
-                    ),
-                    array(
-                        'type' => 'select',
-                        'label' => $this->l('Associated products'),
-                        'desc' => $this->l('Please choose at least one product'),
-                        'hint' => $this->l('Choose one or more product'),
-                        'name' => 'post_products[]',
-                        'class' => 'chosen',
-                        'multiple' => true,
-                        'options' => array(
-                            'query' => Product::getProducts(
-                                (int)$this->context->language->id,
-                                0,
-                                0,
-                                'name',
-                                'ASC'
-                            ),
-                            'id' => 'id_product',
-                            'name' => 'name',
-                        ),
-                    ),
-                    array(
-                        'type' => 'select',
-                        'label' => $this->l('Author'),
-                        'desc' => $this->l('Please choose post author'),
-                        'hint' => $this->l('Else will be shop name'),
-                        'name' => 'id_author',
-                        'options' => array(
-                            'query' => EverPsBlogAuthor::getAllAuthors(
-                                (int)$this->context->language->id,
-                                (int)$this->context->shop->id
-                            ),
-                            'id' => 'id_ever_author',
-                            'name' => 'nickhandle',
-                        ),
+                        'name' => 'id_ever_author'
                     ),
                     array(
                         'type' => 'text',
-                        'label' => $this->l('Post meta title'),
+                        'label' => $this->l('Author meta title'),
                         'desc' => $this->l('Most of search engines do not accept more that 65 characters'),
                         'hint' => $this->l('Important for your SEO !'),
                         'maxchar' => 65,
@@ -412,7 +280,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     ),
                     array(
                         'type' => 'text',
-                        'label' => $this->l('Post meta description'),
+                        'label' => $this->l('Author meta description'),
                         'desc' => $this->l('Most of search engines do not accept more that 165 characters'),
                         'hint' => $this->l('Important for your SEO !'),
                         'maxchar' => 165,
@@ -425,9 +293,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     ),
                     array(
                         'type' => 'text',
-                        'label' => $this->l('Post link rewrite'),
+                        'label' => $this->l('Author link rewrite'),
                         'desc' => $this->l('For rewrite rules, required for SEO'),
-                        'hint' => $this->l('Will set post base URL'),
+                        'hint' => $this->l('Will set author base URL'),
                         'required' => true,
                         'name' => 'link_rewrite',
                         'lang' => true,
@@ -437,20 +305,56 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     ),
                     array(
                         'type' => 'text',
-                        'label' => $this->l('Post title'),
-                        'desc' => $this->l('Add here post title'),
+                        'label' => $this->l('Author nickhandle'),
+                        'desc' => $this->l('Add here author nickhandle'),
                         'hint' => $this->l('Will be shown on each pages'),
                         'required' => true,
-                        'name' => 'title',
-                        'lang' => true,
+                        'name' => 'nickhandle',
+                        'lang' => false,
+                        'autoload_rte' => true,
+                        'cols' => 60,
+                        'rows' => 30
+                    ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('Author twitter'),
+                        'desc' => $this->l('Add here author twitter'),
+                        'hint' => $this->l('Will be shown on each pages'),
+                        'required' => true,
+                        'name' => 'twitter',
+                        'lang' => false,
+                        'autoload_rte' => true,
+                        'cols' => 60,
+                        'rows' => 30
+                    ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('Author facebook'),
+                        'desc' => $this->l('Add here author facebook'),
+                        'hint' => $this->l('Will be shown on each pages'),
+                        'required' => true,
+                        'name' => 'facebook',
+                        'lang' => false,
+                        'autoload_rte' => true,
+                        'cols' => 60,
+                        'rows' => 30
+                    ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('Author linkedin'),
+                        'desc' => $this->l('Add here author linkedin'),
+                        'hint' => $this->l('Will be shown on each pages'),
+                        'required' => true,
+                        'name' => 'linkedin',
+                        'lang' => false,
                         'autoload_rte' => true,
                         'cols' => 60,
                         'rows' => 30
                     ),
                     array(
                         'type' => 'textarea',
-                        'label' => $this->l('Post content'),
-                        'desc' => $this->l('Add here post content'),
+                        'label' => $this->l('Author content'),
+                        'desc' => $this->l('Add here author content'),
                         'hint' => $this->l('Will be shown on each pages'),
                         'required' => true,
                         'name' => 'content',
@@ -461,19 +365,19 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     ),
                     array(
                         'type' => 'file',
-                        'label' => $this->l('Post image'),
-                        'desc' => $this->l('Will be shown on post top'),
+                        'label' => $this->l('Author image'),
+                        'desc' => $this->l('Will be shown on author top'),
                         'hint' => $this->l('Useful for sharing on social medias'),
-                        'name' => 'post_image',
+                        'name' => 'author_image',
                         'display_image' => true,
                         'required' => true,
-                        'image' => $post_img
+                        'image' => $author_img
                     ),
                     array(
                         'type' => 'switch',
-                        'label' => $this->l('SEO index post ?'),
+                        'label' => $this->l('SEO index author ?'),
                         'desc' => $this->l('Set yes to index, no to noindex'),
-                        'hint' => $this->l('Else post won\'t be available on Google'),
+                        'hint' => $this->l('Else author won\'t be available on Google'),
                         'name' => 'index',
                         'is_bool' => true,
                         'values' => array(
@@ -491,9 +395,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     ),
                     array(
                         'type' => 'switch',
-                        'label' => $this->l('SEO follow post ?'),
+                        'label' => $this->l('SEO follow author ?'),
                         'desc' => $this->l('Set yes to follow, no to nofollow'),
-                        'hint' => $this->l('Nofollow will block search engines from following links on this post'),
+                        'hint' => $this->l('Nofollow will block search engines from following links on this author'),
                         'name' => 'follow',
                         'is_bool' => true,
                         'values' => array(
@@ -512,8 +416,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     array(
                         'type' => 'datetime',
                         'label' => $this->l('Date add'),
-                        'desc' => $this->l('Add here post date'),
-                        'hint' => $this->l('Default date add will date post has been created'),
+                        'desc' => $this->l('Add here author date'),
+                        'hint' => $this->l('Default date add will date author has been created'),
                         'required' => true,
                         'name' => 'date_add',
                         'lang' => false,
@@ -521,15 +425,23 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'rows' => 30
                     ),
                     array(
-                        'type' => 'select',
-                        'label' => $this->l('Post status'),
-                        'desc' => $this->l('Select if published, draft or more'),
-                        'hint' => $this->l('Pending is "waiting for review"'),
-                        'name' => 'post_status',
-                        'options' => array(
-                            'query' => $post_status,
-                            'id' => 'id_status',
-                            'name' => 'name',
+                        'type' => 'switch',
+                        'label' => $this->l('Enable author ?'),
+                        'desc' => $this->l('Set yes to enable author, no to disable'),
+                        'hint' => $this->l('Posts without authors will show shop name as author'),
+                        'name' => 'active',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No')
+                            )
                         ),
                     ),
                 )
@@ -559,133 +471,139 @@ class AdminEverPsBlogPostController extends ModuleAdminController
 
     public function postProcess()
     {
-        if (Tools::getIsset('duplicateever_blog_post')) {
-            return $this->duplicatePost(
-                (int)Tools::getValue('id_ever_post')
-            );
-        }
-        if (Tools::getIsset('deleteever_blog_post')) {
-            $everObj = new EverPsBlogPost(
-                (int)Tools::getValue('id_ever_post')
+        if (Tools::getValue('deleteever_blog_author')) {
+            $everObj = new EverPsBlogAuthor(
+                (int)Tools::getValue('id_ever_author')
             );
             $everObj->delete();
         }
-        if (Tools::getIsset('statusever_blog_post')) {
-            $everObj = new EverPsBlogPost(
-                (int)Tools::getValue('id_ever_post')
+        if (Tools::getValue('statusever_blog_author')) {
+            $everObj = new EverPsBlogAuthor(
+                (int)Tools::getValue('id_ever_author')
             );
             (int)$everObj->active = !(int)$everObj->active;
             $everObj->save();
         }
         if (Tools::isSubmit('save')) {
-            if (!Tools::getValue('id_ever_post')) {
-                $post = new EverPsBlogPost();
+            if (!Tools::getValue('id_ever_author')) {
+                $author = new EverPsBlogAuthor();
             } else {
-                $post = new EverPsBlogPost(
-                    (int)Tools::getValue('id_ever_post')
+                $author = new EverPsBlogAuthor(
+                    (int)Tools::getValue('id_ever_author')
                 );
             }
             // Validate functions
-            $post->id_shop = (int)$this->context->shop->id;
-            // SEO
+            $author->id_shop = (int)$this->context->shop->id;
+            if (!Tools::getValue('nickhandle')
+                || !Validate::isCleanHtml(Tools::getValue('nickhandle'))
+            ) {
+                $this->errors[] = $this->l('Nickhandle is not valid');
+            } else {
+                $author->nickhandle = Tools::getValue('nickhandle');
+            }
+            if (Tools::getValue('linkedin')
+                && !Validate::isCleanHtml(Tools::getValue('linkedin'))
+            ) {
+                $this->errors[] = $this->l('Nickhandle is not valid');
+            } else {
+                $author->linkedin = Tools::getValue('linkedin');
+            }
+            if (Tools::getValue('facebook')
+                && !Validate::isCleanHtml(Tools::getValue('facebook'))
+            ) {
+                $this->errors[] = $this->l('Nickhandle is not valid');
+            } else {
+                $author->facebook = Tools::getValue('facebook');
+            }
+            if (Tools::getValue('twitter')
+                && !Validate::isCleanHtml(Tools::getValue('twitter'))
+            ) {
+                $this->errors[] = $this->l('Nickhandle is not valid');
+            } else {
+                $author->twitter = Tools::getValue('twitter');
+            }
             if (Tools::getValue('index')
                 && !Validate::isBool(Tools::getValue('index'))
             ) {
                  $this->errors[] = $this->l('Index is not valid');
             } else {
-                $post->index = Tools::getValue('index');
+                $author->index = Tools::getValue('index');
             }
             if (Tools::getValue('follow')
                 && !Validate::isBool(Tools::getValue('follow'))
             ) {
                  $this->errors[] = $this->l('Follow is not valid');
             } else {
-                $post->follow = Tools::getValue('follow');
+                $author->follow = Tools::getValue('follow');
+            }
+            if (Tools::getValue('active')
+                && !Validate::isBool(Tools::getValue('active'))
+            ) {
+                 $this->errors[] = $this->l('Follow is not valid');
+            } else {
+                $author->active = Tools::getValue('active');
             }
             // Date add
             if (!Tools::getValue('date_add')) {
-                $post->date_add = date('Y-m-d H:i:s');
+                $author->date_add = date('Y-m-d H:i:s');
             }
             if (Tools::getValue('date_add')
                 && !Validate::isDate(Tools::getValue('date_add'))
             ) {
                  $this->errors[] = $this->l('Date add is not valid');
             } else {
-                $post->date_add = Tools::getValue('date_add');
+                $author->date_add = Tools::getValue('date_add');
             }
-            if ($post->date_add > date('Y-m-d H:i:s')) {
-                $post->post_status = 'planned';
-            } else {
-                $post->post_status = Tools::getValue('post_status');
-            }
-            // Author
-            if (Tools::getValue('id_author')
-                && !Validate::isInt(Tools::getValue('id_author'))
-            ) {
-                 $this->errors[] = $this->l('Author is not valid');
-            } else {
-                $post->id_author = Tools::getValue('id_author');
-            }
-            // Categories, products and tags
-            $post->post_categories = json_encode(Tools::getValue('post_categories'));
-            $post->post_tags = json_encode(Tools::getValue('post_tags'));
-            $post->post_products = json_encode(Tools::getValue('post_products'));
-            $post->date_upd = date('Y-m-d H:i:s');
+
+            $author->date_upd = date('Y-m-d H:i:s');
             // Multilingual fields
             foreach (Language::getLanguages(false) as $lang) {
-                if (!Tools::getValue('title_'.$lang['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('title_'.$lang['id_lang']))
-                ) {
-                    $this->errors[] = $this->l('Title is not valid for lang ').$lang['id_lang'];
-                } else {
-                    $post->title[$lang['id_lang']] = Tools::getValue('title_'.$lang['id_lang']);
-                }
                 if (!Tools::getValue('content_'.$lang['id_lang'])
                     || !Validate::isCleanHtml(Tools::getValue('content_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Content is not valid for lang ').$lang['id_lang'];
                 } else {
-                    $post->content[$lang['id_lang']] = Tools::getValue('content_'.$lang['id_lang']);
+                    $author->content[$lang['id_lang']] = Tools::getValue('content_'.$lang['id_lang']);
                 }
                 if (!Tools::getValue('meta_title_'.$lang['id_lang'])
                     || !Validate::isCleanHtml(Tools::getValue('meta_title_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Meta title is not valid for lang ').$lang['id_lang'];
                 } else {
-                    $post->meta_title[$lang['id_lang']] = Tools::getValue('meta_title_'.$lang['id_lang']);
+                    $author->meta_title[$lang['id_lang']] = Tools::getValue('meta_title_'.$lang['id_lang']);
                 }
                 if (!Tools::getValue('meta_description_'.$lang['id_lang'])
                     || !Validate::isCleanHtml(Tools::getValue('meta_description_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Meta description is not valid for lang ').$lang['id_lang'];
                 } else {
-                    $post->meta_description[$lang['id_lang']] = Tools::getValue('meta_description_'.$lang['id_lang']);
+                    $author->meta_description[$lang['id_lang']] = Tools::getValue('meta_description_'.$lang['id_lang']);
                 }
                 if (!Tools::getValue('link_rewrite_'.$lang['id_lang'])
                     || !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Link rewrite is not valid for lang ').$lang['id_lang'];
                 } else {
-                    $post->link_rewrite[$lang['id_lang']] = Tools::getValue('link_rewrite_'.$lang['id_lang']);
+                    $author->link_rewrite[$lang['id_lang']] = Tools::getValue('link_rewrite_'.$lang['id_lang']);
                 }
             }
             if (!count($this->errors)) {
-                $post->save();
-                $post_img_destination = _PS_MODULE_DIR_
-                .'everpsblog/views/img/posts/post_image_'
-                .(int)$post->id
+                $author->save();
+                $author_img_destination = _PS_MODULE_DIR_
+                .'everpsblog/views/img/authors/author_image_'
+                .(int)$author->id
                 .'.jpg';
                 /* upload the image */
-                if (isset($_FILES['post_image']) && isset($_FILES['post_image']['tmp_name']) && !empty($_FILES['post_image']['tmp_name'])) {
+                if (isset($_FILES['author_image']) && isset($_FILES['author_image']['tmp_name']) && !empty($_FILES['author_image']['tmp_name'])) {
                     Configuration::set('PS_IMAGE_GENERATION_METHOD', 1);
-                    if (file_exists($post_img_destination)) {
-                        unlink($post_img_destination);
+                    if (file_exists($author_img_destination)) {
+                        unlink($author_img_destination);
                     }
-                    if ($error = ImageManager::validateUpload($_FILES['post_image'])) {
+                    if ($error = ImageManager::validateUpload($_FILES['author_image'])) {
                         $this->errors .= $error;
-                    } elseif (!($tmp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS')) || !move_uploaded_file($_FILES['post_image']['tmp_name'], $tmp_name)) {
+                    } elseif (!($tmp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS')) || !move_uploaded_file($_FILES['author_image']['tmp_name'], $tmp_name)) {
                         return false;
-                    } elseif (!ImageManager::resize($tmp_name, $post_img_destination)) {
+                    } elseif (!ImageManager::resize($tmp_name, $author_img_destination)) {
                         $this->errors .= $this->l(
                             'An error occurred while attempting to upload the image.'
                         );
@@ -695,13 +613,13 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         return true;
                     }
                 } else {
-                    if (file_exists($post_img_destination)) {
-                        unlink($post_img_destination);
+                    if (file_exists($author_img_destination)) {
+                        unlink($author_img_destination);
                     }
                     $logo = _PS_ROOT_DIR_.'/img/'.Configuration::get(
                         'PS_LOGO'
                     );
-                    if (copy($logo, $post_img_destination)) {
+                    if (copy($logo, $author_img_destination)) {
                         return true;
                     }
                 }
@@ -713,7 +631,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
     protected function processBulkDelete()
     {
         foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
-            $everObj = new EverPsBlogPost((int)$idEverObj);
+            $everObj = new EverPsBlogAuthor((int)$idEverObj);
 
             if (!$everObj->delete()) {
                 $this->errors[] = $this->l('An error has occurred: Can\'t delete the current object');
@@ -721,65 +639,11 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         }
     }
 
-    protected function processBulkDuplicate()
-    {
-        foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
-            $duplicate = true;
-            if (!$this->duplicatePost((int)$idEverObj)) {
-                $duplicate = false;
-            }
-        }
-        return $duplicate;
-    }
-
     public function processDeleteObjImage($id_obj)
     {
-        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.(int)$id_obj.'.jpg')) {
-                $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$id_obj.'.jpg';
+        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/authors/author_image_'.(int)$id_obj.'.jpg')) {
+                $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/authors/author_image_'.$id_obj.'.jpg';
                 return unlink($old_img);
-        }
-    }
-
-    protected function duplicatePost($id_ever_post)
-    {
-        $everObj = new EverPsBlogPost(
-            (int)$id_ever_post
-        );
-        $new_everObj = new EverPsBlogPost();
-        $new_everObj->id_lang = $everObj->id_lang;
-        $new_everObj->id_shop = $everObj->id_shop;
-        $new_everObj->id_author = $everObj->id_author;
-        $new_everObj->index = $everObj->index;
-        $new_everObj->follow = $everObj->follow;
-        $new_everObj->post_status = $everObj->post_status;
-        $new_everObj->post_categories = $everObj->post_categories;
-        $new_everObj->post_tags = $everObj->post_tags;
-        $new_everObj->post_products = $everObj->post_products;
-        $new_everObj->date_add = $everObj->date_add;
-        $new_everObj->date_upd = $everObj->date_upd;
-        foreach (Language::getLanguages(false) as $language) {
-            $new_everObj->title[$language['id_lang']] = $everObj->title[$language['id_lang']];
-            $new_everObj->content[$language['id_lang']] = $everObj->content[$language['id_lang']];
-            $new_everObj->meta_title[$language['id_lang']] = $everObj->meta_title[$language['id_lang']];
-            $new_everObj->meta_description[$language['id_lang']] = $everObj->meta_description[$language['id_lang']];
-            $new_everObj->link_rewrite[$language['id_lang']] = $everObj->link_rewrite[$language['id_lang']];
-        }
-        if ($new_everObj->save()) {
-            $new_img = _PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$new_everObj->id.'.jpg';
-            if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$id_ever_post.'.jpg')) {
-                $old_img = Tools::getHttpHost(true)
-                .__PS_BASE_URI__
-                .'modules/everpsblog/views/img/posts/post_image_'
-                .$id_ever_post
-                .'.jpg';
-            } else {
-                $old_img = Tools::getHttpHost(true).__PS_BASE_URI__.'/img/'.Configuration::get(
-                    'PS_LOGO'
-                );
-            }
-            if (copy($old_img, $new_img)) {
-                return true;
-            }
         }
     }
 

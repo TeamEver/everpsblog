@@ -71,38 +71,38 @@ if ($displayAfterEverLoop) {
     $hook->delete();
 }
 // Hook before post init
-$beforeEverPostInitContent = Hook::getIdByName('beforeEverPostInitContent');
-if ($beforeEverPostInitContent) {
-    $hook = new Hook((int)$beforeEverPostInitContent);
+$actionBeforeEverPostInitContent = Hook::getIdByName('actionBeforeEverPostInitContent');
+if ($actionBeforeEverPostInitContent) {
+    $hook = new Hook((int)$actionBeforeEverPostInitContent);
     $hook->delete();
 }
 // Hook category init
-$beforeEverCategoryInitContent = Hook::getIdByName('beforeEverCategoryInitContent');
-if ($beforeEverCategoryInitContent) {
-    $hook = new Hook((int)$beforeEverCategoryInitContent);
+$actionBeforeEverCategoryInitContent = Hook::getIdByName('actionBeforeEverCategoryInitContent');
+if ($actionBeforeEverCategoryInitContent) {
+    $hook = new Hook((int)$actionBeforeEverCategoryInitContent);
     $hook->delete();
 }
 // Hook before tag init
-$beforeEverTagInitContent = Hook::getIdByName('beforeEverTagInitContent');
-if ($beforeEverTagInitContent) {
-    $hook = new Hook((int)$beforeEverTagInitContent);
+$actionBeforeEverTagInitContent = Hook::getIdByName('actionBeforeEverTagInitContent');
+if ($actionBeforeEverTagInitContent) {
+    $hook = new Hook((int)$actionBeforeEverTagInitContent);
     $hook->delete();
 }
 // Hook before blog init content
-$beforeEverBlogInitContent = Hook::getIdByName('beforeEverBlogInitContent');
-if ($beforeEverBlogInitContent) {
-    $hook = new Hook((int)$beforeEverBlogInitContent);
+$actionBeforeEverBlogInitContent = Hook::getIdByName('actionBeforeEverBlogInitContent');
+if ($actionBeforeEverBlogInitContent) {
+    $hook = new Hook((int)$actionBeforeEverBlogInitContent);
     $hook->delete();
 }
 // Hook before blog init
-$beforeEverBlogInit = Hook::getIdByName('beforeEverBlogInit');
-if ($beforeEverBlogInit) {
-    $hook = new Hook((int)$beforeEverBlogInit);
+$actionBeforeEverBlogInit = Hook::getIdByName('actionBeforeEverBlogInit');
+if ($actionBeforeEverBlogInit) {
+    $hook = new Hook((int)$actionBeforeEverBlogInit);
     $hook->delete();
 }
 // Hook after blog init
-$beforeEverBlogInit = Hook::getIdByName('afterEverBlogInit');
-if ($afterEverBlogInit) {
-    $hook = new Hook((int)$afterEverBlogInit);
+$actionAfterEverBlogInit = Hook::getIdByName('actionAfterEverBlogInit');
+if ($actionAfterEverBlogInit) {
+    $hook = new Hook((int)$actionAfterEverBlogInit);
     $hook->delete();
 }

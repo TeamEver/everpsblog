@@ -14,6 +14,7 @@ if (!defined('_PS_VERSION_')) {
 function upgrade_module_2_3_5()
 {
     set_time_limit(0);
+    $module = Module::getInstanceByName('everpsblog');
     $result = false;
     // Hook before post init
     if (!Hook::getIdByName('beforeEverPostInitContent')) {
@@ -22,6 +23,7 @@ function upgrade_module_2_3_5()
         $hook->title = 'Before post init';
         $hook->description = 'This hook is triggered before post init';
         $result &= $hook->save();
+        $result &= $module->registerHook($hook->name);
     }
     // Hook before category init
     if (!Hook::getIdByName('beforeEverCategoryInitContent')) {
@@ -30,6 +32,7 @@ function upgrade_module_2_3_5()
         $hook->title = 'Before category init';
         $hook->description = 'This hook is triggered before category init';
         $result &= $hook->save();
+        $result &= $module->registerHook($hook->name);
     }
     // Hook before tag init
     if (!Hook::getIdByName('beforeEverTagInitContent')) {
@@ -38,6 +41,7 @@ function upgrade_module_2_3_5()
         $hook->title = 'Before tag init';
         $hook->description = 'This hook is triggered before tag init';
         $result &= $hook->save();
+        $result &= $module->registerHook($hook->name);
     }
     // Hook before blog init
     if (!Hook::getIdByName('beforeEverBlogInitContent')) {
@@ -46,6 +50,7 @@ function upgrade_module_2_3_5()
         $hook->title = 'Before blog init';
         $hook->description = 'This hook is triggered before blog init';
         $result &= $hook->save();
+        $result &= $module->registerHook($hook->name);
     }
     return $result;
 }

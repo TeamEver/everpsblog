@@ -10,6 +10,7 @@
 if (!defined('_PS_VERSION_')) {
     exit;
 }
+
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Presenter\AbstractLazyArray;
 use PrestaShop\PrestaShop\Adapter\Presenter\Product\ProductListingPresenter;
@@ -31,6 +32,7 @@ class EverPsBlogPost extends ObjectModel
     public $content;
     public $id_lang;
     public $id_shop;
+    public $id_author;
     public $date_add;
     public $date_upd;
     public $post_status;
@@ -64,7 +66,7 @@ class EverPsBlogPost extends ObjectModel
             'link_rewrite' => array(
                 'type' => self::TYPE_STRING,
                 'lang' => true,
-                'validate' => 'isString'
+                'validate' => 'isLinkRewrite'
             ),
             'content' => array(
                 'type' => self::TYPE_HTML,
@@ -84,6 +86,11 @@ class EverPsBlogPost extends ObjectModel
                 'required' => false
             ),
             'id_shop' => array(
+                'type' => self::TYPE_INT,
+                'validate' => 'isunsignedInt',
+                'required' => false
+            ),
+            'id_author' => array(
                 'type' => self::TYPE_INT,
                 'validate' => 'isunsignedInt',
                 'required' => false
@@ -197,7 +204,35 @@ class EverPsBlogPost extends ObjectModel
         $sql->orderBy('bp.date_add DESC');
         $sql->orderBy('bp.id_ever_post DESC');
         $posts = Db::getInstance()->executeS($sql);
-        return $posts;
+        $return = array();
+        foreach ($posts as $post_array) {
+                $post = new self(
+                    (int)$post_array['id_ever_post'],
+                    (int)$id_lang,
+                    (int)$id_shop
+                );
+                $post->title = self::changeShortcodes(
+                    $post->title,
+                    (int)Context::getContext()->customer->id
+                );
+                $post->content = self::changeShortcodes(
+                    $post->content,
+                    (int)Context::getContext()->customer->id
+                );
+                // Length
+                $post->title = Tools::substr(
+                    $post->title,
+                    0,
+                    (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
+                );
+                $post->content = Tools::substr(
+                    $post->content,
+                    0,
+                    (int)Configuration::get('EVERPSBLOG_EXCERPT')
+                );
+                $return[] = $post;
+        }
+        return $return;
     }
 
     public static function getPostsByTag($id_lang, $id_shop, $id_tag, $start = 0, $limit = null, $post_status = 'published')
@@ -213,44 +248,45 @@ class EverPsBlogPost extends ObjectModel
             'bp',
             'bp.id_ever_post = bpl.id_ever_post'
         );
+        $sql->leftJoin(
+            'ever_blog_post_tag',
+            'bpt',
+            'bpt.id_ever_post = bpl.id_ever_post'
+        );
         $sql->where('bp.post_status = "'.(string)$post_status.'"');
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
+        $sql->where('bpt.id_ever_post_tag = '.(int)$id_tag);
         $sql->orderBy('bp.date_add DESC');
         $sql->limit((int)$limit, (int)$start);
         $posts = Db::getInstance()->executeS($sql);
         $return = array();
         foreach ($posts as $post) {
-            $post_tags = EverPsBlogCleaner::convertToArray(
-                json_decode($post['post_tags'])
+            $post = new self(
+                (int)$post['id_ever_post'],
+                (int)$id_lang,
+                (int)$id_shop
             );
-            if (in_array($id_tag, $post_tags)) {
-                $post = new self(
-                    (int)$post['id_ever_post'],
-                    (int)$id_lang,
-                    (int)$id_shop
-                );
-                $post->title = self::changeShortcodes(
-                    $post->title,
-                    (int)Context::getContext()->customer->id
-                );
-                $post->content = self::changeShortcodes(
-                    $post->content,
-                    (int)Context::getContext()->customer->id
-                );
-                // Length
-                $post->title = Tools::substr(
-                    $post->title,
-                    0,
-                    (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
-                );
-                $post->content = Tools::substr(
-                    $post->content,
-                    0,
-                    (int)Configuration::get('EVERPSBLOG_EXCERPT')
-                );
-                $return[] = $post;
-            }
+            $post->title = self::changeShortcodes(
+                $post->title,
+                (int)Context::getContext()->customer->id
+            );
+            $post->content = self::changeShortcodes(
+                $post->content,
+                (int)Context::getContext()->customer->id
+            );
+            // Length
+            $post->title = Tools::substr(
+                $post->title,
+                0,
+                (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
+            );
+            $post->content = Tools::substr(
+                $post->content,
+                0,
+                (int)Configuration::get('EVERPSBLOG_EXCERPT')
+            );
+            $return[] = $post;
         }
         if ($return) {
             return $return;
@@ -258,6 +294,66 @@ class EverPsBlogPost extends ObjectModel
     }
 
     public static function getPostsByCategory($id_lang, $id_shop, $id_category, $start = 0, $limit = null, $post_status = 'published')
+    {
+        if (!(int)$limit) {
+            $limit = (int)Configuration::get('EVERPSBLOG_PAGINATION');
+        }
+        $sql = new DbQuery;
+        $sql->from('ever_blog_post', 'ebp');
+        $sql = new DbQuery;
+        $sql->select('*');
+        $sql->from('ever_blog_post_lang', 'bpl');
+        $sql->leftJoin(
+            'ever_blog_post',
+            'bp',
+            'bp.id_ever_post = bpl.id_ever_post'
+        );
+        $sql->leftJoin(
+            'ever_blog_post_category',
+            'bpc',
+            'bpc.id_ever_post = bpl.id_ever_post'
+        );
+        $sql->where('bp.post_status = "'.pSQL($post_status).'"');
+        $sql->where('bp.id_shop = '.(int)$id_shop);
+        $sql->where('bpl.id_lang = '.(int)$id_lang);
+        $sql->where('bpc.id_ever_post_category = '.(int)$id_category);
+        $sql->orderBy('bp.date_add DESC');
+        $sql->limit((int)$limit, (int)$start);
+        $posts = Db::getInstance()->executeS($sql);
+        $return = array();
+        foreach ($posts as $post_array) {
+            $post = new self(
+                (int)$post_array['id_ever_post'],
+                (int)$id_lang,
+                (int)$id_shop
+            );
+            $post->title = self::changeShortcodes(
+                $post->title,
+                (int)Context::getContext()->customer->id
+            );
+            $post->content = self::changeShortcodes(
+                $post->content,
+                (int)Context::getContext()->customer->id
+            );
+            // Length
+            $post->title = Tools::substr(
+                $post->title,
+                0,
+                (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
+            );
+            $post->content = Tools::substr(
+                $post->content,
+                0,
+                (int)Configuration::get('EVERPSBLOG_EXCERPT')
+            );
+            $return[] = $post;
+        }
+        if ($return) {
+            return $return;
+        }
+    }
+
+    public static function getPostsByAuthor($id_lang, $id_shop, $id_author, $start = 0, $limit = null, $post_status = 'published')
     {
         if (!(int)$limit) {
             $limit = (int)Configuration::get('EVERPSBLOG_PAGINATION');
@@ -271,6 +367,7 @@ class EverPsBlogPost extends ObjectModel
             'bp.id_ever_post = bpl.id_ever_post'
         );
         $sql->where('bp.post_status = "'.pSQL($post_status).'"');
+        $sql->where('bp.id_author = '.(int)$id_author);
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
         $sql->orderBy('bp.date_add DESC');
@@ -278,36 +375,31 @@ class EverPsBlogPost extends ObjectModel
         $posts = Db::getInstance()->executeS($sql);
         $return = array();
         foreach ($posts as $post) {
-            $post_categories = EverPsBlogCleaner::convertToArray(
-                json_decode($post['post_categories'])
+            $post = new self(
+                (int)$post['id_ever_post'],
+                (int)$id_lang,
+                (int)$id_shop
             );
-            if (in_array($id_category, $post_categories)) {
-                $post = new self(
-                    (int)$post['id_ever_post'],
-                    (int)$id_lang,
-                    (int)$id_shop
-                );
-                $post->title = self::changeShortcodes(
-                    $post->title,
-                    (int)Context::getContext()->customer->id
-                );
-                $post->content = self::changeShortcodes(
-                    $post->content,
-                    (int)Context::getContext()->customer->id
-                );
-                // Length
-                $post->title = Tools::substr(
-                    $post->title,
-                    0,
-                    (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
-                );
-                $post->content = Tools::substr(
-                    $post->content,
-                    0,
-                    (int)Configuration::get('EVERPSBLOG_EXCERPT')
-                );
-                $return[] = $post;
-            }
+            $post->title = self::changeShortcodes(
+                $post->title,
+                (int)Context::getContext()->customer->id
+            );
+            $post->content = self::changeShortcodes(
+                $post->content,
+                (int)Context::getContext()->customer->id
+            );
+            // Length
+            $post->title = Tools::substr(
+                $post->title,
+                0,
+                (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
+            );
+            $post->content = Tools::substr(
+                $post->content,
+                0,
+                (int)Configuration::get('EVERPSBLOG_EXCERPT')
+            );
+            $return[] = $post;
         }
         if ($return) {
             return $return;
@@ -327,45 +419,45 @@ class EverPsBlogPost extends ObjectModel
             'bp',
             'bp.id_ever_post = bpl.id_ever_post'
         );
-        $sql->where('bp.post_status = "'.(string)$post_status.'"');
+        $sql->leftJoin(
+            'ever_blog_post_product',
+            'bpp',
+            'bpp.id_ever_post = bpl.id_ever_post'
+        );
+        $sql->where('bp.post_status = "'.pSQL($post_status).'"');
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
+        $sql->where('bpp.id_ever_post_product = '.(int)$id_product);
         $sql->orderBy('bp.date_add DESC');
-        $sql->orderBy('bp.id_ever_post DESC');
         $sql->limit((int)$limit, (int)$start);
         $posts = Db::getInstance()->executeS($sql);
         $return = array();
-        foreach ($posts as $post) {
-            $post_products = EverPsBlogCleaner::convertToArray(
-                json_decode($post['post_products'])
+        foreach ($posts as $post_array) {
+            $post = new self(
+                (int)$post_array['id_ever_post'],
+                (int)$id_lang,
+                (int)$id_shop
             );
-            if (in_array((int)$id_product, $post_products)) {
-                $post = new self(
-                    (int)$post['id_ever_post'],
-                    (int)$id_lang,
-                    (int)$id_shop
-                );
-                $post->title = self::changeShortcodes(
-                    $post->title,
-                    (int)Context::getContext()->customer->id
-                );
-                $post->content = self::changeShortcodes(
-                    $post->content,
-                    (int)Context::getContext()->customer->id
-                );
-                // Length
-                $post->title = Tools::substr(
-                    $post->title,
-                    0,
-                    (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
-                );
-                $post->content = Tools::substr(
-                    $post->content,
-                    0,
-                    (int)Configuration::get('EVERPSBLOG_EXCERPT')
-                );
-                $return[] = $post;
-            }
+            $post->title = self::changeShortcodes(
+                $post->title,
+                (int)Context::getContext()->customer->id
+            );
+            $post->content = self::changeShortcodes(
+                $post->content,
+                (int)Context::getContext()->customer->id
+            );
+            // Length
+            $post->title = Tools::substr(
+                $post->title,
+                0,
+                (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
+            );
+            $post->content = Tools::substr(
+                $post->content,
+                0,
+                (int)Configuration::get('EVERPSBLOG_EXCERPT')
+            );
+            $return[] = $post;
         }
         if ($return) {
             return $return;
@@ -429,18 +521,19 @@ class EverPsBlogPost extends ObjectModel
             'bp',
             'bp.id_ever_post = bpl.id_ever_post'
         );
+        $sql->leftJoin(
+            'ever_blog_post_tag',
+            'bpc',
+            'bpc.id_ever_post = bpl.id_ever_post'
+        );
+        $sql->where('bpc.id_ever_post_tag = '.(int)$id_tag);
         $sql->where('bp.post_status = "'.(string)$post_status.'"');
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
         $posts = Db::getInstance()->executeS($sql);
         $count = 0;
         foreach ($posts as $post) {
-            $post_tags = EverPsBlogCleaner::convertToArray(
-                json_decode($post['post_tags'])
-            );
-            if (in_array($id_tag, $post_tags)) {
-                $count += 1;
-            }
+            $count += 1;
         }
         if ($count) {
             return $count;
@@ -457,18 +550,43 @@ class EverPsBlogPost extends ObjectModel
             'bp',
             'bp.id_ever_post = bpl.id_ever_post'
         );
+        $sql->leftJoin(
+            'ever_blog_post_category',
+            'bpc',
+            'bpc.id_ever_post = bpl.id_ever_post'
+        );
+        $sql->where('bpc.id_ever_post_category = '.(int)$id_category);
         $sql->where('bp.post_status = "'.(string)$post_status.'"');
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
         $posts = Db::getInstance()->executeS($sql);
         $count = 0;
         foreach ($posts as $post) {
-            $post_categories = EverPsBlogCleaner::convertToArray(
-                json_decode($post['post_categories'])
-            );
-            if (in_array($id_category, $post_categories)) {
-                $count += 1;
-            }
+            $count += 1;
+        }
+        if ($count) {
+            return $count;
+        }
+    }
+
+    public static function countPostsByAuthor($id_author, $id_lang, $id_shop, $post_status = 'published')
+    {
+        $sql = new DbQuery;
+        $sql->select('*');
+        $sql->from('ever_blog_post_lang', 'bpl');
+        $sql->leftJoin(
+            'ever_blog_post',
+            'bp',
+            'bp.id_ever_post = bpl.id_ever_post'
+        );
+        $sql->where('bp.post_status = "'.(string)$post_status.'"');
+        $sql->where('bp.id_author = '.(int)$id_author);
+        $sql->where('bp.id_shop = '.(int)$id_shop);
+        $sql->where('bpl.id_lang = '.(int)$id_lang);
+        $posts = Db::getInstance()->executeS($sql);
+        $count = 0;
+        foreach ($posts as $post) {
+            $count += 1;
         }
         if ($count) {
             return $count;

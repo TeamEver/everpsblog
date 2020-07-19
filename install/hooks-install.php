@@ -92,49 +92,49 @@ if (!Hook::getIdByName('displayAfterEverLoop')) {
     $result &= $hook->save();
 }
 // Hook before post init
-if (!Hook::getIdByName('beforeEverPostInitContent')) {
+if (!Hook::getIdByName('actionBeforeEverPostInitContent')) {
     $hook = new Hook();
-    $hook->name = 'beforeEverPostInitContent';
+    $hook->name = 'actionBeforeEverPostInitContent';
     $hook->title = 'Before post init';
     $hook->description = 'This hook is triggered before post init';
     $result &= $hook->save();
 }
 // Hook before category init
-if (!Hook::getIdByName('beforeEverCategoryInitContent')) {
+if (!Hook::getIdByName('actionBeforeEverCategoryInitContent')) {
     $hook = new Hook();
-    $hook->name = 'beforeEverCategoryInitContent';
+    $hook->name = 'actionBeforeEverCategoryInitContent';
     $hook->title = 'Before category init';
     $hook->description = 'This hook is triggered before category init';
     $result &= $hook->save();
 }
 // Hook before tag init
-if (!Hook::getIdByName('beforeEverTagInitContent')) {
+if (!Hook::getIdByName('actionBeforeEverTagInitContent')) {
     $hook = new Hook();
-    $hook->name = 'beforeTagInitContent';
+    $hook->name = 'actionBeforeEverTagInitContent';
     $hook->title = 'Before tag init';
     $hook->description = 'This hook is triggered before tag init';
     $result &= $hook->save();
 }
 // Hook before blog init
-if (!Hook::getIdByName('beforeEverBlogInitContent')) {
+if (!Hook::getIdByName('actionBeforeEverBlogInitContent')) {
     $hook = new Hook();
-    $hook->name = 'beforeEverBlogInitContent';
+    $hook->name = 'actionBeforeEverBlogInitContent';
     $hook->title = 'Before blog init';
     $hook->description = 'This hook is triggered before blog init';
     $result &= $hook->save();
 }
 // Hook before blog init
-if (!Hook::getIdByName('beforeEverBlogInit')) {
+if (!Hook::getIdByName('actionBeforeEverBlogInit')) {
     $hook = new Hook();
-    $hook->name = 'beforeEverBlogInit';
+    $hook->name = 'actionBeforeEverBlogInit';
     $hook->title = 'Before blog init';
     $hook->description = 'This hook is triggered before main blog init';
     $result &= $hook->save();
 }
 // Hook after blog init
-if (!Hook::getIdByName('afterEverBlogInit')) {
+if (!Hook::getIdByName('actionAfterEverBlogInit')) {
     $hook = new Hook();
-    $hook->name = 'afterEverBlogInit';
+    $hook->name = 'actionAfterEverBlogInit';
     $hook->title = 'After blog init';
     $hook->description = 'This hook is triggered after main blog init';
     $result &= $hook->save();

@@ -9,19 +9,29 @@
 {extends file='page.tpl'}
 
 {block name='head' append}
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="{$urls.current_url|escape:'htmlall':'UTF-8'}">
-  <meta property="og:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
-  <meta property="og:site_name" content="{$shop.name|escape:'htmlall':'UTF-8'}">
-  <meta property="og:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
-  <meta property="og:image" content="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$category->id}.jpg">
+    <!-- Twitter Card data -->
+    <meta name="twitter:card" content="summary">
+    {* <meta name="twitter:site" content="@publisher_handle"> *}
+    <meta name="twitter:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
+    <meta name="twitter:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
+    {* <meta name="twitter:creator" content="@author_handle"> *}
+    <meta name="twitter:image" content="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$category->id|escape:'htmlall':'UTF-8'}.jpg">
+    <!-- Open Graph Card data -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{$urls.current_url|escape:'htmlall':'UTF-8'}">
+    <meta property="og:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
+    <meta property="og:site_name" content="{$shop.name|escape:'htmlall':'UTF-8'}">
+    <meta property="og:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
+    <meta property="og:image" content="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$category->id|escape:'htmlall':'UTF-8'}.jpg">
 {/block}
 
 {block name="page_content"}
 {hook h="displayBeforeEverCategory" everblogcategory=$category}
-<h1>{$category->title|escape:'htmlall':'UTF-8'}</h1>
+<h1 class="text-center">{$category->title|escape:'htmlall':'UTF-8'}</h1>
+<div class="category-header">
+  <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$category->id|escape:'htmlall':'UTF-8'}.jpg" class="img img-fluid category-featured-image featured-image" alt="{$category->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
+</div>
 {if isset($paginated) && !$paginated}
-<img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$category->id}.jpg" class="img img-fluid mx-auto d-block" alt="{$category->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
 <div class="container">
     <div class="row categoryinfos">
         {$category->date_add|escape:'htmlall':'UTF-8'}

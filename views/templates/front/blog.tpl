@@ -9,12 +9,20 @@
 {extends file='page.tpl'}
 
 {block name='head' append}
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="{$urls.current_url|escape:'htmlall':'UTF-8'}">
-  <meta property="og:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
-  <meta property="og:site_name" content="{$shop.name|escape:'htmlall':'UTF-8'}">
-  <meta property="og:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
-  <meta property="og:image" content="{$shop.logo|escape:'htmlall':'UTF-8'}">
+    <!-- Twitter Card data -->
+    <meta name="twitter:card" content="summary">
+    {* <meta name="twitter:site" content="@publisher_handle"> *}
+    <meta name="twitter:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
+    <meta name="twitter:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
+    {* <meta name="twitter:creator" content="@author_handle"> *}
+    <meta name="twitter:image" content="{$shop.logo|escape:'htmlall':'UTF-8'}">
+    <!-- Open Graph Card data -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{$urls.current_url|escape:'htmlall':'UTF-8'}">
+    <meta property="og:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
+    <meta property="og:site_name" content="{$shop.name|escape:'htmlall':'UTF-8'}">
+    <meta property="og:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
+    <meta property="og:image" content="{$shop.logo|escape:'htmlall':'UTF-8'}">
 {/block}
 
 {block name="page_content"}
@@ -30,8 +38,8 @@
     <div class="col-xs-12 col-md-3 evercategory everpsblog" id="everpsblog-{$item.id_ever_category|escape:'htmlall':'UTF-8'}">
         <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category'=>$item.id_ever_category, 'link_rewrite'=>$item.link_rewrite])|escape:'htmlall':'UTF-8'}" class="col-md-12">
             <h3 class="everpsblogcategory" id="everpsblog-post-title-{$item.id_ever_category|escape:'htmlall':'UTF-8'}">{$item.title|escape:'htmlall':'UTF-8'}</h3>
-            <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$item.id_ever_category|escape:'htmlall':'UTF-8'}.jpg" class="img img-fluid"/>
-            <p class="everpsblogcategory" id="everpsblog-post-content-{$item.id_ever_category|escape:'htmlall':'UTF-8'}">{$item.content nofilter}</p>
+            <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$item.id_ever_category|escape:'htmlall':'UTF-8'}.jpg" class="img img-fluid category-featured-image featured-image"/>
+            <p class="everpsblogcategory" id="everpsblog-post-content-{$item.id_ever_category|escape:'htmlall':'UTF-8'}">{$item.content|truncate:150:"..." nofilter}</p>
         </a>
     </div>
     {/if}
