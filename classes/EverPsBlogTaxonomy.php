@@ -101,12 +101,9 @@ class EverPsBlogTaxonomy extends ObjectModel
             WHERE id_ever_post = '.(int)$id_post.'
             AND '.pSQL($key).' = '.(int)$id_obj.'
             ';
-            if ($obj_name == 'tag') {
-                // die(var_dump(Db::getInstance()->Execute($sql)));
-            }
             // If dropped, return insert as kind of update
             if (!Db::getInstance()->Execute($sql)) {
-                die(var_dump(Db::getInstance()->Execute($sql)));
+                return false;
             } else {
                 return true;
             }

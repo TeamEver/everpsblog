@@ -117,7 +117,7 @@ class EverPsBlogCategory extends ObjectModel
         $sql = new DbQuery;
         $sql->select('id_ever_category');
         $sql->from('ever_blog_category');
-        $sql->where('id_ever_category = '.$id_parent_category);
+        $sql->where('id_ever_category = '.(int)$id_parent_category);
         $return = Db::getInstance()->getValue($sql);
         return $return;
     }

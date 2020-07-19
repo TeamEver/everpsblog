@@ -84,7 +84,7 @@ function upgrade_module_3_0_1()
     $sql = array();
     $sql[] =
         'ALTER TABLE '._DB_PREFIX_.'ever_blog_post
-         ADD `id_author` VARCHAR(255) NULL DEFAULT NULL
+         ADD `id_author` int(10) unsigned NOT NULL
          AFTER `id_shop`
     ';
     $sql[] =

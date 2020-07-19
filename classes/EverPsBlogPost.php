@@ -145,7 +145,7 @@ class EverPsBlogPost extends ObjectModel
             'bp',
             'bp.id_ever_post = bpl.id_ever_post'
         );
-        $sql->where('bp.post_status = "'.(string)$post_status.'"');
+        $sql->where('bp.post_status = "'.pSQL($post_status).'"');
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
         $sql->orderBy('bp.date_add DESC');
@@ -253,7 +253,7 @@ class EverPsBlogPost extends ObjectModel
             'bpt',
             'bpt.id_ever_post = bpl.id_ever_post'
         );
-        $sql->where('bp.post_status = "'.(string)$post_status.'"');
+        $sql->where('bp.post_status = "'.pSQL($post_status).'"');
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
         $sql->where('bpt.id_ever_post_tag = '.(int)$id_tag);
@@ -502,7 +502,7 @@ class EverPsBlogPost extends ObjectModel
             'bp',
             'bp.id_ever_post = bpl.id_ever_post'
         );
-        $sql->where('bp.post_status = "'.(string)$post_status.'"');
+        $sql->where('bp.post_status = "'.pSQL($post_status).'"');
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
         $count = Db::getInstance()->getValue($sql);
@@ -527,7 +527,7 @@ class EverPsBlogPost extends ObjectModel
             'bpc.id_ever_post = bpl.id_ever_post'
         );
         $sql->where('bpc.id_ever_post_tag = '.(int)$id_tag);
-        $sql->where('bp.post_status = "'.(string)$post_status.'"');
+        $sql->where('bp.post_status = "'.pSQL($post_status).'"');
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
         $posts = Db::getInstance()->executeS($sql);
@@ -556,7 +556,7 @@ class EverPsBlogPost extends ObjectModel
             'bpc.id_ever_post = bpl.id_ever_post'
         );
         $sql->where('bpc.id_ever_post_category = '.(int)$id_category);
-        $sql->where('bp.post_status = "'.(string)$post_status.'"');
+        $sql->where('bp.post_status = "'.pSQL($post_status).'"');
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
         $posts = Db::getInstance()->executeS($sql);
@@ -579,7 +579,7 @@ class EverPsBlogPost extends ObjectModel
             'bp',
             'bp.id_ever_post = bpl.id_ever_post'
         );
-        $sql->where('bp.post_status = "'.(string)$post_status.'"');
+        $sql->where('bp.post_status = "'.pSQL($post_status).'"');
         $sql->where('bp.id_author = '.(int)$id_author);
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
@@ -728,5 +728,18 @@ class EverPsBlogPost extends ObjectModel
             $message = str_replace($key, $value, $message);
         }
         return $message;
+    }
+
+    public static function dropBlogAuthorPosts($id_ever_author)
+    {
+        $sql[] = 'UPDATE '._DB_PREFIX_.'ever_blog_post
+            SET id_author = 0
+            WHERE id_author = '.(int)$id_ever_author.';
+        ';
+        if (!Db::getInstance()->execute($sql)) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }

@@ -13,6 +13,7 @@ require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCleaner.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTaxonomy.php';
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogAuthor.php';
 
 class EverPsBlog extends Module
 {
@@ -25,7 +26,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '3.1.2';
+        $this->version = '3.1.3';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -185,14 +186,17 @@ class EverPsBlog extends Module
             && $this->registerHook('actionObjectEverPsBlogCategoryAddAfter')
             && $this->registerHook('actionObjectEverPsBlogTagAddAfter')
             && $this->registerHook('actionObjectEverPsBlogCommentAddAfter')
+            && $this->registerHook('actionObjectEverPsBlogAuthorAddAfter')
             && $this->registerHook('actionObjectEverPsBlogCategoryDeleteAfter')
             && $this->registerHook('actionObjectEverPsBlogTagDeleteAfter')
             && $this->registerHook('actionObjectEverPsBlogCommentDeleteAfter')
             && $this->registerHook('actionObjectEverPsBlogPostDeleteAfter')
+            && $this->registerHook('actionObjectEverPsBlogAuthorDeleteAfter')
             && $this->registerHook('actionObjectEverPsBlogCategoryUpdateAfter')
             && $this->registerHook('actionObjectEverPsBlogTagUpdateAfter')
             && $this->registerHook('actionObjectEverPsBlogCommentUpdateAfter')
-            && $this->registerHook('actionObjectEverPsBlogPostUpdateAfter');
+            && $this->registerHook('actionObjectEverPsBlogPostUpdateAfter')
+            && $this->registerHook('actionObjectEverPsBlogAuthorUpdateAfter');
     }
 
     /**
@@ -1447,6 +1451,17 @@ class EverPsBlog extends Module
             unlink($old_img);
         }
         EverPsBlogTaxonomy::dropProductTaxonomy(
+            (int)$params['object']->id
+        );
+    }
+
+    public function hookActionObjectAuthorDeleteAfter($params)
+    {
+        $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.(int)$params['object']->id.'.jpg';
+        if (file_exists($old_img)) {
+            unlink($old_img);
+        }
+        EverPsBlogPost::dropBlogAuthorPosts(
             (int)$params['object']->id
         );
     }
