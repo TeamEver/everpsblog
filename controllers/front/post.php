@@ -11,7 +11,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-include_once(dirname(__FILE__).'/../../classes/controller/FrontController.php');
+require_once(dirname(__FILE__).'/../../classes/controller/FrontController.php');
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogPost.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCategory.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';

@@ -641,7 +641,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     $post->title[$lang['id_lang']] = Tools::getValue('title_'.$lang['id_lang']);
                 }
                 if (!Tools::getValue('content_'.$lang['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('content_'.$lang['id_lang']))
+                    || !Validate::isCleanHtml(Tools::getValue('content_'.$lang['id_lang']), true)
                 ) {
                     $this->errors[] = $this->l('Content is not valid for lang ').$lang['id_lang'];
                 } else {
