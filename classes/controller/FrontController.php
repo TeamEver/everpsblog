@@ -256,6 +256,7 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
                 'id_ever_category',
                 'id_ever_post',
                 'id_ever_tag',
+                'id_ever_author',
                 'fc',
                 'module'
             );

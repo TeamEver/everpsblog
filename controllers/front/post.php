@@ -239,6 +239,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                     }
                     $pproduct = new Product(
                         (int)$post_product['id_ever_post_product'],
+                        false,
                         (int)$this->context->shop->id,
                         (int)$this->context->language->id
                     );
