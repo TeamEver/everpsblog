@@ -31,6 +31,7 @@ class EverPsBlogAuthor extends ObjectModel
     public $date_upd;
     public $index;
     public $follow;
+    public $author_products;
     public $active;
 
     public static $definition = array(
@@ -104,6 +105,11 @@ class EverPsBlogAuthor extends ObjectModel
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true
+            ),
+            'author_products' => array(
+                'type' => self::TYPE_STRING,
+                'validate' => 'isJson',
+                'required' => false
             ),
             'active' => array(
                 'type' => self::TYPE_BOOL,

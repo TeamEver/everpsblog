@@ -52,6 +52,7 @@ $sql[] =
         `date_upd` DATETIME DEFAULT NULL,
         `index` int(10) unsigned DEFAULT NULL,
         `follow` int(10) unsigned DEFAULT NULL,
+        `category_products` varchar(255) DEFAULT NULL,
         `is_root_category` int(10) unsigned DEFAULT NULL,
         PRIMARY KEY (`id_ever_category`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
@@ -77,6 +78,7 @@ $sql[] =
         `date_upd` DATETIME DEFAULT NULL,
         `index` int(10) unsigned DEFAULT NULL,
         `follow` int(10) unsigned DEFAULT NULL,
+        `tag_products` varchar(255) DEFAULT NULL,
         PRIMARY KEY (`id_ever_tag`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
@@ -119,6 +121,7 @@ $sql[] =
         `date_upd` DATETIME DEFAULT NULL,
         `index` int(10) unsigned DEFAULT NULL,
         `follow` int(10) unsigned DEFAULT NULL,
+        `author_products` varchar(255) DEFAULT NULL,
         `active` int(10) unsigned DEFAULT NULL,
         PRIMARY KEY (`id_ever_author`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
@@ -153,6 +156,27 @@ $sql[] =
         `id_ever_post_product` int(10) NOT NULL,
         `id_ever_post` int(10) unsigned NOT NULL,
         PRIMARY KEY (`id_ever_post`, `id_ever_post_product`)
+    ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
+
+$sql[] =
+    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_category_product` (
+        `id_ever_category_product` int(10) NOT NULL,
+        `id_ever_category` int(10) unsigned NOT NULL,
+        PRIMARY KEY (`id_ever_category`, `id_ever_category_product`)
+    ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
+
+$sql[] =
+    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_tag_product` (
+        `id_ever_tag_product` int(10) NOT NULL,
+        `id_ever_tag` int(10) unsigned NOT NULL,
+        PRIMARY KEY (`id_ever_tag`, `id_ever_tag_product`)
+    ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
+
+$sql[] =
+    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_author_product` (
+        `id_ever_author_product` int(10) NOT NULL,
+        `id_ever_author` int(10) unsigned NOT NULL,
+        PRIMARY KEY (`id_ever_author`, `id_ever_author_product`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 foreach ($sql as $s) {

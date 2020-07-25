@@ -559,7 +559,7 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
             // Multilingual fields
             foreach (Language::getLanguages(false) as $lang) {
                 if (!Tools::getValue('content_'.$lang['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('content_'.$lang['id_lang']))
+                    || !Validate::isCleanHtml(Tools::getValue('content_'.$lang['id_lang']), true)
                 ) {
                     $this->errors[] = $this->l('Content is not valid for lang ').$lang['id_lang'];
                 } else {

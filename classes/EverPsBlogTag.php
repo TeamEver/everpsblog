@@ -26,6 +26,7 @@ class EverPsBlogTag extends ObjectModel
     public $date_upd;
     public $index;
     public $follow;
+    public $tag_products;
 
     public static $definition = array(
         'table' => 'ever_blog_tag',
@@ -82,6 +83,11 @@ class EverPsBlogTag extends ObjectModel
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true
+            ),
+            'tag_products' => array(
+                'type' => self::TYPE_STRING,
+                'validate' => 'isJson',
+                'required' => false
             ),
             'active' => array(
                 'type' => self::TYPE_BOOL,

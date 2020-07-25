@@ -27,6 +27,7 @@ class EverPsBlogCategory extends ObjectModel
     public $active;
     public $index;
     public $follow;
+    public $category_products;
     public $is_root_category;
 
     public static $definition = array(
@@ -87,6 +88,11 @@ class EverPsBlogCategory extends ObjectModel
             'follow' => array(
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
+                'required' => false
+            ),
+            'category_products' => array(
+                'type' => self::TYPE_STRING,
+                'validate' => 'isJson',
                 'required' => false
             ),
             'active' => array(

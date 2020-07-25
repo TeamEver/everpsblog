@@ -406,7 +406,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                     $category->title[$lang['id_lang']] = Tools::getValue('title_'.$lang['id_lang']);
                 }
                 if (!Tools::getValue('content_'.$lang['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('content_'.$lang['id_lang']))
+                    || !Validate::isCleanHtml(Tools::getValue('content_'.$lang['id_lang']), true)
                 ) {
                     $this->errors[] = $this->l(
                         'Content is not valid for lang '

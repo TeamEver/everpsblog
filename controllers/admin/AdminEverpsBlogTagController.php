@@ -372,7 +372,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                     $tag->title[$language['id_lang']] = Tools::getValue('title_'.$language['id_lang']);
                 }
                 if (!Tools::getValue('content_'.$language['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('content_'.$language['id_lang']))
+                    || !Validate::isCleanHtml(Tools::getValue('content_'.$language['id_lang']), true)
                 ) {
                     $this->errors[] = $this->l('Content is not valid for lang ').$language['id_lang'];
                 } else {
