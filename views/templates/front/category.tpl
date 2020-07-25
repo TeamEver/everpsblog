@@ -27,13 +27,13 @@
 
 {block name="page_content"}
 {hook h="displayBeforeEverCategory" everblogcategory=$category}
-<h1 class="text-center">{$category->title|escape:'htmlall':'UTF-8'}</h1>
 <div class="category-header">
-  <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$category->id|escape:'htmlall':'UTF-8'}.jpg" class="img img-fluid category-featured-image featured-image" alt="{$category->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
+  <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$category->id|escape:'htmlall':'UTF-8'}.jpg" class="img img-fluid category-featured-image featured-image" alt="{$category->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$category->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
 </div>
+<h1 class="text-center">{$category->title|escape:'htmlall':'UTF-8'}</h1>
 {if isset($paginated) && !$paginated}
 <div class="container">
-    <div class="row categoryinfos">
+    <div class="row categoryinfos d-none">
         {$category->date_add|escape:'htmlall':'UTF-8'}
     </div>
     <div class="row categorycontent">

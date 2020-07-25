@@ -57,30 +57,30 @@
 {hook h="displayBeforeEverPost" everblogpost=$post}
 <div class="content" itemscope="itemscope" itemtype="http://schema.org/Blog">
     <div class="container" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
-            {if isset($errors) && $errors}
-            <div class="col-12 col-xs-12 col-md-12 alert alert-danger" role="alert">
-            {foreach from=$errors item=error}
-              <p>{$error|escape:'htmlall':'UTF-8'}</p>
-            {/foreach}
-            </div>
-            {/if}
-            {if isset($successes) && $successes}
-            <div class="col-12 col-xs-12 col-md-12 alert alert-success" role="alert">
-            {foreach from=$successes item=success}
-              <p>{$success|escape:'htmlall':'UTF-8'}</p>
-            {/foreach}
-            </div>
-            {/if}
-            <h1 itemprop="headline" class="text-center">{$post->title|escape:'htmlall':'UTF-8'}</h1>
-            <p itemscope="" itemprop="author" itemtype="http://schema.org/Person" class="text-center">
-                <a href="{$author->url|escape:'htmlall':'UTF-8'}" nickhandle="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
-                    <img src="{$author_cover|escape:'htmlall':'UTF-8'}" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" class="img-fluid author-icon rounded-circle" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'}" title="{$author->nickhandle|escape:'htmlall':'UTF-8'}">
-                    {l s='By' mod='everpsblog'} {$author->nickhandle|escape:'htmlall':'UTF-8'}
-                </a>
-            </p>
-            <div class="row post-header">
+        {if isset($errors) && $errors}
+        <div class="col-12 col-xs-12 col-md-12 alert alert-danger" role="alert">
+        {foreach from=$errors item=error}
+          <p>{$error|escape:'htmlall':'UTF-8'}</p>
+        {/foreach}
+        </div>
+        {/if}
+        {if isset($successes) && $successes}
+        <div class="col-12 col-xs-12 col-md-12 alert alert-success" role="alert">
+        {foreach from=$successes item=success}
+          <p>{$success|escape:'htmlall':'UTF-8'}</p>
+        {/foreach}
+        </div>
+        {/if}
+        <div class="row post-header">
             <img class="img img-fluid post-featured-image featured-image" src="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$post->id|escape:'htmlall':'UTF-8'}.jpg" alt="{$post->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$post->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
         </div>
+        <h1 itemprop="headline" class="text-center">{$post->title|escape:'htmlall':'UTF-8'}</h1>
+        <p itemscope="" itemprop="author" itemtype="http://schema.org/Person" class="text-center">
+            <a href="{$author->url|escape:'htmlall':'UTF-8'}" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
+                <img src="{$author_cover|escape:'htmlall':'UTF-8'}" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" class="img-fluid author-icon rounded-circle" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'}" title="{$author->nickhandle|escape:'htmlall':'UTF-8'}">
+                {l s='By' mod='everpsblog'} {$author->nickhandle|escape:'htmlall':'UTF-8'}
+            </a>
+        </p>
     </div>
     <div class="container">
         <div class="row postcontent {if $animated}zoomed{/if}" itemprop="articleBody">

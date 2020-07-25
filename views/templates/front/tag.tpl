@@ -29,19 +29,21 @@
 {hook h="displayBeforeEverTag" everblogtag=$tag}
 <div class="container">
     <div class="row">
-        <h1 class="text-center">{$tag->title nofilter}</h1>
         {if isset($paginated) && !$paginated}
         <div class="tag-header">
-            <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}tags/tag_image_{$tag->id|escape:'htmlall':'UTF-8'}.jpg" class="img img-fluid mx-auto d-block" alt="{$tag->title nofilter} {$shop.name|escape:htmlall:'UTF-8'}">
+            <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}tags/tag_image_{$tag->id|escape:'htmlall':'UTF-8'}.jpg" class="img img-fluid mx-auto d-block" alt="{$tag->title nofilter} {$shop.name|escape:htmlall:'UTF-8'}" title="{$tag->title nofilter} {$shop.name|escape:htmlall:'UTF-8'}">
         </div>
         {/if}
+        <h1 class="text-center">{$tag->title nofilter}</h1>
     </div>
 </div>
+{if isset($paginated) && !$paginated}
 <div class="container">
     <div class="row tagcontent">
         {$tag->content nofilter}
     </div>
 </div>
+{/if}
 
 {if isset($post_number) && $post_number > 0}
 <div class="container">

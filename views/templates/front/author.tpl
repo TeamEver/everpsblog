@@ -64,12 +64,15 @@
         </div>
         {/if}
     </div>
+    {if isset($paginated) && !$paginated}
     <div class="container">
         <div class="row authorcontent {if $animated}zoomed{/if}" itemprop="articleBody">
             {$author->content nofilter}
         </div>
     </div>
+    {/if}
 </div>
+{if isset($paginated) && !$paginated}
 <div class="container">
     <div class="row">
         <div class="social-sharing d-flex justify-content-center">
@@ -93,6 +96,7 @@
         </div>
     </div>
 </div>
+{/if}
 {if isset($post_number) && $post_number > 0}
 <div class="container">
 {hook h="displayBeforeEverLoop"}
