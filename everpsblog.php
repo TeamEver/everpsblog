@@ -625,7 +625,7 @@ class EverPsBlog extends Module
 
         $layouts = array(
             array(
-                'layout' => 'layouts/layout-content-only.tpl',
+                'layout' => 'layouts/layout-full-width.tpl',
                 'name' => $this->l('Full width')
             ),
             array(
@@ -1305,20 +1305,21 @@ class EverPsBlog extends Module
 
     public function hookOverrideLayoutTemplate($params)
     {
-        if (isset($params['controller']->page_name)
-            && (
-                $params['controller']->page_name == 'module-everpsblog-blog'
-                || $params['controller']->page_name == 'module-everpsblog-category'
-                || $params['controller']->page_name == 'module-everpsblog-post'
-                || $params['controller']->page_name == 'module-everpsblog-tag'
-            )
-        ) {
-            return $this->context->shop->theme->getLayoutRelativePathForPage(
-                $params['controller']->page_name
-            );
-        } else {
-            return $params['default_layout'];
-        }
+        // if (isset($params['controller']->page_name)
+        //     && (
+        //         $params['controller']->page_name == 'module-everpsblog-blog'
+        //         || $params['controller']->page_name == 'module-everpsblog-category'
+        //         || $params['controller']->page_name == 'module-everpsblog-post'
+        //         || $params['controller']->page_name == 'module-everpsblog-tag'
+        //         || $params['controller']->page_name == 'module-everpsblog-author'
+        //     )
+        // ) {
+        //     return $this->context->shop->theme->getLayoutRelativePathForPage(
+        //         $params['controller']->page_name
+        //     );
+        // } else {
+        //     return $params['default_layout'];
+        // }
     }
 
     public function hookActionFrontControllerAfterInit()
