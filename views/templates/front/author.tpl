@@ -118,9 +118,9 @@
         </div>
     </div>
 {/foreach}
-{hook h="displayAfterEverLoop"}
 </div>
 {include file='_partials/pagination.tpl' pagination=$pagination}
+{hook h="displayAfterEverLoop"}
 {hook h="displayAfterEverCategory" everblogauthor=$author}
 {else}
 <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>

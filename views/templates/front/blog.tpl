@@ -71,7 +71,6 @@
         </div>
     </article>
 {/foreach}
-{hook h="displayAfterEverLoop"}
 </div>
 {else}
 <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>
@@ -79,6 +78,7 @@
 <div class="row">
     {include file='_partials/pagination.tpl' pagination=$pagination}
 </div>
+{hook h="displayAfterEverLoop"}
 {if isset($default_blog_bottom_text) && $default_blog_bottom_text}
 <div class="row mt-2">
     {$default_blog_bottom_text nofilter}
