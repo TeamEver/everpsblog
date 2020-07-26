@@ -60,7 +60,7 @@
         <h1 itemprop="headline" class="text-center">{$author->nickhandle|escape:'htmlall':'UTF-8'}</h1>
         {if isset($paginated) && !$paginated}
         <div class="row author-header">
-            <img class="img img-fluid author-featured-image featured-image" src="{$blogImg_dir|escape:'htmlall':'UTF-8'}authors/author_image_{$author->id|escape:'htmlall':'UTF-8'}.jpg" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
+            <img class="img img-fluid author-featured-image featured-image" src="{$blogImg_dir|escape:'htmlall':'UTF-8'}authors/author_image_{$author->id|escape:'htmlall':'UTF-8'}.jpg" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
         </div>
         {/if}
     </div>
@@ -79,17 +79,17 @@
             <ul>
             {if isset($author->facebook) && $author->facebook}
                 <li>
-                    <a href="{$author->facebook|escape:'htmlall':'UTF-8'}" target="_blank" rel="nofollow" class="facebook icon-gray">{l s='Follow me !' mod='everpsblog'}</a>
+                    <a href="{$author->facebook|escape:'htmlall':'UTF-8'}" target="_blank" rel="nofollow" class="facebook icon-gray" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{l s='Follow me !' mod='everpsblog'}</a>
                 </li>
             {/if}
             {if isset($author->linkedin) && $author->linkedin}
                 <li>
-                    <a href="{$author->linkedin|escape:'htmlall':'UTF-8'}" target="_blank" rel="nofollow" class="linkedin icon-gray">{l s='Follow me !' mod='everpsblog'}</a>
+                    <a href="{$author->linkedin|escape:'htmlall':'UTF-8'}" target="_blank" rel="nofollow" class="linkedin icon-gray" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{l s='Follow me !' mod='everpsblog'}</a>
                 </li>
             {/if}
             {if isset($author->twitter) && $author->twitter}
                 <li>
-                    <a href="{$author->twitter|escape:'htmlall':'UTF-8'}" target="_blank" rel="nofollow" class="twitter icon-gray">{l s='Follow me !' mod='everpsblog'}</a>
+                    <a href="{$author->twitter|escape:'htmlall':'UTF-8'}" target="_blank" rel="nofollow" class="twitter icon-gray" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{l s='Follow me !' mod='everpsblog'}</a>
                 </li>
             {/if}
             </ul>
@@ -104,7 +104,7 @@
     <div class="col-xs-12 article everpsblog" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
         <div class="col-md-12">
             <div class="col-xs-12 col-md-4 article-img">
-                <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$item->id_ever_post|escape:'htmlall':'UTF-8'}.jpg" class="img-fluid mx-auto d-block {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item->title nofilter} {$shop.name|escape:'htmlall':'UTF-8'}" />
+                <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$item->id_ever_post|escape:'htmlall':'UTF-8'}.jpg" class="img-fluid mx-auto d-block {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item->title nofilter} {$shop.name|escape:'htmlall':'UTF-8'}"  title="{$item->title nofilter} {$shop.name|escape:'htmlall':'UTF-8'}"/>
             </div>
             <div class="col-xs-12 col-md-8">
                 <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">

@@ -138,6 +138,31 @@
     background-size: cover;
     background-position: center;
 }
+/* Rewriting products listing */
+body#module-everpsblog-blog .products,
+body#module-everpsblog-tag .products,
+body#module-everpsblog-author .products,
+body#module-everpsblog-post .products{
+    padding: 0%;
+}
+body#module-everpsblog-blog #products .product-miniature,
+body#module-everpsblog-blog .featured-products .product-miniature,
+body#module-everpsblog-blog .product-accessories .product-miniature,
+body#module-everpsblog-blog .product-miniature .product-miniature,
+body#module-everpsblog-tag #products .product-miniature,
+body#module-everpsblog-tag .featured-products .product-miniature,
+body#module-everpsblog-tag .product-accessories .product-miniature,
+body#module-everpsblog-tag .product-miniature .product-miniature,
+body#module-everpsblog-author #products .product-miniature,
+body#module-everpsblog-author .featured-products .product-miniature,
+body#module-everpsblog-author .product-accessories .product-miniature,
+body#module-everpsblog-author .product-miniature .product-miniature,
+body#module-everpsblog-post #products .product-miniature,
+body#module-everpsblog-post .featured-products .product-miniature,
+body#module-everpsblog-post .product-accessories .product-miniature,
+body#module-everpsblog-post .product-miniature .product-miniature{
+    margin: 0 .3rem;
+}
 /* Missing Bootstrap */
 .d-flex{
     display: flex;

@@ -53,6 +53,48 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             (int)$this->context->language->id,
             (int)$this->context->shop->id
         );
+        $this->featured_category = new Category(
+            (int)Configuration::get('EVERBLOG_CAT_FEATURED'),
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
+        $featured_products = $this->featured_category->getProducts(
+            (int)$this->context->language->id,
+            1,
+            (int)Configuration::get('EVERPSBLOG_PAGINATION')
+        );
+        if (!empty($featured_products)) {
+            $showPrice = true;
+            $assembler = new ProductAssembler($this->context);
+            $presenterFactory = new ProductPresenterFactory($this->context);
+            $presentationSettings = $presenterFactory->getPresentationSettings();
+            $presenter = new ProductListingPresenter(
+                new ImageRetriever(
+                    $this->context->link
+                ),
+                $this->context->link,
+                new PriceFormatter(),
+                new ProductColorsRetriever(),
+                $this->context->getTranslator()
+            );
+
+            $productsForTemplate = array();
+
+            $presentationSettings->showPrices = $showPrice;
+
+            if (is_array($featured_products)) {
+                foreach ($featured_products as $productId) {
+                    $productsForTemplate[] = $presenter->present(
+                        $presentationSettings,
+                        $assembler->assembleProduct(array('id_product' => $productId['id_product'])),
+                        $this->context->language
+                    );
+                }
+            }
+            $this->context->smarty->assign(array(
+                'everhome_products' => $productsForTemplate,
+            ));
+        }
         // pagination
         $pagination = $this->getTemplateVarPagination($this->post_number);
         // SEO title and meta desc
@@ -69,7 +111,6 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             $page['meta']['robots'] = 'noindex, follow';
         }
         $this->context->smarty->assign('page', $page);
-        // die(var_dump($page));
         $everpsblogposts = EverPsBlogPost::getPosts(
             (int)$this->context->language->id,
             (int)$this->context->shop->id,
@@ -106,6 +147,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
                 'id_lang' => (int)$this->context->language->id,
                 'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'modules/everpsblog/views/img/',
                 'animated' => $animate,
+                'pagination' => $pagination,
             )
         );
         $this->setTemplate('module:everpsblog/views/templates/front/blog.tpl');

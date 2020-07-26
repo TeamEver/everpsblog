@@ -12,33 +12,35 @@
     <!-- Twitter Card data -->
     <meta name="twitter:card" content="summary">
     {* <meta name="twitter:site" content="@publisher_handle"> *}
-    <meta name="twitter:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
+    <meta name="twitter:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'} {if isset($pagination) && $pagination.current_page > 0}{l s='(page' mod='everpsblog'} {$pagination.current_page}/{$pagination.pages_count}{l s=')' mod='everpsblog'}{/if}">
     <meta name="twitter:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
     {* <meta name="twitter:creator" content="@author_handle"> *}
     <meta name="twitter:image" content="{$shop.logo|escape:'htmlall':'UTF-8'}">
     <!-- Open Graph Card data -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{$urls.current_url|escape:'htmlall':'UTF-8'}">
-    <meta property="og:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
+    <meta property="og:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'} {if isset($pagination) && $pagination.current_page > 0}{l s='(page' mod='everpsblog'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' mod='everpsblog'}{/if}">
     <meta property="og:site_name" content="{$shop.name|escape:'htmlall':'UTF-8'}">
     <meta property="og:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
     <meta property="og:image" content="{$shop.logo|escape:'htmlall':'UTF-8'}">
 {/block}
 
 {block name="page_content"}
+<h1 class="text-center">{l s='Our blog' mod='everpsblog'}</h1>
+<span class="paginated float-right d-none">{if isset($pagination) && $pagination.current_page > 0}{l s='(page' mod='everpsblog'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' mod='everpsblog'}{/if}</span>
+{if isset($paginated) && !$paginated}
 {if isset($default_blog_top_text) && $default_blog_top_text}
-<div class="row">
+<div class="row mt-2">
     {$default_blog_top_text nofilter}
 </div>
 {/if}
-{if isset($paginated) && !$paginated}
 <div class="row mt-2">
 {foreach from=$evercategory item=item}
     {if !$item.is_root_category}
     <div class="col-xs-12 col-md-6 evercategory everpsblog" id="everpsblog-{$item.id_ever_category|escape:'htmlall':'UTF-8'}">
         <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category'=>$item.id_ever_category, 'link_rewrite'=>$item.link_rewrite])|escape:'htmlall':'UTF-8'}" class="col-md-12" title="{$item.title|escape:'htmlall':'UTF-8'}">
-            <h3 class="everpsblogcategory" id="everpsblog-post-title-{$item.id_ever_category|escape:'htmlall':'UTF-8'}">{$item.title|escape:'htmlall':'UTF-8'}</h3>
-            <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$item.id_ever_category|escape:'htmlall':'UTF-8'}.jpg" class="img img-fluid category-featured-image featured-image" title="{$item.title|escape:'htmlall':'UTF-8'}" />
+            <h2 class="everpsblogcategory text-center" id="everpsblog-post-title-{$item.id_ever_category|escape:'htmlall':'UTF-8'}">{$item.title|escape:'htmlall':'UTF-8'}</h2>
+            <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$item.id_ever_category|escape:'htmlall':'UTF-8'}.jpg" class="img img-fluid category-featured-image featured-image" alt="{$item.title|escape:'htmlall':'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'}" />
         </a>
     </div>
     {/if}
@@ -47,7 +49,7 @@
 {/if}
 
 {if isset($post_number) && $post_number > 0}
-<div class="row">
+<div class="row mt-2">
 {hook h="displayBeforeEverLoop"}
 {foreach from=$everpsblog item=item}
     <article class="col-xs-12 article everpsblog" id="everpsblog-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
@@ -74,12 +76,22 @@
 {else}
 <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>
 {/if}
-{if isset($default_blog_bottom_text) && $default_blog_bottom_text}
-<div class="row">
-    {$default_blog_bottom_text nofilter}
-</div>
-{/if}
 <div class="row">
     {include file='_partials/pagination.tpl' pagination=$pagination}
 </div>
+{if isset($default_blog_bottom_text) && $default_blog_bottom_text}
+<div class="row mt-2">
+    {$default_blog_bottom_text nofilter}
+</div>
+{/if}
+{if isset($everhome_products) && $everhome_products}
+<section id="products" class="mt-2">
+  <h2 class="text-center">{l s='Our best products' d='Modules.everpshomeproducts.Shop'}</h2>
+  <div class="products row">
+    {foreach from=$everhome_products item="product"}
+      {include file="catalog/_partials/miniatures/product.tpl" product=$product}
+    {/foreach}
+  </div>
+</section>
+{/if}
 {/block}

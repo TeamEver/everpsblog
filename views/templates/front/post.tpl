@@ -112,7 +112,7 @@
   {/if}
 
 {if isset($allow_comments) && $allow_comments}
-<section class="leaveComment container clearfix">
+<section class="container clearfix">
     <span id="leaveComment">{l s='Leave a comment' mod='everpsblog'}</span>
     <div class="row">
         <form enctype="multipart/form-data" method="post">
@@ -172,7 +172,7 @@
 {/if}
 {if isset($count_products) && $count_products > 0}
 
-<section id="products" class="row">
+<section id="products">
   <h2 class="text-center">{l s='Linked products' mod='everpsblog'}</h2>
   <div class="products row">
     {foreach from=$ps_products item="product"}

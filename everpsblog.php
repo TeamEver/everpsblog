@@ -26,7 +26,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '3.1.11';
+        $this->version = '3.1.12';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -371,6 +371,13 @@ class EverPsBlog extends Module
                     'Error : The field "Fancybox" is not valid'
                 );
             }
+            if (Tools::getValue('EVERBLOG_CAT_FEATURED')
+                && !Validate::isUnsignedInt(Tools::getValue('EVERBLOG_CAT_FEATURED'))
+            ) {
+                $this->postErrors[] = $this->l(
+                    'Error : The field "Featured category" is not valid'
+                );
+            }
             // Multilingual fields
             foreach (Language::getLanguages(false) as $lang) {
                 if (!Tools::getValue('EVERBLOG_TITLE_'.$lang['id_lang'])
@@ -556,6 +563,7 @@ class EverPsBlog extends Module
             'EVERBLOG_TAG_COLUMNS' => Configuration::get('EVERBLOG_TAG_COLUMNS'),
             'EVERBLOG_CATEG_COLUMNS' => Configuration::get('EVERBLOG_CATEG_COLUMNS'),
             'EVERBLOG_FANCYBOX' => Configuration::get('EVERBLOG_FANCYBOX'),
+            'EVERBLOG_CAT_FEATURED' => Configuration::get('EVERBLOG_CAT_FEATURED'),
             'EVERBLOG_TITLE' => (!empty(
                 $everblog_title[(int)Configuration::get('PS_LANG_DEFAULT')]
             )) ? $everblog_title : Configuration::getInt(
@@ -981,6 +989,15 @@ class EverPsBlog extends Module
                                 'label' => $this->l('Disabled')
                             )
                         ),
+                    ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('Featured category on blog default page'),
+                        'name' => 'EVERBLOG_CAT_FEATURED',
+                        'desc' => $this->l('Featured category'),
+                        'hint' => $this->l('Will show category products on blog page'),
+                        'cols' => 36,
+                        'rows' => 4,
                     ),
                 ),
                 'submit' => array(

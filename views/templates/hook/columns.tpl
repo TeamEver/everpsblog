@@ -63,7 +63,7 @@
                                 {$item->title|strip_tags nofilter}
                         </h3>
                         <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
-                            {$item->content nofilter}
+                            {$item->content|truncate:90:'...' nofilter}
                         </div>
                         <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary" title="{l s='Read more' mod='everpsblog'} {$item->title nofilter}">{l s='Read more' mod='everpsblog'}</a>
                     </div>
@@ -72,11 +72,11 @@
         </div>
 {$postcounter = $postcounter+1}
 {/foreach}
-        <a class="carousel-control-prev" href="#latestCarousel" role="button" data-slide="prev">
+        <a class="carousel-control-prev" href="#latestCarousel" role="button" data-slide="prev" title="{l s='Previous' mod='everpsblog'}">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
             <span class="sr-only"></span>
         </a>
-        <a class="carousel-control-next" href="#latestCarousel" role="button" data-slide="next">
+        <a class="carousel-control-next" href="#latestCarousel" role="button" data-slide="next" title="{l s='Next' mod='everpsblog'}">
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
             <span class="sr-only">{l s='Previous' mod='everpsblog'}</span>
         </a>
