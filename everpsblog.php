@@ -26,7 +26,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '3.1.13';
+        $this->version = '3.1.15';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;

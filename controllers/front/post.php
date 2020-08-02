@@ -130,7 +130,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 // Mokay, let's see your IP first
                 foreach ($ip_banned as $banned_ip) {
                     if ($banned_ip == $_SERVER['REMOTE_ADDR']) {
-                        $errors[] = $this->l('Wow ! What have you done ? You\'re banned from this blog !');
+                        $errors[] = $this->module->l('Wow ! What have you done ? You\'re banned from this blog !');
                     }
                 }
                 // So now, u're unlogged ? Right, email is required, must be unbanned
@@ -138,12 +138,12 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                     if (!Tools::getValue('customerEmail')
                         || !Validate::isEmail(Tools::getValue('customerEmail'))
                     ) {
-                        $errors[] = $this->l('Error : The field "Email" is not valid');
+                        $errors[] = $this->module->l('Error : The field "Email" is not valid');
                     } else {
                         $emails_banned = explode(',', Configuration::get('EVERBLOG_BANNED_USERS'));
                         foreach ($emails_banned as $banned_user) {
                             if ($banned_user == Tools::getValue('customerEmail')) {
-                                $errors[] = $this->l('Wow ! What have you done ? You\'re banned from this blog !');
+                                $errors[] = $this->module->l('Wow ! What have you done ? You\'re banned from this blog !');
                             }
                         }
                     }
@@ -151,12 +151,12 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 if (!Tools::getValue('RgpdCompliance')
                     || !Validate::isBool(Tools::getValue('RgpdCompliance'))
                 ) {
-                    $errors[] = $this->l('Error : The field "RGPD" is not valid');
+                    $errors[] = $this->module->l('Error : The field "RGPD" is not valid');
                 }
                 if (!Tools::getValue('evercomment')
                     || !Validate::isCleanHtml(Tools::getValue('evercomment'))
                 ) {
-                    $errors[] = $this->l('Error : The field "comments" is not valid');
+                    $errors[] = $this->module->l('Error : The field "comments" is not valid');
                 }
                 $comment = new EverPsBlogComment();
                 $latest = $comment->getLatestCommentByEmail(
@@ -167,7 +167,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 if ($latest->date_add
                     && strtotime($latest->date_add) >= strtotime('-30 minutes')
                 ) {
-                    $errors[] = $this->l('You must wait before sending another comment');
+                    $errors[] = $this->module->l('You must wait before sending another comment');
                 }
 
                 if (count($errors)) {
@@ -200,14 +200,14 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                     $comment->save();
                     // alert admin ! comment saved ! whouhouhouhou !
                     if ($this->sendCommentAlert((int)$comment->id)) {
-                        $success[] = $this->l('Your comment has been submitted');
+                        $success[] = $this->module->l('Your comment has been submitted');
                         $this->context->smarty->assign(
                             array(
                                 'successes' => $success,
                             )
                         );
                     } else {
-                        $errors[] = $this->l('Email has not been sent to admin');
+                        $errors[] = $this->module->l('Email has not been sent to admin');
                         $this->context->smarty->assign(
                             array(
                                 'errors' => $errors,
@@ -292,12 +292,12 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             ));
             $social_share_links = [];
             $social_share_links['facebook'] = [
-                'label' => $this->trans('Share', [], 'Modules.Everpsblog.Shop'),
+                'label' => $this->module->l('Share'),
                 'class' => 'facebook',
                 'url' => 'https://www.facebook.com/sharer.php?u='.$page['canonical'],
             ];
             $social_share_links['twitter'] = [
-                'label' => $this->trans('Tweet', [], 'Modules.Everpsblog.Shop'),
+                'label' => $this->module->l('Tweet'),
                 'class' => 'twitter',
                 'url' => 'https://twitter.com/intent/tweet?text='.$this->post->title.' '.$page['canonical'],
             ];
@@ -348,7 +348,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
         );
         $breadcrumb = parent::getBreadcrumbLinks();
         $breadcrumb['links'][] = array(
-            'title' => $this->l('Blog'),
+            'title' => $this->module->l('Blog'),
             'url' => $this->context->link->getModuleLink(
                 'everpsblog',
                 'blog'
@@ -419,7 +419,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
         $mail = Mail::send(
             (int)$this->context->language->id,
             'everpsblog',
-            $this->l('A new comment is pending'),
+            $this->module->l('A new comment is pending'),
             array(
                 '{shop_name}'=>Configuration::get('PS_SHOP_NAME'),
                 '{shop_logo}'=>_PS_IMG_DIR_.Configuration::get(
