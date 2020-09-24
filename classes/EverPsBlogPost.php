@@ -226,7 +226,7 @@ class EverPsBlogPost extends ObjectModel
                     (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
                 );
                 $post->content = Tools::substr(
-                    $post->content,
+                    strip_tags($post->content),
                     0,
                     (int)Configuration::get('EVERPSBLOG_EXCERPT')
                 );
