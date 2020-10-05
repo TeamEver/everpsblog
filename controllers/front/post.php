@@ -147,6 +147,11 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                             }
                         }
                     }
+                    if (!Tools::getValue('name')
+                        || !Validate::isCleanHtml(Tools::getValue('name'))
+                    ) {
+                        $errors[] = $this->module->l('Error : The field "name" is not valid');
+                    }
                 }
                 if (!Tools::getValue('RgpdCompliance')
                     || !Validate::isBool(Tools::getValue('RgpdCompliance'))
