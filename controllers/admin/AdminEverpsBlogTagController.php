@@ -390,7 +390,9 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                 ) {
                     $this->errors[] = $this->l('Meta description is not valid for lang ').$language['id_lang'];
                 } else {
-                    $tag->meta_description[$language['id_lang']] = Tools::getValue('meta_description_'.$language['id_lang']);
+                    $tag->meta_description[$language['id_lang']] = Tools::getValue(
+                        'meta_description_'.$language['id_lang']
+                    );
                 }
                 if (!Tools::getValue('link_rewrite_'.$language['id_lang'])
                     || !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$language['id_lang']))
@@ -407,7 +409,10 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                 .'everpsblog/views/img/tags/tag_image_'
                 .(int)$tag->id
                 .'.jpg';
-                if (isset($_FILES['tag_image']) && isset($_FILES['tag_image']['tmp_name']) && !empty($_FILES['tag_image']['tmp_name'])) {
+                if (isset($_FILES['tag_image'])
+                    && isset($_FILES['tag_image']['tmp_name'])
+                    && !empty($_FILES['tag_image']['tmp_name'])
+                ) {
                     Configuration::set('PS_IMAGE_GENERATION_METHOD', 1);
                     if (file_exists($tag_img_destination)) {
                         unlink($tag_img_destination);

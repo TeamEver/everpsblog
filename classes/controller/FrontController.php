@@ -233,7 +233,11 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
             return;
         }
 
-        $match_url = (Configuration::get('PS_SSL_ENABLED') && ($this->ssl || Configuration::get('PS_SSL_ENABLED_EVERYWHERE')) ? 'https://' : 'http://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+        $match_url = (Configuration::get('PS_SSL_ENABLED')
+            && ($this->ssl
+                || Configuration::get('PS_SSL_ENABLED_EVERYWHERE')) ? 'https://' : 'http://')
+        .$_SERVER['HTTP_HOST']
+        .$_SERVER['REQUEST_URI'];
         $match_url = rawurldecode($match_url);
         if (!preg_match(
             '/^'.Tools::pRegexp(rawurldecode($canonical_url), '/').'([&?].*)?$/',
@@ -283,7 +287,11 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
                 && $_SERVER['REQUEST_URI'] != __PS_BASE_URI__
             ) {
                 die(
-                    '[Debug] This page has moved<br />Please use the following URL instead: <a href="'.$final_url.'">'.$final_url.'</a>'
+                    '[Debug] This page has moved<br />Please use the following URL instead: <a href="'
+                    .$final_url
+                    .'">'
+                    .$final_url
+                    .'</a>'
                 );
             }
 

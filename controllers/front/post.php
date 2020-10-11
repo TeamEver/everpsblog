@@ -54,7 +54,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                     'id_ever_author' => $this->author->id,
                     'link_rewrite' => $this->author->link_rewrite
                 )
-        );
+            );
         } else {
             $this->author = new stdClass();
             $this->author->id_ever_author = 0;
@@ -62,8 +62,17 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             $this->author->nickhandle = Configuration::get('PS_SHOP_NAME');
             $this->author->url = Tools::getHttpHost(true).__PS_BASE_URI__;
         }
-        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/authors/author_image_'.(int)$this->post->id_author.'.jpg')) {
-                $this->author_cover = Tools::getHttpHost(true).__PS_BASE_URI__.'modules/everpsblog/views/img/authors/author_image_'.(int)$this->post->id_author.'.jpg';
+        // Get author cover if exists, else get shop logo
+        $author_cover_file = _PS_MODULE_DIR_
+        .'everpsblog/views/img/authors/author_image_'
+        .(int)$this->post->id_author
+        .'.jpg';
+        if (file_exists($author_cover_file)) {
+                $this->author_cover = Tools::getHttpHost(true)
+                .__PS_BASE_URI__
+                .'modules/everpsblog/views/img/authors/author_image_'
+                .(int)$this->post->id_author
+                .'.jpg';
         } else {
             $this->author_cover = Tools::getHttpHost(true).__PS_BASE_URI__.'img/'.Configuration::get(
                 'PS_LOGO',
@@ -130,7 +139,9 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 // Mokay, let's see your IP first
                 foreach ($ip_banned as $banned_ip) {
                     if ($banned_ip == $_SERVER['REMOTE_ADDR']) {
-                        $errors[] = $this->module->l('Wow ! What have you done ? You\'re banned from this blog !');
+                        $errors[] = $this->module->l(
+                            'Wow ! What have you done ? You\'re banned from this blog !'
+                        );
                     }
                 }
                 // So now, u're unlogged ? Right, email is required, must be unbanned
@@ -143,7 +154,9 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                         $emails_banned = explode(',', Configuration::get('EVERBLOG_BANNED_USERS'));
                         foreach ($emails_banned as $banned_user) {
                             if ($banned_user == Tools::getValue('customerEmail')) {
-                                $errors[] = $this->module->l('Wow ! What have you done ? You\'re banned from this blog !');
+                                $errors[] = $this->module->l(
+                                    'Wow ! What have you done ? You\'re banned from this blog !'
+                                );
                             }
                         }
                     }
@@ -306,12 +319,6 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 'class' => 'twitter',
                 'url' => 'https://twitter.com/intent/tweet?text='.$this->post->title.' '.$page['canonical'],
             ];
-            // $social_share_links['pinterest'] = [
-            //     'label' => $this->trans('Pinterest', [], 'Modules.Everpsblog.Shop'),
-            //     'class' => 'pinterest',
-            //     'url' => 'https://www.pinterest.com/pin/create/button/?media='.$sharing_img.'&url='.$page['canonical'],
-            // ];
-            // die(var_dump($products));
             $this->context->smarty->assign(
                 array(
                     'author_cover' => $this->author_cover,

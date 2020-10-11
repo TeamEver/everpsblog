@@ -454,7 +454,11 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
         $helper->toolbar_scroll = true;
         $lang = new Language((int) Configuration::get('PS_LANG_DEFAULT'));
         $helper->default_form_language = $lang->id;
-        $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
+        $helper->allow_employee_form_lang = Configuration::get(
+            'PS_BO_ALLOW_EMPLOYEE_FORM_LANG'
+        ) ? Configuration::get(
+            'PS_BO_ALLOW_EMPLOYEE_FORM_LANG'
+        ) : 0;
         $this->fields_form = array();
         $helper->identifier = $this->identifier;
         $helper->currentIndex = AdminController::$currentIndex;
@@ -594,14 +598,19 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
                 .(int)$author->id
                 .'.jpg';
                 /* upload the image */
-                if (isset($_FILES['author_image']) && isset($_FILES['author_image']['tmp_name']) && !empty($_FILES['author_image']['tmp_name'])) {
+                if (isset($_FILES['author_image'])
+                    && isset($_FILES['author_image']['tmp_name'])
+                    && !empty($_FILES['author_image']['tmp_name'])
+                ) {
                     Configuration::set('PS_IMAGE_GENERATION_METHOD', 1);
                     if (file_exists($author_img_destination)) {
                         unlink($author_img_destination);
                     }
                     if ($error = ImageManager::validateUpload($_FILES['author_image'])) {
                         $this->errors .= $error;
-                    } elseif (!($tmp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS')) || !move_uploaded_file($_FILES['author_image']['tmp_name'], $tmp_name)) {
+                    } elseif (!($tmp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS'))
+                        || !move_uploaded_file($_FILES['author_image']['tmp_name'], $tmp_name)
+                    ) {
                         return false;
                     } elseif (!ImageManager::resize($tmp_name, $author_img_destination)) {
                         $this->errors .= $this->l(

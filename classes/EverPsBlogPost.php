@@ -152,7 +152,6 @@ class EverPsBlogPost extends ObjectModel
         $sql->limit((int)$limit, (int)$start);
         $posts = Db::getInstance()->executeS($sql);
         $return = array();
-        // die(var_dump($current_context->controller->controller_type));
         if ($current_context->controller->controller_type == 'front'
             || $current_context->controller->controller_type == 'modulefront'
         ) {
@@ -235,8 +234,14 @@ class EverPsBlogPost extends ObjectModel
         return $return;
     }
 
-    public static function getPostsByTag($id_lang, $id_shop, $id_tag, $start = 0, $limit = null, $post_status = 'published')
-    {
+    public static function getPostsByTag(
+        $id_lang,
+        $id_shop,
+        $id_tag,
+        $start = 0,
+        $limit = null,
+        $post_status = 'published'
+    ) {
         if (!(int)$limit) {
             $limit = (int)Configuration::get('EVERPSBLOG_PAGINATION');
         }
@@ -293,8 +298,14 @@ class EverPsBlogPost extends ObjectModel
         }
     }
 
-    public static function getPostsByCategory($id_lang, $id_shop, $id_category, $start = 0, $limit = null, $post_status = 'published')
-    {
+    public static function getPostsByCategory(
+        $id_lang,
+        $id_shop,
+        $id_category,
+        $start = 0,
+        $limit = null,
+        $post_status = 'published'
+    ) {
         if (!(int)$limit) {
             $limit = (int)Configuration::get('EVERPSBLOG_PAGINATION');
         }
@@ -353,8 +364,14 @@ class EverPsBlogPost extends ObjectModel
         }
     }
 
-    public static function getPostsByAuthor($id_lang, $id_shop, $id_author, $start = 0, $limit = null, $post_status = 'published')
-    {
+    public static function getPostsByAuthor(
+        $id_lang,
+        $id_shop,
+        $id_author,
+        $start = 0,
+        $limit = null,
+        $post_status = 'published'
+    ) {
         if (!(int)$limit) {
             $limit = (int)Configuration::get('EVERPSBLOG_PAGINATION');
         }
@@ -406,8 +423,14 @@ class EverPsBlogPost extends ObjectModel
         }
     }
 
-    public static function getPostsByProduct($id_lang, $id_shop, $id_product, $start = 0, $limit = null, $post_status = 'published')
-    {
+    public static function getPostsByProduct(
+        $id_lang,
+        $id_shop,
+        $id_product,
+        $start = 0,
+        $limit = null,
+        $post_status = 'published'
+    ) {
         if (!(int)$limit) {
             $limit = (int)Configuration::get('EVERPSBLOG_PAGINATION');
         }
@@ -531,13 +554,7 @@ class EverPsBlogPost extends ObjectModel
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
         $posts = Db::getInstance()->executeS($sql);
-        $count = 0;
-        foreach ($posts as $post) {
-            $count += 1;
-        }
-        if ($count) {
-            return $count;
-        }
+        return count($posts);
     }
 
     public static function countPostsByCategory($id_category, $id_lang, $id_shop, $post_status = 'published')
@@ -560,13 +577,7 @@ class EverPsBlogPost extends ObjectModel
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
         $posts = Db::getInstance()->executeS($sql);
-        $count = 0;
-        foreach ($posts as $post) {
-            $count += 1;
-        }
-        if ($count) {
-            return $count;
-        }
+        return count($posts);
     }
 
     public static function countPostsByAuthor($id_author, $id_lang, $id_shop, $post_status = 'published')
@@ -584,13 +595,7 @@ class EverPsBlogPost extends ObjectModel
         $sql->where('bp.id_shop = '.(int)$id_shop);
         $sql->where('bpl.id_lang = '.(int)$id_lang);
         $posts = Db::getInstance()->executeS($sql);
-        $count = 0;
-        foreach ($posts as $post) {
-            $count += 1;
-        }
-        if ($count) {
-            return $count;
-        }
+        return count($posts);
     }
 
     public static function changeShortcodes($message, $id_entity = false)
@@ -732,7 +737,7 @@ class EverPsBlogPost extends ObjectModel
 
     public static function dropBlogAuthorPosts($id_ever_author)
     {
-        $sql[] = 'UPDATE '._DB_PREFIX_.'ever_blog_post
+        $sql = 'UPDATE '._DB_PREFIX_.'ever_blog_post
             SET id_author = 0
             WHERE id_author = '.(int)$id_ever_author.';
         ';

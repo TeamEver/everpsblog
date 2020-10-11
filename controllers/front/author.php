@@ -67,8 +67,6 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
             $pagination = $this->getTemplateVarPagination(
                 $this->post_number
             );
-            $errors = array();
-            $success = array();
             $animate = Configuration::get(
                 'EVERBLOG_ANIMATE'
             );
@@ -117,12 +115,6 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
                 'class' => 'twitter',
                 'url' => 'https://twitter.com/intent/tweet?text='.$this->author->nickhandle.' '.$page['canonical'],
             ];
-            // $social_share_links['pinterest'] = [
-            //     'label' => $this->trans('Pinterest', [], 'Modules.Everpsblog.Shop'),
-            //     'class' => 'pinterest',
-            //     'url' => 'https://www.pinterest.com/pin/create/button/?media='.$sharing_img.'&url='.$page['canonical'],
-            // ];
-            // die(var_dump($products));
             $this->context->smarty->assign(
                 array(
                     'posts' => $posts,

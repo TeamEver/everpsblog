@@ -159,26 +159,26 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
             ),
         );
         foreach ($this->parent_categories as $parent_category) {
-                $category = new EverPsBlogCategory(
-                    (int)$parent_category,
-                    (int)$this->context->shop->id,
-                    (int)$this->context->language->id
+            $category = new EverPsBlogCategory(
+                (int)$parent_category,
+                (int)$this->context->shop->id,
+                (int)$this->context->language->id
+            );
+            if ((bool)$category->is_root_category === false
+                && (int)$category->id > 0
+            ) {
+                $breadcrumb['links'][] = array(
+                    'title' => $category->title,
+                    'url' => $this->context->link->getModuleLink(
+                        'everpsblog',
+                        'category',
+                        array(
+                            'id_ever_category' => $category->id,
+                            'link_rewrite' => $category->link_rewrite
+                        )
+                    ),
                 );
-                if ((bool)$category->is_root_category === false
-                    && (int)$category->id > 0
-                ) {
-                    $breadcrumb['links'][] = array(
-                        'title' => $category->title,
-                        'url' => $this->context->link->getModuleLink(
-                            'everpsblog',
-                            'category',
-                            array(
-                                'id_ever_category' => $category->id,
-                                'link_rewrite' => $category->link_rewrite
-                            )
-                        ),
-                    );
-                }
+            }
         }
         $breadcrumb['links'][] = array(
             'title' => $this->category->title,
