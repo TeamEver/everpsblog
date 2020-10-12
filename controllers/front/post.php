@@ -258,9 +258,12 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                     $pproduct = new Product(
                         (int)$post_product['id_ever_post_product'],
                         false,
-                        (int)$this->context->shop->id,
-                        (int)$this->context->language->id
+                        (int)Context::getContext()->shop->id,
+                        (int)Context::getContext()->language->id
                     );
+                    if ($pproduct->id <= 0) {
+                        continue;
+                    }
                     if ((bool)$pproduct->active === true) {
                         $pproduct_cover = Product::getCover(
                             (int)$pproduct->id
