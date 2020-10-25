@@ -113,7 +113,7 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
     public function l($string, $class = null, $addslashes = false, $htmlentities = true)
     {
         if ($this->isSeven) {
-            return Context::getContext()->getTranslator()->trans($string);
+            return Context::getContext()->getTranslator()->trans($string, [],'Modules.Everpsblog.Admineverpsblogauthorcontroller');
         }
 
         return parent::l($string, $class, $addslashes, $htmlentities);
@@ -166,20 +166,20 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
     {
         $formValues = array();
         $formValues[] = array(
-            'id_ever_author' => $obj->id,
-            'nickhandle' => $obj->nickhandle,
-            'meta_title' => $obj->meta_title,
-            'meta_description' => $obj->meta_description,
-            'link_rewrite' => $obj->link_rewrite,
-            'twitter' => $obj->twitter,
-            'facebook' => $obj->facebook,
-            'linkedin' => $obj->linkedin,
-            'content' => $obj->content,
-            'date_add' => $obj->date_add,
-            'date_upd' => $obj->date_upd,
-            'index' => $obj->index,
-            'follow' => $obj->follow,
-            'active' => $obj->active,
+            'id_ever_author' => (!empty(Tools::getValue('id_ever_author'))) ? Tools::getValue('id_ever_author') : $obj->id,
+            'nickhandle' => (!empty(Tools::getValue('nickhandle'))) ? Tools::getValue('nickhandle') : $obj->nickhandle,
+            'meta_title' => (!empty(Tools::getValue('meta_title'))) ? Tools::getValue('meta_title') : $obj->meta_title,
+            'meta_description' => (!empty(Tools::getValue('meta_description'))) ? Tools::getValue('meta_description') : $obj->meta_description,
+            'link_rewrite' => (!empty(Tools::getValue('link_rewrite'))) ? Tools::getValue('link_rewrite') : $obj->link_rewrite,
+            'twitter' => (!empty(Tools::getValue('twitter'))) ? Tools::getValue('twitter') : $obj->twitter,
+            'facebook' => (!empty(Tools::getValue('facebook'))) ? Tools::getValue('facebook') : $obj->facebook,
+            'linkedin' => (!empty(Tools::getValue('linkedin'))) ? Tools::getValue('linkedin') : $obj->linkedin,
+            'content' => (!empty(Tools::getValue('content'))) ? Tools::getValue('content') : $obj->content,
+            'date_add' => (!empty(Tools::getValue('date_add'))) ? Tools::getValue('date_add') : $obj->date_add,
+            'date_upd' => (!empty(Tools::getValue('date_upd'))) ? Tools::getValue('date_upd') : $obj->date_upd,
+            'index' => (!empty(Tools::getValue('index'))) ? Tools::getValue('index') : $obj->index,
+            'follow' => (!empty(Tools::getValue('follow'))) ? Tools::getValue('follow') : $obj->follow,
+            'active' => (!empty(Tools::getValue('active'))) ? Tools::getValue('active') : $obj->active,
         );
         $values = call_user_func_array('array_merge', $formValues);
         return $values;
@@ -189,9 +189,6 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
     {
         if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP && Shop::isFeatureActive()) {
             $this->errors[] = $this->l('You have to select a shop before creating or editing new backlink.');
-        }
-
-        if (count($this->errors)) {
             return false;
         }
         $author_id = Tools::getValue('id_ever_author');
@@ -632,6 +629,8 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
                         return true;
                     }
                 }
+            } else {
+                $this->display = 'edit';
             }
         }
         parent::postProcess();

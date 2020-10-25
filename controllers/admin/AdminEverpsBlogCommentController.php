@@ -102,7 +102,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
     public function l($string, $class = null, $addslashes = false, $htmlentities = true)
     {
         if ($this->isSeven) {
-            return Context::getContext()->getTranslator()->trans($string);
+            return Context::getContext()->getTranslator()->trans($string, [],'Modules.Everpsblog.Admineverpsblogcommentcontroller');
         }
 
         return parent::l($string, $class, $addslashes, $htmlentities);
@@ -155,6 +155,11 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
 
     public function renderForm()
     {
+        if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP && Shop::isFeatureActive()) {
+            $this->errors[] = $this->l('You have to select a shop before creating or editing new backlink.');
+            return false;
+        }
+        
         $posts_published = EverPsBlogPost::getPosts(
             (int)$this->context->language->id,
             (int)$this->context->shop->id
@@ -302,6 +307,8 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
             }
             if (!count($this->errors)) {
                 $comment->save();
+            } else {
+                $this->display = 'edit';
             }
         }
         parent::postProcess();

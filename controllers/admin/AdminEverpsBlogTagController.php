@@ -96,7 +96,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
     public function l($string, $class = null, $addslashes = false, $htmlentities = true)
     {
         if ($this->isSeven) {
-            return Context::getContext()->getTranslator()->trans($string);
+            return Context::getContext()->getTranslator()->trans($string, [],'Modules.Everpsblog.Admineverpsblogtagcontroller');
         }
 
         return parent::l($string, $class, $addslashes, $htmlentities);
@@ -154,6 +154,11 @@ class AdminEverPsBlogTagController extends ModuleAdminController
 
     public function renderForm()
     {
+        if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP && Shop::isFeatureActive()) {
+            $this->errors[] = $this->l('You have to select a shop before creating or editing new backlink.');
+            return false;
+        }
+        
         $tag_id = Tools::getValue('id_ever_tag');
 
         if (file_exists(
@@ -443,6 +448,8 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                         return true;
                     }
                 }
+            } else {
+                $this->display = 'edit';
             }
         }
         parent::postProcess();

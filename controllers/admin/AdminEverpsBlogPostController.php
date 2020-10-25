@@ -121,7 +121,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
     public function l($string, $class = null, $addslashes = false, $htmlentities = true)
     {
         if ($this->isSeven) {
-            return Context::getContext()->getTranslator()->trans($string);
+            return Context::getContext()->getTranslator()->trans($string, [],'Modules.Everpsblog.Admineverpsblogpostcontroller');
         }
 
         return parent::l($string, $class, $addslashes, $htmlentities);
@@ -204,21 +204,21 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         }
         $formValues = array();
         $formValues[] = array(
-            'id_ever_post' => $obj->id,
-            'title' => $obj->title,
-            'id_author' => $obj->id_author,
-            'meta_title' => $obj->meta_title,
-            'meta_description' => $obj->meta_description,
-            'link_rewrite' => $obj->link_rewrite,
-            'content' => $obj->content,
-            'date_add' => $obj->date_add,
-            'date_upd' => $obj->date_upd,
-            'post_categories[]' => $cat_taxonomies,
-            'post_tags[]' => $tag_taxonomies,
-            'post_products[]' => $product_taxonomies,
-            'index' => json_decode($obj->index),
-            'follow' => json_decode($obj->follow),
-            'post_status' => $obj->post_status,
+            'id_ever_post' => (!empty(Tools::getValue('id_ever_post'))) ? Tools::getValue('id_ever_post') : $obj->id,
+            'title' => (!empty(Tools::getValue('title'))) ? Tools::getValue('title') : $obj->title,
+            'id_author' => (!empty(Tools::getValue('id_author'))) ? Tools::getValue('id_author') : $obj->id_author,
+            'meta_title' => (!empty(Tools::getValue('meta_title'))) ? Tools::getValue('meta_title') : $obj->meta_title,
+            'meta_description' => (!empty(Tools::getValue('meta_description'))) ? Tools::getValue('meta_description') : $obj->meta_description,
+            'link_rewrite' => (!empty(Tools::getValue('link_rewrite'))) ? Tools::getValue('link_rewrite') : $obj->link_rewrite,
+            'content' => (!empty(Tools::getValue('content'))) ? Tools::getValue('content') : $obj->content,
+            'date_add' => (!empty(Tools::getValue('date_add'))) ? Tools::getValue('date_add') : $obj->date_add,
+            'date_upd' => (!empty(Tools::getValue('date_upd'))) ? Tools::getValue('date_upd') : $obj->date_upd,
+            'post_categories[]' => (!empty(Tools::getValue('post_categories'))) ? Tools::getValue('post_categories') : $cat_taxonomies,
+            'post_tags[]' => (!empty(Tools::getValue('post_tags'))) ? Tools::getValue('post_tags') : $tag_taxonomies,
+            'post_products[]' => (!empty(Tools::getValue('post_products'))) ? Tools::getValue('post_products') : $product_taxonomies,
+            'index' => (!empty(Tools::getValue('index'))) ? Tools::getValue('index') : $obj->index,
+            'follow' => (!empty(Tools::getValue('follow'))) ? Tools::getValue('follow') : $obj->follow,
+            'post_status' => (!empty(Tools::getValue('post_status'))) ? Tools::getValue('post_status') : $obj->post_status,
         );
         $values = call_user_func_array('array_merge', $formValues);
         return $values;
@@ -228,11 +228,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
     {
         if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP && Shop::isFeatureActive()) {
             $this->errors[] = $this->l('You have to select a shop before creating or editing new backlink.');
-        }
-
-        if (count($this->errors)) {
             return false;
         }
+
         $post_id = Tools::getValue('id_ever_post');
         $obj = new EverPsBlogPost(
             (int)Tools::getValue('id_ever_post')
@@ -637,36 +635,36 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             $post->date_upd = date('Y-m-d H:i:s');
             // Multilingual fields
             foreach (Language::getLanguages(false) as $lang) {
-                if (!Tools::getValue('title_'.$lang['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('title_'.$lang['id_lang']))
+                if (Tools::getValue('title_'.$lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('title_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Title is not valid for lang ').$lang['id_lang'];
                 } else {
                     $post->title[$lang['id_lang']] = Tools::getValue('title_'.$lang['id_lang']);
                 }
-                if (!Tools::getValue('content_'.$lang['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('content_'.$lang['id_lang']), true)
+                if (Tools::getValue('content_'.$lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('content_'.$lang['id_lang']), true)
                 ) {
                     $this->errors[] = $this->l('Content is not valid for lang ').$lang['id_lang'];
                 } else {
                     $post->content[$lang['id_lang']] = Tools::getValue('content_'.$lang['id_lang']);
                 }
-                if (!Tools::getValue('meta_title_'.$lang['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('meta_title_'.$lang['id_lang']))
+                if (Tools::getValue('meta_title_'.$lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('meta_title_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Meta title is not valid for lang ').$lang['id_lang'];
                 } else {
                     $post->meta_title[$lang['id_lang']] = Tools::getValue('meta_title_'.$lang['id_lang']);
                 }
-                if (!Tools::getValue('meta_description_'.$lang['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('meta_description_'.$lang['id_lang']))
+                if (Tools::getValue('meta_description_'.$lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('meta_description_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Meta description is not valid for lang ').$lang['id_lang'];
                 } else {
                     $post->meta_description[$lang['id_lang']] = Tools::getValue('meta_description_'.$lang['id_lang']);
                 }
-                if (!Tools::getValue('link_rewrite_'.$lang['id_lang'])
-                    || !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$lang['id_lang']))
+                if (Tools::getValue('link_rewrite_'.$lang['id_lang'])
+                    && !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Link rewrite is not valid for lang ').$lang['id_lang'];
                 } else {
@@ -714,6 +712,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         return true;
                     }
                 }
+            } else {
+                $this->display = 'edit';
             }
         }
         parent::postProcess();
