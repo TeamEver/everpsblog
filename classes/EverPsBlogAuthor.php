@@ -31,6 +31,7 @@ class EverPsBlogAuthor extends ObjectModel
     public $date_upd;
     public $index;
     public $follow;
+    public $sitemap;
     public $author_products;
     public $active;
 
@@ -105,6 +106,11 @@ class EverPsBlogAuthor extends ObjectModel
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true
+            ),
+            'sitemap' => array(
+                'type' => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => false
             ),
             'author_products' => array(
                 'type' => self::TYPE_STRING,

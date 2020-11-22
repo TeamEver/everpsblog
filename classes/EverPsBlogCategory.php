@@ -27,6 +27,7 @@ class EverPsBlogCategory extends ObjectModel
     public $active;
     public $index;
     public $follow;
+    public $sitemap;
     public $category_products;
     public $is_root_category;
 
@@ -86,6 +87,11 @@ class EverPsBlogCategory extends ObjectModel
                 'required' => false
             ),
             'follow' => array(
+                'type' => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => false
+            ),
+            'sitemap' => array(
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => false

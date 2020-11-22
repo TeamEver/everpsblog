@@ -45,12 +45,12 @@
 <div class="container">
 {hook h="displayBeforeEverLoop"}
 {foreach from=$posts item=item}
-    <div class="col-xs-12 article everpsblog" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
+    <div class="col-12 col-xs-12 article everpsblog" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
         <div class="col-md-12">
-            <div class="col-xs-12 col-md-4 article-img">
+            <div class="col-12 col-xs-12 col-md-4 article-img">
                 <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$item->id_ever_post|escape:'htmlall':'UTF-8'}.jpg" class="img-fluid mx-auto d-block {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item->title nofilter} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$item->title nofilter} {$shop.name|escape:'htmlall':'UTF-8'}" />
             </div>
-            <div class="col-xs-12 col-md-8">
+            <div class="col-12 col-xs-12 col-md-8">
                 <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
                     <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item->title nofilter} {$shop.name|escape:'htmlall':'UTF-8'}">
                         {$item->title nofilter}

@@ -31,7 +31,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
         $this->context = Context::getContext();
         $this->identifier = "id_ever_tag";
         $this->_orderBy = 'id_ever_tag';
-        $this->_orderWay = 'ASC';
+        $this->_orderWay = 'DESC';
         $this->fields_list = array(
             'id_ever_tag' => array(
                 'title' => $this->l('Tag ID'),
@@ -116,6 +116,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
     {
         $this->addRowAction('edit');
         $this->addRowAction('delete');
+        $this->addRowAction('ViewTag');
         $this->toolbar_title = $this->l('Tags settings');
         $this->bulk_actions = array(
             'delete' => array(
@@ -155,7 +156,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
     public function renderForm()
     {
         if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP && Shop::isFeatureActive()) {
-            $this->errors[] = $this->l('You have to select a shop before creating or editing new backlink.');
+            $this->errors[] = $this->l('You have to select a shop before creating or editing new element.');
             return false;
         }
         
@@ -399,12 +400,14 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                         'meta_description_'.$language['id_lang']
                     );
                 }
-                if (!Tools::getValue('link_rewrite_'.$language['id_lang'])
-                    || !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$language['id_lang']))
+                if (!Tools::getValue('link_rewrite_'.$lang['id_lang'])
+                    || !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$lang['id_lang']))
                 ) {
-                    $this->errors[] = $this->l('Link rewrite is not valid for lang ').$language['id_lang'];
+                    $tag->link_rewrite[$lang['id_lang']] = EverPsBlogCleaner::convertToUrlRewrite(
+                        Tools::getValue('title_'.$lang['id_lang'])
+                    );
                 } else {
-                    $tag->link_rewrite[$language['id_lang']] = Tools::getValue('link_rewrite_'.$language['id_lang']);
+                    $tag->link_rewrite[$lang['id_lang']] = Tools::getValue('link_rewrite_'.$lang['id_lang']);
                 }
             }
             if (!count($this->errors)) {
@@ -453,6 +456,31 @@ class AdminEverPsBlogTagController extends ModuleAdminController
             }
         }
         parent::postProcess();
+    }
+
+    public function displayViewTagLink($token, $id_ever_tag)
+    {
+        $tag = new EverPsBlogTag($id_ever_tag);
+        $link = new Link();
+        $id_lang = (int)Context::getContext()->language->id;
+        $see_url = $link->getModuleLink(
+            'everpsblog',
+            'tag',
+            array(
+                'id_ever_tag' => $tag->id,
+                'link_rewrite' => $tag->link_rewrite[$id_lang]
+            )
+        );
+
+        $this->context->smarty->assign(array(
+            'href' => $see_url,
+            'confirm' => null,
+            'action' => $this->l('View tag')
+        ));
+
+        return $this->context->smarty->fetch(
+            _PS_MODULE_DIR_.'everpsblog/views/templates/admin/helpers/lists/list_action_view_order.tpl'
+        );
     }
 
     protected function processBulkDisable()

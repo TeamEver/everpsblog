@@ -26,6 +26,7 @@ class EverPsBlogTag extends ObjectModel
     public $date_upd;
     public $index;
     public $follow;
+    public $sitemap;
     public $tag_products;
 
     public static $definition = array(
@@ -83,6 +84,11 @@ class EverPsBlogTag extends ObjectModel
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true
+            ),
+            'sitemap' => array(
+                'type' => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => false
             ),
             'tag_products' => array(
                 'type' => self::TYPE_STRING,

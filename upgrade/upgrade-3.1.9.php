@@ -11,7 +11,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_3_0_1()
+function upgrade_module_3_1_9()
 {
     set_time_limit(0);
     $result = false;

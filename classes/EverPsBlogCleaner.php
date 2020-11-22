@@ -41,6 +41,7 @@ class EverPsBlogCleaner extends ObjectModel
             )
         );
         $string = str_replace(' ', '-', $string);
+        $string = Tools::strtolower($string);
         return $string;
     }
 

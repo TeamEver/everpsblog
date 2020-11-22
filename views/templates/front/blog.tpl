@@ -37,7 +37,7 @@
 <div class="row mt-2">
 {foreach from=$evercategory item=item}
     {if !$item.is_root_category}
-    <div class="col-xs-12 col-md-6 evercategory everpsblog" id="everpsblog-{$item.id_ever_category|escape:'htmlall':'UTF-8'}">
+    <div class="col-12 col-xs-12 col-md-6 evercategory everpsblog" id="everpsblog-{$item.id_ever_category|escape:'htmlall':'UTF-8'}">
         <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category'=>$item.id_ever_category, 'link_rewrite'=>$item.link_rewrite])|escape:'htmlall':'UTF-8'}" class="col-md-12" title="{$item.title|escape:'htmlall':'UTF-8'}">
             <h2 class="everpsblogcategory text-center" id="everpsblog-post-title-{$item.id_ever_category|escape:'htmlall':'UTF-8'}">{$item.title|escape:'htmlall':'UTF-8'}</h2>
             <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$item.id_ever_category|escape:'htmlall':'UTF-8'}.jpg" class="img img-fluid category-featured-image featured-image" alt="{$item.title|escape:'htmlall':'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'}" />
@@ -52,12 +52,12 @@
 <div class="row mt-2">
 {hook h="displayBeforeEverLoop"}
 {foreach from=$everpsblog item=item}
-    <article class="col-xs-12 article everpsblog" id="everpsblog-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
+    <article class="col-12 col-xs-12 article everpsblog" id="everpsblog-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
         <div class="row">
-            <div class="col-xs-12 col-md-4 article-img">
+            <div class="col-12 col-xs-12 col-md-4 article-img">
                 <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$item.id_ever_post|escape:'htmlall':'UTF-8'}.jpg" class="img-fluid {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item.title nofilter} {$shop.name|escape:htmlall:'UTF-8'}" title="{$item.title nofilter} {$shop.name|escape:'htmlall':'UTF-8'}" />
             </div>
-            <div class="col-xs-12 col-md-8">
+            <div class="col-12 col-xs-12 col-md-8">
                 <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
                     <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item.title nofilter} {$shop.name|escape:htmlall:'UTF-8'}">
                         {$item.title nofilter}

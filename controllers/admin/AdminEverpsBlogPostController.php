@@ -17,6 +17,7 @@ require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogAuthor.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTaxonomy.php';
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCleaner.php';
 
 class AdminEverPsBlogPostController extends ModuleAdminController
 {
@@ -35,7 +36,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         $this->context = Context::getContext();
         $this->identifier = "id_ever_post";
         $this->_orderBy = 'id_ever_post';
-        $this->_orderWay = 'ASC';
+        $this->_orderWay = 'DESC';
         $this->fields_list = array(
             'id_ever_post' => array(
                 'title' => $this->l('ID'),
@@ -85,8 +86,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 ON (
                     au.`id_ever_author` = a.`id_author`
                 )';
-        $this->_where = 'AND a.id_shop = '.(int)$this->context->shop->id;
-        $this->_where = 'AND l.id_lang = '.(int)$this->context->language->id;
+        $this->_where = 'AND a.id_shop = '.(int)Context::getContext()->shop->id;
+        $this->_where = 'AND l.id_lang = '.(int)Context::getContext()->language->id;
         $moduleConfUrl  = 'index.php?controller=AdminModules&configure=everpsblog&token=';
         $moduleConfUrl .= Tools::getAdminTokenLite('AdminModules');
         $postUrl  = 'index.php?controller=AdminEverPsBlogPost&token=';
@@ -142,6 +143,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         $this->addRowAction('edit');
         $this->addRowAction('delete');
         $this->addRowAction('duplicate');
+        $this->addRowAction('ViewPost');
         $this->bulk_actions = array(
             'delete' => array(
                 'text' => $this->l('Delete selected items'),
@@ -227,7 +229,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
     public function renderForm()
     {
         if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP && Shop::isFeatureActive()) {
-            $this->errors[] = $this->l('You have to select a shop before creating or editing new backlink.');
+            $this->errors[] = $this->l('You have to select a shop before creating or editing new element.');
             return false;
         }
 
@@ -336,8 +338,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'multiple' => true,
                         'options' => array(
                             'query' => EverPsBlogCategory::getAllCategories(
-                                (int)$this->context->language->id,
-                                (int)$this->context->shop->id
+                                (int)Context::getContext()->language->id,
+                                (int)Context::getContext()->shop->id
                             ),
                             'id' => 'id_ever_category',
                             'name' => 'title',
@@ -353,8 +355,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'multiple' => true,
                         'options' => array(
                             'query' => EverPsBlogTag::getAllTags(
-                                (int)$this->context->language->id,
-                                (int)$this->context->shop->id
+                                (int)Context::getContext()->language->id,
+                                (int)Context::getContext()->shop->id
                             ),
                             'id' => 'id_ever_tag',
                             'name' => 'title',
@@ -370,7 +372,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'multiple' => true,
                         'options' => array(
                             'query' => Product::getProducts(
-                                (int)$this->context->language->id,
+                                (int)Context::getContext()->language->id,
                                 0,
                                 0,
                                 'name',
@@ -388,8 +390,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'name' => 'id_author',
                         'options' => array(
                             'query' => EverPsBlogAuthor::getAllAuthors(
-                                (int)$this->context->language->id,
-                                (int)$this->context->shop->id
+                                (int)Context::getContext()->language->id,
+                                (int)Context::getContext()->shop->id
                             ),
                             'id' => 'id_ever_author',
                             'name' => 'nickhandle',
@@ -553,7 +555,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         $helper->tpl_vars = array(
             'fields_value' => $this->getConfigFormValues($obj), /* Add values for your inputs */
             'languages' => $this->context->controller->getLanguages(),
-            'id_language' => (int)$this->context->language->id,
+            'id_language' => (int)Context::getContext()->language->id,
         );
         $helper->currentIndex = AdminController::$currentIndex;
         return $helper->generateForm($fields_form);
@@ -576,7 +578,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             $everObj = new EverPsBlogPost(
                 (int)Tools::getValue('id_ever_post')
             );
-            (int)$everObj->active = !(int)$everObj->active;
+            (int)$everObj->index = !(int)$everObj->index;
             $everObj->save();
         }
         if (Tools::isSubmit('save')) {
@@ -588,7 +590,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 );
             }
             // Validate functions
-            $post->id_shop = (int)$this->context->shop->id;
+            $post->id_shop = (int)Context::getContext()->shop->id;
             // SEO
             if (Tools::getValue('index')
                 && !Validate::isBool(Tools::getValue('index'))
@@ -603,6 +605,13 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                  $this->errors[] = $this->l('Follow is not valid');
             } else {
                 $post->follow = Tools::getValue('follow');
+            }
+            if (Tools::getValue('sitemap')
+                && !Validate::isBool(Tools::getValue('sitemap'))
+            ) {
+                 $this->errors[] = $this->l('Sitemap is not valid');
+            } else {
+                $post->sitemap = Tools::getValue('sitemap');
             }
             // Date add
             if (!Tools::getValue('date_add')) {
@@ -663,10 +672,12 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 } else {
                     $post->meta_description[$lang['id_lang']] = Tools::getValue('meta_description_'.$lang['id_lang']);
                 }
-                if (Tools::getValue('link_rewrite_'.$lang['id_lang'])
-                    && !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$lang['id_lang']))
+                if (!Tools::getValue('link_rewrite_'.$lang['id_lang'])
+                    || !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$lang['id_lang']))
                 ) {
-                    $this->errors[] = $this->l('Link rewrite is not valid for lang ').$lang['id_lang'];
+                    $post->link_rewrite[$lang['id_lang']] = EverPsBlogCleaner::convertToUrlRewrite(
+                        Tools::getValue('title_'.$lang['id_lang'])
+                    );
                 } else {
                     $post->link_rewrite[$lang['id_lang']] = Tools::getValue('link_rewrite_'.$lang['id_lang']);
                 }
@@ -717,6 +728,31 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             }
         }
         parent::postProcess();
+    }
+
+    public function displayViewPostLink($token, $id_ever_post)
+    {
+        $post = new EverPsBlogPost($id_ever_post);
+        $link = new Link();
+        $id_lang = (int)Context::getContext()->language->id;
+        $see_url = $link->getModuleLink(
+            'everpsblog',
+            'post',
+            array(
+                'id_ever_post' => $post->id,
+                'link_rewrite' => $post->link_rewrite[$id_lang]
+            )
+        );
+
+        $this->context->smarty->assign(array(
+            'href' => $see_url,
+            'confirm' => null,
+            'action' => $this->l('View post')
+        ));
+
+        return $this->context->smarty->fetch(
+            _PS_MODULE_DIR_.'everpsblog/views/templates/admin/helpers/lists/list_action_view_order.tpl'
+        );
     }
 
     protected function processBulkDelete()

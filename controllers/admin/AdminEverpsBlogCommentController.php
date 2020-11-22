@@ -30,7 +30,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
         $this->context = Context::getContext();
         $this->identifier = "id_ever_comment";
         $this->_orderBy = 'id_ever_comment';
-        $this->_orderWay = 'ASC';
+        $this->_orderWay = 'DESC';
 
         $this->_select = 'pl.title AS pltitle';
 
@@ -156,7 +156,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
     public function renderForm()
     {
         if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP && Shop::isFeatureActive()) {
-            $this->errors[] = $this->l('You have to select a shop before creating or editing new backlink.');
+            $this->errors[] = $this->l('You have to select a shop before creating or editing new element.');
             return false;
         }
         

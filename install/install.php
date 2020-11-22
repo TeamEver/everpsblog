@@ -21,9 +21,10 @@ $sql[] =
         `post_status` varchar(255) NOT NULL,
         `date_add` DATETIME DEFAULT NULL,
         `date_upd` DATETIME DEFAULT NULL,
-        `index` int(10) unsigned DEFAULT NULL,
-        `follow` int(10) unsigned DEFAULT NULL,
-        `active` int(10) unsigned DEFAULT NULL,
+        `index` int(1) unsigned DEFAULT NULL,
+        `follow` int(1) unsigned DEFAULT NULL,
+        `sitemap` int(1) unsigned DEFAULT NULL,
+        `active` int(1) unsigned DEFAULT NULL,
         `post_categories` varchar(255) DEFAULT NULL,
         `post_tags` varchar(255) DEFAULT NULL,
         `post_products` varchar(255) DEFAULT NULL,
@@ -50,10 +51,12 @@ $sql[] =
         `id_shop` int(10) unsigned NOT NULL,
         `date_add` DATETIME DEFAULT NULL,
         `date_upd` DATETIME DEFAULT NULL,
-        `index` int(10) unsigned DEFAULT NULL,
-        `follow` int(10) unsigned DEFAULT NULL,
+        `index` int(1) unsigned DEFAULT NULL,
+        `follow` int(1) unsigned DEFAULT NULL,
+        `sitemap` int(1) unsigned DEFAULT NULL,
+        `active` int(1) unsigned DEFAULT NULL,
         `category_products` varchar(255) DEFAULT NULL,
-        `is_root_category` int(10) unsigned DEFAULT NULL,
+        `is_root_category` int(1) unsigned DEFAULT NULL,
         PRIMARY KEY (`id_ever_category`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
@@ -78,6 +81,8 @@ $sql[] =
         `date_upd` DATETIME DEFAULT NULL,
         `index` int(10) unsigned DEFAULT NULL,
         `follow` int(10) unsigned DEFAULT NULL,
+        `sitemap` int(1) unsigned DEFAULT NULL,
+        `active` int(1) unsigned DEFAULT NULL,
         `tag_products` varchar(255) DEFAULT NULL,
         PRIMARY KEY (`id_ever_tag`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
@@ -121,6 +126,7 @@ $sql[] =
         `date_upd` DATETIME DEFAULT NULL,
         `index` int(10) unsigned DEFAULT NULL,
         `follow` int(10) unsigned DEFAULT NULL,
+        `sitemap` int(1) unsigned DEFAULT NULL,
         `author_products` varchar(255) DEFAULT NULL,
         `active` int(10) unsigned DEFAULT NULL,
         PRIMARY KEY (`id_ever_author`)

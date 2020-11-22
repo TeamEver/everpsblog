@@ -41,6 +41,8 @@ class EverPsBlogPost extends ObjectModel
     public $post_products;
     public $index;
     public $follow;
+    public $sitemap;
+    public $active;
     public $limit;
 
     public static $definition = array(
@@ -104,6 +106,16 @@ class EverPsBlogPost extends ObjectModel
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true
+            ),
+            'sitemap' => array(
+                'type' => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => false
+            ),
+            'active' => array(
+                'type' => self::TYPE_BOOL,
+                'validate' => 'isBool',
+                'required' => false
             ),
             'post_status' => array(
                 'type' => self::TYPE_STRING,
