@@ -26,7 +26,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '3.1.20';
+        $this->version = '3.1.21';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -1401,8 +1401,8 @@ class EverPsBlog extends Module
         foreach ($posts as $pending) {
             $post = new EverPsBlogPost(
                 (int)$pending['id_ever_post'],
-                (int)$id_shop,
-                (int)$employee->id_lang
+                (int)$employee->id_lang,
+                (int)$id_shop
             );
             $post_list .= '<br/><p>'.$post->title.'</p>';
         }
@@ -1454,6 +1454,7 @@ class EverPsBlog extends Module
         foreach ($posts as $planned) {
             $post = new EverPsBlogPost(
                 (int)$planned['id_ever_post'],
+                (int)$context->language->id,
                 (int)$id_shop
             );
             if ($post->date_add <= date('Y-m-d H:i:s')) {

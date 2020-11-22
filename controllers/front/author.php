@@ -33,8 +33,8 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
         $this->errors = array();
         $this->author = new EverPsBlogAuthor(
             (int)Tools::getValue('id_ever_author'),
-            (int)$this->context->shop->id,
-            (int)$this->context->language->id
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
         );
         parent::init();
         // if inactive post or unexists, redirect

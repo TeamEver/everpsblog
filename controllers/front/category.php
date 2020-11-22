@@ -37,8 +37,8 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         $this->category = new EverPsBlogCategory(
             (int)Tools::getValue('id_ever_category'),
-            (int)$this->context->shop->id,
-            (int)$this->context->language->id
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
         );
         parent::init();
         $this->parent_categories = EverPsBlogTaxonomy::getCategoryParentsTaxonomy(
@@ -161,8 +161,8 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
         foreach ($this->parent_categories as $parent_category) {
             $category = new EverPsBlogCategory(
                 (int)$parent_category,
-                (int)$this->context->shop->id,
-                (int)$this->context->language->id
+                (int)$this->context->language->id,
+                (int)$this->context->shop->id
             );
             if ((bool)$category->is_root_category === false
                 && (int)$category->id > 0

@@ -38,14 +38,14 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
         $this->errors = array();
         $this->post = new EverPsBlogPost(
             (int)Tools::getValue('id_ever_post'),
-            (int)$this->context->shop->id,
-            (int)$this->context->language->id
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
         );
         if (isset($this->post->id_author) && (int)$this->post->id_author > 0) {
             $this->author = new EverPsBlogAuthor(
                 (int)$this->post->id_author,
-                (int)$this->context->shop->id,
-                (int)$this->context->language->id
+                (int)$this->context->language->id,
+                (int)$this->context->shop->id
             );
             $this->author->url = $this->context->link->getModuleLink(
                 'everpsblog',
@@ -373,11 +373,12 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             foreach ($this->post_categories as $cat) {
                 $category = new EverPsBlogCategory(
                     (int)$cat['id_ever_post_category'],
-                    (int)$this->context->shop->id,
-                    (int)$this->context->language->id
+                    (int)$this->context->language->id,
+                    (int)$this->context->shop->id
                 );
                 if ((bool)$category->is_root_category === false
                     && (int)$category->id > 0
+                    && !empty($category->title)
                 ) {
                     $breadcrumb['links'][] = array(
                         'title' => $category->title,

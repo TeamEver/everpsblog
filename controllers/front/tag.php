@@ -35,8 +35,8 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
     {
         $this->tag = new EverPsBlogTag(
             (int)Tools::getValue('id_ever_tag'),
-            (int)$this->context->shop->id,
-            (int)$this->context->language->id
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
         );
         parent::init();
         // if inactive tag or unexists, redirect
