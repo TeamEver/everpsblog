@@ -57,7 +57,6 @@ $sql[] =
     'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_category` (
         `id_ever_category` int(10) unsigned NOT NULL auto_increment,
         `id_parent_category` int(10) DEFAULT NULL,
-        `active` int(10) DEFAULT NULL,
         `id_shop` int(10) unsigned NOT NULL,
         `date_add` DATETIME DEFAULT NULL,
         `date_upd` DATETIME DEFAULT NULL,
@@ -85,7 +84,6 @@ $sql[] =
 $sql[] =
     'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_tag` (
         `id_ever_tag` int(10) unsigned NOT NULL auto_increment,
-        `active` int(10) DEFAULT NULL,
         `id_shop` int(10) unsigned NOT NULL,
         `date_add` DATETIME DEFAULT NULL,
         `date_upd` DATETIME DEFAULT NULL,
