@@ -92,8 +92,8 @@
             </a>
         </p>
     </div>
-    <div class="container">
-        <div class="row postcontent {if $animated}zoomed{/if}" itemprop="articleBody">
+    <div class="row">
+        <div class="col-12 col-md-12 postcontent {if $animated}zoomed{/if}" itemprop="articleBody">
             {$post->content nofilter}
         </div>
         <p class="postpublished" itemprop="datePublished">{l s='Published on' mod='everpsblog'} {$post->date_add|escape:'htmlall':'UTF-8'}</p>

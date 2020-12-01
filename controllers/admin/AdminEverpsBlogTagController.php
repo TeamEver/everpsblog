@@ -465,6 +465,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                 $this->display = 'edit';
             }
         }
+        Tools::clearCache();
         parent::postProcess();
     }
 

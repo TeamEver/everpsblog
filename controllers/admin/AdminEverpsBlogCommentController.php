@@ -321,6 +321,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
                 $this->display = 'edit';
             }
         }
+        Tools::clearCache();
         parent::postProcess();
     }
 

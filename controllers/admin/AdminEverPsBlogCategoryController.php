@@ -507,6 +507,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                 $this->display = 'edit';
             }
         }
+        Tools::clearCache();
         parent::postProcess();
     }
 
