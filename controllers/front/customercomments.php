@@ -13,7 +13,7 @@
  * to license@prestashop.com so we can send you a copy immediately.
  *
  *  @author    Team Ever <https://www.team-ever.com/>
- *  @copyright 2019-2020 Team Ever
+ *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -26,6 +26,7 @@ require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogPost.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCategory.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogImage.php';
 
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
@@ -74,6 +75,11 @@ class EverPsBlogcustomercommentsModuleFrontController extends EverPsBlogModuleFr
                 (int)$comment->id_ever_post,
                 (int)$this->context->shop->id,
                 (int)$this->context->language->id
+            );
+            $post->featured_image = EverPsBlogImage::getBlogImageUrl(
+                (int)$post->id,
+                (int)$this->context->shop->id,
+                'post'
             );
             $cust_comments[] = array(
                 'post' => $post,

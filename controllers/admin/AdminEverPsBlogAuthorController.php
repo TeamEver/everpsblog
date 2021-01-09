@@ -13,7 +13,7 @@
  * to license@prestashop.com so we can send you a copy immediately.
  *
  *  @author    Team Ever <https://www.team-ever.com/>
- *  @copyright 2019-2020 Team Ever
+ *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -26,6 +26,7 @@ require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCategory.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogAuthor.php';
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogImage.php';
 
 class AdminEverPsBlogAuthorController extends ModuleAdminController
 {
@@ -41,6 +42,7 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
         $this->meta_title = $this->l('Ever Blog Authors');
         $this->table = 'ever_blog_author';
         $this->className = 'EverPsBlogAuthor';
+        $this->name = 'everpsblog';
         $this->context = Context::getContext();
         $this->identifier = "id_ever_author";
         $this->_orderBy = 'id_ever_author';
@@ -107,7 +109,45 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
             array(),
             true
         );
+        $ever_blog_token = Tools::encrypt('everpsblog/cron');
+        $emptytrash = $this->context->link->getModuleLink(
+            $this->name,
+            'emptytrash',
+            array(
+                'token' => $ever_blog_token,
+                'id_shop' => (int)$this->context->shop->id
+            ),
+            true,
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
+        $pending = $this->context->link->getModuleLink(
+            $this->name,
+            'pending',
+            array(
+                'token' => $ever_blog_token,
+                'id_shop' => (int)$this->context->shop->id
+            ),
+            true,
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
+        $planned = $this->context->link->getModuleLink(
+            $this->name,
+            'planned',
+            array(
+                'token' => $ever_blog_token,
+                'id_shop' => (int)$this->context->shop->id
+            ),
+            true,
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
         $this->context->smarty->assign(array(
+            'image_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'/modules/everpsblog/views/img/',
+            'everpsblogcron' => $emptytrash,
+            'everpsblogcronpending' => $pending,
+            'everpsblogcronplanned' => $planned,
             'moduleConfUrl' => $moduleConfUrl,
             'authorUrl' => $authorUrl,
             'postUrl' => $postUrl,
@@ -123,7 +163,11 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
     public function l($string, $class = null, $addslashes = false, $htmlentities = true)
     {
         if ($this->isSeven) {
-            return Context::getContext()->getTranslator()->trans($string, [],'Modules.Everpsblog.Admineverpsblogauthorcontroller');
+            return Context::getContext()->getTranslator()->trans(
+                $string,
+                [],
+                'Modules.Everpsblog.Admineverpsblogauthorcontroller'
+            );
         }
 
         return parent::l($string, $class, $addslashes, $htmlentities);
@@ -208,21 +252,12 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
         );
         $fields_form = array();
 
-        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/authors/author_image_'.$author_id.'.jpg')) {
-            $author_img = Tools::getHttpHost(true)
-            .__PS_BASE_URI__
-            .'modules/everpsblog/views/img/authors/author_image_'
-            .$author_id
-            .'.jpg';
-        } else {
-            $author_img = Tools::getHttpHost(true)
-            .__PS_BASE_URI__
-            .'/img/'
-            .Configuration::get(
-                'PS_LOGO'
-            );
-        }
-        $author_img = '<image src="'.(string)$author_img.'" style="max-width:150px;"/>';
+        $file_url = EverPsBlogImage::getBlogImageUrl(
+            (int)$author_id,
+            (int)$this->context->shop->id,
+            'author'
+        );
+        $author_img = '<image src="'.(string)$file_url.'" style="max-width:150px;"/>';
 
         if ($obj) {
             $link = new Link();
@@ -607,6 +642,9 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
                 .'everpsblog/views/img/authors/author_image_'
                 .(int)$author->id
                 .'.jpg';
+                $author_img_link = 'authors/author_image_'
+                .(int)$author->id
+                .'.jpg';
                 /* upload the image */
                 if (isset($_FILES['author_image'])
                     && isset($_FILES['author_image']['tmp_name'])
@@ -629,17 +667,38 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
                     }
                     if (isset($tmp_name)) {
                         unlink($tmp_name);
-                        return true;
                     }
+                    $featured_image = EverPsBlogImage::getBlogImage(
+                        (int)$author->id,
+                        (int)Context::getContext()->shop->id,
+                        'author'
+                    );
+                    if (!$featured_image) {
+                        $featured_image = new EverPsBlogImage();
+                    }
+                    $featured_image->id_element = (int)$author->id;
+                    $featured_image->image_type = 'author';
+                    $featured_image->image_link = $author_img_link;
+                    $featured_image->id_shop = (int)Context::getContext()->shop->id;
+                    return $featured_image->save();
                 } else {
-                    if (file_exists($author_img_destination)) {
-                        unlink($author_img_destination);
-                    }
                     $logo = _PS_ROOT_DIR_.'/img/'.Configuration::get(
                         'PS_LOGO'
                     );
                     if (copy($logo, $author_img_destination)) {
-                        return true;
+                        $featured_image = EverPsBlogImage::getBlogImage(
+                            (int)$author->id,
+                            (int)Context::getContext()->shop->id,
+                            'author'
+                        );
+                        if (!$featured_image) {
+                            $featured_image = new EverPsBlogImage();
+                        }
+                        $featured_image->id_element = (int)$author->id;
+                        $featured_image->image_type = 'author';
+                        $featured_image->image_link = $author_img_link;
+                        $featured_image->id_shop = (int)Context::getContext()->shop->id;
+                        return $featured_image->save();
                     }
                 }
             } else {

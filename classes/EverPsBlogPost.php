@@ -13,7 +13,7 @@
  * to license@prestashop.com so we can send you a copy immediately.
  *
  *  @author    Team Ever <https://www.team-ever.com/>
- *  @copyright 2019-2020 Team Ever
+ *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -31,6 +31,7 @@ use PrestaShop\PrestaShop\Core\Product\ProductExtraContentFinder;
 use PrestaShop\PrestaShop\Core\Product\ProductInterface;
 
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCleaner.php';
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogImage.php';
 
 class EverPsBlogPost extends ObjectModel
 {
@@ -197,6 +198,11 @@ class EverPsBlogPost extends ObjectModel
                     0,
                     (int)Configuration::get('EVERPSBLOG_EXCERPT')
                 );
+                $post['featured_image'] = EverPsBlogImage::getBlogImageUrl(
+                    (int)$post['id_ever_post'],
+                    (int)$id_shop,
+                    'post'
+                );
                 $return[] = $post;
             }
         } else {
@@ -250,6 +256,11 @@ class EverPsBlogPost extends ObjectModel
                     strip_tags($post->content),
                     0,
                     (int)Configuration::get('EVERPSBLOG_EXCERPT')
+                );
+                $post->featured_image = EverPsBlogImage::getBlogImageUrl(
+                    (int)$post->id,
+                    (int)$id_shop,
+                    'post'
                 );
                 $return[] = $post;
         }
@@ -312,6 +323,11 @@ class EverPsBlogPost extends ObjectModel
                 $post->content,
                 0,
                 (int)Configuration::get('EVERPSBLOG_EXCERPT')
+            );
+            $post->featured_image = EverPsBlogImage::getBlogImageUrl(
+                (int)$post->id,
+                (int)$id_shop,
+                'post'
             );
             $return[] = $post;
         }
@@ -379,6 +395,11 @@ class EverPsBlogPost extends ObjectModel
                 0,
                 (int)Configuration::get('EVERPSBLOG_EXCERPT')
             );
+            $post->featured_image = EverPsBlogImage::getBlogImageUrl(
+                (int)$post->id,
+                (int)$id_shop,
+                'post'
+            );
             $return[] = $post;
         }
         if ($return) {
@@ -437,6 +458,11 @@ class EverPsBlogPost extends ObjectModel
                 $post->content,
                 0,
                 (int)Configuration::get('EVERPSBLOG_EXCERPT')
+            );
+            $post->featured_image = EverPsBlogImage::getBlogImageUrl(
+                (int)$post->id,
+                (int)$id_shop,
+                'post'
             );
             $return[] = $post;
         }
@@ -501,6 +527,11 @@ class EverPsBlogPost extends ObjectModel
                 $post->content,
                 0,
                 (int)Configuration::get('EVERPSBLOG_EXCERPT')
+            );
+            $post->featured_image = EverPsBlogImage::getBlogImageUrl(
+                (int)$post->id,
+                (int)$id_shop,
+                'post'
             );
             $return[] = $post;
         }

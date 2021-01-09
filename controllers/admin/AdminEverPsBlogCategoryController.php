@@ -13,7 +13,7 @@
  * to license@prestashop.com so we can send you a copy immediately.
  *
  *  @author    Team Ever <https://www.team-ever.com/>
- *  @copyright 2019-2020 Team Ever
+ *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -26,6 +26,7 @@ require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCategory.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCleaner.php';
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogImage.php';
 
 class AdminEverPsBlogCategoryController extends ModuleAdminController
 {
@@ -39,6 +40,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
         $this->meta_title = $this->l('Ever Blog Categories');
         $this->table = 'ever_blog_category';
         $this->className = 'EverPsBlogCategory';
+        $this->name = 'everpsblog';
         $this->context = Context::getContext();
         $this->identifier = "id_ever_category";
         $this->_orderBy = 'id_ever_category';
@@ -106,7 +108,45 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
             array(),
             true
         );
+        $ever_blog_token = Tools::encrypt('everpsblog/cron');
+        $emptytrash = $this->context->link->getModuleLink(
+            $this->name,
+            'emptytrash',
+            array(
+                'token' => $ever_blog_token,
+                'id_shop' => (int)$this->context->shop->id
+            ),
+            true,
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
+        $pending = $this->context->link->getModuleLink(
+            $this->name,
+            'pending',
+            array(
+                'token' => $ever_blog_token,
+                'id_shop' => (int)$this->context->shop->id
+            ),
+            true,
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
+        $planned = $this->context->link->getModuleLink(
+            $this->name,
+            'planned',
+            array(
+                'token' => $ever_blog_token,
+                'id_shop' => (int)$this->context->shop->id
+            ),
+            true,
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
         $this->context->smarty->assign(array(
+            'image_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'/modules/everpsblog/views/img/',
+            'everpsblogcron' => $emptytrash,
+            'everpsblogcronpending' => $pending,
+            'everpsblogcronplanned' => $planned,
             'moduleConfUrl' => $moduleConfUrl,
             'authorUrl' => $authorUrl,
             'postUrl' => $postUrl,
@@ -122,8 +162,11 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
     public function l($string, $class = null, $addslashes = false, $htmlentities = true)
     {
         if ($this->isSeven) {
-            
-            return Context::getContext()->getTranslator()->trans($string, [],'Modules.Everpsblog.Admineverpsblogcategorycontroller');
+            return Context::getContext()->getTranslator()->trans(
+                $string,
+                [],
+                'Modules.Everpsblog.Admineverpsblogcategorycontroller'
+            );
         }
 
         return parent::l($string, $class, $addslashes, $htmlentities);
@@ -194,21 +237,12 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
             1,
             (int)$category_id
         );
-        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/categories/category_image_'.$category_id.'.jpg')) {
-            $category_img = Tools::getHttpHost(true)
-            .__PS_BASE_URI__
-            .'modules/everpsblog/views/img/categories/category_image_'
-            .$category_id
-            .'.jpg';
-        } else {
-            $category_img = Tools::getHttpHost(true)
-            .__PS_BASE_URI__
-            .'/img/'
-            .Configuration::get(
-                'PS_LOGO'
-            );
-        }
-        $categoryImg = '<image src="'.(string)$category_img.'" style="max-width:150px;"/>';
+        $file_url = EverPsBlogImage::getBlogImageUrl(
+            (int)$category_id,
+            (int)$this->context->shop->id,
+            'category'
+        );
+        $categoryImg = '<image src="'.(string)$file_url.'" style="max-width:150px;"/>';
 
         // Building the Add/Edit form
         $this->fields_form = array(
@@ -468,6 +502,9 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                 .'everpsblog/views/img/categories/category_image_'
                 .(int)$category->id
                 .'.jpg';
+                $category_img_link = 'categories/category_image_'
+                .(int)$category->id
+                .'.jpg';
                 /* upload the image */
                 if (isset($_FILES['category_image'])
                     && isset($_FILES['category_image']['tmp_name'])
@@ -490,17 +527,38 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                     }
                     if (isset($tmp_name)) {
                         unlink($tmp_name);
-                        return true;
                     }
+                    $featured_image = EverPsBlogImage::getBlogImage(
+                        (int)$category->id,
+                        (int)Context::getContext()->shop->id,
+                        'category'
+                    );
+                    if (!$featured_image) {
+                        $featured_image = new EverPsBlogImage();
+                    }
+                    $featured_image->id_element = (int)$category->id;
+                    $featured_image->image_type = 'category';
+                    $featured_image->image_link = $category_img_link;
+                    $featured_image->id_shop = (int)Context::getContext()->shop->id;
+                    return $featured_image->save();
                 } else {
-                    if (file_exists($category_img_destination)) {
-                        unlink($category_img_destination);
-                    }
                     $logo = _PS_ROOT_DIR_.'/img/'.Configuration::get(
                         'PS_LOGO'
                     );
                     if (copy($logo, $category_img_destination)) {
-                        return true;
+                        $featured_image = EverPsBlogImage::getBlogImage(
+                            (int)$category->id,
+                            (int)Context::getContext()->shop->id,
+                            'category'
+                        );
+                        if (!$featured_image) {
+                            $featured_image = new EverPsBlogImage();
+                        }
+                        $featured_image->id_element = (int)$category->id;
+                        $featured_image->image_type = 'category';
+                        $featured_image->image_link = $category_img_link;
+                        $featured_image->id_shop = (int)Context::getContext()->shop->id;
+                        return $featured_image->save();
                     }
                 }
             } else {

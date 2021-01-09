@@ -13,7 +13,7 @@
  * to license@prestashop.com so we can send you a copy immediately.
  *
  *  @author    Team Ever <https://www.team-ever.com/>
- *  @copyright 2019-2020 Team Ever
+ *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -28,6 +28,7 @@ require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogAuthor.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTaxonomy.php';
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogImage.php';
 
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
@@ -332,8 +333,14 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 'class' => 'twitter',
                 'url' => 'https://twitter.com/intent/tweet?text='.$this->post->title.' '.$page['canonical'],
             ];
+            $file_url = EverPsBlogImage::getBlogImageUrl(
+                (int)$this->post->id,
+                (int)$this->context->shop->id,
+                'post'
+            );
             $this->context->smarty->assign(
                 array(
+                    'featured_image' => $file_url,
                     'author_cover' => $this->author_cover,
                     'author' => $this->author,
                     'social_share_links' => $social_share_links,

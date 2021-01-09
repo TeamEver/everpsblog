@@ -13,7 +13,7 @@
  * to license@prestashop.com so we can send you a copy immediately.
  *
  *  @author    Team Ever <https://www.team-ever.com/>
- *  @copyright 2019-2020 Team Ever
+ *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -24,7 +24,6 @@ if (!defined('_PS_VERSION_')) {
 function upgrade_module_3_0_1()
 {
     set_time_limit(0);
-    $module = Module::getInstanceByName('everpsblog');
     $result = false;
     // Hook before post init
     $beforeEverPostInitContent = Hook::getIdByName('beforeEverPostInitContent');
@@ -32,7 +31,6 @@ function upgrade_module_3_0_1()
         $hook = new Hook((int)$beforeEverPostInitContent);
         $hook->name = 'actionBeforeEverPostInitContent';
         $result &= $hook->save();
-        $result &= $module->registerHook($hook->name);
     }
     // Hook category init
     $beforeEverCategoryInitContent = Hook::getIdByName('beforeEverCategoryInitContent');
@@ -40,7 +38,6 @@ function upgrade_module_3_0_1()
         $hook = new Hook((int)$beforeEverCategoryInitContent);
         $hook->name = 'actionBeforeEverCategoryInitContent';
         $result &= $hook->save();
-        $result &= $module->registerHook($hook->name);
     }
     // Hook before tag init
     $beforeEverTagInitContent = Hook::getIdByName('beforeEverTagInitContent');
@@ -48,7 +45,6 @@ function upgrade_module_3_0_1()
         $hook = new Hook((int)$beforeEverTagInitContent);
         $hook->name = 'actionBeforeEverTagInitContent';
         $result &= $hook->save();
-        $result &= $module->registerHook($hook->name);
     }
     // Hook before blog init content
     $beforeEverBlogInitContent = Hook::getIdByName('beforeEverBlogInitContent');
@@ -56,7 +52,6 @@ function upgrade_module_3_0_1()
         $hook = new Hook((int)$beforeEverBlogInitContent);
         $hook->name = 'actionBeforeEverBlogInitContent';
         $result &= $hook->save();
-        $result &= $module->registerHook($hook->name);
     }
     // Hook before blog init
     $beforeEverBlogInit = Hook::getIdByName('beforeEverBlogInit');
@@ -64,7 +59,6 @@ function upgrade_module_3_0_1()
         $hook = new Hook((int)$beforeEverBlogInit);
         $hook->name = 'actionBeforeEverBlogInit';
         $result &= $hook->save();
-        $result &= $module->registerHook($hook->name);
     }
     // Hook after blog init
     $afterEverBlogInit = Hook::getIdByName('afterEverBlogInit');
@@ -72,24 +66,7 @@ function upgrade_module_3_0_1()
         $hook = new Hook((int)$afterEverBlogInit);
         $hook->name = 'actionAfterEverBlogInit';
         $result &= $hook->save();
-        $result &= $module->registerHook($hook->name);
     }
-    // Register blog hook
-    $result &= $module->registerHook('actionObjectEverPsBlogPostAddAfter');
-    $result &= $module->registerHook('actionObjectEverPsBlogCategoryAddAfter');
-    $result &= $module->registerHook('actionObjectEverPsBlogTagAddAfter');
-    $result &= $module->registerHook('actionObjectEverPsBlogCommentAddAfter');
-    $result &= $module->registerHook('actionObjectEverPsBlogCategoryDeleteAfter');
-    $result &= $module->registerHook('actionObjectEverPsBlogTagDeleteAfter');
-    $result &= $module->registerHook('actionObjectEverPsBlogCommentDeleteAfter');
-    $result &= $module->registerHook('actionObjectEverPsBlogPostDeleteAfter');
-    $result &= $module->registerHook('actionObjectEverPsBlogCategoryUpdateAfter');
-    $result &= $module->registerHook('actionObjectEverPsBlogTagUpdateAfter');
-    $result &= $module->registerHook('actionObjectEverPsBlogCommentUpdateAfter');
-    $result &= $module->registerHook('actionObjectEverPsBlogPostUpdateAfter');
-    // Register prestashop hook
-    $result &= $module->registerHook('actionObjectProductDeleteAfter');
-    $result &= $module->registerHook('actionFrontControllerAfterInit');
     // SQL alter and create
     $sql = array();
     $sql[] =

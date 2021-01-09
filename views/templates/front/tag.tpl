@@ -12,7 +12,7 @@
  * to license@prestashop.com so we can send you a copy immediately.
  *
  *  @author    Team Ever <https://www.team-ever.com/>
- *  @copyright 2019-2020 Team Ever
+ *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 
@@ -41,7 +41,7 @@
     <div class="row">
         {if isset($paginated) && !$paginated}
         <div class="tag-header">
-            <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}tags/tag_image_{$tag->id|escape:'htmlall':'UTF-8'}.jpg" class="img img-fluid mx-auto d-block" alt="{$tag->title nofilter} {$shop.name|escape:htmlall:'UTF-8'}" title="{$tag->title nofilter} {$shop.name|escape:htmlall:'UTF-8'}">
+            <img src="{$featured_image|escape:'htmlall':'UTF-8'}" class="img img-fluid mx-auto d-block" alt="{$tag->title nofilter} {$shop.name|escape:htmlall:'UTF-8'}" title="{$tag->title nofilter} {$shop.name|escape:htmlall:'UTF-8'}">
         </div>
         {/if}
         <h1 class="text-center">{$tag->title nofilter}</h1>

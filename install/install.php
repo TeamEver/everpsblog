@@ -13,7 +13,7 @@
  * to license@prestashop.com so we can send you a copy immediately.
  *
  *  @author    Team Ever <https://www.team-ever.com/>
- *  @copyright 2019-2020 Team Ever
+ *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -33,7 +33,7 @@ $sql[] =
         `date_upd` DATETIME DEFAULT NULL,
         `index` int(1) unsigned DEFAULT NULL,
         `follow` int(1) unsigned DEFAULT NULL,
-        `sitemap` int(1) unsigned DEFAULT NULL,
+        `sitemap` int(1) unsigned DEFAULT 1,
         `active` int(1) unsigned DEFAULT NULL,
         `post_categories` varchar(255) DEFAULT NULL,
         `post_tags` varchar(255) DEFAULT NULL,
@@ -62,7 +62,7 @@ $sql[] =
         `date_upd` DATETIME DEFAULT NULL,
         `index` int(1) unsigned DEFAULT NULL,
         `follow` int(1) unsigned DEFAULT NULL,
-        `sitemap` int(1) unsigned DEFAULT NULL,
+        `sitemap` int(1) unsigned DEFAULT 1,
         `active` int(1) unsigned DEFAULT NULL,
         `category_products` varchar(255) DEFAULT NULL,
         `is_root_category` int(1) unsigned DEFAULT NULL,
@@ -89,7 +89,7 @@ $sql[] =
         `date_upd` DATETIME DEFAULT NULL,
         `index` int(10) unsigned DEFAULT NULL,
         `follow` int(10) unsigned DEFAULT NULL,
-        `sitemap` int(1) unsigned DEFAULT NULL,
+        `sitemap` int(1) unsigned DEFAULT 1,
         `active` int(1) unsigned DEFAULT NULL,
         `tag_products` varchar(255) DEFAULT NULL,
         PRIMARY KEY (`id_ever_tag`)
@@ -134,7 +134,7 @@ $sql[] =
         `date_upd` DATETIME DEFAULT NULL,
         `index` int(10) unsigned DEFAULT NULL,
         `follow` int(10) unsigned DEFAULT NULL,
-        `sitemap` int(1) unsigned DEFAULT NULL,
+        `sitemap` int(1) unsigned DEFAULT 1,
         `author_products` varchar(255) DEFAULT NULL,
         `active` int(10) unsigned DEFAULT NULL,
         PRIMARY KEY (`id_ever_author`)
@@ -149,6 +149,16 @@ $sql[] =
         `content` text NOT NULL,
         `id_lang` int(10) unsigned NOT NULL,
         PRIMARY KEY (`id_ever_author`, `id_lang`)
+    ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
+
+$sql[] =
+    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_image` (
+        `id_ever_image` int(10) unsigned NOT NULL auto_increment,
+        `image_type` varchar(255) DEFAULT NULL,
+        `image_link` varchar(255) DEFAULT NULL,
+        `id_element` int(10) unsigned NOT NULL,
+        `id_shop` int(10) unsigned NOT NULL,
+        PRIMARY KEY (`id_ever_image`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =

@@ -1,4 +1,5 @@
-{*
+<?php
+/**
  * 2019-2020 Team Ever
  *
  * NOTICE OF LICENSE
@@ -14,20 +15,33 @@
  *  @author    Team Ever <https://www.team-ever.com/>
  *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*}
-<div class="panel everfooter">
-    <div class="panel-heading">
-        <i class="icon icon-smile"></i> {l s='Ever Blog' mod='everpsblog'}
-    </div>
-    <div class="panel-body">
-        <a href="#evertop" id="everbottom">
-           <img id="everlogo" src="{$image_dir|escape:'htmlall':'UTF-8'}/ever.png" style="float:left;max-width: 120px;">
-        </a>
-        <p>
-            {l s='Click on our logo to go top !' mod='everpsblog'}
-        </p>
-        <p>
-            {l s='Feel free to ask some custom actions !' mod='everpsblog'}
-        </p>
-    </div>
-</div>
+ */
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
+function upgrade_module_4_1_4()
+{
+    set_time_limit(0);
+    $result = false;
+    // Preparing new taxonomies
+    $sql = array();
+    $sql[] =
+        'UPDATE `'._DB_PREFIX_.'ever_blog_post` 
+        SET sitemap = 1';
+    $sql[] =
+        'UPDATE `'._DB_PREFIX_.'ever_blog_category` 
+        SET sitemap = 1';
+    $sql[] =
+        'UPDATE `'._DB_PREFIX_.'ever_blog_tag` 
+        SET sitemap = 1';
+    $sql[] =
+        'UPDATE `'._DB_PREFIX_.'ever_blog_author` 
+        SET sitemap = 1';
+
+    foreach ($sql as $s) {
+        $result &= Db::getInstance()->execute($s);
+    }
+    return $result;
+}

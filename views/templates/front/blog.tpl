@@ -12,7 +12,7 @@
  * to license@prestashop.com so we can send you a copy immediately.
  *
  *  @author    Team Ever <https://www.team-ever.com/>
- *  @copyright 2019-2020 Team Ever
+ *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 
@@ -50,7 +50,7 @@
     <div class="col-12 col-xs-12 col-md-6 evercategory everpsblog" id="everpsblog-{$item.id_ever_category|escape:'htmlall':'UTF-8'}">
         <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category'=>$item.id_ever_category, 'link_rewrite'=>$item.link_rewrite])|escape:'htmlall':'UTF-8'}" class="col-md-12" title="{$item.title|escape:'htmlall':'UTF-8'}">
             <h2 class="everpsblogcategory text-center" id="everpsblog-post-title-{$item.id_ever_category|escape:'htmlall':'UTF-8'}">{$item.title|escape:'htmlall':'UTF-8'}</h2>
-            <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$item.id_ever_category|escape:'htmlall':'UTF-8'}.jpg" class="img img-fluid category-featured-image featured-image" alt="{$item.title|escape:'htmlall':'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'}" />
+            <img src="{$item.featured_image|escape:'htmlall':'UTF-8'}" class="img img-fluid category-featured-image featured-image" alt="{$item.title|escape:'htmlall':'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'}" />
         </a>
     </div>
     {/if}
@@ -65,7 +65,7 @@
     <article class="col-12 col-xs-12 article everpsblog" id="everpsblog-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
         <div class="row">
             <div class="col-12 col-xs-12 col-md-4 article-img">
-                <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$item.id_ever_post|escape:'htmlall':'UTF-8'}.jpg" class="img-fluid {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item.title nofilter} {$shop.name|escape:htmlall:'UTF-8'}" title="{$item.title nofilter} {$shop.name|escape:'htmlall':'UTF-8'}" />
+                <img src="{$item.featured_image|escape:'htmlall':'UTF-8'}" class="img-fluid {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item.title nofilter} {$shop.name|escape:htmlall:'UTF-8'}" title="{$item.title nofilter} {$shop.name|escape:'htmlall':'UTF-8'}" />
             </div>
             <div class="col-12 col-xs-12 col-md-8">
                 <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">

@@ -12,7 +12,7 @@
  * to license@prestashop.com so we can send you a copy immediately.
  *
  *  @author    Team Ever <https://www.team-ever.com/>
- *  @copyright 2019-2020 Team Ever
+ *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 
@@ -36,7 +36,7 @@
         <div class="col-xs-12 col-12 col-md-3 article everpsblog bordered" id="comment-{$comment.post->id|escape:'htmlall':'UTF-8'}" style="border:1px solid black;">
             <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $comment.post->id , 'link_rewrite' => $comment.post->link_rewrite])|escape:'htmlall':'UTF-8'}">
                 <div class="col-xs-12 col-12 article-img">
-                    <img src="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$comment.post->id|escape:'htmlall':'UTF-8'}.jpg" class="col-xs-12 col-12 img img-fluid mt-2 {if $animated}animated flipSideBySide zoomed{/if}"/>
+                    <img src="{$comment.post->featured_image|escape:'htmlall':'UTF-8'}" class="col-xs-12 col-12 img img-fluid mt-2 {if $animated}animated flipSideBySide zoomed{/if}"/>
                 </div>
                 <div class="col-xs-12">
                     <h3>{$comment.post->title|escape:'htmlall':'UTF-8'}</h3>

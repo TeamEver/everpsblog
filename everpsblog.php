@@ -13,7 +13,7 @@
  * to license@prestashop.com so we can send you a copy immediately.
  *
  *  @author    Team Ever <https://www.team-ever.com/>
- *  @copyright 2019-2020 Team Ever
+ *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -24,6 +24,7 @@ require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCleaner.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTaxonomy.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogAuthor.php';
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogImage.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogSitemap.php';
 
 class EverPsBlog extends Module
@@ -37,7 +38,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '3.3.4';
+        $this->version = '4.1.5';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -49,17 +50,7 @@ class EverPsBlog extends Module
         $this->confirmUninstall = $this->l('Do you really want to uninstall this module ?');
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
-        $id_shop = (int)$this->context->shop->id;
-        $emptytrash = _PS_BASE_URL_._MODULE_DIR_.'everpsblog/emptytrash.php?token=';
-        $pending = _PS_BASE_URL_._MODULE_DIR_.'everpsblog/pending.php?token=';
-        $planned = _PS_BASE_URL_._MODULE_DIR_.'everpsblog/planned.php?token=';
-        $blogToken = Tools::substr(Tools::encrypt('everpsblog/cron'), 0, 10);
-        $this->context->smarty->assign(array(
-            'image_dir' => $this->_path.'views/img',
-            'everpsblogcron' => $emptytrash.$blogToken.'&id_shop='.(int)$id_shop,
-            'everpsblogcronpending' => $pending.$blogToken.'&id_shop='.(int)$id_shop,
-            'everpsblogcronplanned' => $planned.$blogToken.'&id_shop='.(int)$id_shop,
-        ));
+        $this->context = Context::getContext();
     }
 
     public function install()
@@ -303,6 +294,7 @@ class EverPsBlog extends Module
             $this->postValidation();
 
             if (!count($this->postErrors)) {
+                $this->checkHooks();
                 $this->postProcess();
             }
         }
@@ -313,9 +305,54 @@ class EverPsBlog extends Module
             }
         }
 
-        $link = new Link();
+        $ever_blog_token = Tools::encrypt('everpsblog/cron');
+        $emptytrash = $this->context->link->getModuleLink(
+            $this->name,
+            'emptytrash',
+            array(
+                'token' => $ever_blog_token,
+                'id_shop' => (int)$this->context->shop->id
+            ),
+            true,
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
+        $pending = $this->context->link->getModuleLink(
+            $this->name,
+            'pending',
+            array(
+                'token' => $ever_blog_token,
+                'id_shop' => (int)$this->context->shop->id
+            ),
+            true,
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
+        $planned = $this->context->link->getModuleLink(
+            $this->name,
+            'planned',
+            array(
+                'token' => $ever_blog_token,
+                'id_shop' => (int)$this->context->shop->id
+            ),
+            true,
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
+        $default_blog = $this->context->link->getModuleLink(
+            $this->name,
+            'blog',
+            array(),
+            true,
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
         $this->context->smarty->assign(array(
-            'blog_url' => $link->getModuleLink('everpsblog', 'blog'),
+            'image_dir' => $this->_path.'views/img',
+            'everpsblogcron' => $emptytrash,
+            'everpsblogcronpending' => $pending,
+            'everpsblogcronplanned' => $planned,
+            'blog_url' => $default_blog,
         ));
 
         $this->html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/header.tpl');
@@ -1854,5 +1891,36 @@ class EverPsBlog extends Module
                 'Today'
             );
         }
+    }
+
+    /**
+     * Register module blog and PS hooks
+    */
+    private function checkHooks()
+    {
+        $result = false;
+        // Register blog hook
+        $result &= $this->registerHook('actionObjectEverPsBlogPostAddAfter');
+        $result &= $this->registerHook('actionObjectEverPsBlogCategoryAddAfter');
+        $result &= $this->registerHook('actionObjectEverPsBlogTagAddAfter');
+        $result &= $this->registerHook('actionObjectEverPsBlogCommentAddAfter');
+        $result &= $this->registerHook('actionObjectEverPsBlogCategoryDeleteAfter');
+        $result &= $this->registerHook('actionObjectEverPsBlogTagDeleteAfter');
+        $result &= $this->registerHook('actionObjectEverPsBlogCommentDeleteAfter');
+        $result &= $this->registerHook('actionObjectEverPsBlogPostDeleteAfter');
+        $result &= $this->registerHook('actionObjectEverPsBlogCategoryUpdateAfter');
+        $result &= $this->registerHook('actionObjectEverPsBlogTagUpdateAfter');
+        $result &= $this->registerHook('actionObjectEverPsBlogCommentUpdateAfter');
+        $result &= $this->registerHook('actionObjectEverPsBlogPostUpdateAfter');
+        // Register prestashop hook
+        $result &= $this->registerHook('actionObjectProductDeleteAfter');
+        $result &= $this->registerHook('actionFrontControllerAfterInit');
+        $result &= $this->registerHook('actionBeforeEverPostInitContent');
+        $result &= $this->registerHook('actionBeforeEverCategoryInitContent');
+        $result &= $this->registerHook('actionBeforeEverTagInitContent');
+        $result &= $this->registerHook('actionBeforeEverBlogInitContent');
+        $result &= $this->registerHook('actionBeforeEverBlogInit');
+        $result &= $this->registerHook('actionAfterEverBlogInit');
+        return $result;
     }
 }

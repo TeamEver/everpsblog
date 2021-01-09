@@ -13,7 +13,7 @@
  * to license@prestashop.com so we can send you a copy immediately.
  *
  *  @author    Team Ever <https://www.team-ever.com/>
- *  @copyright 2019-2020 Team Ever
+ *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -25,6 +25,7 @@ require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogPost.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCategory.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogImage.php';
 
 class AdminEverPsBlogCommentController extends ModuleAdminController
 {
@@ -37,6 +38,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
         $this->display = 'Ever Blog Comments';
         $this->table = 'ever_blog_comments';
         $this->className = 'EverPsBlogComment';
+        $this->name = 'everpsblog';
         $this->context = Context::getContext();
         $this->identifier = "id_ever_comment";
         $this->_orderBy = 'id_ever_comment';
@@ -96,7 +98,45 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
             array(),
             true
         );
+        $ever_blog_token = Tools::encrypt('everpsblog/cron');
+        $emptytrash = $this->context->link->getModuleLink(
+            $this->name,
+            'emptytrash',
+            array(
+                'token' => $ever_blog_token,
+                'id_shop' => (int)$this->context->shop->id
+            ),
+            true,
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
+        $pending = $this->context->link->getModuleLink(
+            $this->name,
+            'pending',
+            array(
+                'token' => $ever_blog_token,
+                'id_shop' => (int)$this->context->shop->id
+            ),
+            true,
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
+        $planned = $this->context->link->getModuleLink(
+            $this->name,
+            'planned',
+            array(
+                'token' => $ever_blog_token,
+                'id_shop' => (int)$this->context->shop->id
+            ),
+            true,
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
         $this->context->smarty->assign(array(
+            'image_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'/modules/everpsblog/views/img/',
+            'everpsblogcron' => $emptytrash,
+            'everpsblogcronpending' => $pending,
+            'everpsblogcronplanned' => $planned,
             'moduleConfUrl' => $moduleConfUrl,
             'authorUrl' => $authorUrl,
             'postUrl' => $postUrl,
@@ -112,7 +152,11 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
     public function l($string, $class = null, $addslashes = false, $htmlentities = true)
     {
         if ($this->isSeven) {
-            return Context::getContext()->getTranslator()->trans($string, [],'Modules.Everpsblog.Admineverpsblogcommentcontroller');
+            return Context::getContext()->getTranslator()->trans(
+                $string,
+                [],
+                'Modules.Everpsblog.Admineverpsblogcommentcontroller'
+            );
         }
 
         return parent::l($string, $class, $addslashes, $htmlentities);

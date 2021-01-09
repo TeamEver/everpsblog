@@ -13,7 +13,7 @@
  * to license@prestashop.com so we can send you a copy immediately.
  *
  *  @author    Team Ever <https://www.team-ever.com/>
- *  @copyright 2019-2020 Team Ever
+ *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -161,7 +161,16 @@ class EverPsBlogCategory extends ObjectModel
             $sql->where('bc.id_ever_category != '.(int)$except);
             $sql->where('bc.id_parent_category != '.(int)$except);
         }
-        $return = Db::getInstance()->executeS($sql);
+        $categories = Db::getInstance()->executeS($sql);
+        $return = array();
+        foreach ($categories as $blog_cat) {
+            $blog_cat['featured_image'] = EverPsBlogImage::getBlogImageUrl(
+                (int)$blog_cat['id_ever_category'],
+                (int)$id_shop,
+                'category'
+            );
+            $return[] = $blog_cat;
+        }
         return $return;
     }
 
