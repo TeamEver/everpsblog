@@ -38,7 +38,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
         $this->display = 'Ever Blog Comments';
         $this->table = 'ever_blog_comments';
         $this->className = 'EverPsBlogComment';
-        $this->name = 'everpsblog';
+        $this->module_name = 'everpsblog';
         $this->context = Context::getContext();
         $this->identifier = "id_ever_comment";
         $this->_orderBy = 'id_ever_comment';
@@ -100,7 +100,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
         );
         $ever_blog_token = Tools::encrypt('everpsblog/cron');
         $emptytrash = $this->context->link->getModuleLink(
-            $this->name,
+            $this->module_name,
             'emptytrash',
             array(
                 'token' => $ever_blog_token,
@@ -111,7 +111,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
             (int)$this->context->shop->id
         );
         $pending = $this->context->link->getModuleLink(
-            $this->name,
+            $this->module_name,
             'pending',
             array(
                 'token' => $ever_blog_token,
@@ -122,7 +122,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
             (int)$this->context->shop->id
         );
         $planned = $this->context->link->getModuleLink(
-            $this->name,
+            $this->module_name,
             'planned',
             array(
                 'token' => $ever_blog_token,
@@ -199,6 +199,11 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
         $this->html .= $this->context->smarty->fetch(
             _PS_MODULE_DIR_ . '/everpsblog/views/templates/admin/headerController.tpl'
         );
+        $blog_instance = Module::getInstanceByName($this->module_name);
+        if ($blog_instance->checkLatestEverModuleVersion($this->module_name, $blog_instance->version)) {
+            $this->html .= $this->context->smarty->fetch(
+                _PS_MODULE_DIR_ .'/everpsblog/views/templates/admin/upgrade.tpl');
+        }
         $this->html .= $lists;
         $this->html .= $this->context->smarty->fetch(
             _PS_MODULE_DIR_ . '/everpsblog/views/templates/admin/footer.tpl'

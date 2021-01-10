@@ -38,7 +38,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '4.1.6';
+        $this->version = '4.1.7';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -355,6 +355,9 @@ class EverPsBlog extends Module
             'blog_url' => $default_blog,
         ));
 
+        if ($this->checkLatestEverModuleVersion($this->name, $this->version)) {
+            $this->html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/upgrade.tpl');
+        }
         $this->html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/header.tpl');
         $this->html .= $this->renderForm();
         $this->html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/footer.tpl');
@@ -1922,5 +1925,19 @@ class EverPsBlog extends Module
         $result &= $this->registerHook('actionBeforeEverBlogInit');
         $result &= $this->registerHook('actionAfterEverBlogInit');
         return $result;
+    }
+
+    public function checkLatestEverModuleVersion($module, $version)
+    {
+        $module_version = Tools::file_get_contents(
+            'https://upgrade.team-ever.com/upgrade.php?module='
+            .$module
+            .'&version='
+            .base64_encode($version)
+        );
+        if ($module_version && $module_version > $version) {
+            return true;
+        }
+        return false;
     }
 }

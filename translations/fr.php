@@ -418,6 +418,8 @@ $_MODULE['<{everpsblog}prestashop>headercontroller_65b9f669c6b38378ba591c9579e8f
 $_MODULE['<{everpsblog}prestashop>headercontroller_35a343da778db8e68b914c8beef0c82b'] = 'Demander du support';
 $_MODULE['<{everpsblog}prestashop>headercontroller_4fb704f05a00111d953eb10dddc881d9'] = 'Ce module est gratuit et le sera toujours! Vous pouvez soutenir nos modules gratuits en faisant un don en cliquant sur le bouton ci-dessous.';
 $_MODULE['<{everpsblog}prestashop>success_b6e26b1e7b238dcc86f1c454fd6c86ff'] = 'Tous les réglages ont bien été enregistrés';
+$_MODULE['<{everpsblog}prestashop>upgrade_11f4d2cc4546c08ed99645473ba29a5f'] = 'Une mise à jour du module est disponible sur notre boutique. Merci de regarder sur  ';
+$_MODULE['<{everpsblog}prestashop>upgrade_a43640b6c7cabe3d8d157aba85f7cee4'] = 'afin de récupérer la dernière version de ce module';
 $_MODULE['<{everpsblog}prestashop>author_8b9d80ab029cc6824eba5b957bf9dc02'] = 'Suivez moi !';
 $_MODULE['<{everpsblog}prestashop>author_43340e6cc4e88197d57f8d6d5ea50a46'] = 'Lire la suite';
 $_MODULE['<{everpsblog}prestashop>author_583f253f05d6eb830fc248784684ec72'] = 'Navré, il n\'y a pas encore d\'articles... Revenez plus tard !';
