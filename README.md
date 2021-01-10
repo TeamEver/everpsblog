@@ -1,11 +1,13 @@
-# Ever PS Blog
+# Ever PS Blog for Prestashop 1.7
 
 Multilingual blog module for Prestashop 1.7 only
+Prestashop administrators can create authors, tags categories and posts. Comments can be allowed on blog, users can be banned too.
 
 https://www.team-ever.com/produit/prestashop-module-de-blog-gratuit/
 
 ## Prestashop 1.7 free blog module
 This free module allows you to create a blog on Prestashop 1.7
+
 [You can make a donation to support the development of free modules by clicking on this link](https://www.paypal.com/donate?hosted_button_id=3CM3XREMKTMSE)
 
 ## Hooks for developpers
