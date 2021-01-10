@@ -39,19 +39,29 @@ class EverPsBlogcustomercommentsModuleFrontController extends EverPsBlogModuleFr
     {
         parent::init();
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
+        if ((bool)Context::getContext()->customer->isLogged() === false) {
+            Tools::redirect('index.php');
+        }
     }
 
-    protected function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
+    public function l($string, $specific = false, $class = NULL, $addslashes = false, $htmlentities = true)
     {
         if ($this->isSeven) {
-            return Context::getContext()->getTranslator()->trans($string);
+            return Context::getContext()->getTranslator()->trans(
+                $string,
+                [],
+                'Modules.Everpsblog.customercomments'
+            );
         }
 
-        return parent::l($string, $specific, $class, $addslashes, $htmlentities);
+        return parent::l($string, $class, $addslashes, $htmlentities);
     }
 
     public function initContent()
     {
+        if ((bool)Context::getContext()->customer->isLogged() === false) {
+            Tools::redirect('index.php');
+        }
         parent::initContent();
         if ($this->isSeven) {
             $page = $this->context->controller->getTemplateVarPage();
@@ -129,6 +139,10 @@ class EverPsBlogcustomercommentsModuleFrontController extends EverPsBlogModuleFr
     {
         $page = parent::getTemplateVarPage();
         $page['body_classes']['page-everblog-customercomments'] = true;
+        $page['body_classes']['page-everblog-customer-id-'.(int)$this->context->customer->id] = true;
+        if ((bool)Context::getContext()->customer->isLogged()) {
+            $page['body_classes']['page-everblog-logged-in'] = true;
+        }
         return $page;
     }
 }

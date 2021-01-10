@@ -57,13 +57,17 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
     }
 
-    protected function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
+    public function l($string, $specific = false, $class = NULL, $addslashes = false, $htmlentities = true)
     {
         if ($this->isSeven) {
-            return Context::getContext()->getTranslator()->trans($string);
+            return Context::getContext()->getTranslator()->trans(
+                $string,
+                [],
+                'Modules.Everpsblog.tag'
+            );
         }
 
-        return parent::l($string, $specific, $class, $addslashes, $htmlentities);
+        return parent::l($string, $class, $addslashes, $htmlentities);
     }
 
     public function initContent()
@@ -184,6 +188,11 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
     {
         $page = parent::getTemplateVarPage();
         $page['body_classes']['page-everblog-tag'] = true;
+        $page['body_classes']['page-everblog-tag-id-'.(int)$this->tag->id] = true;
+        if ((bool)Context::getContext()->customer->isLogged()) {
+            $page['body_classes']['page-everblog-logged-in'] = true;
+        }
+        $page['body_classes']['page-everblog-'.Configuration::get('EVERPSBLOG_TAG_LAYOUT')] = true;
         return $page;
     }
 }

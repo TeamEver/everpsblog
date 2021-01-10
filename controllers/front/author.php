@@ -56,13 +56,17 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
         }
     }
 
-    protected function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
+    public function l($string, $specific = false, $class = NULL, $addslashes = false, $htmlentities = true)
     {
         if ($this->isSeven) {
-            return Context::getContext()->getTranslator()->trans($string);
+            return Context::getContext()->getTranslator()->trans(
+                $string,
+                [],
+                'Modules.Everpsblog.author'
+            );
         }
 
-        return parent::l($string, $specific, $class, $addslashes, $htmlentities);
+        return parent::l($string, $class, $addslashes, $htmlentities);
     }
 
     public function initContent()
@@ -208,6 +212,11 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
     {
         $page = parent::getTemplateVarPage();
         $page['body_classes']['page-everblog-author'] = true;
+        $page['body_classes']['page-everblog-author-id-'.(int)$this->author->id] = true;
+        if ((bool)Context::getContext()->customer->isLogged()) {
+            $page['body_classes']['page-everblog-logged-in'] = true;
+        }
+        $page['body_classes']['page-everblog-'.Configuration::get('EVERPSBLOG_AUTHOR_LAYOUT')] = true;
         return $page;
     }
 }
