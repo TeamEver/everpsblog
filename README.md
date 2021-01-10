@@ -31,5 +31,7 @@ Tou can use these diplay hooks by hooking modules on theses custom display hooks
 - displayBeforeEverComment (no params) : displayed before comments on post page
 - displayAfterEverComment (params: obj everblogpost) : displayed after comments on post page
 
+In order to use these hooks, [you can use free HTML blocks module Ever Block, available here](https://www.team-ever.com/prestashop-module-bloc-editeur-html-illimite-shortcode/)
+
 ## Documentation (French only)
 Available at https://www.team-ever.com/prestashop-1-7-un-module-de-blog-gratuit/
