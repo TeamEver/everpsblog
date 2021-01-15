@@ -292,6 +292,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             return false;
         }
 
+        Tools::clearCache();
+
         $post_id = Tools::getValue('id_ever_post');
         $obj = new EverPsBlogPost(
             (int)Tools::getValue('id_ever_post')
@@ -777,25 +779,6 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     $featured_image->image_link = $post_img_link;
                     $featured_image->id_shop = (int)Context::getContext()->shop->id;
                     return $featured_image->save();
-                } else {
-                    $logo = _PS_ROOT_DIR_.'/img/'.Configuration::get(
-                        'PS_LOGO'
-                    );
-                    if (copy($logo, $post_img_destination)) {
-                        $featured_image = EverPsBlogImage::getBlogImage(
-                            (int)$post->id,
-                            (int)Context::getContext()->shop->id,
-                            'post'
-                        );
-                        if (!$featured_image) {
-                            $featured_image = new EverPsBlogImage();
-                        }
-                        $featured_image->id_element = (int)$post->id;
-                        $featured_image->image_type = 'post';
-                        $featured_image->image_link = $post_img_link;
-                        $featured_image->id_shop = (int)Context::getContext()->shop->id;
-                        return $featured_image->save();
-                    }
                 }
             } else {
                 $this->display = 'edit';

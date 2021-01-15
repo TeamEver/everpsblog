@@ -686,25 +686,6 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
                     $featured_image->image_link = $author_img_link;
                     $featured_image->id_shop = (int)Context::getContext()->shop->id;
                     return $featured_image->save();
-                } else {
-                    $logo = _PS_ROOT_DIR_.'/img/'.Configuration::get(
-                        'PS_LOGO'
-                    );
-                    if (copy($logo, $author_img_destination)) {
-                        $featured_image = EverPsBlogImage::getBlogImage(
-                            (int)$author->id,
-                            (int)Context::getContext()->shop->id,
-                            'author'
-                        );
-                        if (!$featured_image) {
-                            $featured_image = new EverPsBlogImage();
-                        }
-                        $featured_image->id_element = (int)$author->id;
-                        $featured_image->image_type = 'author';
-                        $featured_image->image_link = $author_img_link;
-                        $featured_image->id_shop = (int)Context::getContext()->shop->id;
-                        return $featured_image->save();
-                    }
                 }
             } else {
                 $this->display = 'edit';
