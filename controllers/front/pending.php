@@ -91,7 +91,11 @@ class EverPsBlogpendingModuleFrontController extends EverPsBlogModuleFrontContro
 
         $everpsblog->cron = true;
         if ($everpsblog->sendPendingNotification((int)$id_shop)) {
-            die($this->smileys[$this->randSmiley].' All emails for pending posts have been sent '.$this->smileys[$this->randSmiley]);
+            die(
+                $this->smileys[$this->randSmiley]
+                .' All emails for pending posts have been sent '
+                .$this->smileys[$this->randSmiley]
+            );
         }
         Tools::redirect('index.php');
     }

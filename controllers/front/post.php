@@ -103,14 +103,17 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
         );
         parent::init();
         // if inactive post or unexists, redirect
-        if (!(int)Tools::getValue('id_ever_post')
-            || $this->post->post_status != 'published'
+        if (!(int)Tools::getValue('id_ever_post')) {
+            Tools::redirect('index.php?controller=404');
+        }
+        if (Tools::getValue('preview') != Tools::encrypt('everpsblog/preview')
+            && $this->post->post_status != 'published'
         ) {
             Tools::redirect('index.php?controller=404');
         }
     }
 
-    public function l($string, $specific = false, $class = NULL, $addslashes = false, $htmlentities = true)
+    public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
     {
         if ($this->isSeven) {
             return Context::getContext()->getTranslator()->trans(

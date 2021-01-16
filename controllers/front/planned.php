@@ -91,7 +91,11 @@ class EverPsBlogplannedModuleFrontController extends EverPsBlogModuleFrontContro
 
         $everpsblog->cron = true;
         if ($everpsblog->publishPlannedPosts((int)$id_shop)) {
-            die($this->smileys[$this->randSmiley].' All planned posts have been checked and published '.$this->smileys[$this->randSmiley]);
+            die(
+                $this->smileys[$this->randSmiley]
+                .' All planned posts have been checked and published '
+                .$this->smileys[$this->randSmiley]
+            );
         }
         Tools::redirect('index.php');
     }

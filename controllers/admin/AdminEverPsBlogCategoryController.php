@@ -59,21 +59,28 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
             'active' => array(
                 'title' => $this->l('Active'),
                 'type' => 'bool',
-                'active' => 'status',
+                'active' => 'statusactive',
                 'orderby' => false,
                 'class' => 'fixed-width-sm'
             ),
             'index' => array(
                 'title' => $this->l('Index'),
                 'type' => 'bool',
-                'active' => 'status',
+                'active' => 'statusindex',
                 'orderby' => false,
                 'class' => 'fixed-width-sm'
             ),
             'follow' => array(
                 'title' => $this->l('Follow'),
                 'type' => 'bool',
-                'active' => 'status',
+                'active' => 'statusfollow',
+                'orderby' => false,
+                'class' => 'fixed-width-sm'
+            ),
+            'sitemap' => array(
+                'title' => $this->l('Sitemap'),
+                'type' => 'bool',
+                'active' => 'statussitemap',
                 'orderby' => false,
                 'class' => 'fixed-width-sm'
             ),
@@ -213,16 +220,20 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
         $lists = parent::renderList();
 
         $this->html .= $this->context->smarty->fetch(
-            _PS_MODULE_DIR_ . '/everpsblog/views/templates/admin/headerController.tpl'
+            _PS_MODULE_DIR_
+            .'/everpsblog/views/templates/admin/headerController.tpl'
         );
         $blog_instance = Module::getInstanceByName($this->module_name);
         if ($blog_instance->checkLatestEverModuleVersion($this->module_name, $blog_instance->version)) {
             $this->html .= $this->context->smarty->fetch(
-                _PS_MODULE_DIR_ .'/everpsblog/views/templates/admin/upgrade.tpl');
+                _PS_MODULE_DIR_
+                .'/everpsblog/views/templates/admin/upgrade.tpl'
+            );
         }
         $this->html .= $lists;
         $this->html .= $this->context->smarty->fetch(
-            _PS_MODULE_DIR_ . '/everpsblog/views/templates/admin/footer.tpl'
+            _PS_MODULE_DIR_
+            .'/everpsblog/views/templates/admin/footer.tpl'
         );
 
         return $this->html;
@@ -377,6 +388,26 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                         )
                     ),
                 ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('SEO sitemap category ?'),
+                        'desc' => $this->l('Set yes to sitemap, no to nositemap'),
+                        'hint' => $this->l('Please generate sitemaps after changing this rule'),
+                        'name' => 'sitemap',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No')
+                            )
+                        ),
+                    ),
                 array(
                     'type' => 'switch',
                     'label' => $this->l('Activate category ?'),
@@ -403,11 +434,32 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
 
     public function postProcess()
     {
-        if (Tools::getIsset('statusever_blog_category')) {
+        if (Tools::getIsset('statusactiveever_blog_category')) {
             $everObj = new EverPsBlogCategory(
                 (int)Tools::getValue('id_ever_category')
             );
             (int)$everObj->active = !(int)$everObj->active;
+            $everObj->save();
+        }
+        if (Tools::getIsset('statusindexever_blog_category')) {
+            $everObj = new EverPsBlogCategory(
+                (int)Tools::getValue('id_ever_category')
+            );
+            (int)$everObj->index = !(int)$everObj->index;
+            $everObj->save();
+        }
+        if (Tools::getIsset('statusfollowever_blog_category')) {
+            $everObj = new EverPsBlogCategory(
+                (int)Tools::getValue('id_ever_category')
+            );
+            (int)$everObj->follow = !(int)$everObj->follow;
+            $everObj->save();
+        }
+        if (Tools::getIsset('statussitemapever_blog_category')) {
+            $everObj = new EverPsBlogCategory(
+                (int)Tools::getValue('id_ever_category')
+            );
+            (int)$everObj->sitemap = !(int)$everObj->sitemap;
             $everObj->save();
         }
         if (Tools::isSubmit('save')) {
@@ -438,6 +490,13 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                 $this->errors[] = $this->l('Follow is not valid');
             } else {
                 $category->follow = Tools::getValue('follow');
+            }
+            if (Tools::getValue('sitemap')
+                && !Validate::isBool(Tools::getValue('sitemap'))
+            ) {
+                $this->errors[] = $this->l('Sitemap is not valid');
+            } else {
+                $category->sitemap = Tools::getValue('sitemap');
             }
             if (Tools::getValue('active')
                 && !Validate::isBool(Tools::getValue('active'))
@@ -557,6 +616,9 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
 
     public function displayViewCategoryLink($token, $id_ever_category)
     {
+        if (!$token) {
+            return;
+        }
         $category = new EverPsBlogCategory($id_ever_category);
         $link = new Link();
         $id_lang = (int)Context::getContext()->language->id;

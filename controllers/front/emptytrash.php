@@ -91,7 +91,11 @@ class EverPsBlogemptytrashModuleFrontController extends EverPsBlogModuleFrontCon
 
         $everpsblog->cron = true;
         if ($everpsblog->emptyTrash((int)$id_shop)) {
-            die($this->smileys[$this->randSmiley].' Trash has been emptied '.$this->smileys[$this->randSmiley]);
+            die(
+                $this->smileys[$this->randSmiley]
+                .' Trash has been emptied '
+                .$this->smileys[$this->randSmiley]
+            );
         }
         Tools::redirect('index.php');
     }

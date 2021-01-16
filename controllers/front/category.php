@@ -63,7 +63,7 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
         }
     }
 
-    public function l($string, $specific = false, $class = NULL, $addslashes = false, $htmlentities = true)
+    public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
     {
         if ($this->isSeven) {
             return Context::getContext()->getTranslator()->trans(

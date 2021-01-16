@@ -197,16 +197,20 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
         $lists = parent::renderList();
 
         $this->html .= $this->context->smarty->fetch(
-            _PS_MODULE_DIR_ . '/everpsblog/views/templates/admin/headerController.tpl'
+            _PS_MODULE_DIR_
+            .'/everpsblog/views/templates/admin/headerController.tpl'
         );
         $blog_instance = Module::getInstanceByName($this->module_name);
         if ($blog_instance->checkLatestEverModuleVersion($this->module_name, $blog_instance->version)) {
             $this->html .= $this->context->smarty->fetch(
-                _PS_MODULE_DIR_ .'/everpsblog/views/templates/admin/upgrade.tpl');
+                _PS_MODULE_DIR_
+                .'/everpsblog/views/templates/admin/upgrade.tpl'
+            );
         }
         $this->html .= $lists;
         $this->html .= $this->context->smarty->fetch(
-            _PS_MODULE_DIR_ . '/everpsblog/views/templates/admin/footer.tpl'
+            _PS_MODULE_DIR_
+            .'/everpsblog/views/templates/admin/footer.tpl'
         );
 
         return $this->html;

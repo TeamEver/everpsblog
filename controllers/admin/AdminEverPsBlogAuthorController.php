@@ -61,21 +61,28 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
             'index' => array(
                 'title' => $this->l('Index'),
                 'type' => 'bool',
-                'active' => 'status',
+                'active' => 'statusindex',
                 'orderby' => false,
                 'class' => 'fixed-width-sm'
             ),
             'follow' => array(
                 'title' => $this->l('Follow'),
                 'type' => 'bool',
-                'active' => 'status',
+                'active' => 'statusfollow',
+                'orderby' => false,
+                'class' => 'fixed-width-sm'
+            ),
+            'sitemap' => array(
+                'title' => $this->l('Sitemap'),
+                'type' => 'bool',
+                'active' => 'statussitemap',
                 'orderby' => false,
                 'class' => 'fixed-width-sm'
             ),
             'active' => array(
                 'title' => $this->l('Active'),
                 'type' => 'bool',
-                'active' => 'status',
+                'active' => 'statusactive',
                 'orderby' => false,
                 'class' => 'fixed-width-sm'
             ),
@@ -207,16 +214,20 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
         $lists = parent::renderList();
 
         $this->html .= $this->context->smarty->fetch(
-            _PS_MODULE_DIR_ . '/everpsblog/views/templates/admin/headerController.tpl'
+            _PS_MODULE_DIR_
+            .'/everpsblog/views/templates/admin/headerController.tpl'
         );
         $blog_instance = Module::getInstanceByName($this->module_name);
         if ($blog_instance->checkLatestEverModuleVersion($this->module_name, $blog_instance->version)) {
             $this->html .= $this->context->smarty->fetch(
-                _PS_MODULE_DIR_ .'/everpsblog/views/templates/admin/upgrade.tpl');
+                _PS_MODULE_DIR_
+                .'/everpsblog/views/templates/admin/upgrade.tpl'
+            );
         }
         $this->html .= $lists;
         $this->html .= $this->context->smarty->fetch(
-            _PS_MODULE_DIR_ . '/everpsblog/views/templates/admin/footer.tpl'
+            _PS_MODULE_DIR_
+            .'/everpsblog/views/templates/admin/footer.tpl'
         );
 
         return $this->html;
@@ -226,20 +237,50 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
     {
         $formValues = array();
         $formValues[] = array(
-            'id_ever_author' => (!empty(Tools::getValue('id_ever_author'))) ? Tools::getValue('id_ever_author') : $obj->id,
-            'nickhandle' => (!empty(Tools::getValue('nickhandle'))) ? Tools::getValue('nickhandle') : $obj->nickhandle,
-            'meta_title' => (!empty(Tools::getValue('meta_title'))) ? Tools::getValue('meta_title') : $obj->meta_title,
-            'meta_description' => (!empty(Tools::getValue('meta_description'))) ? Tools::getValue('meta_description') : $obj->meta_description,
-            'link_rewrite' => (!empty(Tools::getValue('link_rewrite'))) ? Tools::getValue('link_rewrite') : $obj->link_rewrite,
-            'twitter' => (!empty(Tools::getValue('twitter'))) ? Tools::getValue('twitter') : $obj->twitter,
-            'facebook' => (!empty(Tools::getValue('facebook'))) ? Tools::getValue('facebook') : $obj->facebook,
-            'linkedin' => (!empty(Tools::getValue('linkedin'))) ? Tools::getValue('linkedin') : $obj->linkedin,
-            'content' => (!empty(Tools::getValue('content'))) ? Tools::getValue('content') : $obj->content,
-            'date_add' => (!empty(Tools::getValue('date_add'))) ? Tools::getValue('date_add') : $obj->date_add,
-            'date_upd' => (!empty(Tools::getValue('date_upd'))) ? Tools::getValue('date_upd') : $obj->date_upd,
-            'index' => (!empty(Tools::getValue('index'))) ? Tools::getValue('index') : $obj->index,
-            'follow' => (!empty(Tools::getValue('follow'))) ? Tools::getValue('follow') : $obj->follow,
-            'active' => (!empty(Tools::getValue('active'))) ? Tools::getValue('active') : $obj->active,
+            'id_ever_author' => (!empty(Tools::getValue('id_ever_author')))
+            ? Tools::getValue('id_ever_author')
+            : $obj->id,
+            'nickhandle' => (!empty(Tools::getValue('nickhandle')))
+            ? Tools::getValue('nickhandle')
+            : $obj->nickhandle,
+            'meta_title' => (!empty(Tools::getValue('meta_title')))
+            ? Tools::getValue('meta_title')
+            : $obj->meta_title,
+            'meta_description' => (!empty(Tools::getValue('meta_description')))
+            ? Tools::getValue('meta_description') : $obj->meta_description,
+            'link_rewrite' => (!empty(Tools::getValue('link_rewrite')))
+            ? Tools::getValue('link_rewrite')
+            : $obj->link_rewrite,
+            'twitter' => (!empty(Tools::getValue('twitter')))
+            ? Tools::getValue('twitter')
+            : $obj->twitter,
+            'facebook' => (!empty(Tools::getValue('facebook')))
+            ? Tools::getValue('facebook')
+            : $obj->facebook,
+            'linkedin' => (!empty(Tools::getValue('linkedin')))
+            ? Tools::getValue('linkedin')
+            : $obj->linkedin,
+            'content' => (!empty(Tools::getValue('content')))
+            ? Tools::getValue('content')
+            : $obj->content,
+            'date_add' => (!empty(Tools::getValue('date_add')))
+            ? Tools::getValue('date_add')
+            : $obj->date_add,
+            'date_upd' => (!empty(Tools::getValue('date_upd')))
+            ? Tools::getValue('date_upd')
+            : $obj->date_upd,
+            'index' => (!empty(Tools::getValue('index')))
+            ? Tools::getValue('index')
+            : $obj->index,
+            'follow' => (!empty(Tools::getValue('follow')))
+            ? Tools::getValue('follow')
+            : $obj->follow,
+            'sitemap' => (!empty(Tools::getValue('sitemap')))
+            ? Tools::getValue('sitemap')
+            : $obj->sitemap,
+            'active' => (!empty(Tools::getValue('active')))
+            ? Tools::getValue('active')
+            : $obj->active,
         );
         $values = call_user_func_array('array_merge', $formValues);
         return $values;
@@ -462,6 +503,26 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
                         ),
                     ),
                     array(
+                        'type' => 'switch',
+                        'label' => $this->l('SEO sitemap author ?'),
+                        'desc' => $this->l('Set yes to sitemap, no to nositemap'),
+                        'hint' => $this->l('Please generate sitemaps after changing this rule'),
+                        'name' => 'sitemap',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No')
+                            )
+                        ),
+                    ),
+                    array(
                         'type' => 'datetime',
                         'label' => $this->l('Date add'),
                         'desc' => $this->l('Add here author date'),
@@ -529,11 +590,32 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
             );
             $everObj->delete();
         }
-        if (Tools::getValue('statusever_blog_author')) {
+        if (Tools::getIsset('statusactiveever_blog_author')) {
             $everObj = new EverPsBlogAuthor(
                 (int)Tools::getValue('id_ever_author')
             );
             (int)$everObj->active = !(int)$everObj->active;
+            $everObj->save();
+        }
+        if (Tools::getIsset('statusindexever_blog_author')) {
+            $everObj = new EverPsBlogAuthor(
+                (int)Tools::getValue('id_ever_author')
+            );
+            (int)$everObj->index = !(int)$everObj->index;
+            $everObj->save();
+        }
+        if (Tools::getIsset('statusfollowever_blog_author')) {
+            $everObj = new EverPsBlogAuthor(
+                (int)Tools::getValue('id_ever_author')
+            );
+            (int)$everObj->follow = !(int)$everObj->follow;
+            $everObj->save();
+        }
+        if (Tools::getIsset('statussitemapever_blog_author')) {
+            $everObj = new EverPsBlogAuthor(
+                (int)Tools::getValue('id_ever_author')
+            );
+            (int)$everObj->sitemap = !(int)$everObj->sitemap;
             $everObj->save();
         }
         if (Tools::isSubmit('save')) {
@@ -588,10 +670,17 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
             } else {
                 $author->follow = Tools::getValue('follow');
             }
+            if (Tools::getValue('sitemap')
+                && !Validate::isBool(Tools::getValue('sitemap'))
+            ) {
+                 $this->errors[] = $this->l('Sitemap is not valid');
+            } else {
+                $author->sitemap = Tools::getValue('sitemap');
+            }
             if (Tools::getValue('active')
                 && !Validate::isBool(Tools::getValue('active'))
             ) {
-                 $this->errors[] = $this->l('Follow is not valid');
+                 $this->errors[] = $this->l('Active is not valid');
             } else {
                 $author->active = Tools::getValue('active');
             }
@@ -697,6 +786,9 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
 
     public function displayViewAuthorLink($token, $id_ever_author)
     {
+        if (!$token) {
+            return;
+        }
         $author = new EverPsBlogAuthor($id_ever_author);
         $link = new Link();
         $id_lang = (int)Context::getContext()->language->id;
