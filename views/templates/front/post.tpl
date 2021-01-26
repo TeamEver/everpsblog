@@ -36,20 +36,20 @@
     <script type="application/ld+json">
     {
     "@context": "https://schema.org",
-    "@type": "NewsArticle",
+    "@type": "Article",
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": "https://google.com/article"
     },
     "headline": "{$post->title|escape:'htmlall':'UTF-8'}",
     "image": [
-      "{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$post->id|escape:'htmlall':'UTF-8'}.jpg"
+      "{$featured_image|escape:'htmlall':'UTF-8'}"
      ],
     "datePublished": "{$post->date_add|escape:'htmlall':'UTF-8'}",
     "dateModified": "{$post->date_upd|escape:'htmlall':'UTF-8'}",
     "author": {
       "@type": "Person",
-      "name": "{$shop.name|escape:'htmlall':'UTF-8'}"
+      "name": "{$author->nickhandle|escape:'htmlall':'UTF-8'}"
     },
      "publisher": {
       "@type": "Organization",
@@ -65,8 +65,8 @@
 
 {block name="page_content"}
 {hook h="displayBeforeEverPost" everblogpost=$post}
-<div class="content" itemscope="itemscope" itemtype="http://schema.org/Blog">
-    <div class="container" itemscope="itemscope" itemtype="http://schema.org/BlogPosting" itemprop="blogPost">
+<div class="content">
+    <div class="container">
         {if isset($errors) && $errors}
         <div class="col-12 col-xs-12 col-md-12 alert alert-danger" role="alert">
         {foreach from=$errors item=error}
@@ -84,8 +84,8 @@
         <div class="row post-header">
             <img class="img img-fluid post-featured-image featured-image" src="{$featured_image|escape:'htmlall':'UTF-8'}" alt="{$post->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$post->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
         </div>
-        <h1 itemprop="headline" class="text-center">{$post->title|escape:'htmlall':'UTF-8'}</h1>
-        <p itemscope="" itemprop="author" itemtype="http://schema.org/Person" class="text-center">
+        <h1 class="text-center">{$post->title|escape:'htmlall':'UTF-8'}</h1>
+        <p class="text-center">
             <a href="{$author->url|escape:'htmlall':'UTF-8'}" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
                 <img src="{$author_cover|escape:'htmlall':'UTF-8'}" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" class="img-fluid author-icon rounded-circle" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'}" title="{$author->nickhandle|escape:'htmlall':'UTF-8'}">
                 {l s='By' mod='everpsblog'} {$author->nickhandle|escape:'htmlall':'UTF-8'}
@@ -93,10 +93,10 @@
         </p>
     </div>
     <div class="row">
-        <div class="col-12 col-md-12 postcontent {if $animated}zoomed{/if}" itemprop="articleBody">
+        <div class="col-12 col-md-12 postcontent {if $animated}zoomed{/if}">
             {$post->content nofilter}
         </div>
-        <p class="postpublished" itemprop="datePublished">{l s='Published on' mod='everpsblog'} {$post->date_add|escape:'htmlall':'UTF-8'}</p>
+        <p class="postpublished">{l s='Published on' mod='everpsblog'} {$post->date_add|escape:'htmlall':'UTF-8'}</p>
     </div>
 </div>
 <div class="container">
