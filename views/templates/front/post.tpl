@@ -153,7 +153,7 @@
         </form>
     </div>
 </section>
-{/if}
+
 {if isset($commentsCount) && $commentsCount > 0}
 {hook h="displayBeforeEverComment"}
 <section class="comments container clearfix">
@@ -180,8 +180,8 @@
 </section>
 {hook h="displayAfterEverComment"}
 {/if}
+{/if}
 {if isset($count_products) && $count_products > 0}
-
 <section id="products">
   <h2 class="text-center">{l s='Linked products' mod='everpsblog'}</h2>
   <div class="products row">

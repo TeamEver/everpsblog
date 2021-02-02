@@ -38,7 +38,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '4.1.10';
+        $this->version = '4.1.11';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -138,7 +138,6 @@ class EverPsBlog extends Module
     public function uninstall()
     {
         include(dirname(__FILE__).'/install/uninstall.php');
-        include(dirname(__FILE__).'/install/hooks-uninstall.php');
         return parent::uninstall()
             && $this->uninstallModuleTab('AdminEverPsBlog')
             && $this->uninstallModuleTab('AdminEverPsBlogPost')
