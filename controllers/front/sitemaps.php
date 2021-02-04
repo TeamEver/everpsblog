@@ -21,7 +21,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class EverPsBlogplannedModuleFrontController extends ModuleFrontController
+class EverPsBlogsitemapsModuleFrontController extends ModuleFrontController
 {
     public function init()
     {
@@ -90,17 +90,11 @@ class EverPsBlogplannedModuleFrontController extends ModuleFrontController
             ? (int)Tools::getValue('id_shop') : (int)Configuration::get('PS_SHOP_DEFAULT');
 
         $everpsblog->cron = true;
-        $published_planned = $everpsblog->publishPlannedPosts((int)$id_shop);
-        if ((bool)$published_planned === true) {
+        $sitemaps_generated = $everpsblog->generateBlogSitemap((int)$id_shop, true);
+        if (Validate::isUnsignedInt($sitemaps_generated)) {
             die(
                 $this->smileys[$this->randSmiley]
-                .' All planned posts have been checked and published '
-                .$this->smileys[$this->randSmiley]
-            );
-        } else {
-            die(
-                $this->smileys[$this->randSmiley]
-                .' There is no planned posts to be published '
+                .' All sitemaps have been regenerated '
                 .$this->smileys[$this->randSmiley]
             );
         }

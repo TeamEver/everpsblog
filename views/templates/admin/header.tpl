@@ -51,6 +51,10 @@
                     <h4>{l s='Pending notifications' mod='everpsblog'}</h4>
                     <a href="{$everpsblogcronpending|escape:'htmlall':'UTF-8'}" target="_blank">{$everpsblogcronpending|escape:'htmlall':'UTF-8'}</a>
                 </div>
+                <div class="alert alert-info">
+                    <h4>{l s='XML sitemaps generation' mod='everpsblog'}</h4>
+                    <a href="{$everpsblogcronsitemap|escape:'htmlall':'UTF-8'}" target="_blank">{$everpsblogcronsitemap|escape:'htmlall':'UTF-8'}</a>
+                </div>
             </p>
         </div>
         <div class="col-xs-12 col-lg-6">

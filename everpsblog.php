@@ -38,7 +38,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '4.1.11';
+        $this->version = '4.1.12';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -304,6 +304,13 @@ class EverPsBlog extends Module
             }
         }
 
+        // Display confirmations
+        if (count($this->postSuccess)) {
+            foreach ($this->postSuccess as $success) {
+                $this->html .= $this->displayConfirmation($success);
+            }
+        }
+
         $ever_blog_token = Tools::encrypt('everpsblog/cron');
         $emptytrash = $this->context->link->getModuleLink(
             $this->name,
@@ -338,6 +345,17 @@ class EverPsBlog extends Module
             (int)$this->context->language->id,
             (int)$this->context->shop->id
         );
+        $sitemap_link = $this->context->link->getModuleLink(
+            $this->name,
+            'sitemaps',
+            array(
+                'token' => $ever_blog_token,
+                'id_shop' => (int)$this->context->shop->id
+            ),
+            true,
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
         $default_blog = $this->context->link->getModuleLink(
             $this->name,
             'blog',
@@ -351,6 +369,7 @@ class EverPsBlog extends Module
             'everpsblogcron' => $emptytrash,
             'everpsblogcronpending' => $pending,
             'everpsblogcronplanned' => $planned,
+            'everpsblogcronsitemap' => $sitemap_link,
             'blog_url' => $default_blog,
         ));
 
@@ -1461,7 +1480,7 @@ class EverPsBlog extends Module
             'pending'
         );
         if (!count($posts)) {
-            die('no pending posts');
+            die('There is no pending posts');
         }
         // Todo : test pending emails
         $post_list = '';
@@ -1691,7 +1710,7 @@ class EverPsBlog extends Module
         );
     }
 
-    public function generateBlogSitemap($id_shop = null)
+    public function generateBlogSitemap($id_shop = null, $cron = false)
     {
         set_time_limit(0);
         if (!$id_shop) {
@@ -1702,12 +1721,17 @@ class EverPsBlog extends Module
         } else {
             $languages = $this->getLanguagesIds(true);
         }
-
+        $result = false;
         foreach ($languages as $id_lang) {
-            $this->processSitemapAuthor((int)$id_shop, (int)$id_lang);
-            $this->processSitemapTag((int)$id_shop, (int)$id_lang);
-            $this->processSitemapCategory((int)$id_shop, (int)$id_lang);
-            $this->processSitemapPost((int)$id_shop, (int)$id_lang);
+            $result &= $this->processSitemapAuthor((int)$id_shop, (int)$id_lang);
+            $result &= $this->processSitemapTag((int)$id_shop, (int)$id_lang);
+            $result &= $this->processSitemapCategory((int)$id_shop, (int)$id_lang);
+            $result &= $this->processSitemapPost((int)$id_shop, (int)$id_lang);
+        }
+
+        $this->postSuccess[] = $this->l('All XML sitemaps have been generated');
+        if ((bool)$cron === true) {
+            return $result;
         }
     }
 

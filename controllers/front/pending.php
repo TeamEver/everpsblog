@@ -21,7 +21,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class EverPsBlogpendingModuleFrontController extends EverPsBlogModuleFrontController
+class EverPsBlogpendingModuleFrontController extends ModuleFrontController
 {
     public function init()
     {
@@ -55,7 +55,7 @@ class EverPsBlogpendingModuleFrontController extends EverPsBlogModuleFrontContro
         );
         $this->randSmiley = array_rand($this->smileys);
         if (!Tools::getValue('token')
-            || Tools::substr(Tools::encrypt('everpsblog/cron'), 0, 10) != Tools::getValue('token')
+            || Tools::encrypt('everpsblog/cron') != Tools::getValue('token')
             || !Module::isInstalled('everpsblog')
         ) {
             Tools::redirect('index.php');
@@ -68,7 +68,7 @@ class EverPsBlogpendingModuleFrontController extends EverPsBlogModuleFrontContro
     public function initContent()
     {
         if (!Tools::getValue('token')
-            || Tools::substr(Tools::encrypt('everpsblog/cron'), 0, 10) != Tools::getValue('token')
+            || Tools::encrypt('everpsblog/cron') != Tools::getValue('token')
             || !Module::isInstalled('everpsblog')
         ) {
             Tools::redirect('index.php');
