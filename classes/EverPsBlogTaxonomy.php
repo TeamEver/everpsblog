@@ -65,7 +65,7 @@ class EverPsBlogTaxonomy extends ObjectModel
         ) {
             set_time_limit(0);
             $sql =
-                'REPLACE INTO `'.pSQL($table).'` (
+                'INSERT IGNORE INTO `'.pSQL($table).'` (
                     '.pSQL($key).',
                     id_ever_post
                 )
@@ -84,10 +84,10 @@ class EverPsBlogTaxonomy extends ObjectModel
     /**
      * Drop taxonomy from table
      *
-     * @param $id_obj, id_post, $obj_name
+     * @param id_post, $obj_name
      * @return false is error
      */
-    public static function dropTaxonomy($id_obj, $id_post, $obj_name)
+    public static function dropTaxonomy($id_post, $obj_name)
     {
         switch ($obj_name) {
             case 'category':
@@ -108,9 +108,7 @@ class EverPsBlogTaxonomy extends ObjectModel
         if (isset($table) && !empty($table) && isset($key) && !empty($key)) {
             set_time_limit(0);
             $sql = 'DELETE FROM '.pSQL($table).'
-            WHERE id_ever_post = '.(int)$id_post.'
-            AND '.pSQL($key).' = '.(int)$id_obj.'
-            ';
+            WHERE id_ever_post = '.(int)$id_post;
             // If dropped, return insert as kind of update
             if (!Db::getInstance()->Execute($sql)) {
                 return false;
@@ -128,8 +126,8 @@ class EverPsBlogTaxonomy extends ObjectModel
      */
     public static function updateTaxonomy($id_obj, $id_post, $obj_name)
     {
-        if (self::dropTaxonomy($id_obj, $id_post, $obj_name)) {
-            return self::insertTaxonomy($id_obj, $id_post, $obj_name);
+        if ((bool)self::dropTaxonomy($id_post, $obj_name) === true) {
+            return (bool)self::insertTaxonomy($id_obj, $id_post, $obj_name);
         }
     }
 
@@ -312,7 +310,7 @@ class EverPsBlogTaxonomy extends ObjectModel
                 $post->post_categories
             );
             foreach ($post_categories as $post_category) {
-                self::updateTaxonomy(
+                self::insertTaxonomy(
                     (int)$post_category,
                     (int)$post->id,
                     'category'
@@ -322,7 +320,7 @@ class EverPsBlogTaxonomy extends ObjectModel
                 $post->post_tags
             );
             foreach ($post_tags as $post_tag) {
-                self::updateTaxonomy(
+                self::insertTaxonomy(
                     (int)$post_tag,
                     (int)$post->id,
                     'tag'
@@ -332,7 +330,7 @@ class EverPsBlogTaxonomy extends ObjectModel
                 $post->post_products
             );
             foreach ($post_products as $post_product) {
-                self::updateTaxonomy(
+                self::insertTaxonomy(
                     (int)$post_product,
                     (int)$post->id,
                     'product'

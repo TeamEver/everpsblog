@@ -428,6 +428,7 @@ $_MODULE['<{everpsblog}prestashop>header_b473f658cee4763fc6bd220915ad96d3'] = 'N
 $_MODULE['<{everpsblog}prestashop>header_206c3d86254559ad3cd3b88e8e002113'] = 'Vider la corbeille';
 $_MODULE['<{everpsblog}prestashop>header_da4b5c2a7bcb9275cfe2e961b0e82e0b'] = 'Publier les articles programmés';
 $_MODULE['<{everpsblog}prestashop>header_1e09e17e42895720b78760bcc00e01f4'] = 'Notifications en attente';
+$_MODULE['<{everpsblog}prestashop>header_1eb317500b29d62a50f294ca6a48ec71'] = 'Génération des sitemaps XML';
 $_MODULE['<{everpsblog}prestashop>header_4fb704f05a00111d953eb10dddc881d9'] = 'Ce module est gratuit et le sera toujours! Vous pouvez soutenir nos modules gratuits en faisant un don en cliquant sur le bouton ci-dessous.';
 $_MODULE['<{everpsblog}prestashop>headercontroller_38a9087bf0172e47955af7a6ec4df4fa'] = 'Ever Blog';
 $_MODULE['<{everpsblog}prestashop>headercontroller_38d49598702bcfd0f06ca2b13ec487bf'] = 'Bienvenue sur Ever Blog !';

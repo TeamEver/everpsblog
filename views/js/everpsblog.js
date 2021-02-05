@@ -21,10 +21,13 @@ $(document).ready(function(){
         window.location.href = $(this).prop('href');
         return false;
     });
-    if ($('#ever_ck_mark').length) {
-        CKEDITOR.replace( 'evercomment' );
-    }
     if ($('#ever_fancy_mark').length) {
+        // Post featured img
+        var featured_img = $('#module-everpsblog-post .post-header .post-featured-image');
+        var featured_src = featured_img.attr('src');
+        var featured_link = $('<a/>').attr('href', featured_src);
+        featured_img.wrap(featured_link).parent().addClass('fancybox').attr('rel', 'gallery').fancybox();
+        // Post content medias
         $('#module-everpsblog-post .postcontent img').each(function() {
             var $this = $(this);
             var src = $this.attr('src');

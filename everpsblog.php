@@ -38,7 +38,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '4.1.12';
+        $this->version = '4.2.1';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -668,7 +668,6 @@ class EverPsBlog extends Module
             'EVERPSBLOG_TAG_LAYOUT' => Configuration::get('EVERPSBLOG_TAG_LAYOUT'),
         );
         $values = call_user_func_array('array_merge', $formValues);
-        // die(var_dump($values));
         return $values;
     }
 
@@ -1553,40 +1552,7 @@ class EverPsBlog extends Module
 
     public function hookActionObjectEverPsBlogPostAddAfter($params)
     {
-        $post_categories = EverPsBlogCleaner::convertToArray(
-            json_decode($params['object']->post_categories, true)
-        );
-        $post_tags = EverPsBlogCleaner::convertToArray(
-            json_decode($params['object']->post_tags, true)
-        );
-        $post_products = EverPsBlogCleaner::convertToArray(
-            json_decode($params['object']->post_products, true)
-        );
-        // Insert into post_category, post_tag and post_product values
-        foreach ($post_categories as $id_post_category) {
-            EverPsBlogTaxonomy::updateTaxonomy(
-                (int)$id_post_category,
-                (int)$params['object']->id,
-                'category'
-            );
-        }
-        foreach ($post_tags as $id_post_tag) {
-            EverPsBlogTaxonomy::updateTaxonomy(
-                (int)$id_post_tag,
-                (int)$params['object']->id,
-                'tag'
-            );
-        }
-        foreach ($post_products as $id_post_product) {
-            EverPsBlogTaxonomy::updateTaxonomy(
-                (int)$id_post_product,
-                (int)$params['object']->id,
-                'product'
-            );
-        }
-        EverPsBlogTaxonomy::checkDefaultPostCategory(
-            $params['object']->id
-        );
+        return $this->hookActionObjectEverPsBlogPostUpdateAfter($params);
     }
 
     public function hookActionObjectEverPsBlogPostUpdateAfter($params)
@@ -1600,28 +1566,43 @@ class EverPsBlog extends Module
         $post_products = EverPsBlogCleaner::convertToArray(
             json_decode($params['object']->post_products, true)
         );
-        // Update into post_category, post_tag and post_product values
+        $return = false;
+        // First drop post taxonomies
+        EverPsBlogTaxonomy::dropTaxonomy(
+                (int)$params['object']->id,
+                'category'
+        );
+        EverPsBlogTaxonomy::dropTaxonomy(
+                (int)$params['object']->id,
+                'tag'
+        );
+        EverPsBlogTaxonomy::dropTaxonomy(
+                (int)$params['object']->id,
+                'product'
+        );
+        // Then insert taxonomies
         foreach ($post_categories as $id_post_category) {
-            EverPsBlogTaxonomy::updateTaxonomy(
+            EverPsBlogTaxonomy::insertTaxonomy(
                 (int)$id_post_category,
                 (int)$params['object']->id,
                 'category'
             );
         }
         foreach ($post_tags as $id_post_tag) {
-            EverPsBlogTaxonomy::updateTaxonomy(
+            EverPsBlogTaxonomy::insertTaxonomy(
                 (int)$id_post_tag,
                 (int)$params['object']->id,
                 'tag'
             );
         }
         foreach ($post_products as $id_post_product) {
-            EverPsBlogTaxonomy::updateTaxonomy(
+            EverPsBlogTaxonomy::insertTaxonomy(
                 (int)$id_post_product,
                 (int)$params['object']->id,
                 'product'
             );
         }
+        // At least check root taxonomy
         EverPsBlogTaxonomy::checkDefaultPostCategory(
             $params['object']->id
         );
@@ -1633,37 +1614,18 @@ class EverPsBlog extends Module
         if (file_exists($old_img)) {
             unlink($old_img);
         }
-        $post_categories = EverPsBlogCleaner::convertToArray(
-            json_decode($params['object']->post_categories, true)
-        );
-        $post_tags = EverPsBlogCleaner::convertToArray(
-            json_decode($params['object']->post_tags, true)
-        );
-        $post_products = EverPsBlogCleaner::convertToArray(
-            json_decode($params['object']->post_products, true)
-        );
-        // Update into post_category, post_tag and post_product values
-        foreach ($post_categories as $id_post_category) {
-            EverPsBlogTaxonomy::dropTaxonomy(
-                (int)$id_post_category,
+        EverPsBlogTaxonomy::dropTaxonomy(
                 (int)$params['object']->id,
                 'category'
-            );
-        }
-        foreach ($post_tags as $id_post_tag) {
-            EverPsBlogTaxonomy::dropTaxonomy(
-                (int)$id_post_tag,
+        );
+        EverPsBlogTaxonomy::dropTaxonomy(
                 (int)$params['object']->id,
                 'tag'
-            );
-        }
-        foreach ($post_products as $id_post_product) {
-            EverPsBlogTaxonomy::dropTaxonomy(
-                (int)$id_post_product,
+        );
+        EverPsBlogTaxonomy::dropTaxonomy(
                 (int)$params['object']->id,
                 'product'
-            );
-        }
+        );
     }
 
     public function hookActionObjectEverPsBlogCategoryDeleteAfter($params)
