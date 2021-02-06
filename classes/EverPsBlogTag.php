@@ -38,6 +38,7 @@ class EverPsBlogTag extends ObjectModel
     public $follow;
     public $sitemap;
     public $tag_products;
+    public $count;
 
     public static $definition = array(
         'table' => 'ever_blog_tag',
@@ -109,6 +110,11 @@ class EverPsBlogTag extends ObjectModel
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true
+            ),
+            'count' => array(
+                'type' => self::TYPE_INT,
+                'validate' => 'isunsignedInt',
+                'required' => false
             ),
         )
     );

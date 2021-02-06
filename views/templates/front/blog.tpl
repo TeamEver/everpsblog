@@ -96,7 +96,7 @@
 {/if}
 {if isset($everhome_products) && $everhome_products}
 <section id="products" class="mt-2">
-  <h2 class="text-center">{l s='Our best products' d='Modules.everpshomeproducts.Shop'}</h2>
+  <h2 class="text-center">{l s='Our best products' mod='everpsblog'}</h2>
   <div class="products row">
     {foreach from=$everhome_products item="product"}
       {include file="catalog/_partials/miniatures/product.tpl" product=$product}

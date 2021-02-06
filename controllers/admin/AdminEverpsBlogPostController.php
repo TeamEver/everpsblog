@@ -45,6 +45,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         $this->table = 'ever_blog_post';
         $this->className = 'EverPsBlogPost';
         $this->module_name = 'everpsblog';
+        $this->shop_url = Tools::getHttpHost(true).__PS_BASE_URI__;
+        $this->img_url = $this->shop_url.'modules/'.$this->module_name.'/views/img/';
         $this->context = Context::getContext();
         $this->identifier = "id_ever_post";
         $this->_orderBy = 'id_ever_post';
@@ -92,10 +94,15 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 'orderby' => false,
                 'class' => 'fixed-width-sm'
             ),
+            'count' => array(
+                'title' => $this->l('Views count'),
+                'align' => 'left',
+                'width' => 25
+            ),
         );
 
         $this->colorOnBackground = true;
-        $this->_select = 'l.title, au.nickhandle';
+        $this->_select = 'l.title, au.nickhandle, CONCAT("'.$this->img_url.'",ai.image_link) AS featured_img';
 
         $this->_join =
             'LEFT JOIN `'._DB_PREFIX_.'ever_blog_post_lang` l
@@ -105,6 +112,10 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             LEFT JOIN `'._DB_PREFIX_.'ever_blog_author` au
                 ON (
                     au.`id_ever_author` = a.`id_author`
+                )
+            LEFT JOIN `'._DB_PREFIX_.'ever_blog_image` ai
+                ON (
+                    ai.`id_ever_image` = a.`id_ever_post`
                 )';
         $this->_where = 'AND a.id_shop = '.(int)Context::getContext()->shop->id;
         $this->_where = 'AND l.id_lang = '.(int)Context::getContext()->language->id;
@@ -240,7 +251,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         if ($blog_instance->checkLatestEverModuleVersion($this->module_name, $blog_instance->version)) {
             $this->html .= $this->context->smarty->fetch(
                 _PS_MODULE_DIR_
-                .'/everpsblog/views/templates/admin/upgrade.tpl'
+                .'/'
+                .$this->module_name
+                .'/views/templates/admin/upgrade.tpl'
             );
         }
         $this->html .= $lists;

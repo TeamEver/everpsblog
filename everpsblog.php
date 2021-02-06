@@ -38,7 +38,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '4.2.1';
+        $this->version = '4.3.2';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -416,6 +416,11 @@ class EverPsBlog extends Module
             ) {
                 $this->postErrors[] = $this->l('Error : The field "Title length" is not valid');
             }
+            if (Tools::getValue('EVERBLOG_SHOW_POST_COUNT')
+                && !Validate::isBool(Tools::getValue('EVERBLOG_SHOW_POST_COUNT'))
+            ) {
+                $this->postErrors[] = $this->l('Error : The field "Show post count" is not valid');
+            }
             if (!Tools::getIsset('EVERBLOG_ADMIN_EMAIL')
                 || !Validate::isUnsignedInt(Tools::getValue('EVERBLOG_ADMIN_EMAIL'))
             ) {
@@ -615,7 +620,7 @@ class EverPsBlog extends Module
             )) ? Tools::getValue(
                 'EVERBLOG_TOP_TEXT_'.$lang['id_lang']
             ) : '';
-            $everblog_top_text[$lang['id_lang']] = (Tools::getValue(
+            $everblog_bottom_text[$lang['id_lang']] = (Tools::getValue(
                 'EVERBLOG_BOTTOM_TEXT_'.$lang['id_lang']
             )) ? Tools::getValue(
                 'EVERBLOG_BOTTOM_TEXT_'.$lang['id_lang']
@@ -625,6 +630,7 @@ class EverPsBlog extends Module
             'EVERPSBLOG_ROUTE' => Configuration::get('EVERPSBLOG_ROUTE'),
             'EVERPSBLOG_EXCERPT' => Configuration::get('EVERPSBLOG_EXCERPT'),
             'EVERPSBLOG_TITLE_LENGTH' => Configuration::get('EVERPSBLOG_TITLE_LENGTH'),
+            'EVERBLOG_SHOW_POST_COUNT' => Configuration::get('EVERBLOG_SHOW_POST_COUNT'),
             'EVERPSBLOG_PAGINATION' => Configuration::get('EVERPSBLOG_PAGINATION'),
             'EVERPSBLOG_HOME_NBR' => Configuration::get('EVERPSBLOG_HOME_NBR'),
             'EVERPSBLOG_PRODUCT_NBR' => Configuration::get('EVERPSBLOG_PRODUCT_NBR'),
@@ -789,6 +795,27 @@ class EverPsBlog extends Module
                         'desc' => $this->l('Post title length for content on listing'),
                         'hint' => $this->l('Please set post title length'),
                         'required' => true,
+                    ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Show post views count ?'),
+                        'desc' => $this->l('Set yes to show views count'),
+                        'hint' => $this->l('Else will only be shown on admin'),
+                        'required' => true,
+                        'name' => 'EVERBLOG_SHOW_POST_COUNT',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No')
+                            )
+                        ),
                     ),
                     array(
                         'type' => 'text',
@@ -1327,6 +1354,9 @@ class EverPsBlog extends Module
 
     public function hookDisplayFooterProduct()
     {
+        if ((bool)Configuration::get('EVERBLOG_RELATED_POST') === false) {
+            return;
+        }
         if ((int)Configuration::get('EVERPSBLOG_PRODUCT_NBR')) {
             $post_number = (int)Configuration::get('EVERPSBLOG_PRODUCT_NBR');
         } else {

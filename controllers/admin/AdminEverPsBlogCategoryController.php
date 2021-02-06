@@ -84,6 +84,11 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                 'orderby' => false,
                 'class' => 'fixed-width-sm'
             ),
+            'count' => array(
+                'title' => $this->l('Views count'),
+                'align' => 'left',
+                'width' => 25
+            ),
         );
 
         $this->colorOnBackground = true;
@@ -227,7 +232,9 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
         if ($blog_instance->checkLatestEverModuleVersion($this->module_name, $blog_instance->version)) {
             $this->html .= $this->context->smarty->fetch(
                 _PS_MODULE_DIR_
-                .'/everpsblog/views/templates/admin/upgrade.tpl'
+                .'/'
+                .$this->module_name
+                .'/views/templates/admin/upgrade.tpl'
             );
         }
         $this->html .= $lists;
@@ -286,8 +293,8 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                 array(
                     'type' => 'text',
                     'label' => $this->l('Category meta title'),
-                    'desc'      => $this->l('More than 45 characters, less than 65'),
-                    'hint' => 'Required for better SEO',
+                    'desc' => $this->l('More than 45 characters, less than 65'),
+                    'hint' => $this->l('Required for better SEO'),
                     'maxchar' => 65,
                     'required' => true,
                     'name' => 'meta_title',
@@ -300,7 +307,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                     'type' => 'text',
                     'label' => $this->l('Category meta description'),
                     'desc' => $this->l('More than 90 characters, less than 165'),
-                    'hint' => 'Required for better SEO',
+                    'hint' => $this->l('Required for better SEO'),
                     'maxchar' => 165,
                     'required' => true,
                     'name' => 'meta_description',
@@ -313,7 +320,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                     'type' => 'text',
                     'label' => $this->l('Category link rewrite'),
                     'desc' => $this->l('For rewrite rules'),
-                    'hint' => 'Will set category base URL',
+                    'hint' => $this->l('Will set category base URL'),
                     'required' => true,
                     'name' => 'link_rewrite',
                     'lang' => true,
@@ -324,7 +331,8 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                 array(
                     'type' => 'text',
                     'label' => $this->l('Category title'),
-                    'desc'      => $this->l('Please choose category title'),
+                    'desc' => $this->l('Please choose category title'),
+                    'hint' => $this->l('Will shown as title 1 on top of category'),
                     'required' => true,
                     'name' => 'title',
                     'lang' => true,
@@ -335,7 +343,8 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                 array(
                     'type' => 'textarea',
                     'label' => $this->l('Category content'),
-                    'desc'      => $this->l('Please set category content'),
+                    'desc' => $this->l('Please set category content here'),
+                    'hint' => $this->l('Category content will be shown on top of page'),
                     'required' => true,
                     'name' => 'content',
                     'lang' => true,
@@ -346,6 +355,8 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                 array(
                     'type' => 'file',
                     'label' => $this->l('Category image'),
+                    'desc' => $this->l('Featured category image'),
+                    'hint' => $this->l('If empty, your shop logo will be used'),
                     'name' => 'category_image',
                     'display_image' => true,
                     'image' => $categoryImg
@@ -354,6 +365,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                     'type' => 'switch',
                     'label' => $this->l('SEO index category ?'),
                     'desc' => $this->l('Set yes to index, no to noindex'),
+                    'hint' => $this->l('This will impact your SEO'),
                     'name' => 'index',
                     'is_bool' => true,
                     'values' => array(
@@ -373,6 +385,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                     'type' => 'switch',
                     'label' => $this->l('SEO follow category ?'),
                     'desc' => $this->l('Set yes to follow, no to nofollow'),
+                    'hint' => $this->l('Do you want search engines to follow links on this category ?'),
                     'name' => 'follow',
                     'is_bool' => true,
                     'values' => array(
@@ -412,6 +425,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                     'type' => 'switch',
                     'label' => $this->l('Activate category ?'),
                     'desc' => $this->l('Set yes to activate'),
+                    'hint' => $this->l('Else this category won\'t be shown, but linked posts will'),
                     'name' => 'active',
                     'is_bool' => true,
                     'values' => array(

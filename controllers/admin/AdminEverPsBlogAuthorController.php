@@ -79,6 +79,11 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
                 'orderby' => false,
                 'class' => 'fixed-width-sm'
             ),
+            'count' => array(
+                'title' => $this->l('Views count'),
+                'align' => 'left',
+                'width' => 25
+            ),
             'active' => array(
                 'title' => $this->l('Active'),
                 'type' => 'bool',
@@ -221,7 +226,9 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
         if ($blog_instance->checkLatestEverModuleVersion($this->module_name, $blog_instance->version)) {
             $this->html .= $this->context->smarty->fetch(
                 _PS_MODULE_DIR_
-                .'/everpsblog/views/templates/admin/upgrade.tpl'
+                .'/'
+                .$this->module_name
+                .'/views/templates/admin/upgrade.tpl'
             );
         }
         $this->html .= $lists;

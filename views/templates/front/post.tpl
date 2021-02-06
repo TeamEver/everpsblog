@@ -96,35 +96,42 @@
         <div class="col-12 col-md-12 postcontent {if $animated}zoomed{/if}">
             {$post->content nofilter}
         </div>
-        <p class="postpublished">{l s='Published on' mod='everpsblog'} {$post->date_add|escape:'htmlall':'UTF-8'}</p>
     </div>
 </div>
 <div class="container">
-    <div class="row">
-        {if isset($tags) && $tags}
-        <p class="taggedIn">{l s='Tagged in' mod='everpsblog'}
-        {foreach from=$tags item=tag}
-            <a href="{$link->getModuleLink('everpsblog', 'tag', ['id_ever_tag'=>$tag->id, 'link_rewrite'=>$tag->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$tag->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{$tag->title|escape:'htmlall':'UTF-8'}</a>&nbsp;
-        {/foreach}
-        </p>
-        {/if}
+    <div class="row mt-2">
+        <div class="col-xs-12 col-12 col-md-6">
+            <span class="postpublished">{l s='Published on' mod='everpsblog'} {$post->date_add|escape:'htmlall':'UTF-8'}</span>
+            {if isset($allow_views_count) && $allow_views_count > 0}
+            <span class="postviews"> | {$post->count|escape:'htmlall':'UTF-8'} {l s='Views' mod='everpsblog'}</span>
+            {/if}
+            {if isset($tags) && $tags}
+            <p class="taggedIn">{l s='Tagged in' mod='everpsblog'}
+            {foreach from=$tags item=tag}
+                <a href="{$link->getModuleLink('everpsblog', 'tag', ['id_ever_tag'=>$tag->id, 'link_rewrite'=>$tag->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$tag->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{$tag->title|escape:'htmlall':'UTF-8'}</a>&nbsp;
+            {/foreach}
+            </p>
+            {/if}
+        </div>
+            <div class="col-xs-12 col-12 col-md-6">
+          {if $social_share_links}
+            <div class="social-sharing">
+              <span>{l s='Share' d='Shop.Theme.Actions'}</span>
+              <ul>
+                {foreach from=$social_share_links item='social_share_link'}
+                  <li class="{$social_share_link.class} icon-gray"><a href="{$social_share_link.url}" class="text-hide" title="{$social_share_link.label}" target="_blank">{$social_share_link.label}</a></li>
+                {/foreach}
+              </ul>
+            </div>
+          {/if}
+        </div>
     </div>
 </div>
-  {if $social_share_links}
-    <div class="social-sharing">
-      <span>{l s='Share' d='Shop.Theme.Actions'}</span>
-      <ul>
-        {foreach from=$social_share_links item='social_share_link'}
-          <li class="{$social_share_link.class} icon-gray"><a href="{$social_share_link.url}" class="text-hide" title="{$social_share_link.label}" target="_blank">{$social_share_link.label}</a></li>
-        {/foreach}
-      </ul>
-    </div>
-  {/if}
 
 {if isset($allow_comments) && $allow_comments}
 <section class="container clearfix">
-    <span id="leaveComment">{l s='Leave a comment' mod='everpsblog'}</span>
-    <div class="row">
+    <div class="row mt-2">
+        <span id="leaveComment">{l s='Leave a comment' mod='everpsblog'}</span>
         <form enctype="multipart/form-data" method="post">
             {if isset($logged) && $logged}
             <input type="hidden" name="customerEmail" id="customerEmail" value="{$customer.email|escape:'htmlall':'UTF-8'}">
@@ -182,7 +189,7 @@
 {/if}
 {/if}
 {if isset($count_products) && $count_products > 0}
-<section id="products">
+<section id="products" class="mt-2">
   <h2 class="text-center">{l s='Linked products' mod='everpsblog'}</h2>
   <div class="products row">
     {foreach from=$ps_products item="product"}

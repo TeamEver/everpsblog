@@ -44,6 +44,7 @@ class EverPsBlogAuthor extends ObjectModel
     public $sitemap;
     public $author_products;
     public $active;
+    public $count;
 
     public static $definition = array(
         'table' => 'ever_blog_author',
@@ -131,6 +132,11 @@ class EverPsBlogAuthor extends ObjectModel
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
                 'required' => true
+            ),
+            'count' => array(
+                'type' => self::TYPE_INT,
+                'validate' => 'isunsignedInt',
+                'required' => false
             ),
         )
     );

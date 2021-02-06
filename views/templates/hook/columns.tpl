@@ -26,7 +26,7 @@
 {foreach from=$categories item=category}
 {if $category.is_root_category == 0}
     <li>
-        <a href="{$link->getModuleLink('everpsblog', 'category',['id_ever_category'=>$category.id_ever_category, 'link_rewrite'=>$category.link_rewrite])|escape:'htmlall':'UTF-8'}" class="category" title="{$category.title nofilter}">
+        <a href="{$link->getModuleLink('everpsblog', 'category',['id_ever_category'=>$category.id_ever_category, 'link_rewrite'=>$category.link_rewrite])|escape:'htmlall':'UTF-8'}" class="category" title="{$category.title|escape:'htmlall':'UTF-8'}">
             {$category.title nofilter}
         </a>
     </li>
@@ -39,7 +39,7 @@
 <div class="columns_everblog_wrapper tag_wrapper">
     <p class="text-uppercase h6 hidden-sm-down">{l s='Tags from the blog' mod='everpsblog'}</p>
 {foreach from=$tags item=tag}
-    <a href="{$link->getModuleLink('everpsblog', 'tag', ['id_ever_tag'=>$tag.id_ever_tag, 'link_rewrite' => $tag.link_rewrite])|escape:'htmlall':'UTF-8'}" class="tag" title="{$tag.title nofilter}">
+    <a href="{$link->getModuleLink('everpsblog', 'tag', ['id_ever_tag'=>$tag.id_ever_tag, 'link_rewrite' => $tag.link_rewrite])|escape:'htmlall':'UTF-8'}" class="tag" title="{$tag.title|escape:'htmlall':'UTF-8'}">
         {$tag.title nofilter}
     </a>
 {/foreach}
@@ -57,21 +57,21 @@
         {assign var=counter value=0}
         {foreach from=$everpsblog item=item}
         <li data-target="#latestCarousel" data-slide-to="{$counter|escape:'htmlall':'UTF-8'}" {if $counter == 0} class="active"{/if}></li>
-        {$counter=$counter+1}
+        {$counter = $counter+1}
         {/foreach}
     </ol>
     <div class="carousel-inner">
 {assign var=postcounter value=1}
 {foreach from=$everpsblog item=item}
         <div class="carousel-item {if $postcounter == 1} active{/if} article everpsblog" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
-            <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item->title nofilter}">
+            <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}">
                 <div class="d-block w-100">
                     <div class="col-12 col-xs-12 article-img">
-                        <img src="{$item->featured_image|escape:'htmlall':'UTF-8'}" class="col-12 col-xs-12 {if $animate}animate flipSideBySide zoomed{/if}" alt="{$item->title nofilter}" title="{$item->title nofilter}" />
+                        <img src="{$item->featured_image|escape:'htmlall':'UTF-8'}" class="col-12 col-xs-12 {if $animate}animate flipSideBySide zoomed{/if}" alt="{$item->title|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}" />
                     </div>
                     <div class="col-12 col-xs-12">
                         <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
-                                {$item->title|strip_tags nofilter}
+                                {$item->title|escape:'htmlall':'UTF-8'}
                         </h3>
                         <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
                             {$item->content|truncate:90:'...' nofilter}

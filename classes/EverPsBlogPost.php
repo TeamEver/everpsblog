@@ -55,6 +55,7 @@ class EverPsBlogPost extends ObjectModel
     public $sitemap;
     public $active;
     public $limit;
+    public $count;
 
     public static $definition = array(
         'table' => 'ever_blog_post',
@@ -146,6 +147,11 @@ class EverPsBlogPost extends ObjectModel
             'post_products' => array(
                 'type' => self::TYPE_STRING,
                 'validate' => 'isJson',
+                'required' => false
+            ),
+            'count' => array(
+                'type' => self::TYPE_INT,
+                'validate' => 'isunsignedInt',
                 'required' => false
             ),
         )

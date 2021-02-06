@@ -51,6 +51,8 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
             (int)$this->context->language->id,
             (int)$this->context->shop->id
         );
+        $this->category->count = $this->category->count + 1;
+        $this->category->save();
         parent::init();
         $this->parent_categories = EverPsBlogTaxonomy::getCategoryParentsTaxonomy(
             (int)$this->category->id

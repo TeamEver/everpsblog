@@ -47,6 +47,8 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
             (int)$this->context->language->id,
             (int)$this->context->shop->id
         );
+        $this->author->count = $this->author->count + 1;
+        $this->author->save();
         parent::init();
         // if inactive post or unexists, redirect
         if (!(int)Tools::getValue('id_ever_author')

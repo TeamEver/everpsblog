@@ -83,6 +83,11 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                 'orderby' => false,
                 'class' => 'fixed-width-sm'
             ),
+            'count' => array(
+                'title' => $this->l('Views count'),
+                'align' => 'left',
+                'width' => 25
+            ),
         );
 
         $this->colorOnBackground = true;
@@ -225,7 +230,9 @@ class AdminEverPsBlogTagController extends ModuleAdminController
         if ($blog_instance->checkLatestEverModuleVersion($this->module_name, $blog_instance->version)) {
             $this->html .= $this->context->smarty->fetch(
                 _PS_MODULE_DIR_
-                .'/everpsblog/views/templates/admin/upgrade.tpl'
+                .'/'
+                .$this->module_name
+                .'/views/templates/admin/upgrade.tpl'
             );
         }
         $this->html .= $lists;
@@ -267,7 +274,8 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                 array(
                     'type' => 'text',
                     'label' => $this->l('Tag meta title'),
-                    'desc'      => $this->l('More than 45 characters, less than 65'),
+                    'desc' => $this->l('More than 45 characters, less than 65'),
+                    'hint' => $this->l('Required for better SEO'),
                     'maxchar' => 65,
                     'required' => true,
                     'name' => 'meta_title',
@@ -280,6 +288,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                     'type' => 'text',
                     'label' => $this->l('Tag meta description'),
                     'desc' => $this->l('More than 90 characters, less than 165'),
+                    'hint' => $this->l('Required for better SEO'),
                     'maxchar' => 165,
                     'required' => true,
                     'name' => 'meta_description',
@@ -292,7 +301,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                     'type' => 'text',
                     'label' => $this->l('Tag link rewrite'),
                     'desc' => $this->l('For rewrite rules'),
-                    'hint' => 'Will set tag base URL',
+                    'hint' => $this->l('Will set tag base URL'),
                     'required' => true,
                     'name' => 'link_rewrite',
                     'lang' => true,
@@ -303,7 +312,8 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                 array(
                     'type' => 'text',
                     'label' => $this->l('Tag title'),
-                    'desc'      => $this->l('Please choose tag title'),
+                    'desc' => $this->l('Please choose tag title'),
+                    'hint' => $this->l('Will set tag base URL'),
                     'required' => true,
                     'name' => 'title',
                     'lang' => true,
@@ -314,7 +324,8 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                 array(
                     'type' => 'textarea',
                     'label' => $this->l('Tag content'),
-                    'desc'      => $this->l('Please set tag content'),
+                    'desc' => $this->l('Please set tag content'),
+                    'hint' => $this->l('Tag content will be shown on top of page'),
                     'required' => true,
                     'name' => 'content',
                     'lang' => true,
@@ -325,6 +336,8 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                 array(
                     'type' => 'file',
                     'label' => $this->l('Tag image'),
+                    'desc' => $this->l('Featured tag image'),
+                    'hint' => $this->l('If empty, your shop logo will be used'),
                     'name' => 'tag_image',
                     'display_image' => true,
                     'image' => $tagImg
@@ -333,6 +346,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                     'type' => 'switch',
                     'label' => $this->l('SEO index tag ?'),
                     'desc' => $this->l('Set yes to index, no to noindex'),
+                    'hint' => $this->l('This will impact your SEO'),
                     'name' => 'index',
                     'is_bool' => true,
                     'values' => array(
@@ -352,6 +366,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                     'type' => 'switch',
                     'label' => $this->l('SEO follow tag ?'),
                     'desc' => $this->l('Set yes to follow, no to nofollow'),
+                    'hint' => $this->l('Do you want search engines to follow links on this category ?'),
                     'name' => 'follow',
                     'is_bool' => true,
                     'values' => array(
@@ -391,6 +406,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                     'type' => 'switch',
                     'label' => $this->l('Activate tag ?'),
                     'desc' => $this->l('Set yes to activate'),
+                    'hint' => $this->l('Else this tag won\'tt be shown, but linked posts will'),
                     'name' => 'active',
                     'is_bool' => true,
                     'values' => array(

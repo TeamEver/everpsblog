@@ -62,6 +62,9 @@
 .author-icon{
     max-width: 40px;
 }
+#module-everpsblog-post .social-sharing{
+    margin-top: 0;
+}
 /*Rewriting bad themes*/
 #module-everpsblog-post #evercomment{
     display: block!important;

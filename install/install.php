@@ -38,6 +38,7 @@ $sql[] =
         `post_categories` varchar(255) DEFAULT NULL,
         `post_tags` varchar(255) DEFAULT NULL,
         `post_products` varchar(255) DEFAULT NULL,
+        `count` int(10) unsigned DEFAULT 0,
         PRIMARY KEY (`id_ever_post`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
@@ -66,6 +67,7 @@ $sql[] =
         `active` int(1) unsigned DEFAULT NULL,
         `category_products` varchar(255) DEFAULT NULL,
         `is_root_category` int(1) unsigned DEFAULT NULL,
+        `count` int(10) unsigned DEFAULT 0,
         PRIMARY KEY (`id_ever_category`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
@@ -92,6 +94,7 @@ $sql[] =
         `sitemap` int(1) unsigned DEFAULT 1,
         `active` int(1) unsigned DEFAULT NULL,
         `tag_products` varchar(255) DEFAULT NULL,
+        `count` int(10) unsigned DEFAULT 0,
         PRIMARY KEY (`id_ever_tag`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
@@ -137,6 +140,7 @@ $sql[] =
         `sitemap` int(1) unsigned DEFAULT 1,
         `author_products` varchar(255) DEFAULT NULL,
         `active` int(10) unsigned DEFAULT NULL,
+        `count` int(10) unsigned DEFAULT 0,
         PRIMARY KEY (`id_ever_author`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 

@@ -40,6 +40,7 @@ class EverPsBlogCategory extends ObjectModel
     public $sitemap;
     public $category_products;
     public $is_root_category;
+    public $count;
 
     public static $definition = array(
         'table' => 'ever_blog_category',
@@ -119,6 +120,11 @@ class EverPsBlogCategory extends ObjectModel
             'is_root_category' => array(
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
+                'required' => false
+            ),
+            'count' => array(
+                'type' => self::TYPE_INT,
+                'validate' => 'isunsignedInt',
                 'required' => false
             ),
         )

@@ -204,7 +204,9 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
         if ($blog_instance->checkLatestEverModuleVersion($this->module_name, $blog_instance->version)) {
             $this->html .= $this->context->smarty->fetch(
                 _PS_MODULE_DIR_
-                .'/everpsblog/views/templates/admin/upgrade.tpl'
+                .'/'
+                .$this->module_name
+                .'/views/templates/admin/upgrade.tpl'
             );
         }
         $this->html .= $lists;
@@ -243,8 +245,9 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
             'input' => array(
                 array(
                     'type' => 'select',
-                    'label' => 'Post',
-                    'hint' => 'Select post\'s comment',
+                    'label' => $this->l('Post'),
+                    'desc' => $this->l('Comment is on this post'),
+                    'hint' => $this->l('Select post\'s comment'),
                     'name' => 'id_ever_post',
                     'identifier' => 'title',
                     'options' => array(
@@ -255,8 +258,9 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
                 ),
                 array(
                     'type' => 'select',
-                    'label' => 'Language',
-                    'hint' => 'Select comment language',
+                    'label' => $this->l('Language'),
+                    'desc' => $this->l('Comment is available only on this language'),
+                    'hint' => $this->l('Select comment language'),
                     'name' => 'id_lang',
                     'identifier' => 'name',
                     'options' => array(
@@ -268,8 +272,8 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
                 array(
                     'type' => 'textarea',
                     'label' => $this->l('Comment'),
-                    'hint' => 'As an administrator you can add HTML tags',
-                    'desc'      => $this->l('Please type or change post comment'),
+                    'desc' => $this->l('Please type or change post comment'),
+                    'hint' => $this->l('As an administrator you can add HTML tags'),
                     'required' => true,
                     'name' => 'comment',
                     'lang' => false,
@@ -278,8 +282,8 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
                 array(
                     'type' => 'text',
                     'label' => $this->l('User email'),
-                    'hint' => 'Required, please type a valid email',
-                    'desc'      => $this->l('Set or change user email'),
+                    'desc' => $this->l('Set or change user email'),
+                    'hint' => $this->l('Required, please type a valid email'),
                     'required' => true,
                     'name' => 'user_email',
                     'lang' => false,
@@ -287,8 +291,8 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
                 array(
                     'type' => 'switch',
                     'label' => $this->l('Activate comment ?'),
-                    'hint' => 'Set "No" to disable this comment',
                     'desc' => $this->l('Set yes to activate'),
+                    'hint' => $this->l('Set "No" to disable this comment'),
                     'name' => 'active',
                     'is_bool' => true,
                     'values' => array(

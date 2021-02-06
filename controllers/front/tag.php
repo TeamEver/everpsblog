@@ -49,6 +49,8 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
             (int)$this->context->language->id,
             (int)$this->context->shop->id
         );
+        $this->tag->count = $this->tag->count + 1;
+        $this->tag->save();
         parent::init();
         // if inactive tag or unexists, redirect
         if (!$this->tag->active) {
