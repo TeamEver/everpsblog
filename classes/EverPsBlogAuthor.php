@@ -34,6 +34,7 @@ class EverPsBlogAuthor extends ObjectModel
     public $facebook;
     public $linkedin;
     public $content;
+    public $bottom_content;
     public $id_lang;
     public $id_shop;
     public $id_author;
@@ -87,6 +88,11 @@ class EverPsBlogAuthor extends ObjectModel
                 'validate' => 'isCleanHtml'
             ),
             'content' => array(
+                'type' => self::TYPE_HTML,
+                'lang' => true,
+                'validate' => 'isCleanHtml'
+            ),
+            'bottom_content' => array(
                 'type' => self::TYPE_HTML,
                 'lang' => true,
                 'validate' => 'isCleanHtml'

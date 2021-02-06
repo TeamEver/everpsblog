@@ -79,6 +79,7 @@ $sql[] =
         `meta_description` varchar(255) DEFAULT NULL,
         `link_rewrite` varchar(255) DEFAULT NULL,
         `content` text NOT NULL,
+        `bottom_content` text DEFAULT NULL,
         `id_lang` int(10) unsigned NOT NULL,
         PRIMARY KEY (`id_ever_category`, `id_lang`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
@@ -106,6 +107,7 @@ $sql[] =
         `meta_description` varchar(255) DEFAULT NULL,
         `link_rewrite` varchar(255) DEFAULT NULL,
         `content` text NOT NULL,
+        `bottom_content` text DEFAULT NULL,
         `id_lang` int(10) unsigned NOT NULL,
         PRIMARY KEY (`id_ever_tag`, `id_lang`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
@@ -151,6 +153,7 @@ $sql[] =
         `meta_description` varchar(255) DEFAULT NULL,
         `link_rewrite` varchar(255) DEFAULT NULL,
         `content` text NOT NULL,
+        `bottom_content` text DEFAULT NULL,
         `id_lang` int(10) unsigned NOT NULL,
         PRIMARY KEY (`id_ever_author`, `id_lang`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';

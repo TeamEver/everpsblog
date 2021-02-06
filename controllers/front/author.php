@@ -108,6 +108,10 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
                 (string)$this->author->content,
                 (int)Context::getContext()->customer->id
             );
+            $this->author->bottom_content = EverPsBlogPost::changeShortcodes(
+                (string)$this->author->bottom_content,
+                (int)Context::getContext()->customer->id
+            );
             $this->author->nickhandle = EverPsBlogPost::changeShortcodes(
                 (string)$this->author->nickhandle,
                 (int)Context::getContext()->customer->id

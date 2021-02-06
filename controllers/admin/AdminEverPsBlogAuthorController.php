@@ -270,6 +270,9 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
             'content' => (!empty(Tools::getValue('content')))
             ? Tools::getValue('content')
             : $obj->content,
+            'bottom_content' => (!empty(Tools::getValue('bottom_content')))
+            ? Tools::getValue('bottom_content')
+            : $obj->bottom_content,
             'date_add' => (!empty(Tools::getValue('date_add')))
             ? Tools::getValue('date_add')
             : $obj->date_add,
@@ -454,6 +457,18 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
                         'hint' => $this->l('Will be shown on each pages'),
                         'required' => true,
                         'name' => 'content',
+                        'lang' => true,
+                        'autoload_rte' => true,
+                        'cols' => 60,
+                        'rows' => 30
+                    ),
+                    array(
+                        'type' => 'textarea',
+                        'label' => $this->l('Author bottom content'),
+                        'desc' => $this->l('Add here author bottom content'),
+                        'hint' => $this->l('Will be shown on each bottom pages'),
+                        'required' => false,
+                        'name' => 'bottom_content',
                         'lang' => true,
                         'autoload_rte' => true,
                         'cols' => 60,
@@ -706,29 +721,36 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
             $author->date_upd = date('Y-m-d H:i:s');
             // Multilingual fields
             foreach (Language::getLanguages(false) as $lang) {
-                if (!Tools::getValue('content_'.$lang['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('content_'.$lang['id_lang']), true)
+                if (Tools::getValue('content_'.$lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('content_'.$lang['id_lang']), true)
                 ) {
                     $this->errors[] = $this->l('Content is not valid for lang ').$lang['id_lang'];
                 } else {
                     $author->content[$lang['id_lang']] = Tools::getValue('content_'.$lang['id_lang']);
                 }
-                if (!Tools::getValue('meta_title_'.$lang['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('meta_title_'.$lang['id_lang']))
+                if (Tools::getValue('bottom_content_'.$lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('bottom_content_'.$lang['id_lang']), true)
+                ) {
+                    $this->errors[] = $this->l('Bottom content is not valid for lang ').$lang['id_lang'];
+                } else {
+                    $author->bottom_content[$lang['id_lang']] = Tools::getValue('bottom_content_'.$lang['id_lang']);
+                }
+                if (Tools::getValue('meta_title_'.$lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('meta_title_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Meta title is not valid for lang ').$lang['id_lang'];
                 } else {
                     $author->meta_title[$lang['id_lang']] = Tools::getValue('meta_title_'.$lang['id_lang']);
                 }
-                if (!Tools::getValue('meta_description_'.$lang['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('meta_description_'.$lang['id_lang']))
+                if (Tools::getValue('meta_description_'.$lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('meta_description_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Meta description is not valid for lang ').$lang['id_lang'];
                 } else {
                     $author->meta_description[$lang['id_lang']] = Tools::getValue('meta_description_'.$lang['id_lang']);
                 }
-                if (!Tools::getValue('link_rewrite_'.$lang['id_lang'])
-                    || !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$lang['id_lang']))
+                if (Tools::getValue('link_rewrite_'.$lang['id_lang'])
+                    && !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$lang['id_lang']))
                 ) {
                     $author->link_rewrite[$lang['id_lang']] = EverPsBlogCleaner::convertToUrlRewrite(
                         Tools::getValue('title_'.$lang['id_lang'])

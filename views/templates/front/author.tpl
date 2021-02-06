@@ -134,5 +134,12 @@
 {else}
 <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>
 {/if}
+{if isset($paginated) && !$paginated}
+<div class="container">
+    <div class="row authorbottomcontent {if $animated}zoomed{/if}" itemprop="articleBody">
+        {$author->bottom_content nofilter}
+    </div>
+</div>
+{/if}
 {hook h="displayAfterEverAuthor" everblogauthor=$author}
 {/block}

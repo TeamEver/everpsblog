@@ -28,6 +28,7 @@ class EverPsBlogTag extends ObjectModel
     public $link_rewrite;
     public $title;
     public $content;
+    public $bottom_content;
     public $id_ever_post_tag;
     public $id_lang;
     public $id_shop;
@@ -67,6 +68,11 @@ class EverPsBlogTag extends ObjectModel
                 'validate' => 'isString'
             ),
             'content' => array(
+                'type' => self::TYPE_HTML,
+                'lang' => true,
+                'validate' => 'isCleanHtml'
+            ),
+            'bottom_content' => array(
                 'type' => self::TYPE_HTML,
                 'lang' => true,
                 'validate' => 'isCleanHtml'

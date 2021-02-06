@@ -353,6 +353,18 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                     'rows' => 30
                 ),
                 array(
+                    'type' => 'textarea',
+                    'label' => $this->l('Category bottom content'),
+                    'desc' => $this->l('Please set category bottom content here'),
+                    'hint' => $this->l('Category content will be shown on bottom of page'),
+                    'required' => false,
+                    'name' => 'bottom_content',
+                    'lang' => true,
+                    'autoload_rte' => true,
+                    'cols' => 60,
+                    'rows' => 30
+                ),
+                array(
                     'type' => 'file',
                     'label' => $this->l('Category image'),
                     'desc' => $this->l('Featured category image'),
@@ -526,8 +538,8 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
             $category->date_upd = date('Y-m-d H:i:s');
             // Multilingual fields
             foreach (Language::getLanguages(false) as $lang) {
-                if (!Tools::getValue('title_'.$lang['id_lang'])
-                    || !Validate::isString(Tools::getValue('title_'.$lang['id_lang']))
+                if (Tools::getValue('title_'.$lang['id_lang'])
+                    && !Validate::isString(Tools::getValue('title_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l(
                         'Title is not valid for lang '
@@ -535,8 +547,8 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                 } else {
                     $category->title[$lang['id_lang']] = Tools::getValue('title_'.$lang['id_lang']);
                 }
-                if (!Tools::getValue('content_'.$lang['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('content_'.$lang['id_lang']), true)
+                if (Tools::getValue('content_'.$lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('content_'.$lang['id_lang']), true)
                 ) {
                     $this->errors[] = $this->l(
                         'Content is not valid for lang '
@@ -544,8 +556,17 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                 } else {
                     $category->content[$lang['id_lang']] = Tools::getValue('content_'.$lang['id_lang']);
                 }
-                if (!Tools::getValue('meta_title_'.$lang['id_lang'])
-                    || !Validate::isString(Tools::getValue('meta_title_'.$lang['id_lang']))
+                if (Tools::getValue('bottom_content_'.$lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('bottom_content_'.$lang['id_lang']), true)
+                ) {
+                    $this->errors[] = $this->l(
+                        'Bottom content is not valid for lang '
+                    ).$lang['id_lang'];
+                } else {
+                    $category->bottom_content[$lang['id_lang']] = Tools::getValue('bottom_content_'.$lang['id_lang']);
+                }
+                if (Tools::getValue('meta_title_'.$lang['id_lang'])
+                    && !Validate::isString(Tools::getValue('meta_title_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l(
                         'Meta title is not valid for lang '
@@ -553,8 +574,8 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                 } else {
                     $category->meta_title[$lang['id_lang']] = Tools::getValue('meta_title_'.$lang['id_lang']);
                 }
-                if (!Tools::getValue('meta_description_'.$lang['id_lang'])
-                    || !Validate::isString(Tools::getValue('meta_description_'.$lang['id_lang']))
+                if (Tools::getValue('meta_description_'.$lang['id_lang'])
+                    && !Validate::isString(Tools::getValue('meta_description_'.$lang['id_lang']))
                 ) {
                     $this->errors[] = $this->l(
                         'Meta description is not valid for lang '
@@ -564,8 +585,8 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                         'meta_description_'.$lang['id_lang']
                     );
                 }
-                if (!Tools::getValue('link_rewrite_'.$lang['id_lang'])
-                    || !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$lang['id_lang']))
+                if (Tools::getValue('link_rewrite_'.$lang['id_lang'])
+                    && !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$lang['id_lang']))
                 ) {
                     $category->link_rewrite[$lang['id_lang']] = EverPsBlogCleaner::convertToUrlRewrite(
                         Tools::getValue('title_'.$lang['id_lang'])

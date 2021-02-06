@@ -29,6 +29,7 @@ class EverPsBlogCategory extends ObjectModel
     public $meta_description;
     public $link_rewrite;
     public $content;
+    public $bottom_content;
     public $date_add;
     public $date_upd;
     public $id_parent_category;
@@ -68,6 +69,11 @@ class EverPsBlogCategory extends ObjectModel
                 'validate' => 'isString'
             ),
             'content' => array(
+                'type' => self::TYPE_HTML,
+                'lang' => true,
+                'validate' => 'isCleanHtml'
+            ),
+            'bottom_content' => array(
                 'type' => self::TYPE_HTML,
                 'lang' => true,
                 'validate' => 'isCleanHtml'

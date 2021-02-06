@@ -334,6 +334,18 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                     'rows' => 30
                 ),
                 array(
+                    'type' => 'textarea',
+                    'label' => $this->l('Tag bottom content'),
+                    'desc' => $this->l('Please set tag bottom content'),
+                    'hint' => $this->l('Tag content will be shown on bottom of page'),
+                    'required' => false,
+                    'name' => 'bottom_content',
+                    'lang' => true,
+                    'autoload_rte' => true,
+                    'cols' => 60,
+                    'rows' => 30
+                ),
+                array(
                     'type' => 'file',
                     'label' => $this->l('Tag image'),
                     'desc' => $this->l('Featured tag image'),
@@ -506,29 +518,36 @@ class AdminEverPsBlogTagController extends ModuleAdminController
             $tag->date_upd = date('Y-m-d H:i:s');
             // Multilingual fields
             foreach (Language::getLanguages(false) as $language) {
-                if (!Tools::getValue('title_'.$language['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('title_'.$language['id_lang']))
+                if (Tools::getValue('title_'.$language['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('title_'.$language['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Title is not valid for lang ').$language['id_lang'];
                 } else {
                     $tag->title[$language['id_lang']] = Tools::getValue('title_'.$language['id_lang']);
                 }
-                if (!Tools::getValue('content_'.$language['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('content_'.$language['id_lang']), true)
+                if (Tools::getValue('content_'.$language['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('content_'.$language['id_lang']), true)
                 ) {
                     $this->errors[] = $this->l('Content is not valid for lang ').$language['id_lang'];
                 } else {
                     $tag->content[$language['id_lang']] = Tools::getValue('content_'.$language['id_lang']);
                 }
-                if (!Tools::getValue('meta_title_'.$language['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('meta_title_'.$language['id_lang']))
+                if (Tools::getValue('bottom_content_'.$language['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('bottom_content_'.$language['id_lang']), true)
+                ) {
+                    $this->errors[] = $this->l('Content is not valid for lang ').$language['id_lang'];
+                } else {
+                    $tag->bottom_content[$language['id_lang']] = Tools::getValue('bottom_content_'.$language['id_lang']);
+                }
+                if (Tools::getValue('meta_title_'.$language['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('meta_title_'.$language['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Meta title is not valid for lang ').$language['id_lang'];
                 } else {
                     $tag->meta_title[$language['id_lang']] = Tools::getValue('meta_title_'.$language['id_lang']);
                 }
-                if (!Tools::getValue('meta_description_'.$language['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('meta_description_'.$language['id_lang']))
+                if (Tools::getValue('meta_description_'.$language['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('meta_description_'.$language['id_lang']))
                 ) {
                     $this->errors[] = $this->l('Meta description is not valid for lang ').$language['id_lang'];
                 } else {
@@ -536,8 +555,8 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                         'meta_description_'.$language['id_lang']
                     );
                 }
-                if (!Tools::getValue('link_rewrite_'.$language['id_lang'])
-                    || !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$language['id_lang']))
+                if (Tools::getValue('link_rewrite_'.$language['id_lang'])
+                    && !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$language['id_lang']))
                 ) {
                     $tag->link_rewrite[$language['id_lang']] = EverPsBlogCleaner::convertToUrlRewrite(
                         Tools::getValue('title_'.$language['id_lang'])

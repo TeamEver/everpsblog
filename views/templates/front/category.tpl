@@ -11,7 +11,7 @@
  * obtain it through the world-wide-web, please send an email
  * to license@prestashop.com so we can send you a copy immediately.
  *
- *  @author    Team Ever <https://www.team-ever.com/>
+ *  @category    Team Ever <https://www.team-ever.com/>
  *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
@@ -24,7 +24,7 @@
     {* <meta name="twitter:site" content="@publisher_handle"> *}
     <meta name="twitter:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
     <meta name="twitter:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
-    {* <meta name="twitter:creator" content="@author_handle"> *}
+    {* <meta name="twitter:creator" content="@category_handle"> *}
     <meta name="twitter:image" content="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$category->id|escape:'htmlall':'UTF-8'}.jpg">
     <!-- Open Graph Card data -->
     <meta property="og:type" content="website">
@@ -75,6 +75,13 @@
 </div>
 {include file='_partials/pagination.tpl' pagination=$pagination}
 {hook h="displayAfterEverLoop"}
+{if isset($paginated) && !$paginated}
+<div class="container">
+    <div class="row categorybottomcontent {if $animated}zoomed{/if}" itemprop="articleBody">
+        {$category->bottom_content nofilter}
+    </div>
+</div>
+{/if}
 {hook h="displayAfterEverCategory" everblogcategory=$category}
 {else}
 <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>

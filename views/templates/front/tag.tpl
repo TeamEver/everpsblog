@@ -79,6 +79,13 @@
 </div>
 {include file='_partials/pagination.tpl' pagination=$pagination}
 {hook h="displayAfterEverLoop"}
+{if isset($paginated) && !$paginated}
+<div class="container">
+    <div class="row tagbottomcontent {if $animated}zoomed{/if}" itemprop="articleBody">
+        {$tag->bottom_content nofilter}
+    </div>
+</div>
+{/if}
 {hook h="displayAfterEverTag" everblogtag=$tag}
 {else}
 <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>
