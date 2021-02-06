@@ -142,6 +142,7 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                     'id_lang' => $this->context->language->id,
                     'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'modules/everpsblog/views/img/',
                     'animated' => $animate,
+                    'show_featured_cat' => (bool)Configuration::get('EVERBLOG_SHOW_FEAT_CAT'),
                 )
             );
             if ($this->isSeven) {

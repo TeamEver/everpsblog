@@ -39,7 +39,7 @@
 {hook h="displayBeforeEverTag" everblogtag=$tag}
 <div class="container">
     <div class="row">
-        {if isset($paginated) && !$paginated}
+        {if isset($paginated) && !$paginated && isset($show_featured_tag) && $show_featured_tag}
         <div class="tag-header">
             <img src="{$featured_image|escape:'htmlall':'UTF-8'}" class="img img-fluid mx-auto d-block" alt="{$tag->title nofilter} {$shop.name|escape:htmlall:'UTF-8'}" title="{$tag->title nofilter} {$shop.name|escape:htmlall:'UTF-8'}">
         </div>

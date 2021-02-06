@@ -48,9 +48,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         $this->ip_banned = explode(',', Configuration::get('EVERBLOG_BANNED_IP'));
         $this->users_banned = explode(',', Configuration::get('EVERBLOG_BANNED_USERS'));
-        if (in_array($_SERVER['REMOTE_ADDR'], $this->ip_banned)
-            || in_array($this->context->customer->email, $this->users_banned)
-        ) {
+        if (in_array($_SERVER['REMOTE_ADDR'], $this->ip_banned)) {
             $this->allow_comments = false;
         } else {
             $this->allow_comments = (bool)Configuration::get('EVERBLOG_ALLOW_COMMENTS');
@@ -332,6 +330,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 (string)$this->post->title,
                 (int)Context::getContext()->customer->id
             );
+            $this->post->date_add = date('d-m-Y', strtotime($this->post->date_add));
             Hook::exec('actionBeforeEverPostInitContent', array(
                 'blog_post' => $this->post,
                 'blog_tags' => $tags,
@@ -372,7 +371,8 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                     'logged' => (bool)$this->context->customer->isLogged(),
                     'comments' => (array)$comments,
                     'commentsCount' => (int)$commentsCount,
-                    'allow_views_count' => (bool)Configuration::get('EVERBLOG_SHOW_POST_COUNT')
+                    'allow_views_count' => (bool)Configuration::get('EVERBLOG_SHOW_POST_COUNT'),
+                    'only_logged_comment' => (bool)Configuration::get('EVERBLOG_ONLY_LOGGED_COMMENT'),
                 )
             );
             if ($this->isSeven) {

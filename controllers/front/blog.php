@@ -163,6 +163,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
                 'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'modules/everpsblog/views/img/',
                 'animated' => $animate,
                 'pagination' => $pagination,
+                'show_featured_cat' => (bool)Configuration::get('EVERBLOG_SHOW_FEAT_CAT'),
             )
         );
         $this->setTemplate('module:everpsblog/views/templates/front/blog.tpl');

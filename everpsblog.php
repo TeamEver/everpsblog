@@ -38,7 +38,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '4.4.2';
+        $this->version = '4.4.3';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -639,9 +639,12 @@ class EverPsBlog extends Module
             'EVERBLOG_CHECK_COMMENTS' => Configuration::get('EVERBLOG_CHECK_COMMENTS'),
             'EVERBLOG_BANNED_USERS' => Configuration::get('EVERBLOG_BANNED_USERS'),
             'EVERBLOG_BANNED_IP' => Configuration::get('EVERBLOG_BANNED_IP'),
+            'EVERBLOG_ONLY_LOGGED_COMMENT' => Configuration::get('EVERBLOG_ONLY_LOGGED_COMMENT'),
             'EVERBLOG_EMPTY_TRASH' => Configuration::get('EVERBLOG_EMPTY_TRASH'),
             'EVERBLOG_ANIMATE' => Configuration::get('EVERBLOG_ANIMATE'),
             'EVERBLOG_RELATED_POST' => Configuration::get('EVERBLOG_RELATED_POST'),
+            'EVERBLOG_SHOW_FEAT_CAT' => Configuration::get('EVERBLOG_SHOW_FEAT_CAT'),
+            'EVERBLOG_SHOW_FEAT_TAG' => Configuration::get('EVERBLOG_SHOW_FEAT_TAG'),
             'EVERBLOG_ARCHIVE_COLUMNS' => Configuration::get('EVERBLOG_ARCHIVE_COLUMNS'),
             'EVERBLOG_TAG_COLUMNS' => Configuration::get('EVERBLOG_TAG_COLUMNS'),
             'EVERBLOG_CATEG_COLUMNS' => Configuration::get('EVERBLOG_CATEG_COLUMNS'),
@@ -859,7 +862,7 @@ class EverPsBlog extends Module
                         'label' => $this->l('Allow comments on posts ?'),
                         'desc' => $this->l('Set yes to allow comments'),
                         'hint' => $this->l('You can check them before publishing'),
-                        'required' => true,
+                        'required' => false,
                         'name' => 'EVERBLOG_ALLOW_COMMENTS',
                         'is_bool' => true,
                         'values' => array(
@@ -882,7 +885,28 @@ class EverPsBlog extends Module
                         'hint' => $this->l('In order to avoid spam'),
                         'required' => true,
                         'name' => 'EVERBLOG_CHECK_COMMENTS',
-                        'is_bool' => true,
+                        'is_bool' => false,
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No')
+                            )
+                        ),
+                    ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Allow only registered customers to comment ?'),
+                        'desc' => $this->l('Set yes to allow only registered customers to comment'),
+                        'hint' => $this->l('Else everyone will be able to comment'),
+                        'required' => true,
+                        'name' => 'EVERBLOG_ONLY_LOGGED_COMMENT',
+                        'is_bool' => false,
                         'values' => array(
                             array(
                                 'id' => 'active_on',
@@ -995,7 +1019,7 @@ class EverPsBlog extends Module
                         'label' => $this->l('Show tags list on left/right columns ?'),
                         'desc' => $this->l('Set yes to activate cool stuff'),
                         'hint' => $this->l('Set yes show a tags cloud on left or right columns'),
-                        'required' => true,
+                        'required' => false,
                         'name' => 'EVERBLOG_TAG_COLUMNS',
                         'is_bool' => true,
                         'values' => array(
@@ -1016,7 +1040,7 @@ class EverPsBlog extends Module
                         'label' => $this->l('Show archives list on left/right columns ?'),
                         'desc' => $this->l('Set yes show links for monthly posts on left or right columns'),
                         'hint' => $this->l('Will show yearly and monthly posts'),
-                        'required' => true,
+                        'required' => false,
                         'name' => 'EVERBLOG_ARCHIVE_COLUMNS',
                         'is_bool' => true,
                         'values' => array(
@@ -1037,8 +1061,48 @@ class EverPsBlog extends Module
                         'label' => $this->l('Show related posts on products pages ?'),
                         'desc' => $this->l('Set yes show related posts on product pages footer'),
                         'hint' => $this->l('Will show related posts on product page footer'),
-                        'required' => true,
+                        'required' => false,
                         'name' => 'EVERBLOG_RELATED_POST',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No')
+                            )
+                        ),
+                    ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Show featured images on categories ?'),
+                        'desc' => $this->l('Set yes to show each category featured image'),
+                        'hint' => $this->l('Else category featured image won\'t be shown'),
+                        'name' => 'EVERBLOG_SHOW_FEAT_CAT',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No')
+                            )
+                        ),
+                    ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Show featured images on tags ?'),
+                        'desc' => $this->l('Set yes to show each tag featured image'),
+                        'hint' => $this->l('Else tag featured image won\'t be shown'),
+                        'name' => 'EVERBLOG_SHOW_FEAT_TAG',
                         'is_bool' => true,
                         'values' => array(
                             array(

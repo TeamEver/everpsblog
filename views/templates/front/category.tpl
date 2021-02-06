@@ -37,9 +37,11 @@
 
 {block name="page_content"}
 {hook h="displayBeforeEverCategory" everblogcategory=$category}
+{if isset($show_featured_cat) && $show_featured_cat}
 <div class="category-header">
   <img src="{$featured_image|escape:'htmlall':'UTF-8'}" class="img img-fluid category-featured-image featured-image" alt="{$category->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$category->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
 </div>
+{/if}
 <h1 class="text-center">{$category->title|escape:'htmlall':'UTF-8'}</h1>
 {if isset($paginated) && !$paginated}
 <div class="container">

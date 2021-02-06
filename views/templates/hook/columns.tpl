@@ -49,7 +49,7 @@
 {if isset($everpsblog) && $everpsblog}
 <div id="latestCarousel" class="columns_everblog_wrapper latests_wrapper carousel slide" data-ride="carousel">
     <p class="text-uppercase h6 hidden-sm-down">
-        <a href="{$blogUrl|escape:'htmlall':'UTF-8'}">
+        <a href="{$blogUrl|escape:'htmlall':'UTF-8'}" title="{l s='Latest from the blog' mod='everpsblog'}">
             {l s='Latest from the blog' mod='everpsblog'}
         </a>
     </p>

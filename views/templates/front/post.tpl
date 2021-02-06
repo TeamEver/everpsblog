@@ -129,6 +129,34 @@
 </div>
 
 {if isset($allow_comments) && $allow_comments}
+
+{if isset($logged) && $logged ==  false && isset($only_logged_comment) && $only_logged_comment == true}
+<div class="card card-block mt-2">
+    <form action="{$link->getPageLink('authentication', true)}?back={$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $post->id_ever_post , 'link_rewrite' => $post->link_rewrite])|escape:'htmlall':'UTF-8'}" method="post" id="login-form" class="box">
+        <h3 class="page-subheading">{l s='Log in to comment' mod='everpsblog'}</h3>
+        <div class="form_content clearfix">
+            <div class="form-group">
+                <label>{l s='Email address' mod='everpsblog'}</label> 
+                <input class="is_required validate account_input form-control" id="email" name="email" value="" type="text" />
+            </div>
+        <div class="form-group">
+            <label>{l s='Password' mod='everpsblog'}</label>
+            <input class="form-control js-child-focus js-visible-password" type="password" id="password" name="password" value="" />
+        </div>
+        <p class="lost_password form-group">
+            <a href="{$link->getPageLink('password', true)}" title="{l s='Recover your forgotten password' mod='everpsblog'}">{l s='Forgot your password ?' mod='everpsblog'}</a>
+        </p>
+        <p class="submit">
+            <input type="hidden" name="submitLogin" value="1">
+            <input type="hidden" class="hidden" name="back" value="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $post->id_ever_post , 'link_rewrite' => $post->link_rewrite])|escape:'htmlall':'UTF-8'}" />
+            <button id="submit-login" class="btn btn-primary" data-link-action="sign-in" type="submit">
+            {l s='Login' mod='everpsblog'}
+          </button>
+        </p>
+        </div>
+    </form>
+</div>
+{else}
 <section class="container clearfix">
     <div class="row mt-2">
         <span id="leaveComment">{l s='Leave a comment' mod='everpsblog'}</span>
@@ -160,6 +188,7 @@
         </form>
     </div>
 </section>
+{/if}
 
 {if isset($commentsCount) && $commentsCount > 0}
 {hook h="displayBeforeEverComment"}
