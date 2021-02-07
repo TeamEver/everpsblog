@@ -22,7 +22,7 @@
     <!-- Twitter Card data -->
     <meta name="twitter:card" content="summary">
     {* <meta name="twitter:site" content="@publisher_handle"> *}
-    <meta name="twitter:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'} {if isset($pagination) && $pagination.current_page > 0}{l s='(page' mod='everpsblog'} {$pagination.current_page}/{$pagination.pages_count}{l s=')' mod='everpsblog'}{/if}">
+    <meta name="twitter:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'} {if isset($pagination) && $pagination.current_page > 0}{l s='(page' mod='everpsblog'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' mod='everpsblog'}{/if}">
     <meta name="twitter:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
     {* <meta name="twitter:creator" content="@author_handle"> *}
     <meta name="twitter:image" content="{$shop.logo|escape:'htmlall':'UTF-8'}">
@@ -33,10 +33,16 @@
     <meta property="og:site_name" content="{$shop.name|escape:'htmlall':'UTF-8'}">
     <meta property="og:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
     <meta property="og:image" content="{$shop.logo|escape:'htmlall':'UTF-8'}">
+    {if isset($allow_feed) && $allow_feed}
+    <link rel="alternate" type="application/rss+xml" title="{$page.meta.title|escape:'htmlall':'UTF-8'} {if isset($pagination) && $pagination.current_page > 0}{l s='(page' mod='everpsblog'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' mod='everpsblog'}{/if}" href="{$feed_url|escape:'htmlall':'UTF-8'}" />
+    {/if}
 {/block}
 
 {block name="page_content"}
 <h1 class="text-center">{l s='Our blog' mod='everpsblog'}</h1>
+{if isset($allow_feed) && $allow_feed}
+<a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' mod='everpsblog'} {$page.meta.title|escape:'htmlall':'UTF-8'}</a>
+{/if}
 <span class="paginated float-right d-none">{if isset($pagination) && $pagination.current_page > 0}{l s='(page' mod='everpsblog'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' mod='everpsblog'}{/if}</span>
 {if isset($paginated) && !$paginated}
 {if isset($default_blog_top_text) && $default_blog_top_text}
@@ -67,17 +73,17 @@
     <article class="col-12 col-xs-12 article everpsblog" id="everpsblog-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
         <div class="row">
             <div class="col-12 col-xs-12 col-md-4 article-img">
-                <img src="{$item.featured_image|escape:'htmlall':'UTF-8'}" class="img-fluid {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item.title nofilter} {$shop.name|escape:htmlall:'UTF-8'}" title="{$item.title nofilter} {$shop.name|escape:'htmlall':'UTF-8'}" />
+                <img src="{$item.featured_image|escape:'htmlall':'UTF-8'}" class="img-fluid {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" />
             </div>
             <div class="col-12 col-xs-12 col-md-8">
                 <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
-                    <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item.title nofilter} {$shop.name|escape:htmlall:'UTF-8'}">
-                        {$item.title nofilter}
+                    <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}">
+                        {$item.title|escape:'htmlall':'UTF-8'}
                     </a>
                 </h3>
                 <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
                     {$item.content nofilter}
-                    <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary" title="{$item.title nofilter} {$shop.name|escape:htmlall:'UTF-8'}">{l s='Read more' mod='everpsblog'}</a>
+                    <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary btn-blog-primary" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}">{l s='Read more' mod='everpsblog'}</a>
                 </div>
             </div>
         </div>
@@ -91,10 +97,13 @@
     {include file='_partials/pagination.tpl' pagination=$pagination}
 </div>
 {hook h="displayAfterEverLoop"}
+
+{if isset($paginated) && !$paginated}
 {if isset($default_blog_bottom_text) && $default_blog_bottom_text}
 <div class="row mt-2">
     {$default_blog_bottom_text nofilter}
 </div>
+{/if}
 {/if}
 {if isset($everhome_products) && $everhome_products}
 <section id="products" class="mt-2">

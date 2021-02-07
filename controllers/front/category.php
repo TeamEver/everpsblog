@@ -46,6 +46,7 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
     public function init()
     {
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
+        $this->module_name = 'everpsblog';
         $this->category = new EverPsBlogCategory(
             (int)Tools::getValue('id_ever_category'),
             (int)$this->context->language->id,
@@ -75,7 +76,7 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
             );
         }
 
-        return parent::l($string, $class, $addslashes, $htmlentities);
+        return parent::l($string, $specific, $class, $addslashes, $htmlentities);
     }
 
     public function initContent()
@@ -121,6 +122,14 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                 (int)$this->category->id,
                 (int)$pagination['items_shown_from'] - 1
             );
+            $this->category->content = EverPsBlogPost::changeShortcodes(
+                (string)$this->category->content,
+                (int)Context::getContext()->customer->id
+            );
+            $this->category->bottom_content = EverPsBlogPost::changeShortcodes(
+                (string)$this->category->bottom_content,
+                (int)Context::getContext()->customer->id
+            );
             Hook::exec('actionBeforeEverCategoryInitContent', array(
                 'blog_category' => $this->category,
                 'blog_posts' => $posts
@@ -130,8 +139,21 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                 (int)$this->context->shop->id,
                 'category'
             );
+            $feed_url = $this->context->link->getModuleLink(
+                $this->module_name,
+                'feed',
+                array(
+                    'feed' => 'category',
+                    'id_obj' => $this->category->id
+                ),
+                true,
+                (int)$this->context->language->id,
+                (int)$this->context->shop->id
+            );
             $this->context->smarty->assign(
                 array(
+                    'allow_feed' => (bool)Configuration::get('EVERBLOG_RSS'),
+                    'feed_url' => $feed_url,
                     'featured_image' => $file_url,
                     'paginated' => Tools::getValue('page'),
                     'post_number' => (int)$this->post_number,
@@ -221,6 +243,7 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
     public function getTemplateVarPage()
     {
         $page = parent::getTemplateVarPage();
+        $page['body_classes']['page-everblog'] = true;
         $page['body_classes']['page-everblog-category'] = true;
         $page['body_classes']['page-everblog-category-id-'.(int)$this->category->id] = true;
         if ((bool)Context::getContext()->customer->isLogged()) {

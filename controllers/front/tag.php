@@ -44,6 +44,8 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
 
     public function init()
     {
+        $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
+        $this->module_name = 'everpsblog';
         $this->tag = new EverPsBlogTag(
             (int)Tools::getValue('id_ever_tag'),
             (int)$this->context->language->id,
@@ -56,7 +58,6 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
         if (!$this->tag->active) {
             Tools::redirect('index.php');
         }
-        $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
     }
 
     public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
@@ -69,7 +70,7 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
             );
         }
 
-        return parent::l($string, $class, $addslashes, $htmlentities);
+        return parent::l($string, $specific, $class, $addslashes, $htmlentities);
     }
 
     public function initContent()
@@ -121,8 +122,21 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
                 (int)$this->context->shop->id,
                 'tag'
             );
+            $feed_url = $this->context->link->getModuleLink(
+                $this->module_name,
+                'feed',
+                array(
+                    'feed' => 'tag',
+                    'id_obj' => $this->tag->id
+                ),
+                true,
+                (int)$this->context->language->id,
+                (int)$this->context->shop->id
+            );
             $this->context->smarty->assign(
                 array(
+                    'allow_feed' => (bool)Configuration::get('EVERBLOG_RSS'),
+                    'feed_url' => $feed_url,
                     'featured_image' => $file_url,
                     'paginated' => Tools::getValue('page'),
                     'post_number' => (int)$this->post_number,
@@ -190,6 +204,7 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
     public function getTemplateVarPage()
     {
         $page = parent::getTemplateVarPage();
+        $page['body_classes']['page-everblog'] = true;
         $page['body_classes']['page-everblog-tag'] = true;
         $page['body_classes']['page-everblog-tag-id-'.(int)$this->tag->id] = true;
         if ((bool)Context::getContext()->customer->isLogged()) {

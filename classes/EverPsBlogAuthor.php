@@ -149,21 +149,53 @@ class EverPsBlogAuthor extends ObjectModel
 
     public static function getAllAuthors($id_lang, $id_shop, $active = 1)
     {
-        $sql = new DbQuery;
-        $sql->select('*');
-        $sql->from('ever_blog_author', 'eba');
-        $sql->leftJoin(
-            'ever_blog_author_lang',
-            'ebl',
-            'ebl.id_ever_author = eba.id_ever_author'
-        );
-        $sql->where('eba.active = '.(int)$active);
-        $sql->where('eba.id_shop = '.(int)$id_shop);
-        $sql->where('ebl.id_lang = '.(int)$id_lang);
-        $sql->orderBy('eba.date_add DESC');
-        $authors = Db::getInstance()->executeS($sql);
-        if (count($authors)) {
-            return $authors;
+        $cache_id = 'EverPsBlogAuthor::getAllAuthors_'
+        .(int)$id_lang
+        .'_'
+        .(int)$id_shop
+        .'_'
+        .(int)$active;
+        if (!Cache::isStored($cache_id)) {
+            $sql = new DbQuery;
+            $sql->select('*');
+            $sql->from('ever_blog_author', 'eba');
+            $sql->leftJoin(
+                'ever_blog_author_lang',
+                'ebl',
+                'ebl.id_ever_author = eba.id_ever_author'
+            );
+            $sql->where('eba.active = '.(int)$active);
+            $sql->where('eba.id_shop = '.(int)$id_shop);
+            $sql->where('ebl.id_lang = '.(int)$id_lang);
+            $sql->orderBy('eba.date_add DESC');
+            $authors = Db::getInstance()->executeS($sql);
+            if (count($authors)) {
+                Cache::store($cache_id, $authors);
+                return $authors;
+            }
         }
+        return Cache::retrieve($cache_id);
+    }
+
+    public static function getAuthorByNickhandle($nickhandle)
+    {
+        $cache_id = 'EverPsBlogAuthor::getAuthorByNickhandle_'
+        .(string)$nickhandle;
+        if (!Cache::isStored($cache_id)) {
+            $sql = new DbQuery;
+            $sql->select('id_ever_author');
+            $sql->from('ever_blog_author');
+            $sql->where('nickhandle = "'.pSQL($nickhandle).'"');
+            $id_author = Db::getInstance()->getValue($sql);
+            if ($id_author) {
+                $return = new self($id_author);
+                Cache::store($cache_id, $return);
+                return $return;
+            } else {
+                Cache::store($cache_id, false);
+                return false;
+            }
+        }
+        return Cache::retrieve($cache_id);
     }
 }

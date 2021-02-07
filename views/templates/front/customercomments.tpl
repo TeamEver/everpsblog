@@ -33,11 +33,8 @@
 <div class="content">
     <div class="row">
 {foreach from=$cust_comments item=comment}
-        <div class="col-xs-12 col-12 col-md-3 article everpsblog bordered" id="comment-{$comment.post->id|escape:'htmlall':'UTF-8'}" style="border:1px solid black;">
+        <div class="col-xs-12 col-12 article everpsblog bordered card card-block" id="comment-{$comment.post->id|escape:'htmlall':'UTF-8'}" style="border:1px solid black;">
             <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $comment.post->id , 'link_rewrite' => $comment.post->link_rewrite])|escape:'htmlall':'UTF-8'}">
-                <div class="col-xs-12 col-12 article-img">
-                    <img src="{$comment.post->featured_image|escape:'htmlall':'UTF-8'}" class="col-xs-12 col-12 img img-fluid mt-2 {if $animated}animated flipSideBySide zoomed{/if}"/>
-                </div>
                 <div class="col-xs-12">
                     <h3>{$comment.post->title|escape:'htmlall':'UTF-8'}</h3>
                 </div>
@@ -48,7 +45,7 @@
                     </div>
                 </div>
             </a>
-            <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $comment.post->id , 'link_rewrite' => $comment.post->link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary">{l s='See post' mod='everpsblog'}</a>
+            <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $comment.post->id , 'link_rewrite' => $comment.post->link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary btn-blog-primary">{l s='See post' mod='everpsblog'}</a>
         </div>
 {/foreach}
     </div>

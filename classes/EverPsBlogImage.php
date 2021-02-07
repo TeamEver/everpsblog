@@ -68,48 +68,104 @@ class EverPsBlogImage extends ObjectModel
         return $image_types;
     }
 
+    public static function getAllBlogImages()
+    {
+        $cache_id = 'EverPsBlogImage::getAllBlogImages';
+        if (!Cache::isStored($cache_id)) {
+            $sql = new DbQuery;
+            $sql->select('*');
+            $sql->from('ever_blog_image');
+            $images = Db::getInstance()->executeS($sql);
+            $featured_images = array();
+            foreach ($images as $image) {
+                $featured_images[] = new self(
+                    (int)$image['id_ever_image']
+                );
+            }
+            Cache::store($cache_id, $featured_images);
+            return $featured_images;
+        }
+        return Cache::retrieve($cache_id);
+    }
+
+
     public static function getBlogImage($id_element, $id_shop, $image_type)
     {
-        $sql = new DbQuery;
-        $sql->select('id_ever_image');
-        $sql->from('ever_blog_image');
-        $sql->where('id_element = '.(int)$id_element);
-        $sql->where('id_shop = '.(int)$id_shop);
-        $sql->where('image_type = "'.pSQL($image_type).'"');
-        $id_image = Db::getInstance()->getValue($sql);
-        $image = new self(
-            (int)$id_image
-        );
-        if (Validate::isLoadedObject($image)) {
-            return $image;
+        $cache_id = 'EverPsBlogImage::getBlogImage_'
+        .(int)$id_element
+        .'_'
+        .(int)$id_shop
+        .'_'
+        .$image_type;
+        if (!Cache::isStored($cache_id)) {
+            $sql = new DbQuery;
+            $sql->select('id_ever_image');
+            $sql->from('ever_blog_image');
+            $sql->where('id_element = '.(int)$id_element);
+            $sql->where('id_shop = '.(int)$id_shop);
+            $sql->where('image_type = "'.pSQL($image_type).'"');
+            $id_image = Db::getInstance()->getValue($sql);
+            $image = new self(
+                (int)$id_image
+            );
+            if (Validate::isLoadedObject($image)) {
+                Cache::store($cache_id, $image);
+                return $image;
+            }
+            Cache::store($cache_id, false);
+            return false;
         }
-        return false;
+        return Cache::retrieve($cache_id);
     }
 
     public static function getBlogImageUrl($id_element, $id_shop, $image_type)
     {
-        $image = self::getBlogImage(
-            (int)$id_element,
-            (int)$id_shop,
-            $image_type
-        );
-        if (!Validate::isLoadedObject($image)) {
-            // If image is not set, return logo
-            return Tools::getHttpHost(true)
-            .__PS_BASE_URI__
-            .'/img/'
-            .Configuration::get(
-                'PS_LOGO'
+        $cache_id = 'EverPsBlogImage::getBlogImageUrl_'
+        .(int)$id_element
+        .'_'
+        .(int)$id_shop
+        .'_'
+        .$image_type;
+        if (!Cache::isStored($cache_id)) {
+            $image = self::getBlogImage(
+                (int)$id_element,
+                (int)$id_shop,
+                $image_type
             );
+            if (!Validate::isLoadedObject($image)) {
+                // If image is not set, return logo
+                $return = Tools::getHttpHost(true)
+                .__PS_BASE_URI__
+                .'/img/'
+                .Configuration::get(
+                    'PS_LOGO'
+                );
+                Cache::store($cache_id, $return);
+                return $return;
+            }
+            // Return file URL
+            $return = Tools::getHttpHost(true)
+            .__PS_BASE_URI__
+            .$image->image_link;
+            Cache::store($cache_id, $return);
+            return $return;
         }
-        // Return file URL
-        return Tools::getHttpHost(true)
-        .__PS_BASE_URI__
-        .'modules/everpsblog/views/img/'
-        .$image->image_link;
+        return Cache::retrieve($cache_id);
     }
 
     public static function blogFileExist($id_element, $image_type)
+    {
+        $file = _PS_IMG_DIR_
+        .$image_type.'/'
+        .(int)$id_element
+        .'.jpg';
+        if (file_exists($file)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static function oldBlogFileExist($id_element, $image_type)
     {
         switch ($image_type) {
             case 'post':
@@ -163,7 +219,7 @@ class EverPsBlogImage extends ObjectModel
                 (int)$id_shop,
                 'post'
             );
-            if (!Validate::isLoadedObject($exists) && self::blogFileExist($post['id_ever_post'], 'post')) {
+            if (!Validate::isLoadedObject($exists) && self::oldBlogFileExist($post['id_ever_post'], 'post')) {
                 $featured_image = new self();
                 $featured_image->id_element = $post['id_ever_post'];
                 $featured_image->image_type = 'post';
@@ -189,7 +245,7 @@ class EverPsBlogImage extends ObjectModel
                 (int)$id_shop,
                 'category'
             );
-            if (!Validate::isLoadedObject($exists) && self::blogFileExist($category['id_ever_category'], 'category')) {
+            if (!Validate::isLoadedObject($exists) && self::oldBlogFileExist($category['id_ever_category'], 'category')) {
                 $featured_image = new self();
                 $featured_image->id_element = $category['id_ever_category'];
                 $featured_image->image_type = 'category';
@@ -215,7 +271,7 @@ class EverPsBlogImage extends ObjectModel
                 (int)$id_shop,
                 'tag'
             );
-            if (!Validate::isLoadedObject($exists) && self::blogFileExist($tag['id_ever_tag'], 'tag')) {
+            if (!Validate::isLoadedObject($exists) && self::oldBlogFileExist($tag['id_ever_tag'], 'tag')) {
                 $featured_image = new self();
                 $featured_image->id_element = $tag['id_ever_tag'];
                 $featured_image->image_type = 'tag';
@@ -241,7 +297,7 @@ class EverPsBlogImage extends ObjectModel
                 (int)$id_shop,
                 'author'
             );
-            if (!Validate::isLoadedObject($exists) && self::blogFileExist($author['id_ever_author'], 'author')) {
+            if (!Validate::isLoadedObject($exists) && self::oldBlogFileExist($author['id_ever_author'], 'author')) {
                 $featured_image = new self();
                 $featured_image->id_element = $author['id_ever_author'];
                 $featured_image->image_type = 'author';

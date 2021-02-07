@@ -36,7 +36,7 @@
     <script type="application/ld+json">
     {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "{$blog_type|escape:'htmlall':'UTF-8'}",
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": "https://google.com/article"
@@ -119,7 +119,7 @@
               <span>{l s='Share' d='Shop.Theme.Actions'}</span>
               <ul>
                 {foreach from=$social_share_links item='social_share_link'}
-                  <li class="{$social_share_link.class} icon-gray"><a href="{$social_share_link.url}" class="text-hide" title="{$social_share_link.label}" target="_blank">{$social_share_link.label}</a></li>
+                  <li class="{$social_share_link.class|escape:'htmlall':'UTF-8'} icon-gray"><a href="{$social_share_link.url|escape:'htmlall':'UTF-8'}" class="text-hide" title="{$social_share_link.label|escape:'htmlall':'UTF-8'}" target="_blank">{$social_share_link.label|escape:'htmlall':'UTF-8'}</a></li>
                 {/foreach}
               </ul>
             </div>
@@ -132,7 +132,7 @@
 
 {if isset($logged) && $logged ==  false && isset($only_logged_comment) && $only_logged_comment == true}
 <div class="card card-block mt-2">
-    <form action="{$link->getPageLink('authentication', true)}?back={$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $post->id_ever_post , 'link_rewrite' => $post->link_rewrite])|escape:'htmlall':'UTF-8'}" method="post" id="login-form" class="box">
+    <form action="{$link->getPageLink('authentication', true)|escape:'htmlall':'UTF-8'}?back={$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $post->id_ever_post , 'link_rewrite' => $post->link_rewrite])|escape:'htmlall':'UTF-8'}" method="post" id="login-form" class="box">
         <h3 class="page-subheading">{l s='Log in to comment' mod='everpsblog'}</h3>
         <div class="form_content clearfix">
             <div class="form-group">
@@ -144,12 +144,12 @@
             <input class="form-control js-child-focus js-visible-password" type="password" id="password" name="password" value="" />
         </div>
         <p class="lost_password form-group">
-            <a href="{$link->getPageLink('password', true)}" title="{l s='Recover your forgotten password' mod='everpsblog'}">{l s='Forgot your password ?' mod='everpsblog'}</a>
+            <a href="{$link->getPageLink('password', true)|escape:'htmlall':'UTF-8'}" title="{l s='Recover your forgotten password' mod='everpsblog'}">{l s='Forgot your password ?' mod='everpsblog'}</a>
         </p>
         <p class="submit">
             <input type="hidden" name="submitLogin" value="1">
             <input type="hidden" class="hidden" name="back" value="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $post->id_ever_post , 'link_rewrite' => $post->link_rewrite])|escape:'htmlall':'UTF-8'}" />
-            <button id="submit-login" class="btn btn-primary" data-link-action="sign-in" type="submit">
+            <button id="submit-login" class="btn btn-primary btn-blog-primary" data-link-action="sign-in" type="submit">
             {l s='Login' mod='everpsblog'}
           </button>
         </p>
@@ -184,7 +184,7 @@
                 {l s='RGPD compliance' mod='everpsblog'}
             </label>
             </div>
-            <button type="submit" class="btn btn-primary" id="everpostcomment" name="everpostcomment">{l s='Submit' mod='everpsblog'}</button>
+            <button type="submit" class="btn btn-primary btn-blog-primary" id="everpostcomment" name="everpostcomment">{l s='Submit' mod='everpsblog'}</button>
         </form>
     </div>
 </section>
@@ -192,7 +192,7 @@
 
 {if isset($commentsCount) && $commentsCount > 0}
 {hook h="displayBeforeEverComment"}
-<section class="comments container clearfix">
+<section class="comments container clearfix mt-2">
     <span id="commentsTitle">{$commentsCount|escape:'htmlall':'UTF-8'} {l s='comment(s)' mod='everpsblog'}</span>
     <div class="commentcontainer row">
         {foreach from=$comments item=comment}

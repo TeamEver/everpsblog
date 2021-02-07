@@ -58,6 +58,15 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 'align' => 'left',
                 'width' => 25
             ),
+            'featured_img' => array(
+                'title' => $this->l('Featured image'),
+                'align' => 'center',
+                'width' => 25,
+                'orderby' => false,
+                'filter' => false,
+                'search' => false,
+                'image' => 'post',
+            ),
             'title' => array(
                 'title' => $this->l('Post title'),
                 'align' => 'left',
@@ -116,6 +125,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             LEFT JOIN `'._DB_PREFIX_.'ever_blog_image` ai
                 ON (
                     ai.`id_ever_image` = a.`id_ever_post`
+                    AND ai.`image_type` = "post"
                 )';
         $this->_where = 'AND a.id_shop = '.(int)Context::getContext()->shop->id;
         $this->_where = 'AND l.id_lang = '.(int)Context::getContext()->language->id;
@@ -214,7 +224,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
     public function renderList()
     {
         $this->addRowAction('edit');
-        $this->addRowAction('delete');
+        $this->addRowAction('deletePost');
         $this->addRowAction('duplicate');
         $this->addRowAction('ViewPost');
         $this->bulk_actions = array(
@@ -228,17 +238,21 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             ),
         );
 
+        if (Tools::getIsset('deletePost'.$this->table)) {
+            $everObj = new EverPsBlogPost(
+                (int)Tools::getValue('id_ever_post')
+            );
+            if (Validate::isLoadedObject($everObj)) {
+                $everObj->delete();
+            }
+        }
+
         if (Tools::isSubmit('submitBulkdelete'.$this->table)) {
             $this->processBulkDelete();
         }
 
         if (Tools::isSubmit('submitBulkduplicateall'.$this->table)) {
             $this->processBulkDuplicate();
-        }
-        if ((bool)Tools::getValue('deleteLogoImage') && (int)Tools::getValue('ever_blog_obj')) {
-            $this->processDeleteObjImage(
-                (int)Tools::getValue('ever_blog_obj')
-            );
         }
 
         $lists = parent::renderList();
@@ -388,7 +402,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             ),
         );
 
-        if ($obj) {
+        if (Validate::isLoadedObject($obj)) {
             $link = new Link();
             $id_lang = (int)Context::getContext()->language->id;
             $objectUrl = $link->getModuleLink(
@@ -837,21 +851,24 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             }
             if (!count($this->errors)) {
                 $post->save();
-                $post_img_destination = _PS_MODULE_DIR_
-                .'everpsblog/views/img/posts/post_image_'
+                $post_img_link = 'img/post/'
                 .(int)$post->id
                 .'.jpg';
-                $post_img_link = 'posts/post_image_'
+                $ps_posts_destination = _PS_IMG_DIR_
+                .'post/'
                 .(int)$post->id
                 .'.jpg';
+                if (!file_exists(_PS_IMG_DIR_.'post')) {
+                    mkdir(_PS_IMG_DIR_.'post', 0755, true);
+                }
                 /* upload the image */
                 if (isset($_FILES['post_image'])
                     && isset($_FILES['post_image']['tmp_name'])
                     && !empty($_FILES['post_image']['tmp_name'])
                 ) {
                     Configuration::set('PS_IMAGE_GENERATION_METHOD', 1);
-                    if (file_exists($post_img_destination)) {
-                        unlink($post_img_destination);
+                    if (file_exists($ps_posts_destination)) {
+                        unlink($ps_posts_destination);
                     }
                     if ($error = ImageManager::validateUpload($_FILES['post_image'])) {
                         $this->errors .= $error;
@@ -859,7 +876,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         || !move_uploaded_file($_FILES['post_image']['tmp_name'], $tmp_name)
                     ) {
                         return false;
-                    } elseif (!ImageManager::resize($tmp_name, $post_img_destination)) {
+                    } elseif (!ImageManager::resize($tmp_name, $ps_posts_destination)) {
                         $this->errors .= $this->l(
                             'An error occurred while attempting to upload the image.'
                         );
@@ -889,6 +906,28 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         parent::postProcess();
     }
 
+    public function displayDeletePostLink($token, $id_ever_post)
+    {
+        if (!$token) {
+            return;
+        }
+        $drop_url  = 'index.php?controller=AdminEverPsBlogPost';
+        $drop_url  .= '&deletePost'.$this->table;
+        $drop_url  .= '&id_ever_post='.$id_ever_post;
+        $drop_url  .= '&token=';
+        $drop_url .= Tools::getAdminTokenLite('AdminEverPsBlogPost');
+
+        $this->context->smarty->assign(array(
+            'href' => $drop_url,
+            'confirm' => $this->l('Delete post ?'),
+            'action' => $this->l('Delete post')
+        ));
+
+        return $this->context->smarty->fetch(
+            _PS_MODULE_DIR_.'everpsblog/views/templates/admin/helpers/lists/list_action_delete_post.tpl'
+        );
+    }
+
     public function displayViewPostLink($token, $id_ever_post)
     {
         if (!$token) {
@@ -913,7 +952,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         ));
 
         return $this->context->smarty->fetch(
-            _PS_MODULE_DIR_.'everpsblog/views/templates/admin/helpers/lists/list_action_view_order.tpl'
+            _PS_MODULE_DIR_.'everpsblog/views/templates/admin/helpers/lists/list_action_view_obj.tpl'
         );
     }
 
@@ -939,14 +978,6 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         return $duplicate;
     }
 
-    public function processDeleteObjImage($id_obj)
-    {
-        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.(int)$id_obj.'.jpg')) {
-                $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$id_obj.'.jpg';
-                return unlink($old_img);
-        }
-    }
-
     protected function duplicatePost($id_ever_post)
     {
         $everObj = new EverPsBlogPost(
@@ -958,7 +989,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         $new_everObj->id_author = $everObj->id_author;
         $new_everObj->index = $everObj->index;
         $new_everObj->follow = $everObj->follow;
-        $new_everObj->post_status = $everObj->post_status;
+        $new_everObj->sitemap = $everObj->sitemap;
+        $new_everObj->post_status = 'draft';
         $new_everObj->post_categories = $everObj->post_categories;
         $new_everObj->post_tags = $everObj->post_tags;
         $new_everObj->post_products = $everObj->post_products;
@@ -972,20 +1004,44 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             $new_everObj->link_rewrite[$language['id_lang']] = $everObj->link_rewrite[$language['id_lang']];
         }
         if ($new_everObj->save()) {
-            $new_img = _PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$new_everObj->id.'.jpg';
-            if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/posts/post_image_'.$id_ever_post.'.jpg')) {
-                $old_img = Tools::getHttpHost(true)
-                .__PS_BASE_URI__
-                .'modules/everpsblog/views/img/posts/post_image_'
-                .$id_ever_post
+            $everObj_featured_image = EverPsBlogImage::getBlogImage(
+                (int)$everObj->id,
+                (int)Context::getContext()->shop->id,
+                'post'
+            );
+            if (Validate::isLoadedObject($everObj_featured_image)) {
+                $new_everObj_featured_image = new EverPsBlogImage();
+                $new_everObj_featured_image->id_element = (int)$new_everObj->id;
+                $new_everObj_featured_image->image_type = 'post';
+                $post_img_link = 'img/post/'
+                .(int)$new_everObj->id
                 .'.jpg';
-            } else {
-                $old_img = Tools::getHttpHost(true).__PS_BASE_URI__.'/img/'.Configuration::get(
-                    'PS_LOGO'
-                );
-            }
-            if (copy($old_img, $new_img)) {
-                return true;
+                $new_everObj_featured_image->image_link = $post_img_link;
+                $new_everObj_featured_image->id_shop = (int)$everObj_featured_image->id_shop;
+                $new_everObj_featured_image->save();
+                // Copy featured image file
+                $old_ps_img = _PS_IMG_DIR_
+                .'post/'
+                .(int)$everObj->id
+                .'.jpg';
+                if (file_exists($old_ps_img)) {
+                    $old_img = Tools::getHttpHost(true)
+                    .__PS_BASE_URI__
+                    .'img/post/'
+                    .(int)$id_ever_post
+                    .'.jpg';
+                } else {
+                    $old_img = Tools::getHttpHost(true).__PS_BASE_URI__.'/img/'.Configuration::get(
+                        'PS_LOGO'
+                    );
+                }
+                $new_ps_img = _PS_IMG_DIR_
+                .'post/'
+                .(int)$new_everObj->id
+                .'.jpg';
+                if (copy($old_img, $new_ps_img)) {
+                    return true;
+                }
             }
         }
     }

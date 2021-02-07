@@ -184,68 +184,100 @@ class EverPsBlogTaxonomy extends ObjectModel
 
     public static function getPostTagsTaxonomies($id_post)
     {
-        $sql = new DbQuery;
-        $sql->select('id_ever_post_tag');
-        $sql->from('ever_blog_post_tag');
-        $sql->where('id_ever_post = '.(int)$id_post);
-        $taxonomies = Db::getInstance()->executeS($sql);
-        return $taxonomies;
+        $cache_id = 'EverPsBlogTaxonomy::getPostTagsTaxonomies_'
+        .(int)$id_post;
+        if (!Cache::isStored($cache_id)) {
+            $sql = new DbQuery;
+            $sql->select('id_ever_post_tag');
+            $sql->from('ever_blog_post_tag');
+            $sql->where('id_ever_post = '.(int)$id_post);
+            $taxonomies = Db::getInstance()->executeS($sql);
+            Cache::store($cache_id, $taxonomies);
+            return $taxonomies;
+        }
+        return Cache::retrieve($cache_id);
     }
 
     public static function getPostCategoriesTaxonomies($id_post)
     {
-        $sql = new DbQuery;
-        $sql->select('epc.id_ever_post_category');
-        $sql->from('ever_blog_post_category', 'epc');
-        $sql->leftJoin(
-            'ever_blog_category',
-            'bc',
-            'bc.id_ever_category = epc.id_ever_post_category'
-        );
-        $sql->where('epc.id_ever_post = '.(int)$id_post);
-        $sql->orderBy('bc.id_parent_category ASC');
-        $sql->groupBy('bc.id_ever_category');
-        $taxonomies = Db::getInstance()->executeS($sql);
-        return $taxonomies;
+        $cache_id = 'EverPsBlogTaxonomy::getPostCategoriesTaxonomies_'
+        .(int)$id_post;
+        if (!Cache::isStored($cache_id)) {
+            $sql = new DbQuery;
+            $sql->select('epc.id_ever_post_category');
+            $sql->from('ever_blog_post_category', 'epc');
+            $sql->leftJoin(
+                'ever_blog_category',
+                'bc',
+                'bc.id_ever_category = epc.id_ever_post_category'
+            );
+            $sql->where('epc.id_ever_post = '.(int)$id_post);
+            $sql->orderBy('bc.id_parent_category ASC');
+            $sql->groupBy('bc.id_ever_category');
+            $taxonomies = Db::getInstance()->executeS($sql);
+            Cache::store($cache_id, $taxonomies);
+            return $taxonomies;
+        }
+        return Cache::retrieve($cache_id);
     }
 
     public static function getCategoryParentsTaxonomy($id_category, $active = 1)
     {
-        $taxonomies = array();
-        $sql = new DbQuery;
-        $sql->select('id_parent_category');
-        $sql->from('ever_blog_category');
-        $sql->where('id_ever_category = '.(int)$id_category);
-        $sql->where('active = '.(int)$active);
-        $taxonomy = Db::getInstance()->getValue($sql);
-        if (isset($taxonomy) && (int)$taxonomy > 0) {
-            $taxonomies[] = $taxonomy;
-            $taxonomies[] = self::getCategoryParentsTaxonomy($taxonomy, $active = 1);
+        $cache_id = 'EverPsBlogTaxonomy::getCategoryParentsTaxonomy_'
+        .(int)$id_category
+        .'_'
+        .(int)$active;
+        if (!Cache::isStored($cache_id)) {
+            $taxonomies = array();
+            $sql = new DbQuery;
+            $sql->select('id_parent_category');
+            $sql->from('ever_blog_category');
+            $sql->where('id_ever_category = '.(int)$id_category);
+            $sql->where('active = '.(int)$active);
+            $taxonomy = Db::getInstance()->getValue($sql);
+            if (isset($taxonomy) && (int)$taxonomy > 0) {
+                $taxonomies[] = $taxonomy;
+                $taxonomies[] = self::getCategoryParentsTaxonomy($taxonomy, $active = 1);
+            }
+            Cache::store($cache_id, $taxonomies);
+            return $taxonomies;
         }
-        return $taxonomies;
+        return Cache::retrieve($cache_id);
     }
 
     public static function getPostHighestCategory($id_post)
     {
-        $root_category = EverPsBlogCategory::getRootCategory();
-        $sql = new DbQuery;
-        $sql->from('ever_blog_post_category');
-        $sql->select('id_ever_post_category');
-        $sql->where('id_ever_post = '.(int)$id_post);
-        $sql->where('id_ever_post_category != '.(int)$root_category->id);
-        $sql->orderBy('id_ever_post_category DESC');
-        $taxonomies = Db::getInstance()->getValue($sql);
-        return $taxonomies;
+        $cache_id = 'EverPsBlogTaxonomy::getPostHighestCategory_'
+        .(int)$id_post;
+        if (!Cache::isStored($cache_id)) {
+            $root_category = EverPsBlogCategory::getRootCategory();
+            $sql = new DbQuery;
+            $sql->from('ever_blog_post_category');
+            $sql->select('id_ever_post_category');
+            $sql->where('id_ever_post = '.(int)$id_post);
+            $sql->where('id_ever_post_category != '.(int)$root_category->id);
+            $sql->orderBy('id_ever_post_category DESC');
+            $taxonomies = Db::getInstance()->getValue($sql);
+            Cache::store($cache_id, $taxonomies);
+            return $taxonomies;
+        }
+        return Cache::retrieve($cache_id);
     }
 
     public static function getPostProductsTaxonomies($id_post)
     {
-        $sql = new DbQuery;
-        $sql->from('ever_blog_post_product');
-        $sql->select('id_ever_post_product');
-        $sql->where('id_ever_post = '.(int)$id_post);
-        $taxonomies = Db::getInstance()->executeS($sql);
-        return $taxonomies;
+        $cache_id = 'EverPsBlogTaxonomy::getPostProductsTaxonomies_'
+        .(int)$id_post;
+        if (!Cache::isStored($cache_id)) {
+            $sql = new DbQuery;
+            $sql->from('ever_blog_post_product');
+            $sql->select('id_ever_post_product');
+            $sql->where('id_ever_post = '.(int)$id_post);
+            $taxonomies = Db::getInstance()->executeS($sql);
+            Cache::store($cache_id, $taxonomies);
+            return $taxonomies;
+        }
+        return Cache::retrieve($cache_id);
     }
 
     public static function checkDefaultPostCategory($id_post)
@@ -263,30 +295,38 @@ class EverPsBlogTaxonomy extends ObjectModel
 
     public static function taxonomyExists($id_obj, $obj_name)
     {
-        switch ($obj_name) {
-            case 'category':
-                $table = 'ever_blog_category';
-                $key = 'id_ever_category';
-                break;
+        $cache_id = 'EverPsBlogTaxonomy::taxonomyExists_'
+        .(int)$id_obj
+        .'_'
+        .$obj_name;
+        if (!Cache::isStored($cache_id)) {
+            switch ($obj_name) {
+                case 'category':
+                    $table = 'ever_blog_category';
+                    $key = 'id_ever_category';
+                    break;
 
-            case 'tag':
-                $table = 'ever_blog_tag';
-                $key = 'id_ever_tag';
-                break;
+                case 'tag':
+                    $table = 'ever_blog_tag';
+                    $key = 'id_ever_tag';
+                    break;
 
-            case 'product':
-                $table = 'product';
-                $key = 'id_product';
-                break;
+                case 'product':
+                    $table = 'product';
+                    $key = 'id_product';
+                    break;
+            }
+            if (isset($table) && !empty($table) && isset($key) && !empty($key)) {
+                $sql = new DbQuery;
+                $sql->select(pSQL($key));
+                $sql->from(pSQL($table));
+                $sql->where(pSQL($key).' = '.(int)$id_obj);
+                $return = Db::getInstance()->getValue($sql);
+                Cache::store($cache_id, $return);
+                return $return;
+            }
         }
-        if (isset($table) && !empty($table) && isset($key) && !empty($key)) {
-            $sql = new DbQuery;
-            $sql->select(pSQL($key));
-            $sql->from(pSQL($table));
-            $sql->where(pSQL($key).' = '.(int)$id_obj);
-            $return = Db::getInstance()->getValue($sql);
-            return $return;
-        }
+        return Cache::retrieve($cache_id);
     }
 
     /**

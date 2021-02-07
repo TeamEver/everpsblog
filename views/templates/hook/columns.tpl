@@ -27,7 +27,7 @@
 {if $category.is_root_category == 0}
     <li>
         <a href="{$link->getModuleLink('everpsblog', 'category',['id_ever_category'=>$category.id_ever_category, 'link_rewrite'=>$category.link_rewrite])|escape:'htmlall':'UTF-8'}" class="category" title="{$category.title|escape:'htmlall':'UTF-8'}">
-            {$category.title nofilter}
+            {$category.title|escape:'htmlall':'UTF-8'}
         </a>
     </li>
 {/if}
@@ -40,7 +40,7 @@
     <p class="text-uppercase h6 hidden-sm-down">{l s='Tags from the blog' mod='everpsblog'}</p>
 {foreach from=$tags item=tag}
     <a href="{$link->getModuleLink('everpsblog', 'tag', ['id_ever_tag'=>$tag.id_ever_tag, 'link_rewrite' => $tag.link_rewrite])|escape:'htmlall':'UTF-8'}" class="tag" title="{$tag.title|escape:'htmlall':'UTF-8'}">
-        {$tag.title nofilter}
+        {$tag.title|escape:'htmlall':'UTF-8'}
     </a>
 {/foreach}
 </div>
@@ -76,7 +76,7 @@
                         <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
                             {$item->content|truncate:90:'...' nofilter}
                         </div>
-                        <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary" title="{l s='Read more' mod='everpsblog'} {$item->title nofilter}">{l s='Read more' mod='everpsblog'}</a>
+                        <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary btn-blog-primary" title="{l s='Read more' mod='everpsblog'} {$item->title|escape:'htmlall':'UTF-8'}">{l s='Read more' mod='everpsblog'}</a>
                     </div>
                 </div>
             </a>

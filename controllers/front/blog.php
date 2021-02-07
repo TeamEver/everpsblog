@@ -46,6 +46,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
     {
         parent::init();
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
+        $this->module_name = 'everpsblog';
     }
 
     public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
@@ -58,7 +59,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             );
         }
 
-        return parent::l($string, $class, $addslashes, $htmlentities);
+        return parent::l($string, $specific, $class, $addslashes, $htmlentities);
     }
 
     public function initContent()
@@ -141,16 +142,36 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         // Default blog text
         $everblog_top_text = Configuration::getInt('EVERBLOG_TOP_TEXT');
         $default_blog_top_text = $everblog_top_text[(int)Context::getContext()->language->id];
+        $default_blog_top_text = EverPsBlogPost::changeShortcodes(
+            $default_blog_top_text,
+            (int)Context::getContext()->customer->id
+        );
         $everblog_bottom_text = Configuration::getInt('EVERBLOG_BOTTOM_TEXT');
         $default_blog_bottom_text = $everblog_bottom_text[(int)Context::getContext()->language->id];
+        $default_blog_bottom_text = EverPsBlogPost::changeShortcodes(
+            $default_blog_bottom_text,
+            (int)Context::getContext()->customer->id
+        );
         Hook::exec('actionBeforeEverBlogInitContent', array(
             'blog_post_number' => $this->post_number,
             'everpsblog' => $everpsblogposts,
             'everpsblogcategories' => $evercategories,
             'blog_page' => Tools::getValue('page')
         ));
+        $feed_url = $this->context->link->getModuleLink(
+            $this->module_name,
+            'feed',
+            array(
+                'feed' => 'blog'
+            ),
+            true,
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
         $this->context->smarty->assign(
             array(
+                'allow_feed' => (bool)Configuration::get('EVERBLOG_RSS'),
+                'feed_url' => $feed_url,
                 'default_blog_top_text' => $default_blog_top_text,
                 'default_blog_bottom_text' => $default_blog_bottom_text,
                 'paginated' => Tools::getValue('page'),

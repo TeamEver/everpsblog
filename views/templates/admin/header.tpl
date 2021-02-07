@@ -28,6 +28,20 @@
                 <a href="{$blog_url|escape:'htmlall':'UTF-8'}" target="_blank" class="btn btn-default">
                     {l s='See blog !' mod='everpsblog'}
                 </a>
+                {if $blog_sitemaps}
+                    <div class="dropdown">
+                      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {l s='See all sitemaps' mod='everpsblog'}
+                      </button>
+                      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        {foreach from=$blog_sitemaps item=sitemap}
+                            {if $sitemap != '.' && $sitemap != '..' && $sitemap != 'index.php' && $sitemap != 'indexes'}
+                            <p><a class="dropdown-item" href="{$sitemap|escape:'htmlall':'UTF-8'}" target="_blank">{$sitemap|escape:'htmlall':'UTF-8'}</a></p>
+                            {/if}
+                        {/foreach}
+                      </div>
+                    </div>
+                {/if}
             </p>
             <strong>{l s='Welcome to Ever Blog !' mod='everpsblog'}</strong><br />{l s='Please configure your this form to set first parameters for your blog' mod='everpsblog'}<br />
             <p>
@@ -40,20 +54,18 @@
                     {l s='Don\'t forget to set this cron for schedules tasks' mod='everpsblog'}
                 </strong>
                 <div class="alert alert-info">
-                    <h4>{l s='Empty trash' mod='everpsblog'}</h4>
-                    <a href="{$everpsblogcron|escape:'htmlall':'UTF-8'}" target="_blank">{$everpsblogcron|escape:'htmlall':'UTF-8'}</a>
-                </div>
-                <div class="alert alert-info">
-                    <h4>{l s='Publish planned posts' mod='everpsblog'}</h4>
-                    <a href="{$everpsblogcronplanned|escape:'htmlall':'UTF-8'}" target="_blank">{$everpsblogcronplanned|escape:'htmlall':'UTF-8'}</a>
-                </div>
-                <div class="alert alert-info">
-                    <h4>{l s='Pending notifications' mod='everpsblog'}</h4>
-                    <a href="{$everpsblogcronpending|escape:'htmlall':'UTF-8'}" target="_blank">{$everpsblogcronpending|escape:'htmlall':'UTF-8'}</a>
-                </div>
-                <div class="alert alert-info">
-                    <h4>{l s='XML sitemaps generation' mod='everpsblog'}</h4>
-                    <a href="{$everpsblogcronsitemap|escape:'htmlall':'UTF-8'}" target="_blank">{$everpsblogcronsitemap|escape:'htmlall':'UTF-8'}</a>
+                    <p>
+                        <strong>{l s='Empty trash' mod='everpsblog'} :</strong>  <a href="{$everpsblogcron|escape:'htmlall':'UTF-8'}" target="_blank">{$everpsblogcron|escape:'htmlall':'UTF-8'}</a>
+                    </p>
+                    <p>
+                        <strong>{l s='Publish planned posts' mod='everpsblog'} :</strong> <a href="{$everpsblogcronplanned|escape:'htmlall':'UTF-8'}" target="_blank">{$everpsblogcronplanned|escape:'htmlall':'UTF-8'}</a>
+                    </p>
+                    <p>
+                        <strong>{l s='Pending notifications' mod='everpsblog'} :</strong> <a href="{$everpsblogcronpending|escape:'htmlall':'UTF-8'}" target="_blank">{$everpsblogcronpending|escape:'htmlall':'UTF-8'}</a>
+                    </p>
+                    <p>
+                        <strong>{l s='XML sitemaps generation' mod='everpsblog'} :</strong> <a href="{$everpsblogcronsitemap|escape:'htmlall':'UTF-8'}" target="_blank">{$everpsblogcronsitemap|escape:'htmlall':'UTF-8'}</a>
+                    </p>
                 </div>
             </p>
         </div>
@@ -64,7 +76,7 @@
             <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
             <input type="hidden" name="cmd" value="_s-xclick" />
             <input type="hidden" name="hosted_button_id" value="3LE8ABFYJKP98" />
-            <input type="image" src="https://www.team-ever.com/wp-content/uploads/2019/06/appel_a_dons-1.jpg" border="0" name="submit" title="Soutenez le développement des modules gratuits de Team Ever !" alt="Soutenez le développement des modules gratuits de Team Ever !" />
+            <input type="image" src="https://www.team-ever.com/wp-content/uploads/2019/06/appel_a_dons-1.jpg" border="0" name="submit" title="{l s='This module is free and will always be ! You can support our free modules by making a donation by clicking the button below' mod='everpsblog'}" alt="{l s='This module is free and will always be ! You can support our free modules by making a donation by clicking the button below' mod='everpsblog'}" />
             <img alt="" border="0" src="https://www.paypal.com/fr_FR/i/scr/pixel.gif" width="1" height="1" />
             </form>
         </div>

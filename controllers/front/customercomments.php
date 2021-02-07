@@ -54,7 +54,7 @@ class EverPsBlogcustomercommentsModuleFrontController extends EverPsBlogModuleFr
             );
         }
 
-        return parent::l($string, $class, $addslashes, $htmlentities);
+        return parent::l($string, $specific, $class, $addslashes, $htmlentities);
     }
 
     public function initContent()

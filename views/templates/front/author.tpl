@@ -33,10 +33,13 @@
     <meta property="og:site_name" content="{$shop.name|escape:'htmlall':'UTF-8'}">
     <meta property="og:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
     <meta property="og:image" content="{$blogImg_dir|escape:'htmlall':'UTF-8'}authors/author_image_{$author->id|escape:'htmlall':'UTF-8'}.jpg">
+    {if isset($allow_feed) && $allow_feed}
+    <link rel="alternate" type="application/rss+xml" title="{$page.meta.title|escape:'htmlall':'UTF-8'} {if isset($pagination) && $pagination.current_page > 0}{l s='(page' mod='everpsblog'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' mod='everpsblog'}{/if}" href="{$feed_url|escape:'htmlall':'UTF-8'}" />
+    {/if}
     <script type="application/ld+json">
     {
     "@context": "https://schema.org",
-    "@type": "NewsArticle",
+    "@type": "{$blog_type|escape:'htmlall':'UTF-8'}",
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": "https://google.com/article"
@@ -68,6 +71,9 @@
 <div class="content" itemscope="itemscope" itemtype="http://schema.org/Blog">
     <div class="container" itemscope="itemscope" itemtype="http://schema.org/BlogAuthoring" itemprop="blogAuthor">
         <h1 itemprop="headline" class="text-center">{$author->nickhandle|escape:'htmlall':'UTF-8'}</h1>
+        {if isset($allow_feed) && $allow_feed}
+        <a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' mod='everpsblog'} {$author->nickhandle|escape:'htmlall':'UTF-8'}</a>
+        {/if}
         {if isset($paginated) && !$paginated}
         <div class="row author-header">
             <img class="img img-fluid author-featured-image featured-image" src="{$featured_image|escape:'htmlall':'UTF-8'}" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
@@ -114,16 +120,16 @@
     <div class="col-12 col-xs-12 article everpsblog" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
         <div class="col-md-12">
             <div class="col-12 col-xs-12 col-md-4 article-img">
-                <img src="{$item->featured_image|escape:'htmlall':'UTF-8'}" class="img-fluid mx-auto d-block {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item->title nofilter} {$shop.name|escape:'htmlall':'UTF-8'}"  title="{$item->title nofilter} {$shop.name|escape:'htmlall':'UTF-8'}"/>
+                <img src="{$item->featured_image|escape:'htmlall':'UTF-8'}" class="img-fluid mx-auto d-block {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}"  title="{$item->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}"/>
             </div>
             <div class="col-12 col-xs-12 col-md-8">
                 <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
-                    <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item->title nofilter} {$shop.name|escape:'htmlall':'UTF-8'}">
-                        {$item->title nofilter}
+                    <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
+                        {$item->title|escape:'htmlall':'UTF-8'}
                     </a>
                 </h3>
                 <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">{$item->content|truncate:350:"..." nofilter}</div>
-                <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary" title="{$item->title nofilter} {$shop.name|escape:'htmlall':'UTF-8'}">{l s='Read more' mod='everpsblog'}</a>
+                <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary btn-blog-primary" title="{$item->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{l s='Read more' mod='everpsblog'}</a>
             </div>
         </div>
     </div>

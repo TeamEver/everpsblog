@@ -41,6 +41,8 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
         $this->table = 'ever_blog_category';
         $this->className = 'EverPsBlogCategory';
         $this->module_name = 'everpsblog';
+        $this->shop_url = Tools::getHttpHost(true).__PS_BASE_URI__;
+        $this->img_url = $this->shop_url.'modules/'.$this->module_name.'/views/img/';
         $this->context = Context::getContext();
         $this->identifier = "id_ever_category";
         $this->_orderBy = 'id_ever_category';
@@ -50,6 +52,15 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                 'title' => $this->l('Category ID'),
                 'align' => 'left',
                 'width' => 25
+            ),
+            'featured_img' => array(
+                'title' => $this->l('Featured image'),
+                'align' => 'center',
+                'width' => 25,
+                'orderby' => false,
+                'filter' => false,
+                'search' => false,
+                'image' => 'category',
             ),
             'title' => array(
                 'title' => $this->l('Category title'),
@@ -92,12 +103,17 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
         );
 
         $this->colorOnBackground = true;
-        $this->_select = 'l.title';
+        $this->_select = 'l.title, CONCAT("'.$this->img_url.'",ai.image_link) AS featured_img';
 
         $this->_join =
             'LEFT JOIN `'._DB_PREFIX_.'ever_blog_category_lang` l
                 ON (
                     l.`id_ever_category` = a.`id_ever_category`
+                )
+            LEFT JOIN `'._DB_PREFIX_.'ever_blog_image` ai
+                ON (
+                    ai.`id_ever_image` = a.`id_ever_category`
+                    AND ai.`image_type` = "category"
                 )';
         $this->_where = 'AND a.id_shop = '.(int)$this->context->shop->id
         .' AND a.is_root_category != 1'
@@ -215,11 +231,6 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
         }
         if (Tools::isSubmit('submitBulkenableSelection'.$this->table)) {
             $this->processBulkEnable();
-        }
-        if ((bool)Tools::getValue('deleteLogoImage') && (int)Tools::getValue('ever_blog_obj')) {
-            $this->processDeleteObjImage(
-                (int)Tools::getValue('ever_blog_obj')
-            );
         }
 
         $lists = parent::renderList();
@@ -597,21 +608,24 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
             }
             if (!count($this->errors)) {
                 $category->save();
-                $category_img_destination = _PS_MODULE_DIR_
-                .'everpsblog/views/img/categories/category_image_'
+                $category_img_link = 'img/category/'
                 .(int)$category->id
                 .'.jpg';
-                $category_img_link = 'categories/category_image_'
+                $ps_categories_destination = _PS_IMG_DIR_
+                .'category/'
                 .(int)$category->id
                 .'.jpg';
+                if (!file_exists(_PS_IMG_DIR_.'category')) {
+                    mkdir(_PS_IMG_DIR_.'category', 0755, true);
+                }
                 /* upload the image */
                 if (isset($_FILES['category_image'])
                     && isset($_FILES['category_image']['tmp_name'])
                     && !empty($_FILES['category_image']['tmp_name'])
                 ) {
                     Configuration::set('PS_IMAGE_GENERATION_METHOD', 1);
-                    if (file_exists($category_img_destination)) {
-                        unlink($category_img_destination);
+                    if (file_exists($ps_categories_destination)) {
+                        unlink($ps_categories_destination);
                     }
                     if ($error = ImageManager::validateUpload($_FILES['category_image'])) {
                         $this->errors .= $error;
@@ -619,7 +633,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                         || !move_uploaded_file($_FILES['category_image']['tmp_name'], $tmp_name)
                     ) {
                         return false;
-                    } elseif (!ImageManager::resize($tmp_name, $category_img_destination)) {
+                    } elseif (!ImageManager::resize($tmp_name, $ps_categories_destination)) {
                         $this->errors .= $this->l(
                             'An error occurred while attempting to upload the image.'
                         );
@@ -673,7 +687,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
         ));
 
         return $this->context->smarty->fetch(
-            _PS_MODULE_DIR_.'everpsblog/views/templates/admin/helpers/lists/list_action_view_order.tpl'
+            _PS_MODULE_DIR_.'everpsblog/views/templates/admin/helpers/lists/list_action_view_obj.tpl'
         );
     }
 
@@ -691,6 +705,17 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
         }
     }
 
+    protected function processBulkDelete()
+    {
+        foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
+            $everObj = new EverPsBlogCategory((int)$idEverObj);
+            
+            if (!$everObj->delete()) {
+                $this->errors[] = $this->l('An error has occurred: Can\'t delete the current object');
+            }
+        }
+    }
+
     protected function processBulkEnable()
     {
         foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
@@ -702,14 +727,6 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
             if (!$everObj->save()) {
                 $this->errors[] = $this->l('An error has occurred: Can\'t enable the current object');
             }
-        }
-    }
-
-    public function processDeleteObjImage($id_obj)
-    {
-        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/categories/category_image_'.(int)$id_obj.'.jpg')) {
-                $old_img = _PS_MODULE_DIR_.'modules/everpsblog/views/img/categories/category_image_'.$id_obj.'.jpg';
-                return unlink($old_img);
         }
     }
 

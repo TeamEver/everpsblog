@@ -46,6 +46,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
     public function init()
     {
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
+        $this->module_name = 'everpsblog';
         $this->ip_banned = explode(',', Configuration::get('EVERBLOG_BANNED_IP'));
         $this->users_banned = explode(',', Configuration::get('EVERBLOG_BANNED_USERS'));
         if (in_array($_SERVER['REMOTE_ADDR'], $this->ip_banned)) {
@@ -136,7 +137,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             );
         }
 
-        return parent::l($string, $class, $addslashes, $htmlentities);
+        return parent::l($string, $specific, $class, $addslashes, $htmlentities);
     }
 
     public function initContent()
@@ -355,6 +356,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             );
             $this->context->smarty->assign(
                 array(
+                    'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
                     'featured_image' => $file_url,
                     'author_cover' => $this->author_cover,
                     'author' => $this->author,
@@ -500,6 +502,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
     public function getTemplateVarPage()
     {
         $page = parent::getTemplateVarPage();
+        $page['body_classes']['page-everblog'] = true;
         $page['body_classes']['page-everblog-post'] = true;
         $page['body_classes']['page-everblog-post-id-'.(int)$this->post->id] = true;
         if ((bool)Context::getContext()->customer->isLogged()) {

@@ -41,6 +41,7 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
     public function init()
     {
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
+        $this->module_name = 'everpsblog';
         $this->errors = array();
         $this->author = new EverPsBlogAuthor(
             (int)Tools::getValue('id_ever_author'),
@@ -68,7 +69,7 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
             );
         }
 
-        return parent::l($string, $class, $addslashes, $htmlentities);
+        return parent::l($string, $specific, $class, $addslashes, $htmlentities);
     }
 
     public function initContent()
@@ -141,8 +142,22 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
                 (int)$this->context->shop->id,
                 'author'
             );
+            $feed_url = $this->context->link->getModuleLink(
+                $this->module_name,
+                'feed',
+                array(
+                    'feed' => 'author',
+                    'id_obj' => $this->author->id
+                ),
+                true,
+                (int)$this->context->language->id,
+                (int)$this->context->shop->id
+            );
             $this->context->smarty->assign(
                 array(
+                    'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
+                    'allow_feed' => (bool)Configuration::get('EVERBLOG_RSS'),
+                    'feed_url' => $feed_url,
                     'featured_image' => $file_url,
                     'posts' => $posts,
                     'paginated' => Tools::getValue('page'),
@@ -217,6 +232,7 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
     public function getTemplateVarPage()
     {
         $page = parent::getTemplateVarPage();
+        $page['body_classes']['page-everblog'] = true;
         $page['body_classes']['page-everblog-author'] = true;
         $page['body_classes']['page-everblog-author-id-'.(int)$this->author->id] = true;
         if ((bool)Context::getContext()->customer->isLogged()) {

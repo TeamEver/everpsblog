@@ -127,13 +127,45 @@ class EverPsBlogTag extends ObjectModel
 
     public static function getAllTags($id_lang, $id_shop, $active = 1)
     {
-        return Db::getInstance()->executeS(
-            'SELECT * FROM `'._DB_PREFIX_.'ever_blog_tag_lang` btl
-            INNER JOIN `'._DB_PREFIX_.'ever_blog_tag` bt
-            ON bt.id_ever_tag = btl.id_ever_tag
-            WHERE bt.active = "'.(bool)$active.'"
-            AND bt.id_shop = '.(int)$id_shop.'
-            AND btl.id_lang = '.(int)$id_lang.''
-        );
+        $cache_id = 'EverPsBlogTag::getAllTags_'
+        .(int)$id_lang
+        .'_'
+        .(int)$id_shop
+        .'_'
+        .(int)$active;
+        if (!Cache::isStored($cache_id)) {
+            $return = Db::getInstance()->executeS(
+                'SELECT * FROM `'._DB_PREFIX_.'ever_blog_tag_lang` btl
+                INNER JOIN `'._DB_PREFIX_.'ever_blog_tag` bt
+                ON bt.id_ever_tag = btl.id_ever_tag
+                WHERE bt.active = "'.(bool)$active.'"
+                AND bt.id_shop = '.(int)$id_shop.'
+                AND btl.id_lang = '.(int)$id_lang.''
+            );
+            Cache::store($cache_id, $return);
+            return $return;
+        }
+        return Cache::retrieve($cache_id);
+    }
+
+    public static function getTagByLinkRewrite($link_rewrite)
+    {
+        $cache_id = 'EverPsBlogTag::getTagByLinkRewrite_'
+        .(string)$link_rewrite;
+        if (!Cache::isStored($cache_id)) {
+            $sql = new DbQuery;
+            $sql->select('id_ever_tag');
+            $sql->from('ever_blog_tag_lang');
+            $sql->where('link_rewrite = "'.pSQL($link_rewrite).'"');
+            $id_tag = Db::getInstance()->getValue($sql);
+            if ($id_tag) {
+                $return = new self($id_tag);
+                Cache::store($cache_id, $return);
+                return $return;
+            }
+            Cache::store($cache_id, false);
+            return false;
+        }
+        return Cache::retrieve($cache_id);
     }
 }

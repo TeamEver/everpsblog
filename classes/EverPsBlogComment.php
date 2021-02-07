@@ -89,73 +89,116 @@ class EverPsBlogComment extends ObjectModel
 
     public function getLatestCommentByEmail($email, $id_lang)
     {
-        $sql = new DbQuery;
-        $sql->select('id_ever_comment');
-        $sql->from('ever_blog_comments');
-        $sql->where('id_lang = '.(int)$id_lang);
-        $sql->where('user_email = "'.pSQL($email).'"');
-        $sql->orderBy('date_add DESC');
-        return new self(Db::getInstance()->getValue($sql));
+        $cache_id = 'EverPsBlogComment::getLatestCommentByEmail_'
+        .$email
+        .'_'
+        .(int)$id_lang;
+        if (!Cache::isStored($cache_id)) {
+            $sql = new DbQuery;
+            $sql->select('id_ever_comment');
+            $sql->from('ever_blog_comments');
+            $sql->where('id_lang = '.(int)$id_lang);
+            $sql->where('user_email = "'.pSQL($email).'"');
+            $sql->orderBy('date_add DESC');
+            $return = new self(Db::getInstance()->getValue($sql));
+            Cache::store($cache_id, $return);
+            return $return;
+        }
+        return Cache::retrieve($cache_id);
     }
 
     public static function getComments()
     {
-        if ($res = Db::getInstance()->executeS(
-            'SELECT * FROM `'._DB_PREFIX_.'everpsblog_comments`'
-        )) {
-            return $res;
+        $cache_id = 'EverPsBlogComment::getComments';
+        if (!Cache::isStored($cache_id)) {
+            if ($res = Db::getInstance()->executeS(
+                'SELECT * FROM `'._DB_PREFIX_.'everpsblog_comments`'
+            )) {
+                Cache::store($cache_id, $res);
+                return $res;
+            }
         }
+        return Cache::retrieve($cache_id);
     }
 
     public static function getCommentsByPost($id_ever_post, $id_lang, $active = 1)
     {
-        $sql = new DbQuery;
-        $sql->select('id_ever_comment');
-        $sql->from('ever_blog_comments');
-        $sql->where('id_lang = '.(int)$id_lang);
-        $sql->where('id_ever_post = '.(int)$id_ever_post);
-        $sql->where('active = '.(int)$active);
-        $sql->groupBy('id_ever_comment');
-        $sql->orderBy('date_add DESC');
-        $comments = Db::getInstance()->executeS($sql);
-        $return = array();
-        // die(var_dump($return));
-        foreach ($comments as $comment) {
-            $return[] = new self((int)$comment['id_ever_comment']);
+        $cache_id = 'EverPsBlogComment::getCommentsByPost_'
+        .(int)$id_ever_post
+        .'_'
+        .(int)$id_lang
+        .'_'
+        .(int)$active;
+        if (!Cache::isStored($cache_id)) {
+            $sql = new DbQuery;
+            $sql->select('id_ever_comment');
+            $sql->from('ever_blog_comments');
+            $sql->where('id_lang = '.(int)$id_lang);
+            $sql->where('id_ever_post = '.(int)$id_ever_post);
+            $sql->where('active = '.(int)$active);
+            $sql->groupBy('id_ever_comment');
+            $sql->orderBy('date_add DESC');
+            $comments = Db::getInstance()->executeS($sql);
+            $return = array();
+            // die(var_dump($return));
+            foreach ($comments as $comment) {
+                $return[] = new self((int)$comment['id_ever_comment']);
+            }
+            Cache::store($cache_id, $return);
+            return $return;
         }
-        return $return;
+        return Cache::retrieve($cache_id);
     }
 
     public static function getCommentsByEmail($email, $id_lang, $active = 1)
     {
-        $sql = new DbQuery;
-        $sql->select('id_ever_comment');
-        $sql->from('ever_blog_comments');
-        $sql->where('id_lang = '.(int)$id_lang);
-        $sql->where('user_email = \''.pSQL($email).'\'');
-        $sql->where('active = '.(int)$active);
-        $sql->groupBy('id_ever_comment');
-        $sql->orderBy('date_add DESC');
-        $comments = Db::getInstance()->executeS($sql);
-        $return = array();
-        foreach ($comments as $comment) {
-            $return[] = new self((int)$comment['id_ever_comment']);
+        $cache_id = 'EverPsBlogComment::getCommentsByEmail_'
+        .$email
+        .'_'
+        .(int)$id_lang
+        .'_'
+        .(int)$active;
+        if (!Cache::isStored($cache_id)) {
+            $sql = new DbQuery;
+            $sql->select('id_ever_comment');
+            $sql->from('ever_blog_comments');
+            $sql->where('id_lang = '.(int)$id_lang);
+            $sql->where('user_email = \''.pSQL($email).'\'');
+            $sql->where('active = '.(int)$active);
+            $sql->groupBy('id_ever_comment');
+            $sql->orderBy('date_add DESC');
+            $comments = Db::getInstance()->executeS($sql);
+            $return = array();
+            foreach ($comments as $comment) {
+                $return[] = new self((int)$comment['id_ever_comment']);
+            }
+            Cache::store($cache_id, $return);
+            return $return;
         }
-        // die(var_dump($return));
-        return $return;
+        return Cache::retrieve($cache_id);
     }
 
     public static function commentsCount($id_ever_post, $id_lang, $active = 1)
     {
-        $sql = new DbQuery;
-        $sql->select('COUNT(*)');
-        $sql->from('ever_blog_comments');
-        $sql->where('id_ever_post = '.(int)$id_ever_post);
-        $sql->where('id_lang = '.(int)$id_lang);
-        $sql->where('active = '.(int)$active);
-        $count = Db::getInstance()->getValue($sql);
-        if ($count) {
-            return (int)$count;
+        $cache_id = 'EverPsBlogComment::commentsCount_'
+        .(int)$id_ever_post
+        .'_'
+        .(int)$id_lang
+        .'_'
+        .(int)$active;
+        if (!Cache::isStored($cache_id)) {
+            $sql = new DbQuery;
+            $sql->select('COUNT(*)');
+            $sql->from('ever_blog_comments');
+            $sql->where('id_ever_post = '.(int)$id_ever_post);
+            $sql->where('id_lang = '.(int)$id_lang);
+            $sql->where('active = '.(int)$active);
+            $count = Db::getInstance()->getValue($sql);
+            if ($count) {
+                Cache::store($cache_id, $count);
+                return (int)$count;
+            }
         }
+        return Cache::retrieve($cache_id);
     }
 }

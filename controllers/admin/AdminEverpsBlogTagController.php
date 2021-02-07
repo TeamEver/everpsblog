@@ -40,6 +40,8 @@ class AdminEverPsBlogTagController extends ModuleAdminController
         $this->table = 'ever_blog_tag';
         $this->className = 'EverPsBlogTag';
         $this->module_name = 'everpsblog';
+        $this->shop_url = Tools::getHttpHost(true).__PS_BASE_URI__;
+        $this->img_url = $this->shop_url.'modules/'.$this->module_name.'/views/img/';
         $this->context = Context::getContext();
         $this->identifier = "id_ever_tag";
         $this->_orderBy = 'id_ever_tag';
@@ -49,6 +51,15 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                 'title' => $this->l('Tag ID'),
                 'align' => 'left',
                 'width' => 25
+            ),
+            'featured_img' => array(
+                'title' => $this->l('Featured image'),
+                'align' => 'center',
+                'width' => 25,
+                'orderby' => false,
+                'filter' => false,
+                'search' => false,
+                'image' => 'tag',
             ),
             'title' => array(
                 'title' => $this->l('Tag title'),
@@ -91,12 +102,17 @@ class AdminEverPsBlogTagController extends ModuleAdminController
         );
 
         $this->colorOnBackground = true;
-        $this->_select = 'l.title';
+        $this->_select = 'l.title, CONCAT("'.$this->img_url.'",ai.image_link) AS featured_img';
 
         $this->_join =
             'LEFT JOIN `'._DB_PREFIX_.'ever_blog_tag_lang` l
                 ON (
                     l.`id_ever_tag` = a.`id_ever_tag`
+                )
+            LEFT JOIN `'._DB_PREFIX_.'ever_blog_image` ai
+                ON (
+                    ai.`id_ever_image` = a.`id_ever_tag`
+                    AND ai.`image_type` = "tag"
                 )';
         $this->_where = 'AND a.id_shop = '.(int)$this->context->shop->id;
         $this->_where = 'AND l.id_lang = '.(int)$this->context->language->id;
@@ -213,11 +229,6 @@ class AdminEverPsBlogTagController extends ModuleAdminController
         }
         if (Tools::isSubmit('submitBulkenableSelection'.$this->table)) {
             $this->processBulkEnable();
-        }
-        if ((bool)Tools::getValue('deleteLogoImage') && (int)Tools::getValue('ever_blog_obj')) {
-            $this->processDeleteObjImage(
-                (int)Tools::getValue('ever_blog_obj')
-            );
         }
 
         $lists = parent::renderList();
@@ -537,7 +548,9 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                 ) {
                     $this->errors[] = $this->l('Content is not valid for lang ').$language['id_lang'];
                 } else {
-                    $tag->bottom_content[$language['id_lang']] = Tools::getValue('bottom_content_'.$language['id_lang']);
+                    $tag->bottom_content[$language['id_lang']] = Tools::getValue(
+                        'bottom_content_'.$language['id_lang']
+                    );
                 }
                 if (Tools::getValue('meta_title_'.$language['id_lang'])
                     && !Validate::isCleanHtml(Tools::getValue('meta_title_'.$language['id_lang']))
@@ -568,20 +581,23 @@ class AdminEverPsBlogTagController extends ModuleAdminController
             if (!count($this->errors)) {
                 $tag->save();
                 /* upload the image */
-                $tag_img_destination = _PS_MODULE_DIR_
-                .'everpsblog/views/img/tags/tag_image_'
+                $tag_img_link = 'img/tag/'
                 .(int)$tag->id
                 .'.jpg';
-                $tag_img_link = 'tags/tag_image_'
+                $ps_tags_destination = _PS_IMG_DIR_
+                .'tag/'
                 .(int)$tag->id
                 .'.jpg';
+                if (!file_exists(_PS_IMG_DIR_.'tag')) {
+                    mkdir(_PS_IMG_DIR_.'tag', 0755, true);
+                }
                 if (isset($_FILES['tag_image'])
                     && isset($_FILES['tag_image']['tmp_name'])
                     && !empty($_FILES['tag_image']['tmp_name'])
                 ) {
                     Configuration::set('PS_IMAGE_GENERATION_METHOD', 1);
-                    if (file_exists($tag_img_destination)) {
-                        unlink($tag_img_destination);
+                    if (file_exists($ps_tags_destination)) {
+                        unlink($ps_tags_destination);
                     }
                     if ($error = ImageManager::validateUpload($_FILES['tag_image'])) {
                         $this->errors .= $error;
@@ -589,7 +605,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                         || !move_uploaded_file($_FILES['tag_image']['tmp_name'], $tmp_name)
                     ) {
                         return false;
-                    } elseif (!ImageManager::resize($tmp_name, $tag_img_destination)) {
+                    } elseif (!ImageManager::resize($tmp_name, $ps_tags_destination)) {
                         $this->errors .= $this->l(
                             'An error occurred while attempting to upload the image.'
                         );
@@ -643,8 +659,19 @@ class AdminEverPsBlogTagController extends ModuleAdminController
         ));
 
         return $this->context->smarty->fetch(
-            _PS_MODULE_DIR_.'everpsblog/views/templates/admin/helpers/lists/list_action_view_order.tpl'
+            _PS_MODULE_DIR_.'everpsblog/views/templates/admin/helpers/lists/list_action_view_obj.tpl'
         );
+    }
+
+    protected function processBulkDelete()
+    {
+        foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
+            $everObj = new EverPsBlogCategory((int)$idEverObj);
+            
+            if (!$everObj->delete()) {
+                $this->errors[] = $this->l('An error has occurred: Can\'t delete the current object');
+            }
+        }
     }
 
     protected function processBulkDisable()
@@ -672,14 +699,6 @@ class AdminEverPsBlogTagController extends ModuleAdminController
             if (!$everObj->save()) {
                 $this->errors[] = $this->l('An error has occurred: Can\'t enable the current object');
             }
-        }
-    }
-
-    public function processDeleteObjImage($id_obj)
-    {
-        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.(int)$id_obj.'.jpg')) {
-                $old_img = _PS_MODULE_DIR_.'modules/everpsblog/views/img/tags/tag_image_'.$id_obj.'.jpg';
-                return unlink($old_img);
         }
     }
 

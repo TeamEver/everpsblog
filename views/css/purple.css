@@ -1,0 +1,35 @@
+.page-everblog #content-wrapper a:not(.btn-blog-primary),
+.page-everblog #right-column a:not(.btn-blog-primary),
+.page-everblog #left-column a:not(.btn-blog-primary){
+    color: #b044d4;
+}
+.page-everblog #content-wrapper a:not(.btn-blog-primary):hover,
+.page-everblog #right-column a:not(.btn-blog-primary):hover,
+.page-everblog #left-column a:not(.btn-blog-primary):hover{
+    color: #a206d6;
+}
+.page-everblog #content-wrapper .btn-blog-primary,
+.page-everblog #right-column .btn-blog-primary,
+.page-everblog #left-column .btn-blog-primary{
+    background-color: #b044d4;
+    color:#fff;
+}
+.page-everblog #content-wrapper .btn-blog-primary:active,
+.page-everblog #content-wrapper .btn-blog-primary:hover,
+.page-everblog #left-column .btn-blog-primary:active,
+.page-everblog #left-column .btn-blog-primary:hover,
+.page-everblog #right-column .btn-blog-primary:active,
+.page-everblog #right-column .btn-blog-primary:hover{
+    background-color: #a206d6;
+}
+.everpsblogcontent{
+    color: #7a7a7a;
+}
+.page-everblog #right-column .h6 a,
+.page-everblog #left-column .h6 a{
+    color: #363a42;
+}
+.page-everblog .product-flags li.product-flag{
+    background-color: #b044d4;
+}
+

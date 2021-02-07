@@ -16,6 +16,6 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 
-<a href="{$href|escape:'html':'UTF-8'}"{if isset($confirm)} onclick="if (confirm('{$confirm}')){ldelim}return true;{rdelim}else{ldelim}event.stopPropagation(); event.preventDefault();{rdelim};"{/if} title="{$action|escape:'html':'UTF-8'}" target="_blank">
-	<i class="icon-file"></i> {$action|escape:'html':'UTF-8'}
+<a href="{$href|escape:'htmlall':'UTF-8'}"{if isset($confirm)} onclick="if (confirm('{$confirm|escape:'htmlall':'UTF-8'}')){ldelim}return true;{rdelim}else{ldelim}event.stopPropagation(); event.preventDefault();{rdelim};"{/if} title="{$action|escape:'htmlall':'UTF-8'}">
+	<i class="icon-trash"></i> {$action|escape:'htmlall':'UTF-8'}
 </a>

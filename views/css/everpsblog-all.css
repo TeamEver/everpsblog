@@ -1,6 +1,23 @@
 .bloghome .everpsblog{
     margin-bottom: 15px;
 }
+.rss-link{
+    display: block;
+    background: url(../img/social.png) no-repeat;
+    height: 20px;
+    width: 20px;
+    text-indent: -3000px;
+    margin-top: -1.7em;
+    float: right;
+    filter: alpha(opacity=60);
+    -moz-opacity: 0.6;
+    -khtml-opacity: 0.6;
+    opacity: 0.6;
+    background-position: -60px 0;
+}
+#module-everpsblog-post img{
+    max-width: 100%;
+}
 /*Animations*/
 .animated {
     -webkit-animation-duration: 1s;
@@ -14,7 +31,6 @@
          -o-animation-fill-mode: both;
             animation-fill-mode: both;
 }
-
 .animated.hinge {
     -webkit-animation-duration: 2s;
        -moz-animation-duration: 2s;
@@ -22,7 +38,6 @@
          -o-animation-duration: 2s;
             animation-duration: 2s;
 }
-
 @-webkit-keyframes flash {
     0%, 50%, 100% {opacity: 1;}
     25%, 75% {opacity: 0;}
