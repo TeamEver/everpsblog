@@ -1,5 +1,5 @@
 {*
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -46,13 +46,13 @@
     },
     "headline": "{$author->nickhandle|escape:'htmlall':'UTF-8'}",
     "image": [
-      "{$blogImg_dir|escape:'htmlall':'UTF-8'}authors/author_image_{$author->id|escape:'htmlall':'UTF-8'}.jpg"
+      "{$featured_image|escape:'htmlall':'UTF-8'}"
      ],
     "datePublished": "{$author->date_add|escape:'htmlall':'UTF-8'}",
     "dateModified": "{$author->date_upd|escape:'htmlall':'UTF-8'}",
     "author": {
       "@type": "Person",
-      "name": "{$shop.name|escape:'htmlall':'UTF-8'}"
+      "name": "{$author->nickhandle|escape:'htmlall':'UTF-8'}"
     },
      "publisher": {
       "@type": "Organization",
@@ -117,22 +117,7 @@
 <div class="container">
 {hook h="displayBeforeEverLoop"}
 {foreach from=$posts item=item}
-    <div class="col-12 col-xs-12 article everpsblog" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
-        <div class="col-md-12">
-            <div class="col-12 col-xs-12 col-md-4 article-img">
-                <img src="{$item->featured_image|escape:'htmlall':'UTF-8'}" class="img-fluid mx-auto d-block {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}"  title="{$item->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}"/>
-            </div>
-            <div class="col-12 col-xs-12 col-md-8">
-                <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
-                    <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
-                        {$item->title|escape:'htmlall':'UTF-8'}
-                    </a>
-                </h3>
-                <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">{$item->content|truncate:350:"..." nofilter}</div>
-                <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary btn-blog-primary" title="{$item->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{l s='Read more' mod='everpsblog'}</a>
-            </div>
-        </div>
-    </div>
+{include file='module:everpsblog/views/templates/front/loop/post_object.tpl'}
 {/foreach}
 </div>
 {include file='_partials/pagination.tpl' pagination=$pagination}

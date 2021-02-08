@@ -66,12 +66,27 @@
     margin-top: 0;
     justify-content: flex-end;
 }
+#module-everpsblog-post .social-sharing li a{
+    display: block;
+    width: 100%;
+    height: 100%;
+    white-space: nowrap;
+    text-indent: 100%;
+    overflow: hidden;
+}
+#module-everpsblog-post .social-sharing li .text-hide {
+    font: 0/0 a;
+    color: transparent;
+    text-shadow: none;
+    background-color: transparent;
+    border: 0;
+}
 #module-everpsblog-post .taggedIn a{
     /*float:left;*/
     margin:0 0 7px 20px;
     position:relative;
     font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size:0.75em;
+    font-size:0.7em;
     font-weight:bold;
     text-decoration:none;
     color:#996633;
@@ -187,7 +202,8 @@
 }
 #module-everpsblog-post .commentblock {
     border: 1px solid #eee;
-    border-color: rgba(0,0,0,.05);
+    border-color: rgba(0,0,0,0.2);
+    border-radius: 1%;
     padding: 10px;
     margin-bottom: 3%;
     font-size: 0.9rem;

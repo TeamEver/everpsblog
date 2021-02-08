@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -136,6 +136,10 @@ class EverPsBlogCategory extends ObjectModel
         )
     );
 
+    /**
+     * Get current blog root category
+     * @return root category obj
+    */
     public static function getRootCategory()
     {
         $cache_id = 'EverPsBlogCategory::getRootCategory';
@@ -152,6 +156,11 @@ class EverPsBlogCategory extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Check if category has parent
+     * @param category id_parent_category
+     * @return int parent category id
+    */
     public function hasParentCategory($id_parent_category)
     {
         $cache_id = 'EverPsBlogCategory::hasParentCategory_'
@@ -168,7 +177,35 @@ class EverPsBlogCategory extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
-    public static function getAllCategories($id_lang, $id_shop, $active = 1, $except = 0)
+    /**
+     * Check if category has children
+     * @return bool
+    */
+    public function hasChildren()
+    {
+        $cache_id = 'EverPsBlogCategory::hasChildren';
+        if (!Cache::isStored($cache_id)) {
+            $sql = new DbQuery;
+            $sql->select('id_ever_category');
+            $sql->from('ever_blog_category');
+            $sql->where('id_parent_category = '.(int)$this->id);
+            $return = Db::getInstance()->getValue($sql);
+            if ((int)$return > 0) {
+                Cache::store($cache_id, true);
+                return true;
+            }
+            Cache::store($cache_id, false);
+            return false;
+        }
+        return Cache::retrieve($cache_id);
+    }
+
+    /**
+     * Get all categories
+     * @param int id_lang, int id_shop, bool active, bool only parent categories
+     * @return array of category objs
+    */
+    public static function getAllCategories($id_lang, $id_shop, $active = 1, $only_parent = 0)
     {
         $cache_id = 'EverPsBlogCategory::getAllCategories_'
         .(int)$id_lang
@@ -177,7 +214,7 @@ class EverPsBlogCategory extends ObjectModel
         .'_'
         .(int)$active
         .'_'
-        .(int)$except;
+        .(int)$only_parent;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
             $sql->select('*');
@@ -188,11 +225,11 @@ class EverPsBlogCategory extends ObjectModel
                 'bc.id_ever_category = bcl.id_ever_category'
             );
             $sql->where('bc.active = '.(int)$active);
+            $sql->where('bc.is_root_category = 0');
             $sql->where('bc.id_shop = '.(int)$id_shop);
             $sql->where('bcl.id_lang = '.(int)$id_lang);
-            if ((int)$except > 0) {
-                $sql->where('bc.id_ever_category != '.(int)$except);
-                $sql->where('bc.id_parent_category != '.(int)$except);
+            if ((int)$only_parent > 0) {
+                $sql->where('bc.id_parent_category = 1');
             }
             $categories = Db::getInstance()->executeS($sql);
             $return = array();
@@ -210,6 +247,11 @@ class EverPsBlogCategory extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Get all parent categories for given category id, except root category
+     * @param int parent id_ever_category, int id_lang, int id_shop, bool active
+     * @return array of category objs | false if not found
+    */
     public static function getParentCategories($id_ever_category, $id_lang, $id_shop, $active = 1)
     {
         $cache_id = 'EverPsBlogCategory::getParentCategories_'
@@ -253,6 +295,65 @@ class EverPsBlogCategory extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Get all children categories for given category id
+     * @param int parent id_ever_category, int id_lang, int id_shop, bool active
+     * @return array of category objs | false if not found
+    */
+    public static function getChildrenCategories($id_ever_category, $id_lang, $id_shop, $active = 1)
+    {
+        $cache_id = 'EverPsBlogCategory::getChildrenCategories_'
+        .(int)$id_ever_category
+        .'_'
+        .(int)$id_lang
+        .'_'
+        .(int)$id_shop
+        .'_'
+        .(int)$active;
+        if (!Cache::isStored($cache_id)) {
+            $sql = new DbQuery;
+            $sql->select('bc.*, bcl.*');
+            $sql->from('ever_blog_category_lang', 'bcl');
+            $sql->leftJoin(
+                'ever_blog_category',
+                'bc',
+                'bc.id_ever_category = bcl.id_ever_category'
+            );
+            $sql->where('bc.active = '.(int)$active);
+            $sql->where('bc.id_shop = '.(int)$id_shop);
+            $sql->where('bcl.id_lang = '.(int)$id_lang);
+            $sql->where('bc.id_parent_category = '.(int)$id_ever_category);
+            $return = Db::getInstance()->executeS($sql);
+            $categories = array();
+            foreach ($return as $child_cat) {
+                $featured_image = EverPsBlogImage::getBlogImageUrl(
+                    (int)$child_cat['id_ever_category'],
+                    (int)$id_shop,
+                    'category'
+                );
+                $category = new self(
+                    $child_cat['id_ever_category'],
+                    (int)$id_lang,
+                    (int)$id_shop
+                );
+                $category->featured_image = $featured_image;
+                $categories[] = $category;
+            }
+            if (!empty($categories)) {
+                Cache::store($cache_id, $categories);
+                return $categories;
+            }
+            Cache::store($cache_id, false);
+            return false;
+        }
+        return Cache::retrieve($cache_id);
+    }
+
+    /**
+     * Get category by link_rewrite
+     * @param string category link_rewrite
+     * @return category obj | false if not found
+    */
     public static function getCategoryByLinkRewrite($link_rewrite)
     {
         $sql = new DbQuery;

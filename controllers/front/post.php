@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -22,13 +22,6 @@ if (!defined('_PS_VERSION_')) {
 }
 
 require_once(dirname(__FILE__).'/../../classes/controller/FrontController.php');
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogPost.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCategory.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogAuthor.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTaxonomy.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogImage.php';
 
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
@@ -66,14 +59,22 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 (int)$this->context->language->id,
                 (int)$this->context->shop->id
             );
-            $this->author->url = $this->context->link->getModuleLink(
-                'everpsblog',
-                'author',
-                array(
-                    'id_ever_author' => $this->author->id,
-                    'link_rewrite' => $this->author->link_rewrite
-                )
-            );
+            if ((bool)$this->author->active === true) {
+                $this->author->url = $this->context->link->getModuleLink(
+                    'everpsblog',
+                    'author',
+                    array(
+                        'id_ever_author' => $this->author->id,
+                        'link_rewrite' => $this->author->link_rewrite
+                    )
+                );
+            } else {
+                $this->author = new stdClass();
+                $this->author->id_ever_author = 0;
+                $this->author->id = 0;
+                $this->author->nickhandle = Configuration::get('PS_SHOP_NAME');
+                $this->author->url = Tools::getHttpHost(true).__PS_BASE_URI__;
+            }
         } else {
             $this->author = new stdClass();
             $this->author->id_ever_author = 0;
@@ -82,24 +83,11 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             $this->author->url = Tools::getHttpHost(true).__PS_BASE_URI__;
         }
         // Get author cover if exists, else get shop logo
-        $author_cover_file = _PS_MODULE_DIR_
-        .'everpsblog/views/img/authors/author_image_'
-        .(int)$this->post->id_author
-        .'.jpg';
-        if (file_exists($author_cover_file)) {
-                $this->author_cover = Tools::getHttpHost(true)
-                .__PS_BASE_URI__
-                .'modules/everpsblog/views/img/authors/author_image_'
-                .(int)$this->post->id_author
-                .'.jpg';
-        } else {
-            $this->author_cover = Tools::getHttpHost(true).__PS_BASE_URI__.'img/'.Configuration::get(
-                'PS_LOGO',
-                null,
-                null,
-                (int)$this->context->shop->id
-            );
-        }
+        $this->author_cover = EverPsBlogImage::getBlogImageUrl(
+            (int)$this->author->id,
+            (int)Context::getContext()->shop->id,
+            'author'
+        );
         $this->post_tags = EverPsBlogTaxonomy::getPostTagsTaxonomies(
             (int)$this->post->id
         );
@@ -287,7 +275,10 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                         (int)Context::getContext()->shop->id,
                         (int)Context::getContext()->language->id
                     );
-                    if ($pproduct->id <= 0) {
+                    if (!$pproduct->checkAccess((int)Context::getContext()->customer->id)
+                        || !$pproduct->id
+                        || (bool)$pproduct->active === false
+                    ) {
                         continue;
                     }
                     if ((bool)$pproduct->active === true) {
@@ -307,11 +298,14 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             $tags = array();
             if (isset($this->post_tags) && !empty($this->post_tags)) {
                 foreach ($this->post_tags as $post_tag) {
-                    $tags[] = new EverPsBlogTag(
+                    $current_post_tag = new EverPsBlogTag(
                         (int)$post_tag['id_ever_post_tag'],
                         (int)$this->context->shop->id,
                         (int)$this->context->language->id
                     );
+                    if ((bool)$current_post_tag->active === true) {
+                        $tags[] = $current_post_tag;
+                    }
                 }
             }
             $commentsCount = EverPsBlogComment::commentsCount(
@@ -405,28 +399,48 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 'blog'
             ),
         );
-        if ($this->post_categories) {
-            foreach ($this->post_categories as $cat) {
-                $category = new EverPsBlogCategory(
-                    (int)$cat['id_ever_post_category'],
+        if ((int)$this->post->id_default_category > 1) {
+            $parent_category = new EverPsBlogCategory(
+                (int)$this->post->id_default_category,
+                (int)$this->context->language->id,
+                (int)$this->context->shop->id
+            );
+            $breadcrumb['links'][] = array(
+                'title' => $parent_category->title,
+                'url' => $this->context->link->getModuleLink(
+                    'everpsblog',
+                    'category',
+                    array(
+                        'id_ever_category' => $parent_category->id,
+                        'link_rewrite' => $parent_category->link_rewrite
+                    )
+                ),
+            );
+            if ((bool)$parent_category->hasChildren() === true) {
+                $children_categories = EverPsBlogCategory::getChildrenCategories(
+                    (int)$this->post->id_default_category,
                     (int)$this->context->language->id,
                     (int)$this->context->shop->id
                 );
-                if ((bool)$category->is_root_category === false
-                    && (int)$category->id > 0
-                    && !empty($category->title)
-                ) {
-                    $breadcrumb['links'][] = array(
-                        'title' => $category->title,
-                        'url' => $this->context->link->getModuleLink(
-                            'everpsblog',
-                            'category',
-                            array(
-                                'id_ever_category' => $category->id,
-                                'link_rewrite' => $category->link_rewrite
-                            )
-                        ),
-                    );
+                foreach ($children_categories as $cat) {
+                    if ((bool)$cat->is_root_category === false
+                        && (int)$cat->id > 0
+                        && !empty($cat->title)
+                        && (bool)$cat->active === true
+                        && in_array($cat->id, $this->post_categories)
+                    ) {
+                        $breadcrumb['links'][] = array(
+                            'title' => $cat->title,
+                            'url' => $this->context->link->getModuleLink(
+                                'everpsblog',
+                                'category',
+                                array(
+                                    'id_ever_category' => $cat->id,
+                                    'link_rewrite' => $cat->link_rewrite
+                                )
+                            ),
+                        );
+                    }
                 }
             }
         }

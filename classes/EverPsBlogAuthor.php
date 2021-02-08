@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -20,8 +20,6 @@
 if (!defined('_PS_VERSION_')) {
     exit;
 }
-
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCleaner.php';
 
 class EverPsBlogAuthor extends ObjectModel
 {
@@ -147,6 +145,11 @@ class EverPsBlogAuthor extends ObjectModel
         )
     );
 
+    /**
+     * Get all available authors
+     * @param int id_lang, int id_shop, bool active (defaut 1)
+     * @return array of all available authors
+    */
     public static function getAllAuthors($id_lang, $id_shop, $active = 1)
     {
         $cache_id = 'EverPsBlogAuthor::getAllAuthors_'
@@ -177,6 +180,11 @@ class EverPsBlogAuthor extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Get author by nickhandle
+     * @param string author nickhandle/name
+     * @return author obj | false if not found
+    */
     public static function getAuthorByNickhandle($nickhandle)
     {
         $sql = new DbQuery;

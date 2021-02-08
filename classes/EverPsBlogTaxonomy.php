@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -20,9 +20,6 @@
 if (!defined('_PS_VERSION_')) {
     exit;
 }
-
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogPost.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCategory.php';
 
 class EverPsBlogTaxonomy extends ObjectModel
 {
@@ -182,6 +179,12 @@ class EverPsBlogTaxonomy extends ObjectModel
         }
     }
 
+    /**
+     * Get post tag taxonomies from table
+     *
+     * @param $id_post
+     * @return array of all tag taxonomies for given post id
+     */
     public static function getPostTagsTaxonomies($id_post)
     {
         $cache_id = 'EverPsBlogTaxonomy::getPostTagsTaxonomies_'
@@ -198,6 +201,12 @@ class EverPsBlogTaxonomy extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Get post category taxonomies from table
+     *
+     * @param $id_post
+     * @return array of all category taxonomies for given post id
+     */
     public static function getPostCategoriesTaxonomies($id_post)
     {
         $cache_id = 'EverPsBlogTaxonomy::getPostCategoriesTaxonomies_'
@@ -221,6 +230,11 @@ class EverPsBlogTaxonomy extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Get all parent category taxonomies for given id category
+     * @param int category id, bool only active categories
+     * @return array of all category obj
+     */
     public static function getCategoryParentsTaxonomy($id_category, $active = 1)
     {
         $cache_id = 'EverPsBlogTaxonomy::getCategoryParentsTaxonomy_'
@@ -293,6 +307,12 @@ class EverPsBlogTaxonomy extends ObjectModel
         }
     }
 
+    /**
+     * Chec if taxonomy exists
+     *
+     * @param int taxonomy, string taxonomy name
+     * @return array of all category taxonomies for given post id
+     */
     public static function taxonomyExists($id_obj, $obj_name)
     {
         $cache_id = 'EverPsBlogTaxonomy::taxonomyExists_'
@@ -334,6 +354,7 @@ class EverPsBlogTaxonomy extends ObjectModel
      *
      * @param $id_tag
      * @return false is error
+     * @deprecated deprecated since version 5.0.1
      */
     public static function migrateJsonPostsData()
     {

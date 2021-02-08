@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -36,8 +36,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
     {
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         $this->bootstrap = true;
-        $this->display = 'Ever Blog Categories';
-        $this->meta_title = $this->l('Ever Blog Categories');
+        $this->display = $this->l('Ever Blog Categories');
         $this->table = 'ever_blog_category';
         $this->className = 'EverPsBlogCategory';
         $this->module_name = 'everpsblog';
@@ -64,8 +63,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
             ),
             'title' => array(
                 'title' => $this->l('Category title'),
-                'align' => 'left',
-                'width' => 25
+                'align' => 'left'
             ),
             'active' => array(
                 'title' => $this->l('Active'),
@@ -97,8 +95,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
             ),
             'count' => array(
                 'title' => $this->l('Views count'),
-                'align' => 'left',
-                'width' => 25
+                'align' => 'left'
             ),
         );
 

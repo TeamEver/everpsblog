@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -20,8 +20,6 @@
 if (!defined('_PS_VERSION_')) {
     exit;
 }
-
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCleaner.php';
 
 class EverPsBlogImage extends ObjectModel
 {
@@ -57,6 +55,10 @@ class EverPsBlogImage extends ObjectModel
         )
     );
 
+    /**
+     * Get all image types for blog
+     * @return array of image types
+    */
     public static function getImageTypes()
     {
         $image_types = array(
@@ -68,6 +70,10 @@ class EverPsBlogImage extends ObjectModel
         return $image_types;
     }
 
+    /**
+     * Get all blog images
+     * @return array of objects of all blog images
+    */
     public static function getAllBlogImages()
     {
         $cache_id = 'EverPsBlogImage::getAllBlogImages';
@@ -88,7 +94,12 @@ class EverPsBlogImage extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
-
+    /**
+     * Get blog image per element
+     * @param int id_element, int id_shop, string image_type
+     * @return array of objects of all blog images
+     * @see getImageTypes()
+    */
     public static function getBlogImage($id_element, $id_shop, $image_type)
     {
         $cache_id = 'EverPsBlogImage::getBlogImage_'
@@ -118,6 +129,12 @@ class EverPsBlogImage extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Get blog image link
+     * @param int id_element, int id_shop, string image_type
+     * @return string image link
+     * @see getImageTypes()
+    */
     public static function getBlogImageUrl($id_element, $id_shop, $image_type)
     {
         $cache_id = 'EverPsBlogImage::getBlogImageUrl_'
@@ -153,6 +170,12 @@ class EverPsBlogImage extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Check if image exists on PS folder
+     * @param int id_element, string image_type
+     * @return bool file exists or not
+     * @see getImageTypes()
+    */
     public static function blogFileExist($id_element, $image_type)
     {
         $file = _PS_IMG_DIR_
@@ -165,6 +188,13 @@ class EverPsBlogImage extends ObjectModel
         return false;
     }
 
+    /**
+     * Check if image exists on old blog folders
+     * @param int id_element, string image_type
+     * @return bool file exists or not
+     * @see getImageTypes()
+     * @deprecated deprecated since version 5.0.1
+    */
     public static function oldBlogFileExist($id_element, $image_type)
     {
         switch ($image_type) {
@@ -206,6 +236,12 @@ class EverPsBlogImage extends ObjectModel
         return false;
     }
 
+    /**
+     * Migrate all posts featured image files to database to old blog image system
+     * @param int id_shop
+     * @return bool if migration has been successfully passed
+     * @deprecated deprecated since version 5.0.1
+    */
     public static function migratePostsImages($id_shop)
     {
         $sql = new DbQuery;
@@ -232,6 +268,12 @@ class EverPsBlogImage extends ObjectModel
         return $result;
     }
 
+    /**
+     * Migrate all categories featured images files to database to old blog image system
+     * @param int id_shop
+     * @return bool if migration has been successfully passed
+     * @deprecated deprecated since version 5.0.1
+    */
     public static function migrateCategoriesImages($id_shop)
     {
         $sql = new DbQuery;
@@ -245,7 +287,9 @@ class EverPsBlogImage extends ObjectModel
                 (int)$id_shop,
                 'category'
             );
-            if (!Validate::isLoadedObject($exists) && self::oldBlogFileExist($category['id_ever_category'], 'category')) {
+            if (!Validate::isLoadedObject($exists)
+                && self::oldBlogFileExist($category['id_ever_category'], 'category')
+            ) {
                 $featured_image = new self();
                 $featured_image->id_element = $category['id_ever_category'];
                 $featured_image->image_type = 'category';
@@ -258,6 +302,12 @@ class EverPsBlogImage extends ObjectModel
         return $result;
     }
 
+    /**
+     * Migrate all tags featured images files to database to old blog image system
+     * @param int id_shop
+     * @return bool if migration has been successfully passed
+     * @deprecated deprecated since version 5.0.1
+    */
     public static function migrateTagsImages($id_shop)
     {
         $sql = new DbQuery;
@@ -284,6 +334,12 @@ class EverPsBlogImage extends ObjectModel
         return $result;
     }
 
+    /**
+     * Migrate all authors featured images files to database to old blog image system
+     * @param int id_shop
+     * @return bool if migration has been successfully passed
+     * @deprecated deprecated since version 5.0.1
+    */
     public static function migrateAuthorsImages($id_shop)
     {
         $sql = new DbQuery;

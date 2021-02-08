@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -87,6 +87,11 @@ class EverPsBlogComment extends ObjectModel
         )
     );
 
+    /**
+     * get latest comment by customer email
+     * @param customer email, int id_lang
+     * @return comment obj
+    */
     public function getLatestCommentByEmail($email, $id_lang)
     {
         $cache_id = 'EverPsBlogComment::getLatestCommentByEmail_'
@@ -107,6 +112,10 @@ class EverPsBlogComment extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Get all comments
+     * @return array of all comments
+    */
     public static function getComments()
     {
         $cache_id = 'EverPsBlogComment::getComments';
@@ -121,6 +130,11 @@ class EverPsBlogComment extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Get all available comments for given post
+     * @param int id post, int id_lang, bool only active
+     * @return array of comment objs
+    */
     public static function getCommentsByPost($id_ever_post, $id_lang, $active = 1)
     {
         $cache_id = 'EverPsBlogComment::getCommentsByPost_'
@@ -142,7 +156,10 @@ class EverPsBlogComment extends ObjectModel
             $return = array();
             // die(var_dump($return));
             foreach ($comments as $comment) {
-                $return[] = new self((int)$comment['id_ever_comment']);
+                $loop_comment = new self((int)$comment['id_ever_comment']);
+                $loop_comment->date_add = date('d/m/Y', strtotime($loop_comment->date_add));
+                $loop_comment->date_upd = date('d/m/Y', strtotime($loop_comment->date_upd));
+                $return[] = $loop_comment;
             }
             Cache::store($cache_id, $return);
             return $return;
@@ -150,6 +167,11 @@ class EverPsBlogComment extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Get all available comments for given email
+     * @param string email, int id_lang, bool only active
+     * @return array of comment objs
+    */
     public static function getCommentsByEmail($email, $id_lang, $active = 1)
     {
         $cache_id = 'EverPsBlogComment::getCommentsByEmail_'
@@ -170,7 +192,10 @@ class EverPsBlogComment extends ObjectModel
             $comments = Db::getInstance()->executeS($sql);
             $return = array();
             foreach ($comments as $comment) {
-                $return[] = new self((int)$comment['id_ever_comment']);
+                $loop_comment = new self((int)$comment['id_ever_comment']);
+                $loop_comment->date_add = date('d/m/Y', strtotime($loop_comment->date_add));
+                $loop_comment->date_upd = date('d/m/Y', strtotime($loop_comment->date_upd));
+                $return[] = $loop_comment;
             }
             Cache::store($cache_id, $return);
             return $return;
@@ -178,6 +203,11 @@ class EverPsBlogComment extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Count comments per post id
+     * @param int id post, int id_lang, bool only active
+     * @return int comments count for given post id
+    */
     public static function commentsCount($id_ever_post, $id_lang, $active = 1)
     {
         $cache_id = 'EverPsBlogComment::commentsCount_'

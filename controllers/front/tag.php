@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -22,11 +22,6 @@ if (!defined('_PS_VERSION_')) {
 }
 
 include_once(dirname(__FILE__).'/../../classes/controller/FrontController.php');
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogPost.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCategory.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogImage.php';
 
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
@@ -51,13 +46,13 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
             (int)$this->context->language->id,
             (int)$this->context->shop->id
         );
-        $this->tag->count = $this->tag->count + 1;
-        $this->tag->save();
         parent::init();
         // if inactive tag or unexists, redirect
-        if (!$this->tag->active) {
+        if ((bool)$this->tag->active === false) {
             Tools::redirect('index.php');
         }
+        $this->tag->count = $this->tag->count + 1;
+        $this->tag->save();
     }
 
     public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
@@ -135,6 +130,7 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
             );
             $this->context->smarty->assign(
                 array(
+                    'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
                     'allow_feed' => (bool)Configuration::get('EVERBLOG_RSS'),
                     'feed_url' => $feed_url,
                     'featured_image' => $file_url,

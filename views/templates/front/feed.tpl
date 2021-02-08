@@ -1,5 +1,5 @@
 {*
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -18,17 +18,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:creativeCommons="http://backend.userland.com/creativeCommonsRssModule" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" version="2.0">
 <channel>
-    <title>{$feed_obj->title}</title>
+    <title>{$feed_obj->title|escape:'htmlall':'UTF-8'}</title>
     {* <atom:link href="{$feed_url}" rel="self" type="application/rss+xml" /> *}
     <link>/</link>
-    <description>{$feed_obj->content}</description>
-    <language>{$locale}</language>
+    <description>{$feed_obj->content nofilter}</description>
+    <language>{$locale|escape:'htmlall':'UTF-8'}</language>
     {foreach from=$posts item=item}
     <item>
-       <title>{$item->title}</title>
+       <title>{$item->title|escape:'htmlall':'UTF-8'}</title>
        <link><![CDATA[{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}]]></link>
-       <pubDate>{$item->date_add}</pubDate>
-       <content:encoded><![CDATA[{$item->content}]]></content:encoded>
+       <pubDate>{$item->date_add|escape:'htmlall':'UTF-8'}</pubDate>
+       <content:encoded><![CDATA[{$item->content nofilter}]]></content:encoded>
     </item>
     {/foreach}
 </channel>

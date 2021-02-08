@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -22,12 +22,6 @@ if (!defined('_PS_VERSION_')) {
 }
 
 include_once(dirname(__FILE__).'/../../classes/controller/FrontController.php');
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogPost.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCategory.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTaxonomy.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogImage.php';
 
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
@@ -122,6 +116,15 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                 (int)$this->category->id,
                 (int)$pagination['items_shown_from'] - 1
             );
+            if ($this->category->hasChildren()) {
+                $children_categories = EverPsBlogCategory::getChildrenCategories(
+                    (int)$this->category->id,
+                    (int)$this->context->language->id,
+                    (int)$this->context->shop->id
+                );
+            } else {
+                $children_categories = false;
+            }
             $this->category->content = EverPsBlogPost::changeShortcodes(
                 (string)$this->category->content,
                 (int)Context::getContext()->customer->id
@@ -152,6 +155,8 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
             );
             $this->context->smarty->assign(
                 array(
+                    'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
+                    'children_categories' => $children_categories,
                     'allow_feed' => (bool)Configuration::get('EVERBLOG_RSS'),
                     'feed_url' => $feed_url,
                     'featured_image' => $file_url,
@@ -212,6 +217,8 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
             );
             if ((bool)$category->is_root_category === false
                 && (int)$category->id > 0
+                && !empty($category->title)
+                && (bool)$category->active === true
             ) {
                 $breadcrumb['links'][] = array(
                     'title' => $category->title,

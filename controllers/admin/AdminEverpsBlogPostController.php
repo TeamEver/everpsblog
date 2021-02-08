@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -40,8 +40,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         $this->name = 'AdminEverPsBlogPostController';
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         $this->bootstrap = true;
-        $this->display = 'Ever Blog Posts';
-        $this->meta_title = $this->l('Ever Blog Posts');
+        $this->display = $this->l('Ever Blog Posts');
         $this->table = 'ever_blog_post';
         $this->className = 'EverPsBlogPost';
         $this->module_name = 'everpsblog';
@@ -69,8 +68,13 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             ),
             'title' => array(
                 'title' => $this->l('Post title'),
+                'align' => 'left'
+            ),
+            'cat_title' => array(
+                'title' => $this->l('Default category'),
                 'align' => 'left',
-                'width' => 25
+                'havingFilter' => true,
+                'filter_key' => 'acl!title'
             ),
             'nickhandle' => array(
                 'title' => $this->l('Author'),
@@ -105,13 +109,15 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             ),
             'count' => array(
                 'title' => $this->l('Views count'),
-                'align' => 'left',
-                'width' => 25
+                'align' => 'left'
             ),
         );
 
         $this->colorOnBackground = true;
-        $this->_select = 'l.title, au.nickhandle, CONCAT("'.$this->img_url.'",ai.image_link) AS featured_img';
+        $this->_select = 'l.title,
+        au.nickhandle,
+        CONCAT("'.$this->img_url.'",ai.image_link) AS featured_img,
+        acl.title AS cat_title';
 
         $this->_join =
             'LEFT JOIN `'._DB_PREFIX_.'ever_blog_post_lang` l
@@ -126,6 +132,11 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 ON (
                     ai.`id_ever_image` = a.`id_ever_post`
                     AND ai.`image_type` = "post"
+                )
+            LEFT JOIN `'._DB_PREFIX_.'ever_blog_category_lang` acl
+                ON (
+                    acl.`id_ever_category` = a.`id_default_category`
+                    AND acl.`id_lang` = '.(int)Context::getContext()->language->id.'
                 )';
         $this->_where = 'AND a.id_shop = '.(int)Context::getContext()->shop->id;
         $this->_where = 'AND l.id_lang = '.(int)Context::getContext()->language->id;
@@ -224,8 +235,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
     public function renderList()
     {
         $this->addRowAction('edit');
-        $this->addRowAction('deletePost');
         $this->addRowAction('duplicate');
+        $this->addRowAction('deletePost');
         $this->addRowAction('ViewPost');
         $this->bulk_actions = array(
             'delete' => array(
@@ -325,6 +336,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             'content' => (!empty(Tools::getValue('content')))
             ? Tools::getValue('content')
             : $obj->content,
+            'excerpt' => (!empty(Tools::getValue('excerpt')))
+            ? Tools::getValue('excerpt')
+            : $obj->excerpt,
             'date_add' => (!empty(Tools::getValue('date_add')))
             ? Tools::getValue('date_add')
             : $obj->date_add,
@@ -334,6 +348,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             'post_categories[]' => (!empty(Tools::getValue('post_categories')))
             ? Tools::getValue('post_categories')
             : $cat_taxonomies,
+            'id_default_category' => (!empty(Tools::getValue('id_default_category')))
+            ? Tools::getValue('id_default_category')
+            : $obj->id_default_category,
             'post_tags[]' => (!empty(Tools::getValue('post_tags')))
             ? Tools::getValue('post_tags')
             : $tag_taxonomies,
@@ -473,6 +490,21 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     ),
                     array(
                         'type' => 'select',
+                        'label' => $this->l('Default categories'),
+                        'desc' => $this->l('Please choose default category'),
+                        'hint' => $this->l('Will be used on breadcrumb'),
+                        'name' => 'id_default_category',
+                        'options' => array(
+                            'query' => EverPsBlogCategory::getAllCategories(
+                                (int)Context::getContext()->language->id,
+                                (int)Context::getContext()->shop->id
+                            ),
+                            'id' => 'id_ever_category',
+                            'name' => 'title',
+                        ),
+                    ),
+                    array(
+                        'type' => 'select',
                         'label' => $this->l('Associated tags'),
                         'desc' => $this->l('Please choose at least one tag'),
                         'hint' => $this->l('Choose one or more tags'),
@@ -582,6 +614,18 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'name' => 'content',
                         'lang' => true,
                         'autoload_rte' => true,
+                        'cols' => 60,
+                        'rows' => 30
+                    ),
+                    array(
+                        'type' => 'textarea',
+                        'label' => $this->l('Post excerpt'),
+                        'desc' => $this->l('Add here post excerpt'),
+                        'hint' => $this->l('Will be shown on listings'),
+                        'required' => true,
+                        'name' => 'excerpt',
+                        'lang' => true,
+                        'autoload_rte' => false,
                         'cols' => 60,
                         'rows' => 30
                     ),
@@ -805,7 +849,18 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 $post->id_author = Tools::getValue('id_author');
             }
             // Categories, products and tags
-            $post->post_categories = json_encode(Tools::getValue('post_categories'));
+            if (Tools::getValue('id_default_category')
+                && !Validate::isInt(Tools::getValue('id_default_category'))
+            ) {
+                 $this->errors[] = $this->l('Default category is not valid');
+            } else {
+                $post->id_default_category = Tools::getValue('id_default_category');
+            }
+            $post_categories = Tools::getValue('post_categories');
+            if (!in_array(Tools::getValue('id_default_category'), Tools::getValue('post_categories'))) {
+                $post_categories[] = Tools::getValue('id_default_category');
+            }
+            $post->post_categories = json_encode($post_categories);
             $post->post_tags = json_encode(Tools::getValue('post_tags'));
             $post->post_products = json_encode(Tools::getValue('post_products'));
             $post->date_upd = date('Y-m-d H:i:s');
@@ -824,6 +879,13 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     $this->errors[] = $this->l('Content is not valid for lang ').$lang['id_lang'];
                 } else {
                     $post->content[$lang['id_lang']] = Tools::getValue('content_'.$lang['id_lang']);
+                }
+                if (Tools::getValue('excerpt_'.$lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('excerpt_'.$lang['id_lang']), true)
+                ) {
+                    $this->errors[] = $this->l('Excerpt is not valid for lang ').$lang['id_lang'];
+                } else {
+                    $post->excerpt[$lang['id_lang']] = Tools::getValue('excerpt_'.$lang['id_lang']);
                 }
                 if (Tools::getValue('meta_title_'.$lang['id_lang'])
                     && !Validate::isCleanHtml(Tools::getValue('meta_title_'.$lang['id_lang']))
@@ -999,6 +1061,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         foreach (Language::getLanguages(false) as $language) {
             $new_everObj->title[$language['id_lang']] = $everObj->title[$language['id_lang']];
             $new_everObj->content[$language['id_lang']] = $everObj->content[$language['id_lang']];
+            $new_everObj->excerpt[$language['id_lang']] = $everObj->excerpt[$language['id_lang']];
             $new_everObj->meta_title[$language['id_lang']] = $everObj->meta_title[$language['id_lang']];
             $new_everObj->meta_description[$language['id_lang']] = $everObj->meta_description[$language['id_lang']];
             $new_everObj->link_rewrite[$language['id_lang']] = $everObj->link_rewrite[$language['id_lang']];

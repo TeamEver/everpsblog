@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -22,10 +22,10 @@ class EverPsBlogCleaner extends ObjectModel
     public $string;
 
     /**
-     * Auto create Prestashop category
+     * Convert string to link rewrite
      *
-     * @param $winparf_category name, $id_shop
-     * @return url rewrite
+     * @param $string
+     * @return link rewrite
      */
     public static function convertToUrlRewrite($string)
     {
@@ -55,42 +55,11 @@ class EverPsBlogCleaner extends ObjectModel
         return $string;
     }
 
-    public static function slugifyLink($text)
-    {
-        // replace non letter or digits by -
-        $text = preg_replace('~[^\pL\d]+~u', '-', $text);
-
-        // transliterate
-        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
-
-        // remove unwanted characters
-        $text = preg_replace('~[^-\w]+~', '', $text);
-
-        // trim
-        $text = trim($text, '-');
-
-        // remove duplicate -
-        $text = preg_replace('~-+~', '-', $text);
-
-        // lowercase
-        $text = Tools::strtolower($text);
-
-        if (empty($text)) {
-            return 'n-a';
-        }
-
-        return $text;
-    }
-
-    public static function isInvalidCutomerName($domain_name)
-    {
-        $validityPattern = Tools::cleanNonUnicodeSupport(
-            '/^(?:[^0-9!<>,;?=+()\/\\@#"°*`{}_^$%:¤\[\]|\.。]|[\.。](?:\s|$))*$/u'
-        );
-
-        return !preg_match($validityPattern, $domain_name);
-    }
-
+    /**
+     * Check if is valid array by forcing it to convert into array
+     * @param supposed array
+     * @return array
+    */
     public static function convertToArray($array)
     {
         if (!is_array($array)) {

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -12,7 +12,7 @@
  * obtain it through the world-wide-web, please send an email
  * to license@prestashop.com so we can send you a copy immediately.
  *
- *  @feed    Team Ever <https://www.team-ever.com/>
+ *  @author    Team Ever <https://www.team-ever.com/>
  *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
@@ -22,12 +22,6 @@ if (!defined('_PS_VERSION_')) {
 }
 
 include_once(dirname(__FILE__).'/../../classes/controller/FrontController.php');
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogAuthor.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCategory.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogAuthor.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogImage.php';
 
 class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontController
 {
@@ -52,7 +46,7 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
         ) {
             Tools::redirect('index.php');
         }
-        header( "Content-type: text/xml");
+        header('Content-type: text/xml');
         parent::init();
     }
 
@@ -82,7 +76,11 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
                 $posts = EverPsBlogPost::getPostsByCategory(
                     (int)$this->context->language->id,
                     (int)$this->context->shop->id,
-                    (int)$feed_obj->id
+                    (int)$feed_obj->id,
+                    0,
+                    null,
+                    'published',
+                    true
                 );
                 break;
 
@@ -95,7 +93,11 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
                 $posts = EverPsBlogPost::getPostsByTag(
                     (int)$this->context->language->id,
                     (int)$this->context->shop->id,
-                    (int)$feed_obj->id
+                    (int)$feed_obj->id,
+                    0,
+                    null,
+                    'published',
+                    true
                 );
                 break;
 
@@ -105,10 +107,15 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
                     (int)$this->context->language->id,
                     (int)$this->context->shop->id
                 );
+                $feed_obj->title = $feed_obj->nickhandle;
                 $posts = EverPsBlogPost::getPostsByAuthor(
                     (int)$this->context->language->id,
                     (int)$this->context->shop->id,
-                    (int)$feed_obj->id
+                    (int)$feed_obj->id,
+                    0,
+                    null,
+                    'published',
+                    true
                 );
                 break;
             
@@ -136,7 +143,11 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
                 );
                 $posts_array = EverPsBlogPost::getPosts(
                     (int)$this->context->language->id,
-                    (int)$this->context->shop->id
+                    (int)$this->context->shop->id,
+                    0,
+                    null,
+                    'published',
+                    true
                 );
                 $posts = array();
                 foreach ($posts_array as $post_array) {

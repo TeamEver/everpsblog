@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -35,7 +35,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
     {
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         $this->bootstrap = true;
-        $this->display = 'Ever Blog Comments';
+        $this->display = $this->l('Ever Blog Comments');
         $this->table = 'ever_blog_comments';
         $this->className = 'EverPsBlogComment';
         $this->module_name = 'everpsblog';
@@ -63,12 +63,16 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
             'pltitle' => array(
                 'title' => $this->l('Post title'),
                 'align' => 'left',
-                'width' => 25
+                'havingFilter' => true,
+                'filter_key' => 'pl!title'
+            ),
+            'name' => array(
+                'title' => $this->l('User name'),
+                'align' => 'left'
             ),
             'user_email' => array(
                 'title' => $this->l('User email'),
-                'align' => 'left',
-                'width' => 25
+                'align' => 'left'
             ),
             'active' => array(
                 'title' => $this->l('Comment status'),
@@ -176,6 +180,8 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
     {
         $this->addRowAction('edit');
         $this->addRowAction('delete');
+        $this->addRowAction('deleteComment');
+        $this->addRowAction('ViewPost');
         $this->toolbar_title = $this->l('Comment settings');
         $this->bulk_actions = array(
             'delete' => array(
@@ -183,6 +189,15 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
                 'confirm' => $this->l('Delete selected items ?')
             ),
         );
+
+        if (Tools::getIsset('deleteComment'.$this->table)) {
+            $everObj = new EverPsBlogComment(
+                (int)Tools::getValue('id_ever_comment')
+            );
+            if (Validate::isLoadedObject($everObj)) {
+                $everObj->delete();
+            }
+        }
 
         if (Tools::isSubmit('submitBulkdelete'.$this->table)) {
             $this->processBulkDelete();
@@ -281,6 +296,15 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
                 ),
                 array(
                     'type' => 'text',
+                    'label' => $this->l('User name'),
+                    'desc' => $this->l('Set or change user name'),
+                    'hint' => $this->l('Required, please type a valid name'),
+                    'required' => true,
+                    'name' => 'name',
+                    'lang' => false,
+                ),
+                array(
+                    'type' => 'text',
                     'label' => $this->l('User email'),
                     'desc' => $this->l('Set or change user email'),
                     'hint' => $this->l('Required, please type a valid email'),
@@ -315,6 +339,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
 
     public function postProcess()
     {
+        parent::postProcess();
         if (Tools::getValue('deleteever_blog_comments')) {
             $everObj = new EverPsBlogComment(
                 (int)Tools::getValue('id_ever_comment')
@@ -351,6 +376,13 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
             } else {
                 $comment->comment = Tools::getValue('comment');
             }
+            if (!Tools::getValue('name')
+                || !Validate::isGenericName(Tools::getValue('name'))
+            ) {
+                $this->errors[] = $this->l('User name is not valid');
+            } else {
+                $comment->name = Tools::getValue('name');
+            }
             if (!Tools::getValue('user_email')
                 || !Validate::isEmail(Tools::getValue('user_email'))
             ) {
@@ -379,7 +411,59 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
             }
         }
         Tools::clearCache();
-        parent::postProcess();
+    }
+
+    public function displayDeleteCommentLink($token, $id_ever_comment)
+    {
+        if (!$token) {
+            return;
+        }
+        $drop_url  = 'index.php?controller=AdminEverPsBlogComment';
+        $drop_url  .= '&deleteComment'.$this->table;
+        $drop_url  .= '&id_ever_comment='.$id_ever_comment;
+        $drop_url  .= '&token=';
+        $drop_url .= Tools::getAdminTokenLite('AdminEverPsBlogComment');
+
+        $this->context->smarty->assign(array(
+            'href' => $drop_url,
+            'confirm' => $this->l('Delete comment ?'),
+            'action' => $this->l('Delete comment')
+        ));
+
+        return $this->context->smarty->fetch(
+            _PS_MODULE_DIR_.'everpsblog/views/templates/admin/helpers/lists/list_action_delete_post.tpl'
+        );
+    }
+
+    public function displayViewPostLink($token, $id_ever_comment)
+    {
+        if (!$token) {
+            return;
+        }
+        $comment = new EverPsBlogComment(
+            (int)$id_ever_comment
+        );
+        $post = new EverPsBlogPost($comment->id_ever_post);
+        $link = new Link();
+        $id_lang = (int)Context::getContext()->language->id;
+        $see_url = $link->getModuleLink(
+            'everpsblog',
+            'post',
+            array(
+                'id_ever_post' => $post->id,
+                'link_rewrite' => $post->link_rewrite[$id_lang]
+            )
+        );
+
+        $this->context->smarty->assign(array(
+            'href' => $see_url,
+            'confirm' => null,
+            'action' => $this->l('View post')
+        ));
+
+        return $this->context->smarty->fetch(
+            _PS_MODULE_DIR_.'everpsblog/views/templates/admin/helpers/lists/list_action_view_obj.tpl'
+        );
     }
 
     protected function processBulkDelete()

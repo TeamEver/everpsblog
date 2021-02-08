@@ -1,5 +1,5 @@
 {*
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -19,7 +19,7 @@
 {if isset($showArchives) && $showArchives}
 {/if}
 
-{if isset($showCategories) && $showCategories}
+{if isset($showCategories) && $showCategories && isset($categories) && !empty($categories)}
 <div class="columns_everblog_wrapper category_wrapper">
     <p class="text-uppercase h6 hidden-sm-down">{l s='Categories from the blog' mod='everpsblog'}</p>
     <ul>
@@ -35,7 +35,7 @@
     </ul>
 </div>
 {/if}
-{if isset($showTags) && $showTags}
+{if isset($showTags) && $showTags && isset($tags) && !empty($tags)}
 <div class="columns_everblog_wrapper tag_wrapper">
     <p class="text-uppercase h6 hidden-sm-down">{l s='Tags from the blog' mod='everpsblog'}</p>
 {foreach from=$tags item=tag}
@@ -74,7 +74,7 @@
                                 {$item->title|escape:'htmlall':'UTF-8'}
                         </h3>
                         <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
-                            {$item->content|truncate:90:'...' nofilter}
+                            {if isset($item->excerpt) && !empty($item->excerpt)}{$item->excerpt|truncate:90:"..."|escape:'htmlall':'UTF-8'}{else}{$item->content|truncate:90:"..."|escape:'htmlall':'UTF-8'}{/if}
                         </div>
                         <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary btn-blog-primary" title="{l s='Read more' mod='everpsblog'} {$item->title|escape:'htmlall':'UTF-8'}">{l s='Read more' mod='everpsblog'}</a>
                     </div>

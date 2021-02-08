@@ -1,5 +1,5 @@
 {*
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -36,6 +36,34 @@
     {if isset($allow_feed) && $allow_feed}
     <link rel="alternate" type="application/rss+xml" title="{$page.meta.title|escape:'htmlall':'UTF-8'} {if isset($pagination) && $pagination.current_page > 0}{l s='(page' mod='everpsblog'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' mod='everpsblog'}{/if}" href="{$feed_url|escape:'htmlall':'UTF-8'}" />
     {/if}
+    <script type="application/ld+json">
+    {
+    "@context": "https://schema.org",
+    "@type": "{$blog_type|escape:'htmlall':'UTF-8'}",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://google.com/article"
+    },
+    "headline": "{$category->title|escape:'htmlall':'UTF-8'}",
+    "image": [
+      "{$featured_image|escape:'htmlall':'UTF-8'}"
+     ],
+    "datePublished": "{$category->date_add|escape:'htmlall':'UTF-8'}",
+    "dateModified": "{$category->date_upd|escape:'htmlall':'UTF-8'}",
+    "author": {
+      "@type": "Person",
+      "name": "{$shop.name|escape:'htmlall':'UTF-8'}"
+    },
+     "publisher": {
+      "@type": "Organization",
+      "name": "{$shop.name|escape:'htmlall':'UTF-8'}",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "{$shop.logo|escape:'htmlall':'UTF-8'}"
+      }
+    }
+    }
+    </script>
 {/block}
 
 {block name="page_content"}
@@ -59,26 +87,20 @@
     </div>
 </div>
 {/if}
+{if isset($children_categories) && $children_categories && !empty($children_categories)}
+<div class="row mt-2">
+{foreach from=$children_categories item=item}
+    {if !$item->is_root_category}
+    {include file='module:everpsblog/views/templates/front/loop/category_object.tpl'}
+    {/if}
+{/foreach}
+</div>
+{/if}
 {if isset($post_number) && $post_number > 0}
 <div class="container">
 {hook h="displayBeforeEverLoop"}
 {foreach from=$posts item=item}
-    <div class="col-12 col-xs-12 article everpsblog" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
-        <div class="col-md-12">
-            <div class="col-12 col-xs-12 col-md-4 article-img">
-                <img src="{$item->featured_image|escape:'htmlall':'UTF-8'}" class="img-fluid mx-auto d-block {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" />
-            </div>
-            <div class="col-12 col-xs-12 col-md-8">
-                <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
-                    <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
-                        {$item->title|escape:'htmlall':'UTF-8'}
-                    </a>
-                </h3>
-                <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">{$item->content|truncate:350:"..." nofilter}</div>
-                <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary btn-blog-primary" title="{$item->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{l s='Read more' mod='everpsblog'}</a>
-            </div>
-        </div>
-    </div>
+{include file='module:everpsblog/views/templates/front/loop/post_object.tpl'}
 {/foreach}
 </div>
 {include file='_partials/pagination.tpl' pagination=$pagination}

@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -125,6 +125,11 @@ class EverPsBlogTag extends ObjectModel
         )
     );
 
+    /**
+     * Get all available tags
+     * @param int id_lang, int id_shop, bool active (defaut 1)
+     * @return array of all available tags
+    */
     public static function getAllTags($id_lang, $id_shop, $active = 1)
     {
         $cache_id = 'EverPsBlogTag::getAllTags_'
@@ -148,6 +153,11 @@ class EverPsBlogTag extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Get tag by link_rewrite
+     * @param string tag link_rewrite
+     * @return tag obj | false if not found
+    */
     public static function getTagByLinkRewrite($link_rewrite)
     {
         $sql = new DbQuery;

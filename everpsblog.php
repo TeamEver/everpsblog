@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -17,15 +17,19 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogPost.php';
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogAuthor.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCategory.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCleaner.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTaxonomy.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogAuthor.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogImage.php';
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogPost.php';
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTaxonomy.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogSitemap.php';
+require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCleaner.php';
 
 class EverPsBlog extends Module
 {
@@ -38,11 +42,12 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.2.3';
+        $this->version = '5.2.5';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
         $this->siteUrl = Tools::getHttpHost(true).__PS_BASE_URI__;
+        $this->module_folder = _PS_MODULE_DIR_.'everpsblog';
         parent::__construct();
 
         $this->displayName = $this->l('Ever Blog');
@@ -116,7 +121,7 @@ class EverPsBlog extends Module
             && $this->installModuleTab(
                 'AdminEverPsBlogCategory',
                 'AdminEverPsBlog',
-                'Categories'
+                $this->l('Categories')
             )
             && $this->installModuleTab(
                 'AdminEverPsBlogTag',
@@ -642,6 +647,55 @@ class EverPsBlog extends Module
                     $this->importWordPressFile($_FILES['wordpress_xml']);
                 }
             }
+            if (Tools::getValue('EVERBLOG_IMPORT_POST_STATE')
+                && !Validate::isString(Tools::getValue('EVERBLOG_IMPORT_POST_STATE'))
+            ) {
+                $this->postErrors[] = $this->l(
+                    'Error : The field "Default post status on import from WordPress xml file" is not valid'
+                );
+            }
+            if (Tools::getValue('EVERBLOG_IMPORT_AUTHORS')
+                && !Validate::isBool(Tools::getValue('EVERBLOG_IMPORT_AUTHORS'))
+            ) {
+                $this->postErrors[] = $this->l(
+                    'Error : The field "Import authors from WordPress xml file" is not valid'
+                );
+            }
+            if (Tools::getValue('EVERBLOG_IMPORT_CATS')
+                && !Validate::isBool(Tools::getValue('EVERBLOG_IMPORT_CATS'))
+            ) {
+                $this->postErrors[] = $this->l(
+                    'Error : The field "Import categories from WordPress xml file" is not valid'
+                );
+            }
+            if (Tools::getValue('EVERBLOG_IMPORT_TAGS')
+                && !Validate::isBool(Tools::getValue('EVERBLOG_IMPORT_TAGS'))
+            ) {
+                $this->postErrors[] = $this->l(
+                    'Error : The field "Import tags from WordPress xml file" is not valid'
+                );
+            }
+            if (Tools::getValue('EVERBLOG_ENABLE_AUTHORS')
+                && !Validate::isBool(Tools::getValue('EVERBLOG_ENABLE_AUTHORS'))
+            ) {
+                $this->postErrors[] = $this->l(
+                    'Error : The field "Enable authors from WordPress xml file" is not valid'
+                );
+            }
+            if (Tools::getValue('EVERBLOG_ENABLE_CATS')
+                && !Validate::isBool(Tools::getValue('EVERBLOG_ENABLE_CATS'))
+            ) {
+                $this->postErrors[] = $this->l(
+                    'Error : The field "Enable categories from WordPress xml file" is not valid'
+                );
+            }
+            if (Tools::getValue('EVERBLOG_ENABLE_TAGS')
+                && !Validate::isBool(Tools::getValue('EVERBLOG_ENABLE_TAGS'))
+            ) {
+                $this->postErrors[] = $this->l(
+                    'Error : The field "Enable tags from WordPress xml file" is not valid'
+                );
+            }
         }
     }
 
@@ -808,6 +862,13 @@ class EverPsBlog extends Module
             'EVERPSBLOG_TAG_LAYOUT' => Configuration::get('EVERPSBLOG_TAG_LAYOUT'),
             'EVERBLOG_CSS' => $custom_css,
             'EVERBLOG_CSS_FILE' => Configuration::get('EVERBLOG_CSS_FILE'),
+            'EVERBLOG_IMPORT_AUTHORS' => Configuration::get('EVERBLOG_IMPORT_AUTHORS'),
+            'EVERBLOG_IMPORT_CATS' => Configuration::get('EVERBLOG_IMPORT_CATS'),
+            'EVERBLOG_IMPORT_TAGS' => Configuration::get('EVERBLOG_IMPORT_TAGS'),
+            'EVERBLOG_ENABLE_AUTHORS' => Configuration::get('EVERBLOG_ENABLE_AUTHORS'),
+            'EVERBLOG_ENABLE_CATS' => Configuration::get('EVERBLOG_ENABLE_CATS'),
+            'EVERBLOG_ENABLE_TAGS' => Configuration::get('EVERBLOG_ENABLE_TAGS'),
+            'EVERBLOG_IMPORT_POST_STATE' => Configuration::get('EVERBLOG_IMPORT_POST_STATE'),
             'wordpress_xml' => ''
         );
         $values = call_user_func_array('array_merge', $formValues);
@@ -927,6 +988,28 @@ class EverPsBlog extends Module
             array(
                 'id_file' => 'yellow',
                 'name' => $this->l('yellow.css file')
+            ),
+        );
+        $post_status = array(
+            array(
+                'id_status' => 'draft',
+                'name' => $this->l('draft')
+            ),
+            array(
+                'id_status' => 'pending',
+                'name' => $this->l('pending')
+            ),
+            array(
+                'id_status' => 'published',
+                'name' => $this->l('published')
+            ),
+            array(
+                'id_status' => 'trash',
+                'name' => $this->l('trash')
+            ),
+            array(
+                'id_status' => 'planned',
+                'name' => $this->l('planned')
             ),
         );
         $form_fields = array();
@@ -1361,14 +1444,6 @@ class EverPsBlog extends Module
                         'cols' => 36,
                         'rows' => 4,
                     ),
-                    array(
-                        'type' => 'file',
-                        'label' => $this->l('Import WordPress XML file'),
-                        'desc' => $this->l('Import WordPress XML posts file'),
-                        'hint' => $this->l('Will import posts from WordPress XML file'),
-                        'name' => 'wordpress_xml',
-                        'required' => false
-                    ),
                 ),
                 'buttons' => array(
                     'generateBlogSitemap' => array(
@@ -1467,6 +1542,167 @@ class EverPsBlog extends Module
         $form_fields[] = array(
             'form' => array(
                 'legend' => array(
+                    'title' => $this->l('WordPress XML import settings'),
+                    'icon' => 'icon-smile',
+                ),
+                'input' => array(
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('Default post state on XML import'),
+                        'desc' => $this->l('Will set default post state on XML import'),
+                        'hint' => $this->l('Please select default post state on XML file import'),
+                        'required' => true,
+                        'name' => 'EVERBLOG_IMPORT_POST_STATE',
+                        'options' => array(
+                            'query' => $post_status,
+                            'id' => 'id_status',
+                            'name' => 'name',
+                        ),
+                    ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Import WordPress authors from xml file ?'),
+                        'desc' => $this->l('Set yes to import WordPress authors'),
+                        'hint' => $this->l('Else no authors will be imported'),
+                        'required' => false,
+                        'name' => 'EVERBLOG_IMPORT_AUTHORS',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No')
+                            )
+                        ),
+                    ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Import WordPress categories from xml file ?'),
+                        'desc' => $this->l('Set yes to import WordPress categories'),
+                        'hint' => $this->l('Else no categories will be imported'),
+                        'required' => false,
+                        'name' => 'EVERBLOG_IMPORT_CATS',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No')
+                            )
+                        ),
+                    ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Import WordPress tags from xml file ?'),
+                        'desc' => $this->l('Set yes to import WordPress tags'),
+                        'hint' => $this->l('Else no tags will be imported'),
+                        'required' => false,
+                        'name' => 'EVERBLOG_IMPORT_TAGS',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No')
+                            )
+                        ),
+                    ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Enable WordPress authors from xml file ?'),
+                        'desc' => $this->l('Set yes to enable WordPress authors'),
+                        'hint' => $this->l('Else no authors will be enabled'),
+                        'required' => false,
+                        'name' => 'EVERBLOG_ENABLE_AUTHORS',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No')
+                            )
+                        ),
+                    ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Enable WordPress categories from xml file ?'),
+                        'desc' => $this->l('Set yes to enable WordPress categories'),
+                        'hint' => $this->l('Else no categories will be enabled'),
+                        'required' => false,
+                        'name' => 'EVERBLOG_ENABLE_CATS',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No')
+                            )
+                        ),
+                    ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Enable WordPress tags from xml file ?'),
+                        'desc' => $this->l('Set yes to enable WordPress tags'),
+                        'hint' => $this->l('Else no tags will be enabled'),
+                        'required' => false,
+                        'name' => 'EVERBLOG_ENABLE_TAGS',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No')
+                            )
+                        ),
+                    ),
+                    array(
+                        'type' => 'file',
+                        'label' => $this->l('Import WordPress XML file'),
+                        'desc' => $this->l('Import WordPress XML posts file'),
+                        'hint' => $this->l('Will import posts from WordPress XML file'),
+                        'name' => 'wordpress_xml',
+                        'required' => false
+                    ),
+                ),
+                'submit' => array(
+                    'name' => 'submit',
+                    'title' => $this->l('Save and import'),
+                ),
+            )
+        );
+        $form_fields[] = array(
+            'form' => array(
+                'legend' => array(
                     'title' => $this->l('Design settings'),
                     'icon' => 'icon-smile',
                 ),
@@ -1521,11 +1757,11 @@ class EverPsBlog extends Module
         $module_name = Tools::getValue('module');
         if ($module_name == 'everpsblog') {
             $this->context->controller->addCSS(
-                _PS_MODULE_DIR_.'everpsblog/views/css/everpsblog.css',
+                $this->module_folder.'/views/css/everpsblog.css',
                 'all'
             );
             $this->context->controller->addCSS(
-                _PS_MODULE_DIR_.'everpsblog/views/css/everpsblog.css',
+                $this->module_folder.'everpsblog/views/css/everpsblog.css',
                 'all'
             );
             $this->context->controller->addJs(
@@ -1541,23 +1777,23 @@ class EverPsBlog extends Module
             }
         }
         $this->context->controller->addCSS(
-            _PS_MODULE_DIR_.'everpsblog/views/css/everpsblog-columns.css',
+            $this->module_folder.'/views/css/everpsblog-columns.css',
             'all'
         );
         $this->context->controller->addCSS(
-            _PS_MODULE_DIR_.'everpsblog/views/css/everpsblog-all.css',
+            $this->module_folder.'/views/css/everpsblog-all.css',
             'all'
         );
         $css_file = Configuration::get('EVERBLOG_CSS_FILE');
         if ($css_file && $css_file != 'default') {
             $this->context->controller->addCSS(
-                _PS_MODULE_DIR_.'everpsblog/views/css/'.$css_file.'.css',
+                $this->module_folder.'/views/css/'.$css_file.'.css',
                 'all'
             );
         }
-        if (file_exists(_PS_MODULE_DIR_.'everpsblog/views/css/custom.css')) {
+        if (file_exists($this->module_folder.'/views/css/custom.css')) {
             $this->context->controller->addCSS(
-                _PS_MODULE_DIR_.'everpsblog/views/css/custom.css',
+                $this->module_folder.'/views/css/custom.css',
                 'all'
             );
         }
@@ -1611,7 +1847,7 @@ class EverPsBlog extends Module
             'tags' => $tags,
             'categories' => $categories,
             'animate' => $animate,
-            'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'/modules/everpsblog/views/img/',
+            'blogImg_dir' => $this->siteUrl.'/modules/everpsblog/views/img/',
         ));
         return $this->display(__FILE__, 'views/templates/hook/columns.tpl');
     }
@@ -1657,7 +1893,7 @@ class EverPsBlog extends Module
                 'evercategory' => $evercategories,
                 'default_lang' => (int)$this->context->language->id,
                 'id_lang' => (int)$this->context->language->id,
-                'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'/modules/everpsblog/views/img/',
+                'blogImg_dir' => $this->siteUrl.'/modules/everpsblog/views/img/',
                 'animated' => $animate,
             )
         );
@@ -1728,7 +1964,7 @@ class EverPsBlog extends Module
                 'evercategory' => $evercategories,
                 'default_lang' => (int)$this->context->language->id,
                 'id_lang' => (int)$this->context->language->id,
-                'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'/modules/everpsblog/views/img/',
+                'blogImg_dir' => $this->siteUrl.'/modules/everpsblog/views/img/',
                 'animated' => $animate,
             )
         );
@@ -1833,7 +2069,6 @@ class EverPsBlog extends Module
         if (!count($posts)) {
             return true;
         }
-        // Todo : test pending emails
         $post_list = '';
         foreach ($posts as $pending) {
             $post = new EverPsBlogPost(
@@ -1843,9 +2078,9 @@ class EverPsBlog extends Module
             );
             $post_list .= '<br/><p>'.$post->title.'</p>';
         }
-        $mailDir = _PS_MODULE_DIR_.'everpsblog/mails/';
+        $mailDir = $this->module_folder.'/mails/';
         $everShopEmail = Configuration::get('PS_SHOP_EMAIL');
-        $mail = Mail::send(
+        $sent = Mail::send(
             (int)$this->context->language->id,
             'pending',
             $this->l('Review on pending posts'),
@@ -1872,7 +2107,7 @@ class EverPsBlog extends Module
             (string)$everShopEmail,
             Configuration::get('PS_SHOP_NAME')
         );
-        return $mail;
+        return $sent;
     }
 
     public function publishPlannedPosts($id_shop)
@@ -1965,6 +2200,7 @@ class EverPsBlog extends Module
         EverPsBlogTaxonomy::checkDefaultPostCategory(
             $params['object']->id
         );
+        return $this->generateBlogSitemap();
     }
 
     public function hookActionObjectEverPsBlogCategoryUpdateAfter($params)
@@ -2067,7 +2303,7 @@ class EverPsBlog extends Module
 
     public function hookActionObjectEverPsBlogTagDeleteAfter($params)
     {
-        $old_img = _PS_MODULE_DIR_.'everpsblog/views/img/tags/tag_image_'.(int)$params['object']->id.'.jpg';
+        $old_img = $this->module_folder.'/views/img/tags/tag_image_'.(int)$params['object']->id.'.jpg';
         if (file_exists($old_img)) {
             unlink($old_img);
         }
@@ -2111,6 +2347,9 @@ class EverPsBlog extends Module
 
     public function hookActionObjectProductDeleteAfter($params)
     {
+        EverPsBlogTaxonomy::dropProductTaxonomy(
+            (int)$params['object']->id
+        );
     }
 
     public function generateBlogSitemap($id_shop = null, $cron = false)
@@ -2144,13 +2383,13 @@ class EverPsBlog extends Module
         $iso_lang = Language::getIsoById((int)$id_lang);
 
         $sitemap = new EverPsBlogSitemap(
-            Tools::getHttpHost(true).__PS_BASE_URI__
+            $this->siteUrl
         );
         $sitemap->setPath(_PS_ROOT_DIR_.'/');
         $sitemap->setFilename('blogpost_'.(int)$id_shop.'_lang_'.(string)$iso_lang);
         $sql =
             'SELECT id_ever_post FROM '._DB_PREFIX_.'ever_blog_post
-            WHERE sitemap = 1';
+            WHERE sitemap = 1 AND post_status = "published"';
         if ($results = Db::getInstance()->executeS($sql)) {
             foreach ($results as $result) {
                 $link = new Link();
@@ -2168,17 +2407,15 @@ class EverPsBlog extends Module
                         'link_rewrite' => $post->link_rewrite
                     )
                 );
-                if ($post->post_status == 'published') {
-                    $sitemap->addItem(
-                        $post_url,
-                        1,
-                        'weekly',
-                        $post->date_upd
-                    );
-                }
+                $sitemap->addItem(
+                    $post_url,
+                    1,
+                    'weekly',
+                    $post->date_upd
+                );
             }
             return $sitemap->createSitemapIndex(
-                Tools::getHttpHost(true).__PS_BASE_URI__,
+                $this->siteUrl,
                 'Today'
             );
         }
@@ -2190,13 +2427,13 @@ class EverPsBlog extends Module
         $iso_lang = Language::getIsoById((int)$id_lang);
 
         $sitemap = new EverPsBlogSitemap(
-            Tools::getHttpHost(true).__PS_BASE_URI__
+            $this->siteUrl
         );
         $sitemap->setPath(_PS_ROOT_DIR_.'/');
         $sitemap->setFilename('blogauthor_'.(int)$id_shop.'_lang_'.(string)$iso_lang);
         $sql =
             'SELECT id_ever_author FROM '._DB_PREFIX_.'ever_blog_author
-            WHERE sitemap = 1';
+            WHERE sitemap = 1 AND active = 1';
         if ($results = Db::getInstance()->executeS($sql)) {
             foreach ($results as $result) {
                 $link = new Link();
@@ -2224,7 +2461,7 @@ class EverPsBlog extends Module
                 }
             }
             return $sitemap->createSitemapIndex(
-                Tools::getHttpHost(true).__PS_BASE_URI__,
+                $this->siteUrl,
                 'Today'
             );
         }
@@ -2236,13 +2473,13 @@ class EverPsBlog extends Module
         $iso_lang = Language::getIsoById((int)$id_lang);
 
         $sitemap = new EverPsBlogSitemap(
-            Tools::getHttpHost(true).__PS_BASE_URI__
+            $this->siteUrl
         );
         $sitemap->setPath(_PS_ROOT_DIR_.'/');
         $sitemap->setFilename('blogtag_'.(int)$id_shop.'_lang_'.(string)$iso_lang);
         $sql =
             'SELECT id_ever_tag FROM '._DB_PREFIX_.'ever_blog_tag
-            WHERE sitemap = 1';
+            WHERE sitemap = 1 AND active = 1';
         if ($results = Db::getInstance()->executeS($sql)) {
             foreach ($results as $result) {
                 $link = new Link();
@@ -2270,7 +2507,7 @@ class EverPsBlog extends Module
                 }
             }
             return $sitemap->createSitemapIndex(
-                Tools::getHttpHost(true).__PS_BASE_URI__,
+                $this->siteUrl,
                 'Today'
             );
         }
@@ -2282,13 +2519,13 @@ class EverPsBlog extends Module
         $iso_lang = Language::getIsoById((int)$id_lang);
 
         $sitemap = new EverPsBlogSitemap(
-            Tools::getHttpHost(true).__PS_BASE_URI__
+            $this->siteUrl
         );
         $sitemap->setPath(_PS_ROOT_DIR_.'/');
         $sitemap->setFilename('blogcategory_'.(int)$id_shop.'_lang_'.(string)$iso_lang);
         $sql =
             'SELECT id_ever_category FROM '._DB_PREFIX_.'ever_blog_category
-            WHERE sitemap = 1';
+            WHERE sitemap = 1 AND active = 1';
         if ($results = Db::getInstance()->executeS($sql)) {
             foreach ($results as $result) {
                 $link = new Link();
@@ -2316,7 +2553,7 @@ class EverPsBlog extends Module
                 }
             }
             return $sitemap->createSitemapIndex(
-                Tools::getHttpHost(true).__PS_BASE_URI__,
+                $this->siteUrl,
                 'Today'
             );
         }
@@ -2324,7 +2561,6 @@ class EverPsBlog extends Module
 
     public function getSitemapIndexes()
     {
-        $siteUrl = Tools::getHttpHost(true).__PS_BASE_URI__;
         $indexes = array();
         $sitemap_indexes_dir = glob(_PS_ROOT_DIR_.'/*');
         foreach ($sitemap_indexes_dir as $index) {
@@ -2332,7 +2568,7 @@ class EverPsBlog extends Module
                 && pathinfo($index, PATHINFO_EXTENSION) == 'xml'
                 && strpos(basename($index), 'index')
             ) {
-                $indexes[] = $siteUrl.basename($index);
+                $indexes[] = $this->siteUrl.basename($index);
             }
         }
         return (array)$indexes;
@@ -2411,11 +2647,21 @@ class EverPsBlog extends Module
 
     public function checkLatestEverModuleVersion($module, $version)
     {
+        $upgrade_link = 'https://upgrade.team-ever.com/upgrade.php?module='
+        .$module
+        .'&version='
+        .$version;
+        $handle = curl_init($upgrade_link);
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+        curl_exec($handle);
+        $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+        if ($httpCode != 200) {
+            curl_close($handle);
+            return false;
+        }
+        curl_close($handle);
         $module_version = Tools::file_get_contents(
-            'https://upgrade.team-ever.com/upgrade.php?module='
-            .$module
-            .'&version='
-            .$version
+            $upgrade_link
         );
         if ($module_version && $module_version > $version) {
             return true;
@@ -2430,7 +2676,7 @@ class EverPsBlog extends Module
             Configuration::updateValue('PS_ALLOW_HTML_IFRAME', true);
         }
         $result = true;
-        $xml_str = file_get_contents($file['tmp_name']);
+        $xml_str = Tools::file_get_contents($file['tmp_name']);
         $xml_str = str_replace(
             'content:encoded',
             'content',
@@ -2456,8 +2702,11 @@ class EverPsBlog extends Module
             // Post categories and post tags
             $post_categories = array();
             $post_tags = array();
+            $parent_category = 1;
             foreach ($el->category as $wp_taxonomy) {
-                if ($wp_taxonomy->attributes()['domain'] == 'category') {
+                if ($wp_taxonomy->attributes()['domain'] == 'category'
+                    && (bool)Configuration::get('EVERBLOG_IMPORT_CATS') === true
+                ) {
                     $category = EverPsBlogCategory::getCategoryByLinkRewrite(
                         (string)$wp_taxonomy['nicename']
                     );
@@ -2474,13 +2723,15 @@ class EverPsBlog extends Module
                         $category->index = true;
                         $category->follow = true;
                         $category->sitemap = true;
-                        $category->active = true;
+                        $category->active = (bool)Configuration::get('EVERBLOG_ENABLE_CATS');
                         $result &= $category->save();
                         $post_categories[] = $category->id;
                     } else {
                         $post_categories[] = $category->id;
                     }
-                } elseif ($wp_taxonomy->attributes()['domain'] == 'post_tag') {
+                } elseif ($wp_taxonomy->attributes()['domain'] == 'post_tag'
+                    && (bool)Configuration::get('EVERBLOG_IMPORT_TAGS') === true
+                ) {
                     $tag = EverPsBlogTag::getTagByLinkRewrite(
                         (string)$wp_taxonomy['nicename']
                     );
@@ -2496,7 +2747,7 @@ class EverPsBlog extends Module
                         $tag->index = true;
                         $tag->follow = true;
                         $tag->sitemap = true;
-                        $tag->active = true;
+                        $tag->active = (bool)Configuration::get('EVERBLOG_ENABLE_TAGS');
                         $result &= $tag->save();
                         $post_tags[] = $tag->id;
                     } else {
@@ -2508,12 +2759,14 @@ class EverPsBlog extends Module
             $author = EverPsBlogAuthor::getAuthorByNickhandle(
                 (string)$el->creator
             );
-            if (!Validate::isLoadedObject($author)) {
+            if (!Validate::isLoadedObject($author)
+                && (bool)Configuration::get('EVERBLOG_IMPORT_AUTHORS') === true
+            ) {
                 $author = new EverPsBlogAuthor();
                 $author->nickhandle = (string)$el->creator;
                 foreach (Language::getLanguages(false) as $lang) {
                     $author->meta_title[$lang['id_lang']] = (string)$el->creator;
-                    $author->link_rewrite[$lang['id_lang']] = EverPsBlogPost::slugifyLink(
+                    $author->link_rewrite[$lang['id_lang']] = EverPsBlogCleaner::convertToUrlRewrite(
                         (string)$el->creator
                     );
                 }
@@ -2522,7 +2775,7 @@ class EverPsBlog extends Module
                 $author->index = true;
                 $author->follow = true;
                 $author->sitemap = true;
-                $author->active = true;
+                $author->active = (bool)Configuration::get('EVERBLOG_ENABLE_AUTHORS');
                 $result &= $author->save();
             }
             // Post
@@ -2542,10 +2795,10 @@ class EverPsBlog extends Module
                     $src = $item->getAttribute('src');
                     // Let's avoid 404 errors
                     $handle = curl_init($src);
-                    curl_setopt($handle,  CURLOPT_RETURNTRANSFER, true);
-                    $response = curl_exec($handle);
+                    curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+                    curl_exec($handle);
                     $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-                    if($httpCode == 404 || $httpCode == 400) {
+                    if ($httpCode != 200) {
                         curl_close($handle);
                         continue;
                     }
@@ -2578,11 +2831,13 @@ class EverPsBlog extends Module
                 foreach ($anchors as $item) {
                     $href = $item->getAttribute('href');
                     $href_array = parse_url($href);
-                    $host = $href_array['host'];
-                    $item->setAttribute(
-                        'src',
-                        str_replace($host, $this->siteUrl, $href)
-                    );
+                    if (isset($href_array['host'])) {
+                        $host = $href_array['host'];
+                        $item->setAttribute(
+                            'src',
+                            str_replace($host, $this->siteUrl, $href)
+                        );
+                    }
                 }
                 $dom->saveHTML();
                 $post = new EverPsBlogPost();
@@ -2593,6 +2848,11 @@ class EverPsBlog extends Module
                 foreach (Language::getLanguages(false) as $lang) {
                     $post->title[$lang['id_lang']] = (string)$el->title;
                     $post->meta_title[$lang['id_lang']] = (string)$el->title;
+                    $post->meta_description[$lang['id_lang']] = Tools::substr(
+                        strip_tags($post_content),
+                        0,
+                        160
+                    );
                     $post->link_rewrite[$lang['id_lang']] = $post_link_rewrite;
                     $post->content = $post_content;
                     if (!Validate::isCleanHtml($post_content, true)) {
@@ -2606,14 +2866,18 @@ class EverPsBlog extends Module
                 $post->sitemap = true;
                 $post->active = true;
                 $post->date_add = $el->date_add;
-                $post->post_status = 'published';
-                $post->id_author = $author->id;
+                $post->date_upd = $post->date_add;
+                $post->post_status = Configuration::get('EVERBLOG_IMPORT_POST_STATE');
+                if (Validate::isLoadedObject($author)) {
+                    $post->id_author = $author->id;
+                }
                 if (!empty($post_categories)) {
+                    $post->id_default_category = $post_categories[0];
                     $post->post_categories = json_encode($post_categories);
                 }
                 if (!empty($post_tags)) {
                     $post->post_tags = json_encode($post_tags);
-                }           
+                }
                 $result &= $post->save();
             }
         }

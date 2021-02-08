@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -41,12 +41,14 @@ class EverPsBlogPost extends ObjectModel
     public $link_rewrite;
     public $title;
     public $content;
+    public $excerpt;
     public $id_lang;
     public $id_shop;
     public $id_author;
     public $date_add;
     public $date_upd;
     public $post_status;
+    public $id_default_category;
     public $post_categories;
     public $post_tags;
     public $post_products;
@@ -83,6 +85,11 @@ class EverPsBlogPost extends ObjectModel
                 'validate' => 'isLinkRewrite'
             ),
             'content' => array(
+                'type' => self::TYPE_HTML,
+                'lang' => true,
+                'validate' => 'isCleanHtml'
+            ),
+            'excerpt' => array(
                 'type' => self::TYPE_HTML,
                 'lang' => true,
                 'validate' => 'isCleanHtml'
@@ -134,6 +141,11 @@ class EverPsBlogPost extends ObjectModel
                 'validate' => 'isName',
                 'required' => true
             ),
+            'id_default_category' => array(
+                'type' => self::TYPE_INT,
+                'validate' => 'isunsignedInt',
+                'required' => false
+            ),
             'post_categories' => array(
                 'type' => self::TYPE_STRING,
                 'validate' => 'isJson',
@@ -157,8 +169,19 @@ class EverPsBlogPost extends ObjectModel
         )
     );
 
-    public static function getPosts($id_lang, $id_shop, $start = 0, $limit = null, $post_status = 'published')
-    {
+    /**
+     * Get all posts depending on start and limit
+     * @param int id_lang, int id_shop, int start query, int limit query, string post_status, bool is feed page or not
+     * @return array of posts obj with changed shortcodes
+    */
+    public static function getPosts(
+        $id_lang,
+        $id_shop,
+        $start = 0,
+        $limit = null,
+        $post_status = 'published',
+        $is_feed = false
+    ) {
         $cache_id = 'EverPsBlogPost::getPosts_'
         .(int)$id_lang
         .'_'
@@ -168,7 +191,9 @@ class EverPsBlogPost extends ObjectModel
         .'_'
         .(int)$limit
         .'_'
-        .$post_status;
+        .$post_status
+        .'_'
+        .$is_feed;
         if (!Cache::isStored($cache_id)) {
             if (!(int)$limit) {
                 $limit = (int)Configuration::get('EVERPSBLOG_PAGINATION');
@@ -193,25 +218,38 @@ class EverPsBlogPost extends ObjectModel
                 || $current_context->controller->controller_type == 'modulefront'
             ) {
                 foreach ($posts as $post) {
-                    $post['content'] = self::changeShortcodes(
-                        $post['content'],
-                        (int)Context::getContext()->customer->id
-                    );
                     $post['title'] = self::changeShortcodes(
                         $post['title'],
                         (int)Context::getContext()->customer->id
                     );
-                    // Length
-                    $post['title'] = Tools::substr(
-                        $post['title'],
-                        0,
-                        (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
-                    );
-                    $post['content'] = Tools::substr(
+                    $post['content'] = self::changeShortcodes(
                         $post['content'],
-                        0,
-                        (int)Configuration::get('EVERPSBLOG_EXCERPT')
+                        (int)Context::getContext()->customer->id
                     );
+                    $post['excerpt'] = self::changeShortcodes(
+                        $post['excerpt'],
+                        (int)Context::getContext()->customer->id
+                    );
+                    $post['date_add'] = date('d/m/Y', strtotime($post['date_add']));
+                    $post['date_upd'] = date('d/m/Y', strtotime($post['date_upd']));
+                    if ((bool)$is_feed === false) {
+                        // Length
+                        $post['title'] = Tools::substr(
+                            $post['title'],
+                            0,
+                            (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
+                        );
+                        $post['content'] = Tools::substr(
+                            strip_tags($post['content']),
+                            0,
+                            (int)Configuration::get('EVERPSBLOG_EXCERPT')
+                        );
+                        $post['excerpt'] = Tools::substr(
+                            strip_tags($post['excerpt']),
+                            0,
+                            (int)Configuration::get('EVERPSBLOG_EXCERPT')
+                        );
+                    }
                     $post['featured_image'] = EverPsBlogImage::getBlogImageUrl(
                         (int)$post['id_ever_post'],
                         (int)$id_shop,
@@ -228,6 +266,11 @@ class EverPsBlogPost extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Get latest posts
+     * @param int id_lang, int id_shop, int start query, int limit query, string post_status
+     * @return array of posts obj with changed shortcodes
+    */
     public static function getLatestPosts($id_lang, $id_shop, $start = 0, $limit = null, $post_status = 'published')
     {
         $cache_id = 'EverPsBlogPost::getLatestPosts_'
@@ -274,6 +317,12 @@ class EverPsBlogPost extends ObjectModel
                         $post->content,
                         (int)Context::getContext()->customer->id
                     );
+                    $post->excerpt = self::changeShortcodes(
+                        $post->excerpt,
+                        (int)Context::getContext()->customer->id
+                    );
+                    $post->date_add = date('d/m/Y', strtotime($post->date_add));
+                    $post->date_upd = date('d/m/Y', strtotime($post->date_upd));
                     // Length
                     $post->title = Tools::substr(
                         $post->title,
@@ -282,6 +331,11 @@ class EverPsBlogPost extends ObjectModel
                     );
                     $post->content = Tools::substr(
                         strip_tags($post->content),
+                        0,
+                        (int)Configuration::get('EVERPSBLOG_EXCERPT')
+                    );
+                    $post->excerpt = Tools::substr(
+                        strip_tags($post->excerpt),
                         0,
                         (int)Configuration::get('EVERPSBLOG_EXCERPT')
                     );
@@ -298,13 +352,20 @@ class EverPsBlogPost extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Get all posts by tag
+     * @param int id_lang, int id_shop,
+     * int tag id, int start query, int limit query, string post_status, bool is feed page
+     * @return array of posts obj with changed shortcodes
+    */
     public static function getPostsByTag(
         $id_lang,
         $id_shop,
         $id_tag,
         $start = 0,
         $limit = null,
-        $post_status = 'published'
+        $post_status = 'published',
+        $is_feed = false
     ) {
         $cache_id = 'EverPsBlogPost::getPostsByTag_'
         .(int)$id_lang
@@ -317,7 +378,9 @@ class EverPsBlogPost extends ObjectModel
         .'_'
         .(int)$limit
         .'_'
-        .$post_status;
+        .$post_status
+        .'_'
+        .$is_feed;
         if (!Cache::isStored($cache_id)) {
             if (!(int)$limit) {
                 $limit = (int)Configuration::get('EVERPSBLOG_PAGINATION');
@@ -357,17 +420,30 @@ class EverPsBlogPost extends ObjectModel
                     $post->content,
                     (int)Context::getContext()->customer->id
                 );
-                // Length
-                $post->title = Tools::substr(
-                    $post->title,
-                    0,
-                    (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
+                $post->excerpt = self::changeShortcodes(
+                    $post->excerpt,
+                    (int)Context::getContext()->customer->id
                 );
-                $post->content = Tools::substr(
-                    $post->content,
-                    0,
-                    (int)Configuration::get('EVERPSBLOG_EXCERPT')
-                );
+                $post->date_add = date('d/m/Y', strtotime($post->date_add));
+                $post->date_upd = date('d/m/Y', strtotime($post->date_upd));
+                if ((bool)$is_feed === false) {
+                    // Length
+                    $post->title = Tools::substr(
+                        $post->title,
+                        0,
+                        (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
+                    );
+                    $post->content = Tools::substr(
+                        strip_tags($post->content),
+                        0,
+                        (int)Configuration::get('EVERPSBLOG_EXCERPT')
+                    );
+                    $post->excerpt = Tools::substr(
+                        strip_tags($post->excerpt),
+                        0,
+                        (int)Configuration::get('EVERPSBLOG_EXCERPT')
+                    );
+                }
                 $post->featured_image = EverPsBlogImage::getBlogImageUrl(
                     (int)$post->id,
                     (int)$id_shop,
@@ -383,13 +459,20 @@ class EverPsBlogPost extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Get all posts by category
+     * @param int id_lang, int id_shop,
+     * int category id, int start query, int limit query, string post_status, bool is feed page
+     * @return array of posts obj with changed shortcodes
+    */
     public static function getPostsByCategory(
         $id_lang,
         $id_shop,
         $id_category,
         $start = 0,
         $limit = null,
-        $post_status = 'published'
+        $post_status = 'published',
+        $is_feed = false
     ) {
         $cache_id = 'EverPsBlogPost::getPostsByTag_'
         .(int)$id_lang
@@ -402,7 +485,9 @@ class EverPsBlogPost extends ObjectModel
         .'_'
         .(int)$limit
         .'_'
-        .$post_status;
+        .$post_status
+        .'_'
+        .$is_feed;
         if (!Cache::isStored($cache_id)) {
             if (!(int)$limit) {
                 $limit = (int)Configuration::get('EVERPSBLOG_PAGINATION');
@@ -444,17 +529,30 @@ class EverPsBlogPost extends ObjectModel
                     $post->content,
                     (int)Context::getContext()->customer->id
                 );
-                // Length
-                $post->title = Tools::substr(
-                    $post->title,
-                    0,
-                    (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
+                $post->excerpt = self::changeShortcodes(
+                    $post->excerpt,
+                    (int)Context::getContext()->customer->id
                 );
-                $post->content = Tools::substr(
-                    $post->content,
-                    0,
-                    (int)Configuration::get('EVERPSBLOG_EXCERPT')
-                );
+                $post->date_add = date('d/m/Y', strtotime($post->date_add));
+                $post->date_upd = date('d/m/Y', strtotime($post->date_upd));
+                if ((bool)$is_feed === false) {
+                    // Length
+                    $post->title = Tools::substr(
+                        $post->title,
+                        0,
+                        (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
+                    );
+                    $post->content = Tools::substr(
+                        strip_tags($post->content),
+                        0,
+                        (int)Configuration::get('EVERPSBLOG_EXCERPT')
+                    );
+                    $post->excerpt = Tools::substr(
+                        strip_tags($post->excerpt),
+                        0,
+                        (int)Configuration::get('EVERPSBLOG_EXCERPT')
+                    );
+                }
                 $post->featured_image = EverPsBlogImage::getBlogImageUrl(
                     (int)$post->id,
                     (int)$id_shop,
@@ -470,13 +568,20 @@ class EverPsBlogPost extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Get all posts by author
+     * @param int id_lang, int id_shop,
+     * int author id, int start query, int limit query, string post_status, bool is feed page
+     * @return array of posts obj with changed shortcodes
+    */
     public static function getPostsByAuthor(
         $id_lang,
         $id_shop,
         $id_author,
         $start = 0,
         $limit = null,
-        $post_status = 'published'
+        $post_status = 'published',
+        $is_feed = false
     ) {
         $cache_id = 'EverPsBlogPost::getPostsByAuthor_'
         .(int)$id_lang
@@ -489,7 +594,9 @@ class EverPsBlogPost extends ObjectModel
         .'_'
         .(int)$limit
         .'_'
-        .$post_status;
+        .$post_status
+        .'_'
+        .$is_feed;
         if (!Cache::isStored($cache_id)) {
             if (!(int)$limit) {
                 $limit = (int)Configuration::get('EVERPSBLOG_PAGINATION');
@@ -524,17 +631,30 @@ class EverPsBlogPost extends ObjectModel
                     $post->content,
                     (int)Context::getContext()->customer->id
                 );
-                // Length
-                $post->title = Tools::substr(
-                    $post->title,
-                    0,
-                    (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
+                $post->excerpt = self::changeShortcodes(
+                    $post->excerpt,
+                    (int)Context::getContext()->customer->id
                 );
-                $post->content = Tools::substr(
-                    $post->content,
-                    0,
-                    (int)Configuration::get('EVERPSBLOG_EXCERPT')
-                );
+                $post->date_add = date('d/m/Y', strtotime($post->date_add));
+                $post->date_upd = date('d/m/Y', strtotime($post->date_upd));
+                if ((bool)$is_feed === false) {
+                    // Length
+                    $post->title = Tools::substr(
+                        $post->title,
+                        0,
+                        (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
+                    );
+                    $post->content = Tools::substr(
+                        strip_tags($post->content),
+                        0,
+                        (int)Configuration::get('EVERPSBLOG_EXCERPT')
+                    );
+                    $post->excerpt = Tools::substr(
+                        strip_tags($post->excerpt),
+                        0,
+                        (int)Configuration::get('EVERPSBLOG_EXCERPT')
+                    );
+                }
                 $post->featured_image = EverPsBlogImage::getBlogImageUrl(
                     (int)$post->id,
                     (int)$id_shop,
@@ -550,6 +670,11 @@ class EverPsBlogPost extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Get all posts by product
+     * @param int id_lang, int id_shop, int id_product, int start query, int limit query, string post_status
+     * @return array of posts obj with changed shortcodes
+    */
     public static function getPostsByProduct(
         $id_lang,
         $id_shop,
@@ -609,6 +734,12 @@ class EverPsBlogPost extends ObjectModel
                     $post->content,
                     (int)Context::getContext()->customer->id
                 );
+                $post->excerpt = self::changeShortcodes(
+                    $post->content,
+                    (int)Context::getContext()->customer->id
+                );
+                $post->date_add = date('d/m/Y', strtotime($post->date_add));
+                $post->date_upd = date('d/m/Y', strtotime($post->date_upd));
                 // Length
                 $post->title = Tools::substr(
                     $post->title,
@@ -616,7 +747,12 @@ class EverPsBlogPost extends ObjectModel
                     (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
                 );
                 $post->content = Tools::substr(
-                    $post->content,
+                    strip_tags($post->content),
+                    0,
+                    (int)Configuration::get('EVERPSBLOG_EXCERPT')
+                );
+                $post->excerpt = Tools::substr(
+                    strip_tags($post->excerpt),
                     0,
                     (int)Configuration::get('EVERPSBLOG_EXCERPT')
                 );
@@ -635,6 +771,11 @@ class EverPsBlogPost extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Get all post categories
+     * @param int post id, int id_shop, int id_lang, bool active or not
+     * @return json array of post categories
+    */
     public static function getPostCategories($id_ever_post, $id_shop, $id_lang, $active = true)
     {
         $cache_id = 'EverPsBlogPost::getPostCategories_'
@@ -676,6 +817,11 @@ class EverPsBlogPost extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Get post by link rewrite
+     * @param string link rewrite
+     * @return post obj
+    */
     public static function getPostByLinkRewrite(
         $link_rewrite
     ) {
@@ -696,6 +842,11 @@ class EverPsBlogPost extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Count posts number
+     * @param int id_lang, int id_shop, string post status
+     * @return int posts count
+    */
     public static function countPosts($id_lang, $id_shop, $post_status = 'published')
     {
         $cache_id = 'EverPsBlogPost::countPosts_'
@@ -725,6 +876,11 @@ class EverPsBlogPost extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Count post per tag
+     * @param int tag id, int id_lang, int id_shop, string post status
+     * @return int post count per tag
+    */
     public static function countPostsByTag($id_tag, $id_lang, $id_shop, $post_status = 'published')
     {
         $cache_id = 'EverPsBlogPost::countPostsByTag_'
@@ -760,6 +916,11 @@ class EverPsBlogPost extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Count post per category
+     * @param int category id, int id_lang, int id_shop, string post status
+     * @return int post count per category
+    */
     public static function countPostsByCategory($id_category, $id_lang, $id_shop, $post_status = 'published')
     {
         $cache_id = 'EverPsBlogPost::countPostsByCategory_'
@@ -795,6 +956,11 @@ class EverPsBlogPost extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Count post per author
+     * @param int author id, int id_lang, int id_shop, string post status
+     * @return int post count per author
+    */
     public static function countPostsByAuthor($id_author, $id_lang, $id_shop, $post_status = 'published')
     {
         $cache_id = 'EverPsBlogPost::countPostsByAuthor_'
@@ -825,6 +991,11 @@ class EverPsBlogPost extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    /**
+     * Change string by replacing shortcodes
+     * @param string message, int customer entity
+     * @return string updated
+    */
     public static function changeShortcodes($message, $id_entity = false)
     {
         $link = new Link();
@@ -962,6 +1133,11 @@ class EverPsBlogPost extends ObjectModel
         return $message;
     }
 
+    /**
+     * Drop post author on each post
+     * @param int id author
+     * @return bool if update query successful
+    */
     public static function dropBlogAuthorPosts($id_ever_author)
     {
         $sql = 'UPDATE '._DB_PREFIX_.'ever_blog_post
@@ -973,32 +1149,5 @@ class EverPsBlogPost extends ObjectModel
         } else {
             return true;
         }
-    }
-
-    public static function slugifyLink($text)
-    {
-        // replace non letter or digits by -
-        $text = preg_replace('~[^\pL\d]+~u', '-', $text);
-
-        // transliterate
-        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
-
-        // remove unwanted characters
-        $text = preg_replace('~[^-\w]+~', '', $text);
-
-        // trim
-        $text = trim($text, '-');
-
-        // remove duplicate -
-        $text = preg_replace('~-+~', '-', $text);
-
-        // lowercase
-        $text = Tools::strtolower($text);
-
-        if (empty($text)) {
-            return 'n-a';
-        }
-
-        return $text;
     }
 }

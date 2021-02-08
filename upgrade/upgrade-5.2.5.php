@@ -21,35 +21,28 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_4_3_1()
+function upgrade_module_5_2_5()
 {
     set_time_limit(0);
-    $result = false;
-    // Preparing new taxonomies
+    $result = true;
     $sql = array();
     $sql[] =
         'ALTER TABLE '._DB_PREFIX_.'ever_blog_post
-         ADD `count` int(10) unsigned DEFAULT 0
-         AFTER `post_products`
+         ADD `id_default_category` int(10) unsigned NOT NULL DEFAULT 1
+         AFTER `id_author`;
     ';
     $sql[] =
-        'ALTER TABLE '._DB_PREFIX_.'ever_blog_category
-         ADD `count` int(10) unsigned DEFAULT 0
-         AFTER `is_root_category`
+        'ALTER TABLE '._DB_PREFIX_.'ever_blog_post_lang
+         ADD `excerpt` varchar(255) DEFAULT NULL
+         AFTER `content`;
     ';
-    $sql[] =
-        'ALTER TABLE '._DB_PREFIX_.'ever_blog_tag
-         ADD `count` int(10) unsigned DEFAULT 0
-         AFTER `tag_products`
-    ';
-    $sql[] =
-        'ALTER TABLE '._DB_PREFIX_.'ever_blog_author
-         ADD `count` int(10) unsigned DEFAULT 0
-         AFTER `active`
-    ';
-
     foreach ($sql as $s) {
         $result &= Db::getInstance()->execute($s);
     }
+    $result &= Configuration::updateValue('EVERPSBLOG_TYPE', 'Article');
+    $result &= Configuration::updateValue('EVERBLOG_IMPORT_POST_STATE', 'published');
+    $result &= Configuration::updateValue('EVERBLOG_CSS_FILE', 'default');
+    $result &= Configuration::updateValue('EVERBLOG_SHOW_FEAT_CAT', true);
+    $result &= Configuration::updateValue('EVERBLOG_SHOW_FEAT_TAG', true);
     return $result;
 }

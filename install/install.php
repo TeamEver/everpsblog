@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -28,6 +28,7 @@ $sql[] =
         `id_ever_post` int(10) unsigned NOT NULL auto_increment,
         `id_shop` int(10) unsigned NOT NULL,
         `id_author` int(10) unsigned NOT NULL,
+        `id_default_category` int(10) unsigned NOT NULL,
         `post_status` varchar(255) NOT NULL,
         `date_add` DATETIME DEFAULT NULL,
         `date_upd` DATETIME DEFAULT NULL,
@@ -50,6 +51,7 @@ $sql[] =
         `meta_description` varchar(255) DEFAULT NULL,
         `link_rewrite` varchar(255) DEFAULT NULL,
         `content` text NOT NULL,
+        `excerpt` varchar(255) DEFAULT NULL,
         `id_lang` int(10) unsigned NOT NULL,
         PRIMARY KEY (`id_ever_post`, `id_lang`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';

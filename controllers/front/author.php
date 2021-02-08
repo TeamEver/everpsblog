@@ -1,6 +1,6 @@
 <?php
 /**
- * 2019-2020 Team Ever
+ * 2019-2021 Team Ever
  *
  * NOTICE OF LICENSE
  *
@@ -22,12 +22,6 @@ if (!defined('_PS_VERSION_')) {
 }
 
 include_once(dirname(__FILE__).'/../../classes/controller/FrontController.php');
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogAuthor.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCategory.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogAuthor.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogImage.php';
 
 class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontController
 {
@@ -48,8 +42,6 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
             (int)$this->context->language->id,
             (int)$this->context->shop->id
         );
-        $this->author->count = $this->author->count + 1;
-        $this->author->save();
         parent::init();
         // if inactive post or unexists, redirect
         if (!(int)Tools::getValue('id_ever_author')
@@ -57,6 +49,8 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
         ) {
             Tools::redirect('index.php?controller=404');
         }
+        $this->author->count = $this->author->count + 1;
+        $this->author->save();
     }
 
     public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
