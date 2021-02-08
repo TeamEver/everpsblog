@@ -38,7 +38,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.2.2';
+        $this->version = '5.2.3';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -83,6 +83,7 @@ class EverPsBlog extends Module
         foreach (Language::getLanguages(false) as $language) {
             $root_category->title[$language['id_lang']] = 'Root';
             $root_category->content[$language['id_lang']] = 'Root';
+            $root_category->link_rewrite[$language['id_lang']] = 'root';
         }
         $root_category->save();
         // Install
@@ -143,7 +144,7 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERPSBLOG_HOME_NBR', '4')
             && Configuration::updateValue('EVERPSBLOG_PRODUCT_NBR', '4')
             && Configuration::updateValue('EVERPSBLOG_EXCERPT', '150')
-            && Configuration::updateValue('EVERPSBLOG_TITLE_LENGTH', '15')
+            && Configuration::updateValue('EVERPSBLOG_TITLE_LENGTH', '150')
             && Configuration::updateValue('EVERPSBLOG_BLOG_LAYOUT', 'layouts/layout-right-column.tpl')
             && Configuration::updateValue('EVERPSBLOG_POST_LAYOUT', 'layouts/layout-right-column.tpl')
             && Configuration::updateValue('EVERPSBLOG_CAT_LAYOUT', 'layouts/layout-right-column.tpl')
@@ -1128,19 +1129,6 @@ class EverPsBlog extends Module
                         )
                     ),
                     array(
-                        'type' => 'select',
-                        'label' => $this->l('Default blog layout'),
-                        'desc' => $this->l('Will add or remove columns from blog page'),
-                        'hint' => $this->l('You can add or remove modules from Prestashop positions'),
-                        'required' => true,
-                        'name' => 'EVERPSBLOG_BLOG_LAYOUT',
-                        'options' => array(
-                            'query' => $layouts,
-                            'id' => 'layout',
-                            'name' => 'name'
-                        )
-                    ),
-                    array(
                         'type' => 'textarea',
                         'label' => $this->l('Default blog top text'),
                         'name' => 'EVERBLOG_TOP_TEXT',
@@ -1379,8 +1367,7 @@ class EverPsBlog extends Module
                         'desc' => $this->l('Import WordPress XML posts file'),
                         'hint' => $this->l('Will import posts from WordPress XML file'),
                         'name' => 'wordpress_xml',
-                        'display_image' => true,
-                        'required' => true
+                        'required' => false
                     ),
                 ),
                 'buttons' => array(
@@ -2526,6 +2513,9 @@ class EverPsBlog extends Module
                 $author->nickhandle = (string)$el->creator;
                 foreach (Language::getLanguages(false) as $lang) {
                     $author->meta_title[$lang['id_lang']] = (string)$el->creator;
+                    $author->link_rewrite[$lang['id_lang']] = EverPsBlogPost::slugifyLink(
+                        (string)$el->creator
+                    );
                 }
                 $author->id_shop = (int)Context::getContext()->shop->id;
                 $author->active = true;
@@ -2617,6 +2607,7 @@ class EverPsBlog extends Module
                 $post->active = true;
                 $post->date_add = $el->date_add;
                 $post->post_status = 'published';
+                $post->id_author = $author->id;
                 if (!empty($post_categories)) {
                     $post->post_categories = json_encode($post_categories);
                 }
@@ -2631,6 +2622,8 @@ class EverPsBlog extends Module
             Configuration::updateValue('PS_ALLOW_HTML_IFRAME', false);
         }
         if ((bool)$result === true) {
+            $this->generateBlogSitemap();
+            Tools::clearCache();
             $this->postSuccess[] = $this->l('WordPress posts have been imported');
         } else {
             $this->postErrors[] = $this->l('An error has occured while importing WordPress file');

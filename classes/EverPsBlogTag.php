@@ -150,22 +150,15 @@ class EverPsBlogTag extends ObjectModel
 
     public static function getTagByLinkRewrite($link_rewrite)
     {
-        $cache_id = 'EverPsBlogTag::getTagByLinkRewrite_'
-        .(string)$link_rewrite;
-        if (!Cache::isStored($cache_id)) {
-            $sql = new DbQuery;
-            $sql->select('id_ever_tag');
-            $sql->from('ever_blog_tag_lang');
-            $sql->where('link_rewrite = "'.pSQL($link_rewrite).'"');
-            $id_tag = Db::getInstance()->getValue($sql);
-            if ($id_tag) {
-                $return = new self($id_tag);
-                Cache::store($cache_id, $return);
-                return $return;
-            }
-            Cache::store($cache_id, false);
-            return false;
+        $sql = new DbQuery;
+        $sql->select('id_ever_tag');
+        $sql->from('ever_blog_tag_lang');
+        $sql->where('link_rewrite = "'.pSQL($link_rewrite).'"');
+        $id_tag = Db::getInstance()->getValue($sql);
+        if ($id_tag) {
+            $return = new self($id_tag);
+            return $return;
         }
-        return Cache::retrieve($cache_id);
+        return false;
     }
 }

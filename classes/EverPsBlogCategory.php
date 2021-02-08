@@ -255,22 +255,15 @@ class EverPsBlogCategory extends ObjectModel
 
     public static function getCategoryByLinkRewrite($link_rewrite)
     {
-        $cache_id = 'EverPsBlogCategory::getCategoryByLinkRewrite_'
-        .(string)$link_rewrite;
-        if (!Cache::isStored($cache_id)) {
-            $sql = new DbQuery;
-            $sql->select('id_ever_category');
-            $sql->from('ever_blog_category_lang');
-            $sql->where('link_rewrite = "'.pSQL($link_rewrite).'"');
-            $id_cat = Db::getInstance()->getValue($sql);
-            if ($id_cat) {
-                $return = new self($id_cat);
-                Cache::store($cache_id, $return);
-                return $return;
-            }
-            Cache::store($cache_id, false);
-            return false;
+        $sql = new DbQuery;
+        $sql->select('id_ever_category');
+        $sql->from('ever_blog_category_lang');
+        $sql->where('link_rewrite = "'.pSQL($link_rewrite).'"');
+        $id_cat = Db::getInstance()->getValue($sql);
+        if ($id_cat) {
+            $return = new self($id_cat);
+            return $return;
         }
-        return Cache::retrieve($cache_id);
+        return false;
     }
 }

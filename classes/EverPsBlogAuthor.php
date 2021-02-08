@@ -179,23 +179,16 @@ class EverPsBlogAuthor extends ObjectModel
 
     public static function getAuthorByNickhandle($nickhandle)
     {
-        $cache_id = 'EverPsBlogAuthor::getAuthorByNickhandle_'
-        .(string)$nickhandle;
-        if (!Cache::isStored($cache_id)) {
-            $sql = new DbQuery;
-            $sql->select('id_ever_author');
-            $sql->from('ever_blog_author');
-            $sql->where('nickhandle = "'.pSQL($nickhandle).'"');
-            $id_author = Db::getInstance()->getValue($sql);
-            if ($id_author) {
-                $return = new self($id_author);
-                Cache::store($cache_id, $return);
-                return $return;
-            } else {
-                Cache::store($cache_id, false);
-                return false;
-            }
+        $sql = new DbQuery;
+        $sql->select('id_ever_author');
+        $sql->from('ever_blog_author');
+        $sql->where('nickhandle = "'.pSQL($nickhandle).'"');
+        $id_author = Db::getInstance()->getValue($sql);
+        if ($id_author) {
+            $return = new self($id_author);
+            return $return;
+        } else {
+            return false;
         }
-        return Cache::retrieve($cache_id);
     }
 }
