@@ -225,7 +225,6 @@ class EverPsBlogCategory extends ObjectModel
                 'bc.id_ever_category = bcl.id_ever_category'
             );
             $sql->where('bc.active = '.(int)$active);
-            $sql->where('bc.is_root_category = 0');
             $sql->where('bc.id_shop = '.(int)$id_shop);
             $sql->where('bcl.id_lang = '.(int)$id_lang);
             if ((int)$only_parent > 0) {
