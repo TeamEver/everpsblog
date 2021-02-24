@@ -130,6 +130,7 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
             );
             $this->context->smarty->assign(
                 array(
+                    'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
                     'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
                     'allow_feed' => (bool)Configuration::get('EVERBLOG_RSS'),
                     'feed_url' => $feed_url,
@@ -146,11 +147,7 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
                     'show_featured_tag' => (bool)Configuration::get('EVERBLOG_SHOW_FEAT_TAG'),
                 )
             );
-            if ($this->isSeven) {
-                $this->setTemplate('module:everpsblog/views/templates/front/tag.tpl');
-            } else {
-                $this->setTemplate('tag.tpl');
-            }
+            $this->setTemplate('module:everpsblog/views/templates/front/tag.tpl');
         } else {
             Tools::redirect('index.php');
         }

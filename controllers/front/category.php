@@ -155,6 +155,7 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
             );
             $this->context->smarty->assign(
                 array(
+                    'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
                     'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
                     'children_categories' => $children_categories,
                     'allow_feed' => (bool)Configuration::get('EVERBLOG_RSS'),
@@ -172,11 +173,7 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                     'show_featured_cat' => (bool)Configuration::get('EVERBLOG_SHOW_FEAT_CAT'),
                 )
             );
-            if ($this->isSeven) {
-                $this->setTemplate('module:everpsblog/views/templates/front/category.tpl');
-            } else {
-                $this->setTemplate('category.tpl');
-            }
+            $this->setTemplate('module:everpsblog/views/templates/front/category.tpl');
         } else {
             Tools::redirect('index.php');
         }

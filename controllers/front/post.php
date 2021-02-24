@@ -350,6 +350,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             );
             $this->context->smarty->assign(
                 array(
+                    'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
                     'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
                     'featured_image' => $file_url,
                     'author_cover' => $this->author_cover,
@@ -371,11 +372,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                     'only_logged_comment' => (bool)Configuration::get('EVERBLOG_ONLY_LOGGED_COMMENT'),
                 )
             );
-            if ($this->isSeven) {
-                $this->setTemplate('module:everpsblog/views/templates/front/post.tpl');
-            } else {
-                $this->setTemplate('post.tpl');
-            }
+            $this->setTemplate('module:everpsblog/views/templates/front/post.tpl');
         }
     }
 

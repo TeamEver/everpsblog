@@ -1150,4 +1150,92 @@ class EverPsBlogPost extends ObjectModel
             return true;
         }
     }
+
+    public static function searchPost(
+        $query,
+        $id_shop, 
+        $id_lang,
+        $start = 0,
+        $limit = null
+    ) {
+        $cached_string = EverPsBlogCleaner::convertToUrlRewrite(
+            $query
+        );
+        $cache_id = 'EverPsBlogPost::searchPosts_'
+        .$cached_string
+        .'_'
+        .(int)$id_shop
+        .'_'
+        .(int)$id_lang
+        .'_'
+        .(int)$start
+        .'_'
+        .(int)$limit;
+        if (!Cache::isStored($cache_id)) {
+            $sql = new DbQuery;
+            $sql->select('*');
+            $sql->from('ever_blog_post_lang', 'bpl');
+            $sql->leftJoin(
+                'ever_blog_post',
+                'bp',
+                'bp.id_ever_post = bpl.id_ever_post'
+            );
+            $sql->where('bp.id_shop = '.(int)$id_shop);
+            $sql->where('bpl.id_lang = '.(int)$id_lang);
+            $sql->where('INSTR(title, "'.pSQL($query).'") OR INSTR(content, "'.pSQL($query).'")');
+            $sql->orderBy('bp.date_add DESC');
+            $sql->limit((int)$limit, (int)$start);
+            $posts = Db::getInstance()->executeS($sql);
+            $return = array();
+            if ($current_context->controller->controller_type == 'front'
+                || $current_context->controller->controller_type == 'modulefront'
+            ) {
+                foreach ($posts as $post) {
+                    $post['title'] = self::changeShortcodes(
+                        $post['title'],
+                        (int)Context::getContext()->customer->id
+                    );
+                    $post['content'] = self::changeShortcodes(
+                        $post['content'],
+                        (int)Context::getContext()->customer->id
+                    );
+                    $post['excerpt'] = self::changeShortcodes(
+                        $post['excerpt'],
+                        (int)Context::getContext()->customer->id
+                    );
+                    $post['date_add'] = date('d/m/Y', strtotime($post['date_add']));
+                    $post['date_upd'] = date('d/m/Y', strtotime($post['date_upd']));
+                    if ((bool)$is_feed === false) {
+                        // Length
+                        $post['title'] = Tools::substr(
+                            $post['title'],
+                            0,
+                            (int)Configuration::get('EVERPSBLOG_TITLE_LENGTH')
+                        );
+                        $post['content'] = Tools::substr(
+                            strip_tags($post['content']),
+                            0,
+                            (int)Configuration::get('EVERPSBLOG_EXCERPT')
+                        );
+                        $post['excerpt'] = Tools::substr(
+                            strip_tags($post['excerpt']),
+                            0,
+                            (int)Configuration::get('EVERPSBLOG_EXCERPT')
+                        );
+                    }
+                    $post['featured_image'] = EverPsBlogImage::getBlogImageUrl(
+                        (int)$post['id_ever_post'],
+                        (int)$id_shop,
+                        'post'
+                    );
+                    $return[] = $post;
+                }
+            } else {
+                $return = $posts;
+            }
+            Cache::store($cache_id, $return);
+            return $return;
+        }
+        return Cache::retrieve($cache_id);
+    }
 }

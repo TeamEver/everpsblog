@@ -433,7 +433,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             );
             $object_html = '<a href="'
             .$objectUrl
-            .'" target="_blank" class="btn btn-default">'
+            .'" target="_blank" class="btn btn-info">'
             .$this->l('See post')
             .'</a>';
             $fields_form[] = array(
@@ -857,7 +857,10 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 $post->id_default_category = Tools::getValue('id_default_category');
             }
             $post_categories = Tools::getValue('post_categories');
-            if (!in_array(Tools::getValue('id_default_category'), Tools::getValue('post_categories'))) {
+            if (!is_array($post_categories)) {
+                $post_categories = array($post_categories);
+            }
+            if (!in_array(Tools::getValue('id_default_category'), $post_categories)) {
                 $post_categories[] = Tools::getValue('id_default_category');
             }
             $post->post_categories = json_encode($post_categories);

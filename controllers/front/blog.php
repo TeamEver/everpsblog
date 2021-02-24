@@ -168,6 +168,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         );
         $this->context->smarty->assign(
             array(
+                'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
                 'blog_path' => $this->blog_path,
                 'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
                 'allow_feed' => (bool)Configuration::get('EVERBLOG_RSS'),

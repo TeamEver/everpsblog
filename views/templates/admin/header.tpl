@@ -25,7 +25,7 @@
                <img id="everlogo" src="{$image_dir|escape:'htmlall':'UTF-8'}/ever.png" style="max-width: 120px;">
             </a>
             <p>
-                <a href="{$blog_url|escape:'htmlall':'UTF-8'}" target="_blank" class="btn btn-default">
+                <a href="{$blog_url|escape:'htmlall':'UTF-8'}" target="_blank" class="btn btn-info">
                     {l s='See blog !' mod='everpsblog'}
                 </a>
                 {if $blog_sitemaps}

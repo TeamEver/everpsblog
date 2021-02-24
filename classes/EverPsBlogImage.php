@@ -160,6 +160,40 @@ class EverPsBlogImage extends ObjectModel
                 Cache::store($cache_id, $return);
                 return $return;
             }
+            // Fix img bug on wrong migration
+            switch ($image_type) {
+                case 'post':
+                    if (strpos($image->image_link, 'img/') !== true) {
+                        $image->image_link = str_replace('posts/', 'img/post/', $image->image_link);
+                    }
+                    $image->save();
+                    break;
+
+                case 'category':
+                    if (strpos($image->image_link, 'img/') !== true) {
+                        $image->image_link = str_replace('categories/', 'img/category/', $image->image_link);
+                    }
+                    $image->save();
+                    break;
+
+                case 'author':
+                    if (strpos($image->image_link, 'img/') !== true) {
+                        $image->image_link = str_replace('authors/', 'img/author/', $image->image_link);
+                    }
+                    $image->save();
+                    break;
+
+                case 'tag':
+                    if (strpos($image->image_link, 'img/') !== true) {
+                        $image->image_link = str_replace('tags/', 'img/tag/', $image->image_link);
+                    }
+                    $image->save();
+                    break;
+                
+                default:
+                    # code...
+                    break;
+            }
             // Return file URL
             $return = Tools::getHttpHost(true)
             .__PS_BASE_URI__

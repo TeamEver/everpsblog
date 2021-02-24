@@ -42,7 +42,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.2.6';
+        $this->version = '5.2.8';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -1839,6 +1839,7 @@ class EverPsBlog extends Module
             'EVERBLOG_TAG_COLUMNS'
         );
         $this->context->smarty->assign(array(
+            'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
             'everpsblog' => $latest_posts,
             'showArchives' => $showArchives,
             'showCategories' => $showCategories,
@@ -1888,6 +1889,7 @@ class EverPsBlog extends Module
         );
         $this->context->smarty->assign(
             array(
+                'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
                 'blogUrl' => $blogUrl,
                 'everpsblog' => $latest_posts,
                 'evercategory' => $evercategories,
@@ -1959,6 +1961,7 @@ class EverPsBlog extends Module
         }
         $this->context->smarty->assign(
             array(
+                'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
                 'blogUrl' => $blogUrl,
                 'everpsblog' => $everpsblog,
                 'evercategory' => $evercategories,
