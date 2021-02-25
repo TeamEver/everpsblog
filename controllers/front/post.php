@@ -266,22 +266,13 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 );
                 $presentationSettings->showPrices = $showPrice;
                 foreach ($this->post_products as $post_product) {
-                    if (!$post_product) {
-                        continue;
-                    }
                     $pproduct = new Product(
                         (int)$post_product['id_ever_post_product'],
-                        false,
-                        (int)Context::getContext()->shop->id,
-                        (int)Context::getContext()->language->id
+                        true,
+                        (int)Context::getContext()->language->id,
+                        (int)Context::getContext()->shop->id
                     );
-                    if (!$pproduct->checkAccess((int)Context::getContext()->customer->id)
-                        || !$pproduct->id
-                        || (bool)$pproduct->active === false
-                    ) {
-                        continue;
-                    }
-                    if ((bool)$pproduct->active === true) {
+                    if (Product::checkAccessStatic((int)$pproduct->id, false)) {
                         $pproduct_cover = Product::getCover(
                             (int)$pproduct->id
                         );
@@ -291,6 +282,8 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                             $assembler->assembleProduct(array('id_product' => $pproduct->id)),
                             Context::getContext()->language
                         );
+                    } else {
+                        var_dump($pproduct->id);
                     }
                 }
             }
