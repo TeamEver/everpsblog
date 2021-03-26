@@ -109,8 +109,10 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
         }
         if (!Tools::getValue('preview')) {
             if ((bool)Tools::isSubmit('everpostcomment') === false) {
-                $this->post->count = $this->post->count + 1;
-                $this->post->save();
+                EverPsBlogPost::updatePostViewCount(
+                    (int)$this->post->id,
+                    (int)$this->context->shop->id
+                );
             }
         }
     }
@@ -282,8 +284,6 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                             $assembler->assembleProduct(array('id_product' => $pproduct->id)),
                             Context::getContext()->language
                         );
-                    } else {
-                        var_dump($pproduct->id);
                     }
                 }
             }

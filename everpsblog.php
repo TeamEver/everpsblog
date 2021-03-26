@@ -42,7 +42,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.2.9';
+        $this->version = '5.2.10';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -989,6 +989,10 @@ class EverPsBlog extends Module
                 'id_file' => 'yellow',
                 'name' => $this->l('yellow.css file')
             ),
+            array(
+                'id_file' => 'white',
+                'name' => $this->l('white.css file')
+            ),
         );
         $post_status = array(
             array(
@@ -1860,7 +1864,7 @@ class EverPsBlog extends Module
 
     public function hookDisplayHome($params)
     {
-        if ((int)Configuration::get('EVERPSBLOG_HOME_NBR')) {
+        if ((int)Configuration::get('EVERPSBLOG_HOME_NBR') > 0) {
             $post_number = (int)Configuration::get('EVERPSBLOG_HOME_NBR');
         } else {
             $post_number = 4;
@@ -2662,7 +2666,7 @@ class EverPsBlog extends Module
             curl_close($handle);
             return false;
         }
-        curl_close($handle);
+        $response = curl_close($handle);
         $module_version = Tools::file_get_contents(
             $upgrade_link
         );

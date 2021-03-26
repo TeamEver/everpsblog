@@ -1238,4 +1238,25 @@ class EverPsBlogPost extends ObjectModel
         }
         return Cache::retrieve($cache_id);
     }
+
+    public static function updatePostViewCount($id_ever_post, $id_shop)
+    {
+        $count =
+            'SELECT count
+            FROM `'._DB_PREFIX_.'ever_blog_post`
+            WHERE id_ever_post = "'.(int)$id_ever_post.'"
+                AND id_shop = '.(int)$id_shop;
+
+        $currentCount = Db::getInstance()->getValue($count);
+
+        $update = Db::getInstance()->update(
+            'ever_blog_post',
+            array(
+                'count' => (int)$currentCount + 1,
+            ),
+            'id_ever_post = '.(int)$id_ever_post
+        );
+
+        return $update;
+    }
 }

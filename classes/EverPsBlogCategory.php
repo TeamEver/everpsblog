@@ -205,7 +205,7 @@ class EverPsBlogCategory extends ObjectModel
      * @param int id_lang, int id_shop, bool active, bool only parent categories
      * @return array of category objs
     */
-    public static function getAllCategories($id_lang, $id_shop, $active = 1, $only_parent = 0)
+    public static function getAllCategories($id_lang, $id_shop, $active = 1, $only_parent = 0, $without_parent = false)
     {
         $cache_id = 'EverPsBlogCategory::getAllCategories_'
         .(int)$id_lang
@@ -214,7 +214,9 @@ class EverPsBlogCategory extends ObjectModel
         .'_'
         .(int)$active
         .'_'
-        .(int)$only_parent;
+        .(int)$only_parent
+        .'_'
+        .(int)$without_parent;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
             $sql->select('*');
@@ -233,6 +235,12 @@ class EverPsBlogCategory extends ObjectModel
             $categories = Db::getInstance()->executeS($sql);
             $return = array();
             foreach ($categories as $blog_cat) {
+                $root = EverPsBlogCategory::getRootCategory();
+                if ((bool)$without_parent === true
+                    && (int)$root->id == (int)$blog_cat['id_ever_category']
+                ) {
+                    continue;
+                }
                 $blog_cat['featured_image'] = EverPsBlogImage::getBlogImageUrl(
                     (int)$blog_cat['id_ever_category'],
                     (int)$id_shop,

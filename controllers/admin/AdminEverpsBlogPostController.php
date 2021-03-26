@@ -497,7 +497,10 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'options' => array(
                             'query' => EverPsBlogCategory::getAllCategories(
                                 (int)Context::getContext()->language->id,
-                                (int)Context::getContext()->shop->id
+                                (int)Context::getContext()->shop->id,
+                                1,
+                                0,
+                                true
                             ),
                             'id' => 'id_ever_category',
                             'name' => 'title',
