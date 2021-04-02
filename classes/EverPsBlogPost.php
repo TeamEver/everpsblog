@@ -1000,6 +1000,9 @@ class EverPsBlogPost extends ObjectModel
     {
         $link = new Link();
         $contactLink = $link->getPageLink('contact');
+        if (!$id_entity) {
+            $id_entity = Context::getContext()->customer->id;
+        }
         if ($id_entity && $id_entity > 0) {
             $entity = new Customer(
                 (int)$id_entity

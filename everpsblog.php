@@ -30,6 +30,10 @@ require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTaxonomy.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogSitemap.php';
 require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCleaner.php';
+use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
+use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
+use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
+use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 
 class EverPsBlog extends Module
 {
@@ -42,7 +46,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.2.11';
+        $this->version = '5.3.1';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -2004,12 +2008,20 @@ class EverPsBlog extends Module
     public function hookActionOutputHTMLBefore($params)
     {
         $regex = '/<p>\[everpsblog\s+id=\s*[\'\"]?(\d+)[\'\"]?\s*\]<\/p>|\[everpsblog\s+id=\s*[\'\"]?(\d+)[\'\"]?\s*\]/Us';
-        if (!preg_match_all($regex, $params['html'], $matches)) {
-            return;
+        if (preg_match_all($regex, $params['html'], $matches)) {
+            if ($html = preg_replace_callback($regex, array($this, 'displayPostsByCatId'), $params['html'])) {
+                $params['html'] = $html;
+            }
         }
-        if ($html = preg_replace_callback($regex, array($this, 'displayByCatId'), $params['html'])) {
-            $params['html'] = $html;
+        $regex_products = '/<p>\[everpsblog\s+productcat=\s*[\'\"]?(\d+)[\'\"]?\s*\]<\/p>|\[everpsblog\s+productcat=\s*[\'\"]?(\d+)[\'\"]?\s*\]/Us';
+        if (preg_match_all($regex_products, $params['html'], $matches)) {
+            if ($html = preg_replace_callback($regex_products, array($this, 'displayProductsByCatId'), $params['html'])) {
+                $params['html'] = $html;
+            }
         }
+        $params['html'] = EverPsBlogPost::changeShortcodes(
+            $params['html']
+        );
     }
 
     public function hookActionFrontControllerAfterInit()
@@ -2024,7 +2036,7 @@ class EverPsBlog extends Module
         }
     }
 
-    public function displayByCatId($id_category)
+    public function displayPostsByCatId($shortcode)
     {
         if ((int)Configuration::get('EVERPSBLOG_PRODUCT_NBR') > 0) {
             $post_number = (int)Configuration::get('EVERPSBLOG_PRODUCT_NBR');
@@ -2037,10 +2049,15 @@ class EverPsBlog extends Module
             array(),
             true
         );
+        $post_category = new EverPsBlogCategory(
+            (int)$shortcode[1],
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
         $latest_posts = EverPsBlogPost::getPostsByCategory(
             (int)$this->context->language->id,
             (int)$this->context->shop->id,
-            (int)$id_category,
+            (int)$shortcode[1],
             0,
             (int)$post_number
         );
@@ -2056,6 +2073,7 @@ class EverPsBlog extends Module
         );
         $this->context->smarty->assign(
             array(
+                'post_category' => $post_category,
                 'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
                 'blogUrl' => $blogUrl,
                 'everpsblog' => $latest_posts,
@@ -2067,6 +2085,54 @@ class EverPsBlog extends Module
             )
         );
         return $this->display(__FILE__, 'views/templates/hook/cat_shortcode.tpl');
+    }
+
+    public function displayProductsByCatId($shortcode)
+    {
+        $featured_category = new Category(
+            (int)$shortcode[1],
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
+        $featured_products = $featured_category->getProducts(
+            (int)$this->context->language->id,
+            1,
+            (int)Configuration::get('EVERPSBLOG_PRODUCT_NBR')
+        );
+        if (!empty($featured_products)) {
+            $showPrice = true;
+            $assembler = new ProductAssembler(Context::getContext());
+            $presenterFactory = new ProductPresenterFactory(Context::getContext());
+            $presentationSettings = $presenterFactory->getPresentationSettings();
+            $presenter = new ProductListingPresenter(
+                new ImageRetriever(
+                    $this->context->link
+                ),
+                $this->context->link,
+                new PriceFormatter(),
+                new ProductColorsRetriever(),
+                $this->context->getTranslator()
+            );
+
+            $productsForTemplate = array();
+
+            $presentationSettings->showPrices = $showPrice;
+
+            if (is_array($featured_products)) {
+                foreach ($featured_products as $productId) {
+                    $productsForTemplate[] = $presenter->present(
+                        $presentationSettings,
+                        $assembler->assembleProduct(array('id_product' => $productId['id_product'])),
+                        $this->context->language
+                    );
+                }
+            }
+            $this->context->smarty->assign(array(
+                'everpsblog_category' => $featured_category,
+                'everpsblog_products' => $productsForTemplate,
+            ));
+            return $this->display(__FILE__, 'views/templates/hook/products_shortcode.tpl');
+        }
     }
 
     public function emptyTrash($id_shop)
