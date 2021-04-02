@@ -70,6 +70,10 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 'title' => $this->l('Post title'),
                 'align' => 'left'
             ),
+            'excerpt' => array(
+                'title' => $this->l('Post excerpt'),
+                'align' => 'left'
+            ),
             'cat_title' => array(
                 'title' => $this->l('Default category'),
                 'align' => 'left',
@@ -115,6 +119,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
 
         $this->colorOnBackground = true;
         $this->_select = 'l.title,
+        l.excerpt,
         au.nickhandle,
         CONCAT("'.$this->img_url.'",ai.image_link) AS featured_img,
         acl.title AS cat_title';

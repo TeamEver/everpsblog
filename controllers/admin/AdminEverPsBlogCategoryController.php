@@ -100,7 +100,8 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
         );
 
         $this->colorOnBackground = true;
-        $this->_select = 'l.title, CONCAT("'.$this->img_url.'",ai.image_link) AS featured_img';
+        $this->_select = 'l.title,
+        CONCAT("'.$this->img_url.'",ai.image_link) AS featured_img';
 
         $this->_join =
             'LEFT JOIN `'._DB_PREFIX_.'ever_blog_category_lang` l
@@ -265,8 +266,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
         $categories = EverPsBlogCategory::getAllCategories(
             (int)$this->context->language->id,
             (int)$this->context->shop->id,
-            1,
-            (int)$category_id
+            1
         );
         $file_url = EverPsBlogImage::getBlogImageUrl(
             (int)$category_id,

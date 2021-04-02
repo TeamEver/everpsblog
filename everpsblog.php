@@ -42,7 +42,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.2.10';
+        $this->version = '5.2.11';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -412,6 +412,7 @@ class EverPsBlog extends Module
             $this->html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/upgrade.tpl');
         }
         $this->html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/header.tpl');
+        $this->html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
         $this->html .= $this->renderForm();
         $this->html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/footer.tpl');
 
@@ -570,28 +571,28 @@ class EverPsBlog extends Module
             }
             // Multilingual fields
             foreach (Language::getLanguages(false) as $lang) {
-                if (!Tools::getValue('EVERBLOG_TITLE_'.$lang['id_lang'])
-                    || !Validate::isString(Tools::getValue('EVERBLOG_TITLE_'.$lang['id_lang']))
+                if (Tools::getValue('EVERBLOG_TITLE_'.$lang['id_lang'])
+                    && !Validate::isString(Tools::getValue('EVERBLOG_TITLE_'.$lang['id_lang']))
                 ) {
                     $this->postErrors[] = $this->l(
                         'Error : Blog title is invalid'
                     );
                 }
-                if (!Tools::getValue('EVERBLOG_META_DESC_'.$lang['id_lang'])
-                    || !Validate::isCleanHtml(Tools::getValue('EVERBLOG_META_DESC_'.$lang['id_lang']))
+                if (Tools::getValue('EVERBLOG_META_DESC_'.$lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('EVERBLOG_META_DESC_'.$lang['id_lang']))
                 ) {
                     $this->postErrors[] = $this->l(
                         'Error : Blog meta description is invalid'
                     );
                 }
-                if (!Tools::getValue('EVERBLOG_TOP_TEXT_'.$lang['id_lang'])
+                if (Tools::getValue('EVERBLOG_TOP_TEXT_'.$lang['id_lang'])
                     && !Validate::isCleanHtml(Tools::getValue('EVERBLOG_TOP_TEXT_'.$lang['id_lang']))
                 ) {
                     $this->postErrors[] = $this->l(
                         'Error : Blog top text is invalid'
                     );
                 }
-                if (!Tools::getValue('EVERBLOG_BOTTOM_'.$lang['id_lang'])
+                if (Tools::getValue('EVERBLOG_BOTTOM_'.$lang['id_lang'])
                     && !Validate::isCleanHtml(Tools::getValue('EVERBLOG_BOTTOM_'.$lang['id_lang']))
                 ) {
                     $this->postErrors[] = $this->l(
@@ -1862,7 +1863,7 @@ class EverPsBlog extends Module
         return $this->hookDisplayLeftColumn($params);
     }
 
-    public function hookDisplayHome($params)
+    public function hookDisplayHome()
     {
         if ((int)Configuration::get('EVERPSBLOG_HOME_NBR') > 0) {
             $post_number = (int)Configuration::get('EVERPSBLOG_HOME_NBR');
@@ -2000,23 +2001,15 @@ class EverPsBlog extends Module
         }
     }
 
-    public function hookOverrideLayoutTemplate($params)
+    public function hookActionOutputHTMLBefore($params)
     {
-        // if (isset($params['controller']->page_name)
-        //     && (
-        //         $params['controller']->page_name == 'module-everpsblog-blog'
-        //         || $params['controller']->page_name == 'module-everpsblog-category'
-        //         || $params['controller']->page_name == 'module-everpsblog-post'
-        //         || $params['controller']->page_name == 'module-everpsblog-tag'
-        //         || $params['controller']->page_name == 'module-everpsblog-author'
-        //     )
-        // ) {
-        //     return $this->context->shop->theme->getLayoutRelativePathForPage(
-        //         $params['controller']->page_name
-        //     );
-        // } else {
-        //     return $params['default_layout'];
-        // }
+        $regex = '/<p>\[everpsblog\s+id=\s*[\'\"]?(\d+)[\'\"]?\s*\]<\/p>|\[everpsblog\s+id=\s*[\'\"]?(\d+)[\'\"]?\s*\]/Us';
+        if(!preg_match_all($regex, $params['html'], $matches)) {
+            return;
+        }
+        if ($html = preg_replace_callback($regex, array($this, 'displayByCatId'), $params['html'])) {
+            $params['html'] = $html;
+        }
     }
 
     public function hookActionFrontControllerAfterInit()
@@ -2029,6 +2022,51 @@ class EverPsBlog extends Module
                 (int)$shop['id_shop']
             );
         }
+    }
+
+    public function displayByCatId($id_category)
+    {
+        if ((int)Configuration::get('EVERPSBLOG_PRODUCT_NBR') > 0) {
+            $post_number = (int)Configuration::get('EVERPSBLOG_PRODUCT_NBR');
+        } else {
+            $post_number = 4;
+        }
+        $blogUrl = Context::getContext()->link->getModuleLink(
+            $this->name,
+            'blog',
+            array(),
+            true
+        );
+        $latest_posts = EverPsBlogPost::getPostsByCategory(
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id,
+            (int)$id_category,
+            0,
+            (int)$post_number
+        );
+        if (!$latest_posts || !count($latest_posts)) {
+            return;
+        }
+        $evercategories = EverPsBlogCategory::getAllCategories(
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
+        $animate = Configuration::get(
+            'EVERBLOG_ANIMATE'
+        );
+        $this->context->smarty->assign(
+            array(
+                'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
+                'blogUrl' => $blogUrl,
+                'everpsblog' => $latest_posts,
+                'evercategory' => $evercategories,
+                'default_lang' => (int)$this->context->language->id,
+                'id_lang' => (int)$this->context->language->id,
+                'blogImg_dir' => $this->siteUrl.'/modules/everpsblog/views/img/',
+                'animated' => $animate,
+            )
+        );
+        return $this->display(__FILE__, 'views/templates/hook/cat_shortcode.tpl');
     }
 
     public function emptyTrash($id_shop)
@@ -2649,6 +2687,7 @@ class EverPsBlog extends Module
         $result &= $this->registerHook('actionBeforeEverBlogInitContent');
         $result &= $this->registerHook('actionBeforeEverBlogInit');
         $result &= $this->registerHook('actionAfterEverBlogInit');
+        $result &= $this->registerHook('actionOutputHTMLBefore');
         return $result;
     }
 
