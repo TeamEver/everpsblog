@@ -1153,10 +1153,11 @@ class EverPsBlogPost extends ObjectModel
 
     public static function searchPost(
         $query,
-        $id_shop, 
+        $id_shop,
         $id_lang,
         $start = 0,
-        $limit = null
+        $limit = null,
+        $is_feed = false
     ) {
         $cached_string = EverPsBlogCleaner::convertToUrlRewrite(
             $query
@@ -1187,6 +1188,7 @@ class EverPsBlogPost extends ObjectModel
             $sql->limit((int)$limit, (int)$start);
             $posts = Db::getInstance()->executeS($sql);
             $return = array();
+            $current_context = Context::getContext();
             if ($current_context->controller->controller_type == 'front'
                 || $current_context->controller->controller_type == 'modulefront'
             ) {

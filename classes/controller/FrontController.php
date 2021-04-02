@@ -190,7 +190,11 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
         $totalItems = (int)$total;
         $page = (int)Tools::getValue('page');
         $page = (int)Tools::getValue('page') ? (int)Tools::getValue('page') : 1;
-        $totalPerPage = (int)Configuration::get('EVERPSBLOG_PAGINATION') ? (int)(int)Configuration::get('EVERPSBLOG_PAGINATION') : 10;
+        $totalPerPage = (int)Configuration::get(
+            'EVERPSBLOG_PAGINATION'
+        ) ? (int)Configuration::get(
+            'EVERPSBLOG_PAGINATION'
+        ) : 10;
         $pagination = new Pagination();
         $pagination
             ->setPage($page)

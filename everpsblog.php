@@ -2004,7 +2004,7 @@ class EverPsBlog extends Module
     public function hookActionOutputHTMLBefore($params)
     {
         $regex = '/<p>\[everpsblog\s+id=\s*[\'\"]?(\d+)[\'\"]?\s*\]<\/p>|\[everpsblog\s+id=\s*[\'\"]?(\d+)[\'\"]?\s*\]/Us';
-        if(!preg_match_all($regex, $params['html'], $matches)) {
+        if (!preg_match_all($regex, $params['html'], $matches)) {
             return;
         }
         if ($html = preg_replace_callback($regex, array($this, 'displayByCatId'), $params['html'])) {
@@ -2705,7 +2705,7 @@ class EverPsBlog extends Module
             curl_close($handle);
             return false;
         }
-        $response = curl_close($handle);
+        curl_close($handle);
         $module_version = Tools::file_get_contents(
             $upgrade_link
         );
