@@ -46,7 +46,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.3.1';
+        $this->version = '5.3.2';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -2013,9 +2013,15 @@ class EverPsBlog extends Module
                 $params['html'] = $html;
             }
         }
-        $regex_products = '/<p>\[everpsblog\s+productcat=\s*[\'\"]?(\d+)[\'\"]?\s*\]<\/p>|\[everpsblog\s+productcat=\s*[\'\"]?(\d+)[\'\"]?\s*\]/Us';
-        if (preg_match_all($regex_products, $params['html'], $matches)) {
-            if ($html = preg_replace_callback($regex_products, array($this, 'displayProductsByCatId'), $params['html'])) {
+        $regex_product_cat = '/<p>\[everpsblog\s+productcat=\s*[\'\"]?(\d+)[\'\"]?\s*\]<\/p>|\[everpsblog\s+productcat=\s*[\'\"]?(\d+)[\'\"]?\s*\]/Us';
+        if (preg_match_all($regex_product_cat, $params['html'], $matches)) {
+            if ($html = preg_replace_callback($regex_product_cat, array($this, 'displayProductsByCatId'), $params['html'])) {
+                $params['html'] = $html;
+            }
+        }
+        $regex_product = '/<p>\[everpsblog\s+productid=\s*[\'\"]?(\d+)[\'\"]?\s*\]<\/p>|\[everpsblog\s+productid=\s*[\'\"]?(\d+)[\'\"]?\s*\]/Us';
+        if (preg_match_all($regex_product, $params['html'], $matches)) {
+            if ($html = preg_replace_callback($regex_product, array($this, 'displayProductById'), $params['html'])) {
                 $params['html'] = $html;
             }
         }
@@ -2132,6 +2138,54 @@ class EverPsBlog extends Module
                 'everpsblog_products' => $productsForTemplate,
             ));
             return $this->display(__FILE__, 'views/templates/hook/products_shortcode.tpl');
+        }
+    }
+
+    public function displayProductById($shortcode)
+    {
+        $product = new Product(
+            (int)$shortcode[1],
+            false,
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
+        if (!Validate::isLoadedObject($product)) {
+            return;
+        }
+        $category = new Category(
+            (int)$product->id_category_default,
+            (int)$this->context->language->id,
+            (int)$this->context->shop->id
+        );
+        if (!$category->checkAccess((int)Context::getContext()->customer->id)) {
+            return;
+        }
+        if ((bool)$product->active === true) {
+            $showPrice = true;
+            $assembler = new ProductAssembler(Context::getContext());
+            $presenterFactory = new ProductPresenterFactory(Context::getContext());
+            $presentationSettings = $presenterFactory->getPresentationSettings();
+            $presenter = new ProductListingPresenter(
+                new ImageRetriever(
+                    $this->context->link
+                ),
+                $this->context->link,
+                new PriceFormatter(),
+                new ProductColorsRetriever(),
+                $this->context->getTranslator()
+            );
+
+            $presentationSettings->showPrices = $showPrice;
+
+            $productForTemplate = $presenter->present(
+                $presentationSettings,
+                $assembler->assembleProduct(array('id_product' => $product->id)),
+                $this->context->language
+            );
+            $this->context->smarty->assign(array(
+                'everpsblog_product' => $productForTemplate,
+            ));
+            return $this->display(__FILE__, 'views/templates/hook/product_shortcode.tpl');
         }
     }
 

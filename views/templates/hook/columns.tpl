@@ -15,7 +15,6 @@
  *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-
 {if isset($showArchives) && $showArchives}
 {/if}
 

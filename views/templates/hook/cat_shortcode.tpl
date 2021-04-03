@@ -22,9 +22,9 @@
             <a href="{$blogUrl|escape:'htmlall':'UTF-8'}">
                 <h2 class="h2 products-section-title text-uppercase text-center {$blogcolor|escape:'htmlall':'UTF-8'}">{$post_category->title}</h2>
             </a>
-            {if isset($post_category->content) && !empty($post_category->content)}
+{*             {if isset($post_category->content) && !empty($post_category->content)}
             {$post_category->content nofilter}
-            {/if}
+            {/if} *}
         </div>
     </div>
     <div class="row blogproduct mt-2">
@@ -32,7 +32,7 @@
     {include file='module:everpsblog/views/templates/front/loop/post_product.tpl'}
     {/foreach}
     </div>
-    {if isset($post_category->bottom_content) && !empty($post_category->bottom_content)}
+{*     {if isset($post_category->bottom_content) && !empty($post_category->bottom_content)}
     {$post_category->bottom_content nofilter}
-    {/if}
+    {/if} *}
 </section>

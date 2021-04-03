@@ -16,16 +16,6 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 
-{if isset($everpsblog_products) && $everpsblog_products}
-<section id="products" class="mt-2">
-  <h2 class="text-center">{$everpsblog_category->name|escape:'htmlall':'UTF-8'}</h2>
-{*   {if isset($everpsblog_category->description) && !empty($everpsblog_category->description)}
-  <p>{$everpsblog_category->description nofilter}</p>
-  {/if} *}
-  <div class="products row">
-    {foreach from=$everpsblog_products item="product"}
-      {include file="catalog/_partials/miniatures/product.tpl" product=$product}
-    {/foreach}
-  </div>
-</section>
+{if isset($everpsblog_product) && $everpsblog_product}
+{include file="catalog/_partials/miniatures/product.tpl" product=$everpsblog_product}
 {/if}
