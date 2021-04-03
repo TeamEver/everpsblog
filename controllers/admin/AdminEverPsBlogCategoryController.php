@@ -249,6 +249,10 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
         $this->html .= $lists;
         $this->html .= $this->context->smarty->fetch(
             _PS_MODULE_DIR_
+            .'/everpsblog/views/templates/admin/shortcodes.tpl'
+        );
+        $this->html .= $this->context->smarty->fetch(
+            _PS_MODULE_DIR_
             .'/everpsblog/views/templates/admin/footer.tpl'
         );
 
