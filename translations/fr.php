@@ -567,6 +567,7 @@ $_MODULE['<{everpsblog}prestashop>admineverpsblogauthorcontroller_6aa4d2ff60396e
 $_MODULE['<{everpsblog}prestashop>admineverpsblogauthorcontroller_5056d83dfa11a4fcf25b0eec55bf4817'] = 'Une erreur est survenue';
 $_MODULE['<{everpsblog}prestashop>home_d83f47161c0edbb08c070910368290f9'] = 'Derniers articles de notre blog';
 $_MODULE['<{everpsblog}prestashop>home_43340e6cc4e88197d57f8d6d5ea50a46'] = 'En lire plus';
+$_MODULE['<{everpsblog}prestashop>home_52f7b53572fe9db69047ccbb3626833a'] = 'Voir tous les articles du blog';
 $_MODULE['<{everpsblog}prestashop>my-account_435e5e6d4790eba0f8d185ba05fcde74'] = 'Mes commentaires';
 $_MODULE['<{everpsblog}prestashop>product_fb3510c4e6419c8fbf7e4460438ac62f'] = 'Articles du blog associés';
 $_MODULE['<{everpsblog}prestashop>columns_9ca411f13c68ff5e6d26d5d80f8c17dc'] = 'Catégories du blog';
