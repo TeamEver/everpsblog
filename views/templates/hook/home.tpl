@@ -45,3 +45,6 @@
     {/foreach}
     </div>
 </div>
+<div class="text-center">
+    <a href="{$blogUrl|escape:'htmlall':'UTF-8'}" title="{l s='See all posts from the blog' mod='everpsblog'}" class="btn btn-info">{l s='See all posts from the blog' mod='everpsblog'}</a>
+</div>

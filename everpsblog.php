@@ -46,7 +46,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.3.3';
+        $this->version = '5.3.4';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -1865,6 +1865,11 @@ class EverPsBlog extends Module
     public function hookDisplayRightColumn($params)
     {
         return $this->hookDisplayLeftColumn($params);
+    }
+
+    public function hookDisplayContainerBottom2()
+    {
+        return $this->hookDisplayHome();
     }
 
     public function hookDisplayHome()
