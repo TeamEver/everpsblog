@@ -651,6 +651,8 @@ $_MODULE['<{everpsblog}prestashop>configure_eb3dfc485dff4d4fef65f46370c08e37'] =
 $_MODULE['<{everpsblog}prestashop>configure_d8946fd03241e90f0e9a1ab577bc9650'] = 'N\'oubliez pas de remplir le titre, l\'URL réécrite et les champs de méta description pour chaque article, catégorie, balise et auteur.';
 $_MODULE['<{everpsblog}prestashop>configure_b774dd727afa3f36bdf582b008b58559'] = 'Vous pouvez utiliser un shortcode pour afficher une liste d\'articles de blog n\'importe où dans votre contenu.';
 $_MODULE['<{everpsblog}prestashop>configure_22174296b6aef23b9f8b4abc18e67dbb'] = 'Par exemple, pour afficher les derniers articles de la catégorie numéro 2, saisissez [everpsblog id=\"2\"] dans votre contenu.';
+$_MODULE['<{everpsblog}prestashop>configure_a0c68ee5f0fde0d1a949908632f162e9'] = 'Vous pouvez également afficher un produit dans votre contenu. Utilisez pour cela le shortcode [everpsblog productid=\"2\"] pour afficher le produit possédant l\'identifiant numéro 2';
+$_MODULE['<{everpsblog}prestashop>configure_7b384bbac441a9786ac845e49d871a90'] = 'Pour afficher la liste des produits d\'une catégorie, utilisez le code [everpsblog productcat=\"2\"] qui ici affichera la liste des produits de la catégorie numéro 2.';
 $_MODULE['<{everpsblog}prestashop>configure_045e2db9af21e9c1014d768718ff5264'] = 'Le module gratuit Ever Block vous permettra de mettre du contenu HTML sur tous les emplacements de votre boutique';
 $_MODULE['<{everpsblog}prestashop>configure_d46fa9317383b50a3f4a42fba533c069'] = 'Voir le module gratuit Ever Block';
 $_MODULE['<{everpsblog}prestashop>configure_579899f0102f46d230288ea6daa9fed0'] = 'Retrouvez notre tutoriel en cliquant ici';

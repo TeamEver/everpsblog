@@ -20,7 +20,7 @@ You can use actions hooks by hooking on these custom action hooks :
 - actionBeforeEverAuthorInitContent (params : obj blog_tag, array blog_posts)
 
 ## Hooks for webdesigners
-You can use these diplay hooks by hooking modules on theses custom display hooks :
+Tou can use these diplay hooks by hooking modules on theses custom display hooks :
 - displayBeforeEverLoop (no params) : displayed before post loop
 - displayAfterEverLoop (no params) : displayed after post loop
 - displayBeforeEverAuthor (params: obj everblogauthor) : displayed before author page
