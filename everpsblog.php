@@ -46,7 +46,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.3.6';
+        $this->version = '5.3.7';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -2826,11 +2826,10 @@ class EverPsBlog extends Module
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
         curl_exec($handle);
         $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+        curl_close($handle);
         if ($httpCode != 200) {
-            curl_close($handle);
             return false;
         }
-        curl_close($handle);
         $module_version = Tools::file_get_contents(
             $upgrade_link
         );

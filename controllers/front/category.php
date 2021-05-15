@@ -36,6 +36,7 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
     protected $post;
     protected $blog;
     public $nbr_blogs;
+    public $controller_name = 'category';
 
     public function init()
     {

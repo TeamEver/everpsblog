@@ -23,6 +23,8 @@ if (!defined('_PS_VERSION_')) {
 
 class EverPsBlogemptytrashModuleFrontController extends ModuleFrontController
 {
+    public $controller_name = 'emptytrash';
+
     public function init()
     {
         $this->smileys = array(

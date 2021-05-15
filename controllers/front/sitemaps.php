@@ -23,6 +23,8 @@ if (!defined('_PS_VERSION_')) {
 
 class EverPsBlogsitemapsModuleFrontController extends ModuleFrontController
 {
+    public $controller_name = 'sitemaps';
+
     public function init()
     {
         $this->smileys = array(

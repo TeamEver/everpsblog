@@ -31,6 +31,7 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
     protected $post;
     protected $blog;
     public $post_number;
+    public $controller_name = 'author';
 
     public function init()
     {

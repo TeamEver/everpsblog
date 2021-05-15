@@ -30,6 +30,8 @@ use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 
 class EverPsBlogcustomercommentsModuleFrontController extends EverPsBlogModuleFrontController
 {
+    public $controller_name = 'customercomments';
+    
     public function init()
     {
         parent::init();

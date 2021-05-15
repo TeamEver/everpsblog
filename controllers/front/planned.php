@@ -23,6 +23,8 @@ if (!defined('_PS_VERSION_')) {
 
 class EverPsBlogplannedModuleFrontController extends ModuleFrontController
 {
+    public $controller_name = 'planned';
+
     public function init()
     {
         $this->smileys = array(

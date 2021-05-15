@@ -108,12 +108,13 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
     {
         parent::init();
         $param = array();
-        $page_name = Dispatcher::getInstance()->getController();
+        $controller_name = Dispatcher::getInstance()->getController();
+        // die(var_dump($this->getPageName()));
         Hook::exec('beforeEverBlogInit', array(
-            'blog_page_name' => $page_name
+            'blog_page_name' => $controller_name
         ));
 
-        switch ($page_name) {
+        switch ($controller_name) {
             case 'post':
                 if (!$this->post) {
                     $this->post = new EverPsBlogPost(
@@ -174,11 +175,11 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
         if ($param) {
             $canonical_url = $this->context->link->getModuleLink(
                 'everpsblog',
-                $page_name,
+                $controller_name,
                 $param
             );
             Hook::exec('afterEverBlogInit', array(
-                'blog_page_name' => $page_name,
+                'blog_page_name' => $controller_name,
                 'param' => $param
             ));
             $this->canonicalRedirection($canonical_url);

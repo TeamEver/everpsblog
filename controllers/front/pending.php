@@ -23,6 +23,8 @@ if (!defined('_PS_VERSION_')) {
 
 class EverPsBlogpendingModuleFrontController extends ModuleFrontController
 {
+    public $controller_name = 'pending';
+
     public function init()
     {
         $this->smileys = array(

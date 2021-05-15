@@ -36,6 +36,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
     protected $post;
     protected $blog;
     public $post_number;
+    public $controller_name = 'blog';
 
     public function init()
     {
