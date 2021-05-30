@@ -100,6 +100,13 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
             } else {
                 $page['meta']['robots'] = 'noindex, follow';
             }
+            if (Tools::getValue('page')) {
+                $meta_title = $this->l('Page : ').Tools::getValue('page').' | '.$this->tag->meta_title;
+                $meta_description = $this->l('Page : ').Tools::getValue('page').' | '.$this->tag->meta_description;
+            } else {
+                $meta_title = $this->tag->meta_title;
+                $meta_description = $this->tag->meta_description;
+            }
             $page['meta']['title'] = $this->tag->meta_title;
             $page['meta']['description'] = $this->tag->meta_description;
             $this->context->smarty->assign('page', $page);
@@ -161,6 +168,9 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
 
     public function getCanonicalURL()
     {
+        if (Tools::getValue('page')) {
+            return;
+        }
         return $this->context->link->getModuleLink(
             'everpsblog',
             'tag',

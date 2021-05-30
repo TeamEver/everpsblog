@@ -95,6 +95,13 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
             }
             $page = $this->context->controller->getTemplateVarPage();
             $page['meta']['robots'] = $seo_index . ', ' . $seo_follow;
+            if (Tools::getValue('page')) {
+                $meta_title = $this->l('Page : ').Tools::getValue('page').' | '.$this->author->meta_title;
+                $meta_description = $this->l('Page : ').Tools::getValue('page').' | '.$this->author->meta_description;
+            } else {
+                $meta_title = $this->author->meta_title;
+                $meta_description = $this->author->meta_description;
+            }
             $page['meta']['title'] = $this->author->meta_title;
             $page['meta']['description'] = $this->author->meta_description;
             $this->context->smarty->assign('page', $page);
@@ -211,6 +218,9 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
 
     public function getCanonicalURL()
     {
+        if (Tools::getValue('page')) {
+            return;
+        }
         return $this->context->link->getModuleLink(
             'everpsblog',
             'author',

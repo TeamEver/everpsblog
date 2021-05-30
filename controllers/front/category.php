@@ -103,13 +103,17 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                 $seo_follow = 'nofollow';
             }
             $page = $this->context->controller->getTemplateVarPage();
-            if (!Tools::getValue('page')) {
-                $page['meta']['robots'] = $seo_index.', '.$seo_follow;
+            // SEO opti on pagination; thx FoP ! Awesome channel !
+            $page['meta']['robots'] = $seo_index.', '.$seo_follow;
+            if (Tools::getValue('page')) {
+                $meta_title = $this->l('Page : ').Tools::getValue('page').' | '.$this->category->meta_title;
+                $meta_description = $this->l('Page : ').Tools::getValue('page').' | '.$this->category->meta_description;
             } else {
-                $page['meta']['robots'] = 'noindex, follow';
+                $meta_title = $this->category->meta_title;
+                $meta_description = $this->category->meta_description;
             }
-            $page['meta']['title'] = $this->category->meta_title;
-            $page['meta']['description'] = $this->category->meta_description;
+            $page['meta']['title'] = $meta_title;
+            $page['meta']['description'] = $meta_description;
             $this->context->smarty->assign('page', $page);
             $posts = EverPsBlogPost::getPostsByCategory(
                 (int)$this->context->language->id,
@@ -187,6 +191,9 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
 
     public function getCanonicalURL()
     {
+        if (Tools::getValue('page')) {
+            return;
+        }
         return $this->context->link->getModuleLink(
             'everpsblog',
             'category',

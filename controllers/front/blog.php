@@ -116,6 +116,10 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         $everblog_desc = Configuration::getInt('EVERBLOG_META_DESC');
         $meta_desc = $everblog_desc[(int)Context::getContext()->language->id];
         $page = $this->context->controller->getTemplateVarPage();
+        if (Tools::getValue('page')) {
+            $meta_title = $this->l('Page : ').Tools::getValue('page').' | '.$meta_title;
+            $meta_description = $this->l('Page : ').Tools::getValue('page').' | '.$meta_description;
+        }
         $page['meta']['title'] = $meta_title;
         $page['meta']['description'] = $meta_desc;
         if (!Tools::getValue('page')) {
@@ -199,6 +203,9 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
 
     public function getCanonicalURL()
     {
+        if (Tools::getValue('page')) {
+            return;
+        }
         return $this->context->link->getModuleLink(
             'everpsblog',
             'blog'
