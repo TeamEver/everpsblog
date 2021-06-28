@@ -861,8 +861,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 $post->id_author = Tools::getValue('id_author');
             }
             // Categories, products and tags
-            if (Tools::getValue('id_default_category')
-                && !Validate::isInt(Tools::getValue('id_default_category'))
+            // Default category is fully required
+            if (!Tools::getValue('id_default_category')
+                || !Validate::isInt(Tools::getValue('id_default_category'))
             ) {
                  $this->errors[] = $this->l('Default category is not valid');
             } else {

@@ -243,6 +243,7 @@ class EverPsBlogTaxonomy extends ObjectModel
         .(int)$active;
         if (!Cache::isStored($cache_id)) {
             $taxonomies = array();
+            $root_category = EverPsBlogCategory::getRootCategory();
             $sql = new DbQuery;
             $sql->select('id_parent_category');
             $sql->from('ever_blog_category');
@@ -251,7 +252,13 @@ class EverPsBlogTaxonomy extends ObjectModel
             $taxonomy = Db::getInstance()->getValue($sql);
             if (isset($taxonomy) && (int)$taxonomy > 0) {
                 $taxonomies[] = $taxonomy;
-                $taxonomies[] = self::getCategoryParentsTaxonomy($taxonomy, $active = 1);
+                $category = new self(
+                    (int)$taxonomy
+                );
+                if ((int)$category->id_parent_category > 0
+                    && (int)$root_category->id != (int)$category->id_parent_category) {
+                    $taxonomies[] = (int)$category->id_parent_category;
+                }
             }
             Cache::store($cache_id, $taxonomies);
             return $taxonomies;
