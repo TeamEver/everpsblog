@@ -36,7 +36,9 @@ class EverPsBlogcustomercommentsModuleFrontController extends EverPsBlogModuleFr
     {
         parent::init();
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
-        if ((bool)Context::getContext()->customer->isLogged() === false) {
+        if ((bool)Context::getContext()->customer->isLogged() === false
+            || (bool)Configuration::get('EVERBLOG_ALLOW_COMMENTS') === false
+        ) {
             Tools::redirect('index.php');
         }
     }

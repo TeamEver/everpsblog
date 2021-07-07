@@ -46,7 +46,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.3.9';
+        $this->version = '5.3.10';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -112,6 +112,7 @@ class EverPsBlog extends Module
             && $this->registerHook('backofficeHeader')
             && $this->registerHook('actionObjectProductDeleteAfter')
             && $this->registerHook('actionAdminMetaAfterWriteRobotsFile')
+            && $this->registerHook('displayAdminAfterHeader')
             && $this->installModuleTab(
                 'AdminEverPsBlog',
                 'IMPROVE',
@@ -1760,6 +1761,13 @@ class EverPsBlog extends Module
         return $this->hookActionAdminControllerSetMedia();
     }
 
+    public function hookDisplayAdminAfterHeader()
+    {
+        if ($this->checkLatestEverModuleVersion($this->name, $this->version)) {
+            return $this->context->smarty->fetch($this->local_path.'views/templates/admin/upgrade.tpl');
+        }
+    }
+
     public function hookHeader()
     {
         $controller_name = Tools::getValue('controller');
@@ -1918,7 +1926,9 @@ class EverPsBlog extends Module
 
     public function hookDisplayCustomerAccount()
     {
-        return $this->display(__FILE__, 'views/templates/hook/my-account.tpl');
+        if ((bool)Configuration::get('EVERBLOG_ALLOW_COMMENTS') === true) {
+            return $this->display(__FILE__, 'views/templates/hook/my-account.tpl');
+        }
     }
 
     public function hookDisplayMyAccountBlock($params)
