@@ -252,7 +252,7 @@ class EverPsBlogTaxonomy extends ObjectModel
             $taxonomy = Db::getInstance()->getValue($sql);
             if (isset($taxonomy) && (int)$taxonomy > 0) {
                 $taxonomies[] = $taxonomy;
-                $category = new self(
+                $category = new EverPsBlogCategory(
                     (int)$taxonomy
                 );
                 if ((int)$category->id_parent_category > 0
