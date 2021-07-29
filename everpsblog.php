@@ -46,7 +46,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.3.11';
+        $this->version = '5.3.12';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -2847,6 +2847,37 @@ class EverPsBlog extends Module
             return true;
         }
         return false;
+    }
+
+    private function exportWordPressFile()
+    {
+        $all_posts = EverPsBlogPost::getPosts(
+            (int)Context::getContext()->language->id,
+            (int)Context::getContext()->shop->id,
+            0,
+            99999
+        );
+        $dom->encoding = 'utf-8';
+        $dom->xmlVersion = '1.0';
+        $dom->formatOutput = true;
+        $xml_file_name = 'blog_'.Configuration::get('PS_SHOP_NAME').'.xml';
+        // RSS node and his attributes
+        $root = $dom->createElement('rss');
+        $rss_version = new DOMAttr('version', '2.0');
+        $root->setAttributeNode($rss_version);
+        $xmlns_excerpt = new DOMAttr('xmlns:excerpt', 'http://wordpress.org/export/1.2/excerpt/');
+        $root->setAttributeNode($xmlns_excerpt);
+        $xmlns_content = new DOMAttr('xmlns:content', 'http://purl.org/rss/1.0/modules/content/');
+        $root->setAttributeNode($xmlns_content);
+        $xmlns_wfw = new DOMAttr('xmlns:wfw', 'http://wellformedweb.org/CommentAPI/');
+        $root->setAttributeNode($xmlns_wfw);
+        $xmlns_dc = new DOMAttr('xmlns:dc', 'http://purl.org/dc/elements/1.1/');
+        $root->setAttributeNode($xmlns_dc);
+        $xmlns_wp = new DOMAttr('xmlns:wp', 'http://wordpress.org/export/1.2/');
+        $root->setAttributeNode($xmlns_wp);
+        foreach ($all_posts as $post) {
+            # code...
+        }
     }
 
     private function importWordPressFile($file)
