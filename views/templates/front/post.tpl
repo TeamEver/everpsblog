@@ -25,14 +25,14 @@
     <meta name="twitter:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
     <meta name="twitter:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
     {* <meta name="twitter:creator" content="@author_handle"> *}
-    <meta name="twitter:image" content="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$post->id|escape:'htmlall':'UTF-8'}.jpg">
+    <meta name="twitter:image" content="{$featured_image|escape:'htmlall':'UTF-8'}>
     <!-- Open Graph Card data -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{$urls.current_url|escape:'htmlall':'UTF-8'}">
     <meta property="og:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
     <meta property="og:site_name" content="{$shop.name|escape:'htmlall':'UTF-8'}">
     <meta property="og:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
-    <meta property="og:image" content="{$blogImg_dir|escape:'htmlall':'UTF-8'}posts/post_image_{$post->id|escape:'htmlall':'UTF-8'}.jpg">
+    <meta property="og:image" content="{$featured_image|escape:'htmlall':'UTF-8'}">
     <script type="application/ld+json">
     {
     "@context": "https://schema.org",
@@ -85,12 +85,14 @@
             <img class="img img-fluid post-featured-image featured-image" src="{$featured_image|escape:'htmlall':'UTF-8'}" alt="{$post->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$post->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
         </div>
         <h1 class="text-center">{$post->title|escape:'htmlall':'UTF-8'}</h1>
-        <p class="text-center">
+        {if isset($show_author) && $show_author}
+        <p class="text-center author_cover_container">
             <a href="{$author->url|escape:'htmlall':'UTF-8'}" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
                 <img src="{$author_cover|escape:'htmlall':'UTF-8'}" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" class="img-fluid author-icon rounded-circle" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'}" title="{$author->nickhandle|escape:'htmlall':'UTF-8'}">
                 {l s='By' mod='everpsblog'} {$author->nickhandle|escape:'htmlall':'UTF-8'}
             </a>
         </p>
+        {/if}
     </div>
     <div class="row">
         <div class="col-12 col-md-12 postcontent {if $animated}zoomed{/if}">

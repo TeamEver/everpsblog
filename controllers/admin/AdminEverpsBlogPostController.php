@@ -68,7 +68,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             ),
             'title' => array(
                 'title' => $this->l('Post title'),
-                'align' => 'left'
+                'align' => 'left',
+                'havingFilter' => true,
+                'filter_key' => 'l!title'
             ),
             'excerpt' => array(
                 'title' => $this->l('Post excerpt'),
@@ -128,6 +130,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             'LEFT JOIN `'._DB_PREFIX_.'ever_blog_post_lang` l
                 ON (
                     l.`id_ever_post` = a.`id_ever_post`
+                    AND l.`id_lang` = '.(int)Context::getContext()->language->id.'
                 )
             LEFT JOIN `'._DB_PREFIX_.'ever_blog_author` au
                 ON (
@@ -600,6 +603,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'hint' => $this->l('Will set post base URL'),
                         'required' => true,
                         'name' => 'link_rewrite',
+                        'class' => 'copy2friendlyUrl',
                         'lang' => true,
                         'autoload_rte' => true,
                         'cols' => 60,

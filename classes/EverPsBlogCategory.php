@@ -148,8 +148,21 @@ class EverPsBlogCategory extends ObjectModel
             $sql->select('id_ever_category');
             $sql->from('ever_blog_category');
             $sql->where('is_root_category = 1');
+            $sql->where('id_shop = '.(int)Context::getContext()->shop->id);
             $return = Db::getInstance()->getValue($sql);
             $return = new self($return);
+            if (!Validate::isLoadedObject($return)) {
+                $return = new self();
+                $return->is_root_category = 1;
+                $return->active = 1;
+                $return->id_shop = (int)Context::getContext()->shop->id;
+                foreach (Language::getLanguages(false) as $language) {
+                    $return->title[$language['id_lang']] = 'Root';
+                    $return->content[$language['id_lang']] = 'Root';
+                    $return->link_rewrite[$language['id_lang']] = 'root';
+                }
+                $return->save();
+            }
             Cache::store($cache_id, $return);
             return $return;
         }

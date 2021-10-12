@@ -344,6 +344,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             );
             $this->context->smarty->assign(
                 array(
+                    'show_author' => (bool)Configuration::get('EVERBLOG_SHOW_AUTHOR'),
                     'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
                     'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
                     'featured_image' => $file_url,

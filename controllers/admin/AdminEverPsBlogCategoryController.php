@@ -335,6 +335,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
                     'hint' => $this->l('Will set category base URL'),
                     'required' => true,
                     'name' => 'link_rewrite',
+                    'class' => 'copy2friendlyUrl',
                     'lang' => true,
                     'autoload_rte' => true,
                     'cols' => 60,

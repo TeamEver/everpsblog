@@ -46,7 +46,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.3.12';
+        $this->version = '5.3.16';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -85,16 +85,19 @@ class EverPsBlog extends Module
             mkdir(_PS_IMG_DIR_.'author', 0755, true);
         }
         // Creating root category
-        $root_category = new EverPsBlogCategory();
-        $root_category->is_root_category = 1;
-        $root_category->active = 1;
-        $root_category->id_shop = (int)$this->context->shop->id;
-        foreach (Language::getLanguages(false) as $language) {
-            $root_category->title[$language['id_lang']] = 'Root';
-            $root_category->content[$language['id_lang']] = 'Root';
-            $root_category->link_rewrite[$language['id_lang']] = 'root';
+        $shops = Shop::getShops();
+        foreach ($shops as $shop) {
+            $root_category = new EverPsBlogCategory();
+            $root_category->is_root_category = 1;
+            $root_category->active = 1;
+            $root_category->id_shop = (int)$shop['id_shop'];
+            foreach (Language::getLanguages(false) as $language) {
+                $root_category->title[$language['id_lang']] = 'Root';
+                $root_category->content[$language['id_lang']] = 'Root';
+                $root_category->link_rewrite[$language['id_lang']] = 'root';
+            }
+            $root_category->save();
         }
-        $root_category->save();
         // Install
         return parent::install()
             && $this->registerBlogHook()
@@ -243,7 +246,9 @@ class EverPsBlog extends Module
             && $this->registerHook('actionObjectEverPsBlogTagAddAfter')
             && $this->registerHook('actionObjectEverPsBlogCategoryAddAfter')
             && $this->registerHook('actionObjectEverPsBlogPostAddAfter')
-            && $this->registerHook('actionObjectEverPsBlogCommentAddAfter');
+            && $this->registerHook('actionObjectEverPsBlogCommentAddAfter')
+            && $this->registerHook('actionObjectShopAddAfter')
+            && $this->registerHook('actionObjectShopDeleteAfter');
     }
 
     /**
@@ -481,6 +486,11 @@ class EverPsBlog extends Module
                 && !Validate::isBool(Tools::getValue('EVERBLOG_RSS'))
             ) {
                 $this->postErrors[] = $this->l('Error : The field "Use RSS feed" is not valid');
+            }
+            if (Tools::getValue('EVERBLOG_SHOW_AUTHOR')
+                && !Validate::isBool(Tools::getValue('EVERBLOG_SHOW_AUTHOR'))
+            ) {
+                $this->postErrors[] = $this->l('Error : The field "Show author" is not valid');
             }
             if (Tools::getValue('EVERBLOG_BANNED_USERS')
                 && !Validate::isGenericName(Tools::getValue('EVERBLOG_BANNED_USERS'))
@@ -758,12 +768,14 @@ class EverPsBlog extends Module
             } elseif ($key == 'EVERBLOG_TOP_TEXT') {
                 Configuration::updateValue(
                     $key,
-                    $everblog_top_text
+                    $everblog_top_text,
+                    true
                 );
             } elseif ($key == 'EVERBLOG_BOTTOM_TEXT') {
                 Configuration::updateValue(
                     $key,
-                    $everblog_bottom_text
+                    $everblog_bottom_text,
+                    true
                 );
             } else {
                 Configuration::updateValue($key, Tools::getValue($key));
@@ -827,6 +839,7 @@ class EverPsBlog extends Module
             'EVERBLOG_ALLOW_COMMENTS' => Configuration::get('EVERBLOG_ALLOW_COMMENTS'),
             'EVERBLOG_CHECK_COMMENTS' => Configuration::get('EVERBLOG_CHECK_COMMENTS'),
             'EVERBLOG_RSS' => Configuration::get('EVERBLOG_RSS'),
+            'EVERBLOG_SHOW_AUTHOR' => Configuration::get('EVERBLOG_SHOW_AUTHOR'),
             'EVERBLOG_BANNED_USERS' => Configuration::get('EVERBLOG_BANNED_USERS'),
             'EVERBLOG_BANNED_IP' => Configuration::get('EVERBLOG_BANNED_IP'),
             'EVERBLOG_ONLY_LOGGED_COMMENT' => Configuration::get('EVERBLOG_ONLY_LOGGED_COMMENT'),
@@ -1250,6 +1263,27 @@ class EverPsBlog extends Module
                         'hint' => $this->l('Else feed wont be used'),
                         'required' => false,
                         'name' => 'EVERBLOG_RSS',
+                        'is_bool' => false,
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No')
+                            )
+                        ),
+                    ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Show author ?'),
+                        'desc' => $this->l('Will show author name and avatar on posts'),
+                        'hint' => $this->l('Else author name and avatar will be hidden'),
+                        'required' => false,
+                        'name' => 'EVERBLOG_SHOW_AUTHOR',
                         'is_bool' => false,
                         'values' => array(
                             array(
@@ -2317,6 +2351,25 @@ class EverPsBlog extends Module
         return true;
     }
 
+    public function hookActionObjectShopAddAfter($params)
+    {
+        $controllerTypes = array('admin', 'moduleadmin');
+        if (!in_array(Context::getContext()->controller->controller_type, $controllerTypes)) {
+            return;
+        }
+        $shop = $params['object'];
+        $root_category = new EverPsBlogCategory();
+        $root_category->is_root_category = 1;
+        $root_category->active = 1;
+        $root_category->id_shop = (int)$shop->id;
+        foreach (Language::getLanguages(false) as $language) {
+            $root_category->title[$language['id_lang']] = 'Root';
+            $root_category->content[$language['id_lang']] = 'Root';
+            $root_category->link_rewrite[$language['id_lang']] = 'root';
+        }
+        $root_category->save();
+    }
+
     public function hookActionObjectEverPsBlogPostAddAfter($params)
     {
         $controllerTypes = array('admin', 'moduleadmin');
@@ -2408,6 +2461,20 @@ class EverPsBlog extends Module
             return;
         }
         return $this->generateBlogSitemap();
+    }
+
+    public function hookActionObjectShopDeleteAfter($params)
+    {
+        $controllerTypes = array('admin', 'moduleadmin');
+        if (!in_array(Context::getContext()->controller->controller_type, $controllerTypes)) {
+            return;
+        }
+        $shop = $params['object'];
+
+        Db::getInstance()->delete(
+            'ever_blog_category',
+            'id_shop = '.(int)$shop->id
+        );
     }
 
     public function hookActionObjectEverPsBlogPostDeleteAfter($params)

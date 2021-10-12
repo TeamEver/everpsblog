@@ -108,12 +108,12 @@ class EverPsBlogPost extends ObjectModel
             ),
             'id_shop' => array(
                 'type' => self::TYPE_INT,
-                'validate' => 'isunsignedInt',
+                'validate' => 'isUnsignedInt',
                 'required' => false
             ),
             'id_author' => array(
                 'type' => self::TYPE_INT,
-                'validate' => 'isunsignedInt',
+                'validate' => 'isUnsignedInt',
                 'required' => false
             ),
             'index' => array(
@@ -143,7 +143,7 @@ class EverPsBlogPost extends ObjectModel
             ),
             'id_default_category' => array(
                 'type' => self::TYPE_INT,
-                'validate' => 'isunsignedInt',
+                'validate' => 'isUnsignedInt',
                 'required' => false
             ),
             'post_categories' => array(
@@ -163,7 +163,7 @@ class EverPsBlogPost extends ObjectModel
             ),
             'count' => array(
                 'type' => self::TYPE_INT,
-                'validate' => 'isunsignedInt',
+                'validate' => 'isUnsignedInt',
                 'required' => false
             ),
         )
