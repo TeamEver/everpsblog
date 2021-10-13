@@ -46,7 +46,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.3.16';
+        $this->version = '5.3.17';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -2433,6 +2433,14 @@ class EverPsBlog extends Module
         EverPsBlogTaxonomy::checkDefaultPostCategory(
             $params['object']->id
         );
+        // Drop temp img
+        $tmp_file = _PS_IMG_DIR_
+        .'tmp/ever_blog_post_mini_'
+        .(int)$params['object']->id
+        .'_1.jpg';
+        if (file_exists($tmp_file)) {
+            unlink($tmp_file);
+        }
         return $this->generateBlogSitemap();
     }
 
@@ -2441,6 +2449,14 @@ class EverPsBlog extends Module
         $controllerTypes = array('admin', 'moduleadmin');
         if (!in_array(Context::getContext()->controller->controller_type, $controllerTypes)) {
             return;
+        }
+        // Drop temp img
+        $tmp_file = _PS_IMG_DIR_
+        .'tmp/ever_blog_category_mini_'
+        .(int)$params['object']->id
+        .'_1.jpg';
+        if (file_exists($tmp_file)) {
+            unlink($tmp_file);
         }
         return $this->generateBlogSitemap();
     }
@@ -2451,6 +2467,14 @@ class EverPsBlog extends Module
         if (!in_array(Context::getContext()->controller->controller_type, $controllerTypes)) {
             return;
         }
+        // Drop temp img
+        $tmp_file = _PS_IMG_DIR_
+        .'tmp/ever_blog_tag_mini_'
+        .(int)$params['object']->id
+        .'_1.jpg';
+        if (file_exists($tmp_file)) {
+            unlink($tmp_file);
+        }
         return $this->generateBlogSitemap();
     }
 
@@ -2459,6 +2483,14 @@ class EverPsBlog extends Module
         $controllerTypes = array('admin', 'moduleadmin');
         if (!in_array(Context::getContext()->controller->controller_type, $controllerTypes)) {
             return;
+        }
+        // Drop temp img
+        $tmp_file = _PS_IMG_DIR_
+        .'tmp/ever_blog_author_mini_'
+        .(int)$params['object']->id
+        .'_1.jpg';
+        if (file_exists($tmp_file)) {
+            unlink($tmp_file);
         }
         return $this->generateBlogSitemap();
     }
