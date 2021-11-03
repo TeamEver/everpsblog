@@ -46,7 +46,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.3.17';
+        $this->version = '5.3.18';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -2857,8 +2857,7 @@ class EverPsBlog extends Module
     {
         $indexes = $this->getSitemapIndexes();
         // Panda theme uses random int on css file parameter
-        $allowSitemap = 'Disallow: /modules/stthemeeditor/views/css'
-                            ."\r\n";
+        $allowSitemap = 'Disallow: /modules/stthemeeditor/views/css'."\r\n";
         $allowSitemap .= "\n";
         if ($indexes) {
             foreach ($indexes as $index) {
@@ -2923,29 +2922,6 @@ class EverPsBlog extends Module
         $result &= $this->registerHook('actionAfterEverBlogInit');
         $result &= $this->registerHook('actionOutputHTMLBefore');
         return $result;
-    }
-
-    public function checkLatestEverModuleVersion($module, $version)
-    {
-        $upgrade_link = 'https://upgrade.team-ever.com/upgrade.php?module='
-        .$module
-        .'&version='
-        .$version;
-        $handle = curl_init($upgrade_link);
-        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-        curl_exec($handle);
-        $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-        curl_close($handle);
-        if ($httpCode != 200) {
-            return false;
-        }
-        $module_version = Tools::file_get_contents(
-            $upgrade_link
-        );
-        if ($module_version && $module_version > $version) {
-            return true;
-        }
-        return false;
     }
 
     private function exportWordPressFile()
@@ -3197,10 +3173,32 @@ class EverPsBlog extends Module
         }
         if ((bool)$result === true) {
             $this->generateBlogSitemap();
-            Tools::clearCache();
             $this->postSuccess[] = $this->l('WordPress posts have been imported');
         } else {
             $this->postErrors[] = $this->l('An error has occured while importing WordPress file');
         }
+    }
+
+    public function checkLatestEverModuleVersion($module, $version)
+    {
+        $upgrade_link = 'https://upgrade.team-ever.com/upgrade.php?module='
+        .$module
+        .'&version='
+        .$version;
+        $handle = curl_init($upgrade_link);
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+        curl_exec($handle);
+        $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+        curl_close($handle);
+        if ($httpCode != 200) {
+            return false;
+        }
+        $module_version = Tools::file_get_contents(
+            $upgrade_link
+        );
+        if ($module_version && $module_version > $version) {
+            return true;
+        }
+        return false;
     }
 }

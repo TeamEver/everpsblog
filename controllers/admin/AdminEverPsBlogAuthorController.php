@@ -327,7 +327,7 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
         );
         $author_img = '<image src="'.(string)$file_url.'" style="max-width:150px;"/>';
 
-        if ($obj) {
+        if (Validate::isLoadedObject($obj)) {
             $link = new Link();
             $id_lang = (int)Context::getContext()->language->id;
             $objectUrl = $link->getModuleLink(

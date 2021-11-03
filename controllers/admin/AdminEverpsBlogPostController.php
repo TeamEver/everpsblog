@@ -393,8 +393,6 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             return false;
         }
 
-        Tools::clearCache();
-
         $post_id = Tools::getValue('id_ever_post');
         $obj = new EverPsBlogPost(
             (int)Tools::getValue('id_ever_post')
