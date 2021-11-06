@@ -304,84 +304,146 @@ class AdminEverPsBlogPostController extends ModuleAdminController
 
     protected function getConfigFormValues($obj)
     {
-        $cat_taxonomies = EverPsBlogTaxonomy::getPostCategoriesTaxonomies(
-            (int)$obj->id
-        );
-        if (isset($cat_taxonomies) && count($cat_taxonomies) > 0) {
-            $cat_taxonomies = array_values(array_map('array_values', $cat_taxonomies));
-            $cat_taxonomies = call_user_func_array('array_merge', $cat_taxonomies);
-        }
-        $tag_taxonomies = EverPsBlogTaxonomy::getPostTagsTaxonomies(
-            (int)$obj->id
-        );
-        if (isset($tag_taxonomies) && count($tag_taxonomies) > 0) {
-            $tag_taxonomies = array_values(array_map('array_values', $tag_taxonomies));
-            $tag_taxonomies = call_user_func_array('array_merge', $tag_taxonomies);
-        }
-        $product_taxonomies = EverPsBlogTaxonomy::getPostProductsTaxonomies(
-            (int)$obj->id
-        );
-        if (isset($product_taxonomies) && count($product_taxonomies) > 0) {
-            $product_taxonomies = array_values(array_map('array_values', $product_taxonomies));
-            $product_taxonomies = call_user_func_array('array_merge', $product_taxonomies);
-        }
         $formValues = array();
-        $formValues[] = array(
-            'id_ever_post' => (!empty(Tools::getValue('id_ever_post')))
-            ? Tools::getValue('id_ever_post')
-            : $obj->id,
-            'title' => (!empty(Tools::getValue('title')))
-            ? Tools::getValue('title')
-            : $obj->title,
-            'id_author' => (!empty(Tools::getValue('id_author')))
-            ? Tools::getValue('id_author')
-            : $obj->id_author,
-            'meta_title' => (!empty(Tools::getValue('meta_title')))
-            ? Tools::getValue('meta_title')
-            : $obj->meta_title,
-            'meta_description' => (!empty(Tools::getValue('meta_description')))
-            ? Tools::getValue('meta_description')
-            : $obj->meta_description,
-            'link_rewrite' => (!empty(Tools::getValue('link_rewrite')))
-            ? Tools::getValue('link_rewrite')
-            : $obj->link_rewrite,
-            'content' => (!empty(Tools::getValue('content')))
-            ? Tools::getValue('content')
-            : $obj->content,
-            'excerpt' => (!empty(Tools::getValue('excerpt')))
-            ? Tools::getValue('excerpt')
-            : $obj->excerpt,
-            'date_add' => (!empty(Tools::getValue('date_add')))
-            ? Tools::getValue('date_add')
-            : $obj->date_add,
-            'date_upd' => (!empty(Tools::getValue('date_upd')))
-            ? Tools::getValue('date_upd')
-            : $obj->date_upd,
-            'post_categories[]' => (!empty(Tools::getValue('post_categories')))
-            ? Tools::getValue('post_categories')
-            : $cat_taxonomies,
-            'id_default_category' => (!empty(Tools::getValue('id_default_category')))
-            ? Tools::getValue('id_default_category')
-            : $obj->id_default_category,
-            'post_tags[]' => (!empty(Tools::getValue('post_tags')))
-            ? Tools::getValue('post_tags')
-            : $tag_taxonomies,
-            'post_products[]' => (!empty(Tools::getValue('post_products')))
-            ? Tools::getValue('post_products')
-            : $product_taxonomies,
-            'index' => (!empty(Tools::getValue('index')))
-            ? Tools::getValue('index')
-            : $obj->index,
-            'follow' => (!empty(Tools::getValue('follow')))
-            ? Tools::getValue('follow')
-            : $obj->follow,
-            'sitemap' => (!empty(Tools::getValue('sitemap')))
-            ? Tools::getValue('sitemap')
-            : $obj->sitemap,
-            'post_status' => (!empty(Tools::getValue('post_status')))
-            ? Tools::getValue('post_status')
-            : $obj->post_status,
-        );
+        if (Validate::isLoadedObject($obj)) {
+            $cat_taxonomies = EverPsBlogTaxonomy::getPostCategoriesTaxonomies(
+                (int)$obj->id
+            );
+            if (isset($cat_taxonomies) && count($cat_taxonomies) > 0) {
+                $cat_taxonomies = array_values(array_map('array_values', $cat_taxonomies));
+                $cat_taxonomies = call_user_func_array('array_merge', $cat_taxonomies);
+            }
+            $tag_taxonomies = EverPsBlogTaxonomy::getPostTagsTaxonomies(
+                (int)$obj->id
+            );
+            if (isset($tag_taxonomies) && count($tag_taxonomies) > 0) {
+                $tag_taxonomies = array_values(array_map('array_values', $tag_taxonomies));
+                $tag_taxonomies = call_user_func_array('array_merge', $tag_taxonomies);
+            }
+            $product_taxonomies = EverPsBlogTaxonomy::getPostProductsTaxonomies(
+                (int)$obj->id
+            );
+            if (isset($product_taxonomies) && count($product_taxonomies) > 0) {
+                $product_taxonomies = array_values(array_map('array_values', $product_taxonomies));
+                $product_taxonomies = call_user_func_array('array_merge', $product_taxonomies);
+            }
+            $formValues[] = array(
+                'id_ever_post' => (!empty(Tools::getValue('id_ever_post')))
+                ? Tools::getValue('id_ever_post')
+                : $obj->id,
+                'title' => (!empty(Tools::getValue('title')))
+                ? Tools::getValue('title')
+                : $obj->title,
+                'id_author' => (!empty(Tools::getValue('id_author')))
+                ? Tools::getValue('id_author')
+                : $obj->id_author,
+                'meta_title' => (!empty(Tools::getValue('meta_title')))
+                ? Tools::getValue('meta_title')
+                : $obj->meta_title,
+                'meta_description' => (!empty(Tools::getValue('meta_description')))
+                ? Tools::getValue('meta_description')
+                : $obj->meta_description,
+                'link_rewrite' => (!empty(Tools::getValue('link_rewrite')))
+                ? Tools::getValue('link_rewrite')
+                : $obj->link_rewrite,
+                'content' => (!empty(Tools::getValue('content')))
+                ? Tools::getValue('content')
+                : $obj->content,
+                'excerpt' => (!empty(Tools::getValue('excerpt')))
+                ? Tools::getValue('excerpt')
+                : $obj->excerpt,
+                'date_add' => (!empty(Tools::getValue('date_add')))
+                ? Tools::getValue('date_add')
+                : $obj->date_add,
+                'date_upd' => (!empty(Tools::getValue('date_upd')))
+                ? Tools::getValue('date_upd')
+                : $obj->date_upd,
+                'post_categories[]' => (!empty(Tools::getValue('post_categories')))
+                ? Tools::getValue('post_categories')
+                : $cat_taxonomies,
+                'id_default_category' => (!empty(Tools::getValue('id_default_category')))
+                ? Tools::getValue('id_default_category')
+                : $obj->id_default_category,
+                'post_tags[]' => (!empty(Tools::getValue('post_tags')))
+                ? Tools::getValue('post_tags')
+                : $tag_taxonomies,
+                'post_products[]' => (!empty(Tools::getValue('post_products')))
+                ? Tools::getValue('post_products')
+                : $product_taxonomies,
+                'index' => (!empty(Tools::getValue('index')))
+                ? Tools::getValue('index')
+                : $obj->index,
+                'follow' => (!empty(Tools::getValue('follow')))
+                ? Tools::getValue('follow')
+                : $obj->follow,
+                'sitemap' => (!empty(Tools::getValue('sitemap')))
+                ? Tools::getValue('sitemap')
+                : $obj->sitemap,
+                'post_status' => (!empty(Tools::getValue('post_status')))
+                ? Tools::getValue('post_status')
+                : $obj->post_status,
+            );
+        } else {
+            $cat_taxonomies = array();
+            $tag_taxonomies = array();
+            $product_taxonomies = array();
+            $formValues[] = array(
+                'id_ever_post' => (!empty(Tools::getValue('id_ever_post')))
+                ? Tools::getValue('id_ever_post')
+                : '',
+                'title' => (!empty(Tools::getValue('title')))
+                ? Tools::getValue('title')
+                : '',
+                'id_author' => (!empty(Tools::getValue('id_author')))
+                ? Tools::getValue('id_author')
+                : '',
+                'meta_title' => (!empty(Tools::getValue('meta_title')))
+                ? Tools::getValue('meta_title')
+                : '',
+                'meta_description' => (!empty(Tools::getValue('meta_description')))
+                ? Tools::getValue('meta_description')
+                : '',
+                'link_rewrite' => (!empty(Tools::getValue('link_rewrite')))
+                ? Tools::getValue('link_rewrite')
+                : '',
+                'content' => (!empty(Tools::getValue('content')))
+                ? Tools::getValue('content')
+                : '',
+                'excerpt' => (!empty(Tools::getValue('excerpt')))
+                ? Tools::getValue('excerpt')
+                : '',
+                'date_add' => (!empty(Tools::getValue('date_add')))
+                ? Tools::getValue('date_add')
+                : '',
+                'date_upd' => (!empty(Tools::getValue('date_upd')))
+                ? Tools::getValue('date_upd')
+                : '',
+                'post_categories[]' => (!empty(Tools::getValue('post_categories')))
+                ? Tools::getValue('post_categories')
+                :'',
+                'id_default_category' => (!empty(Tools::getValue('id_default_category')))
+                ? Tools::getValue('id_default_category')
+                : '',
+                'post_tags[]' => (!empty(Tools::getValue('post_tags')))
+                ? Tools::getValue('post_tags')
+                :'',
+                'post_products[]' => (!empty(Tools::getValue('post_products')))
+                ? Tools::getValue('post_products')
+                :'',
+                'index' => (!empty(Tools::getValue('index')))
+                ? Tools::getValue('index')
+                : '',
+                'follow' => (!empty(Tools::getValue('follow')))
+                ? Tools::getValue('follow')
+                : '',
+                'sitemap' => (!empty(Tools::getValue('sitemap')))
+                ? Tools::getValue('sitemap')
+                : '',
+                'post_status' => (!empty(Tools::getValue('post_status')))
+                ? Tools::getValue('post_status')
+                : '',
+            );
+        }
         $values = call_user_func_array('array_merge', $formValues);
         return $values;
     }

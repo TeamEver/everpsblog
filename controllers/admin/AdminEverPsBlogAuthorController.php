@@ -255,55 +255,107 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
     protected function getConfigFormValues($obj)
     {
         $formValues = array();
-        $formValues[] = array(
-            'id_ever_author' => (!empty(Tools::getValue('id_ever_author')))
-            ? Tools::getValue('id_ever_author')
-            : $obj->id,
-            'nickhandle' => (!empty(Tools::getValue('nickhandle')))
-            ? Tools::getValue('nickhandle')
-            : $obj->nickhandle,
-            'meta_title' => (!empty(Tools::getValue('meta_title')))
-            ? Tools::getValue('meta_title')
-            : $obj->meta_title,
-            'meta_description' => (!empty(Tools::getValue('meta_description')))
-            ? Tools::getValue('meta_description') : $obj->meta_description,
-            'link_rewrite' => (!empty(Tools::getValue('link_rewrite')))
-            ? Tools::getValue('link_rewrite')
-            : $obj->link_rewrite,
-            'twitter' => (!empty(Tools::getValue('twitter')))
-            ? Tools::getValue('twitter')
-            : $obj->twitter,
-            'facebook' => (!empty(Tools::getValue('facebook')))
-            ? Tools::getValue('facebook')
-            : $obj->facebook,
-            'linkedin' => (!empty(Tools::getValue('linkedin')))
-            ? Tools::getValue('linkedin')
-            : $obj->linkedin,
-            'content' => (!empty(Tools::getValue('content')))
-            ? Tools::getValue('content')
-            : $obj->content,
-            'bottom_content' => (!empty(Tools::getValue('bottom_content')))
-            ? Tools::getValue('bottom_content')
-            : $obj->bottom_content,
-            'date_add' => (!empty(Tools::getValue('date_add')))
-            ? Tools::getValue('date_add')
-            : $obj->date_add,
-            'date_upd' => (!empty(Tools::getValue('date_upd')))
-            ? Tools::getValue('date_upd')
-            : $obj->date_upd,
-            'index' => (!empty(Tools::getValue('index')))
-            ? Tools::getValue('index')
-            : $obj->index,
-            'follow' => (!empty(Tools::getValue('follow')))
-            ? Tools::getValue('follow')
-            : $obj->follow,
-            'sitemap' => (!empty(Tools::getValue('sitemap')))
-            ? Tools::getValue('sitemap')
-            : $obj->sitemap,
-            'active' => (!empty(Tools::getValue('active')))
-            ? Tools::getValue('active')
-            : $obj->active,
-        );
+        if (Validate::isLoadedObject($obj)) {
+            $formValues[] = array(
+                'id_ever_author' => (!empty(Tools::getValue('id_ever_author')))
+                ? Tools::getValue('id_ever_author')
+                : $obj->id,
+                'nickhandle' => (!empty(Tools::getValue('nickhandle')))
+                ? Tools::getValue('nickhandle')
+                : $obj->nickhandle,
+                'meta_title' => (!empty(Tools::getValue('meta_title')))
+                ? Tools::getValue('meta_title')
+                : $obj->meta_title,
+                'meta_description' => (!empty(Tools::getValue('meta_description')))
+                ? Tools::getValue('meta_description') : $obj->meta_description,
+                'link_rewrite' => (!empty(Tools::getValue('link_rewrite')))
+                ? Tools::getValue('link_rewrite')
+                : $obj->link_rewrite,
+                'twitter' => (!empty(Tools::getValue('twitter')))
+                ? Tools::getValue('twitter')
+                : $obj->twitter,
+                'facebook' => (!empty(Tools::getValue('facebook')))
+                ? Tools::getValue('facebook')
+                : $obj->facebook,
+                'linkedin' => (!empty(Tools::getValue('linkedin')))
+                ? Tools::getValue('linkedin')
+                : $obj->linkedin,
+                'content' => (!empty(Tools::getValue('content')))
+                ? Tools::getValue('content')
+                : $obj->content,
+                'bottom_content' => (!empty(Tools::getValue('bottom_content')))
+                ? Tools::getValue('bottom_content')
+                : $obj->bottom_content,
+                'date_add' => (!empty(Tools::getValue('date_add')))
+                ? Tools::getValue('date_add')
+                : $obj->date_add,
+                'date_upd' => (!empty(Tools::getValue('date_upd')))
+                ? Tools::getValue('date_upd')
+                : $obj->date_upd,
+                'index' => (!empty(Tools::getValue('index')))
+                ? Tools::getValue('index')
+                : $obj->index,
+                'follow' => (!empty(Tools::getValue('follow')))
+                ? Tools::getValue('follow')
+                : $obj->follow,
+                'sitemap' => (!empty(Tools::getValue('sitemap')))
+                ? Tools::getValue('sitemap')
+                : $obj->sitemap,
+                'active' => (!empty(Tools::getValue('active')))
+                ? Tools::getValue('active')
+                : $obj->active,
+            );
+        } else {
+            $formValues[] = array(
+                'id_ever_author' => (!empty(Tools::getValue('id_ever_author')))
+                ? Tools::getValue('id_ever_author')
+                : '',
+                'nickhandle' => (!empty(Tools::getValue('nickhandle')))
+                ? Tools::getValue('nickhandle')
+                : '',
+                'meta_title' => (!empty(Tools::getValue('meta_title')))
+                ? Tools::getValue('meta_title')
+                : '',
+                'meta_description' => (!empty(Tools::getValue('meta_description')))
+                ? Tools::getValue('meta_description') : '',
+                'link_rewrite' => (!empty(Tools::getValue('link_rewrite')))
+                ? Tools::getValue('link_rewrite')
+                : '',
+                'twitter' => (!empty(Tools::getValue('twitter')))
+                ? Tools::getValue('twitter')
+                : '',
+                'facebook' => (!empty(Tools::getValue('facebook')))
+                ? Tools::getValue('facebook')
+                : '',
+                'linkedin' => (!empty(Tools::getValue('linkedin')))
+                ? Tools::getValue('linkedin')
+                : '',
+                'content' => (!empty(Tools::getValue('content')))
+                ? Tools::getValue('content')
+                : '',
+                'bottom_content' => (!empty(Tools::getValue('bottom_content')))
+                ? Tools::getValue('bottom_content')
+                : '',
+                'date_add' => (!empty(Tools::getValue('date_add')))
+                ? Tools::getValue('date_add')
+                : '',
+                'date_upd' => (!empty(Tools::getValue('date_upd')))
+                ? Tools::getValue('date_upd')
+                : '',
+                'index' => (!empty(Tools::getValue('index')))
+                ? Tools::getValue('index')
+                : '',
+                'follow' => (!empty(Tools::getValue('follow')))
+                ? Tools::getValue('follow')
+                : '',
+                'sitemap' => (!empty(Tools::getValue('sitemap')))
+                ? Tools::getValue('sitemap')
+                : '',
+                'active' => (!empty(Tools::getValue('active')))
+                ? Tools::getValue('active')
+                : '',
+            );
+        }
         $values = call_user_func_array('array_merge', $formValues);
         return $values;
     }
