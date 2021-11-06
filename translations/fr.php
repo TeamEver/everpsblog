@@ -22,6 +22,7 @@ $_MODULE['<{everpsblog}prestashop>everpsblog_7408f9aa28eb52e10de342c7018fd3ad'] 
 $_MODULE['<{everpsblog}prestashop>everpsblog_36bbc6129a117d65199b86d06519a9ed'] = 'Erreur : le champ \"autoriser les commentaires\" n\'est pas valide';
 $_MODULE['<{everpsblog}prestashop>everpsblog_1e24509793ef3aac8694d220c4b3c8f3'] = 'Erreur : le champ \"vérification des commentaires\" n\'est pas valide';
 $_MODULE['<{everpsblog}prestashop>everpsblog_625a5a5b07c1f0a805b277a7a0917ac9'] = 'Erreur : le champ \"utiliser le flux RSS\" n\'est pas valide';
+$_MODULE['<{everpsblog}prestashop>everpsblog_28bedb80257b15e882fd5378dd1f7316'] = 'Erreur : le champ \"montrer l\'auteur\" n\'est pas valide';
 $_MODULE['<{everpsblog}prestashop>everpsblog_c1abaae4c5c0f3f55a830a7a229459c1'] = 'Erreur : le champ \"Utilisateurs bannis\" n\'est pas valide';
 $_MODULE['<{everpsblog}prestashop>everpsblog_1d38b3922a25265687622d33f993f38f'] = 'Erreur : le champ \"IP bannies\" n\'est pas valide';
 $_MODULE['<{everpsblog}prestashop>everpsblog_d59cea946ef2a68aee69ba5b30be640b'] = 'Erreur : le champ \"Seuls les internautes connectés peuvent commenter\" n\'est pas valide';
@@ -129,6 +130,9 @@ $_MODULE['<{everpsblog}prestashop>everpsblog_e99298c5e947fcc2ea0189185199513c'] 
 $_MODULE['<{everpsblog}prestashop>everpsblog_0f83b01440e1bca5237cbde7e91862f6'] = 'Utiliser les flux RSS ?';
 $_MODULE['<{everpsblog}prestashop>everpsblog_d4d38d8a6f02a842af7a8d9c6d105ef0'] = 'Ajoutera un lien vers les flux RSS sur le blog, les catégories, les tags et les auteurs';
 $_MODULE['<{everpsblog}prestashop>everpsblog_e6473cda7106fdc3147561361e4c35b0'] = 'Sinon les flux RSS ne seront pas affichés';
+$_MODULE['<{everpsblog}prestashop>everpsblog_6d532950875779e75d8eaf9d5a846e27'] = 'Afficher les auteurs ?';
+$_MODULE['<{everpsblog}prestashop>everpsblog_e4791bfeca5ee44c2df5e00528412fce'] = 'Affichera le nom de l\'auteur et l\'avatar sur les publications';
+$_MODULE['<{everpsblog}prestashop>everpsblog_b39a6bc91e9ceba32ba6d0acb6f53acc'] = 'Sinon, le nom de l\'auteur et l\'avatar seront masqués';
 $_MODULE['<{everpsblog}prestashop>everpsblog_19b630511e7a1d75c9b5d90d990f1951'] = 'Utilisateurs bannis';
 $_MODULE['<{everpsblog}prestashop>everpsblog_6220fb8a91848ef50d32f748f84dd89b'] = 'Ajoutez des utilisateurs interdits en tapant leurs emails, un par ligne';
 $_MODULE['<{everpsblog}prestashop>everpsblog_1ba12ed5c2a481b7a0ae9de836089f65'] = 'Les utilisateurs non désirés ne pourront pas poster de commentaires';
@@ -546,6 +550,7 @@ $_MODULE['<{everpsblog}prestashop>admineverpsblogtagcontroller_57cc147451f84d789
 $_MODULE['<{everpsblog}prestashop>admineverpsblogtagcontroller_5056d83dfa11a4fcf25b0eec55bf4817'] = 'Une erreur est survenue : impossible de supprimer l\'objet';
 $_MODULE['<{everpsblog}prestashop>admineverpsblogtagcontroller_a58187b4f69391dd2de52ac140a8bd29'] = 'Une erreur est survenue';
 $_MODULE['<{everpsblog}prestashop>admineverpsblogtagcontroller_d0e6d7167352c4f7d5257f81b4393d78'] = 'Une erreur est survenue';
+$_MODULE['<{everpsblog}prestashop>author_5611ece194167d5330cafa2bab9dcaf8'] = 'Page :';
 $_MODULE['<{everpsblog}prestashop>author_be8df1f28c0abc85a0ed0c6860e5d832'] = 'Blog';
 $_MODULE['<{everpsblog}prestashop>blog_5611ece194167d5330cafa2bab9dcaf8'] = 'Page :';
 $_MODULE['<{everpsblog}prestashop>blog_be8df1f28c0abc85a0ed0c6860e5d832'] = 'Blog';
@@ -640,7 +645,7 @@ $_MODULE['<{everpsblog}prestashop>shortcodes_c175ea8844257663d380485d12613b9b'] 
 $_MODULE['<{everpsblog}prestashop>shortcodes_697898e10c703cf29e62f3ba838634ce'] = 'Ouvre un lien vers la page d\'accueil';
 $_MODULE['<{everpsblog}prestashop>shortcodes_8526a69317e11e36334a81401352bf2d'] = 'Referme le lien vers la page d\'accueil';
 $_MODULE['<{everpsblog}prestashop>success_b6e26b1e7b238dcc86f1c454fd6c86ff'] = 'Tous les réglages ont bien été enregistrés';
-$_MODULE['<{everpsblog}prestashop>upgrade_11f4d2cc4546c08ed99645473ba29a5f'] = 'Une mise à jour du module est disponible sur notre boutique. Merci de regarder sur  ';
+$_MODULE['<{everpsblog}prestashop>upgrade_5aff843eb811b092fad9c758d2aa727a'] = 'Une mise à niveau est disponible pour Ever Blog. Vérifiez s\'il vous plaît';
 $_MODULE['<{everpsblog}prestashop>upgrade_a43640b6c7cabe3d8d157aba85f7cee4'] = 'afin de récupérer la dernière version de ce module';
 $_MODULE['<{everpsblog}prestashop>author_9164821136276ba8ac78ddc7cffda6cb'] = '(page';
 $_MODULE['<{everpsblog}prestashop>author_9371d7a2e3ae86a00aab4771e39d255d'] = ')';
