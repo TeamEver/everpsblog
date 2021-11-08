@@ -245,6 +245,7 @@ class EverPsBlogCategory extends ObjectModel
             if ((int)$only_parent > 0) {
                 $sql->where('bc.id_parent_category = 1');
             }
+            $sql->orderBy('bc.date_add DESC');
             $categories = Db::getInstance()->executeS($sql);
             $return = array();
             foreach ($categories as $blog_cat) {

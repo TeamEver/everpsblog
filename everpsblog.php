@@ -46,7 +46,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.3.20';
+        $this->version = '5.3.22';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -163,7 +163,8 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERPSBLOG_CAT_LAYOUT', 'layouts/layout-right-column.tpl')
             && Configuration::updateValue('EVERPSBLOG_AUTHOR_LAYOUT', 'layouts/layout-right-column.tpl')
             && Configuration::updateValue('EVERPSBLOG_TAG_LAYOUT', 'layouts/layout-right-column.tpl')
-            && Configuration::updateValue('EVERBLOG_SITEMAP_NUMBER', 5000);
+            && Configuration::updateValue('EVERBLOG_SITEMAP_NUMBER', 5000)
+            && $this->checkHooks();
     }
 
     public function uninstall()
@@ -324,7 +325,6 @@ class EverPsBlog extends Module
 
     public function getContent()
     {
-        $this->checkHooks();
         $this->html = '';
         // Process internal linking
         if (Tools::isSubmit('submitGenerateBlogSitemap')) {
@@ -717,7 +717,6 @@ class EverPsBlog extends Module
 
     protected function postProcess()
     {
-        $this->checkHooks();
         $form_values = $this->getConfigFormValues();
         // Reset hooks
         Configuration::deleteByName('PS_ROUTE_module-everpsblog-blog');
@@ -2875,53 +2874,51 @@ class EverPsBlog extends Module
     */
     private function checkHooks()
     {
-        $result = false;
         // Register blog hook
-        $result &= $this->registerHook('actionAdminMetaAfterWriteRobotsFile');
-        $result &= $this->registerHook('actionBeforeEverPostInitContent');
-        $result &= $this->registerHook('actionBeforeEverCategoryInitContent');
-        $result &= $this->registerHook('actionBeforeEverTagInitContent');
-        $result &= $this->registerHook('actionBeforeEverBlogInitContent');
-        $result &= $this->registerHook('actionBeforeEverBlogInit');
-        $result &= $this->registerHook('displayBeforeEverPost');
-        $result &= $this->registerHook('displayAfterEverPost');
-        $result &= $this->registerHook('displayBeforeEverCategory');
-        $result &= $this->registerHook('displayAfterEverCategory');
-        $result &= $this->registerHook('displayBeforeEverTag');
-        $result &= $this->registerHook('displayAfterEverTag');
-        $result &= $this->registerHook('displayBeforeEverComment');
-        $result &= $this->registerHook('displayAfterEverComment');
-        $result &= $this->registerHook('displayBeforeEverLoop');
-        $result &= $this->registerHook('displayAfterEverLoop');
-        $result &= $this->registerHook('actionObjectProductDeleteAfter');
-        $result &= $this->registerHook('actionObjectAuthorDeleteAfter');
-        $result &= $this->registerHook('actionObjectEverPsBlogTagDeleteAfter');
-        $result &= $this->registerHook('actionObjectEverPsBlogCategoryDeleteAfter');
-        $result &= $this->registerHook('actionObjectEverPsBlogPostDeleteAfter');
-        $result &= $this->registerHook('actionObjectEverPsBlogCommentDeleteAfter');
-        $result &= $this->registerHook('actionObjectProductUpdateAfter');
-        $result &= $this->registerHook('actionObjectEverPsBlogAuthorUpdateAfter');
-        $result &= $this->registerHook('actionObjectEverPsBlogTagUpdateAfter');
-        $result &= $this->registerHook('actionObjectEverPsBlogCategoryUpdateAfter');
-        $result &= $this->registerHook('actionObjectEverPsBlogPostUpdateAfter');
-        $result &= $this->registerHook('actionObjectEverPsBlogCommentUpdateAfter');
-        $result &= $this->registerHook('actionObjectProductAddAfter');
-        $result &= $this->registerHook('actionObjectAuthorAddAfter');
-        $result &= $this->registerHook('actionObjectEverPsBlogTagAddAfter');
-        $result &= $this->registerHook('actionObjectEverPsBlogCategoryAddAfter');
-        $result &= $this->registerHook('actionObjectEverPsBlogPostAddAfter');
-        $result &= $this->registerHook('actionObjectEverPsBlogCommentAddAfter');
-        // Register prestashop hook
-        $result &= $this->registerHook('actionObjectProductDeleteAfter');
-        $result &= $this->registerHook('actionFrontControllerAfterInit');
-        $result &= $this->registerHook('actionBeforeEverPostInitContent');
-        $result &= $this->registerHook('actionBeforeEverCategoryInitContent');
-        $result &= $this->registerHook('actionBeforeEverTagInitContent');
-        $result &= $this->registerHook('actionBeforeEverBlogInitContent');
-        $result &= $this->registerHook('actionBeforeEverBlogInit');
-        $result &= $this->registerHook('actionAfterEverBlogInit');
-        $result &= $this->registerHook('actionOutputHTMLBefore');
-        return $result;
+        $this->registerHook('actionAdminMetaAfterWriteRobotsFile');
+        $this->registerHook('actionBeforeEverPostInitContent');
+        $this->registerHook('actionBeforeEverCategoryInitContent');
+        $this->registerHook('actionBeforeEverTagInitContent');
+        $this->registerHook('actionBeforeEverBlogInitContent');
+        $this->registerHook('actionBeforeEverBlogInit');
+        $this->registerHook('displayBeforeEverPost');
+        $this->registerHook('displayAfterEverPost');
+        $this->registerHook('displayBeforeEverCategory');
+        $this->registerHook('displayAfterEverCategory');
+        $this->registerHook('displayBeforeEverTag');
+        $this->registerHook('displayAfterEverTag');
+        $this->registerHook('displayBeforeEverComment');
+        $this->registerHook('displayAfterEverComment');
+        $this->registerHook('displayBeforeEverLoop');
+        $this->registerHook('displayAfterEverLoop');
+        $this->registerHook('actionObjectProductDeleteAfter');
+        $this->registerHook('actionObjectAuthorDeleteAfter');
+        $this->registerHook('actionObjectEverPsBlogTagDeleteAfter');
+        $this->registerHook('actionObjectEverPsBlogCategoryDeleteAfter');
+        $this->registerHook('actionObjectEverPsBlogPostDeleteAfter');
+        $this->registerHook('actionObjectEverPsBlogCommentDeleteAfter');
+        $this->registerHook('actionObjectProductUpdateAfter');
+        $this->registerHook('actionObjectEverPsBlogAuthorUpdateAfter');
+        $this->registerHook('actionObjectEverPsBlogTagUpdateAfter');
+        $this->registerHook('actionObjectEverPsBlogCategoryUpdateAfter');
+        $this->registerHook('actionObjectEverPsBlogPostUpdateAfter');
+        $this->registerHook('actionObjectEverPsBlogCommentUpdateAfter');
+        $this->registerHook('actionObjectProductAddAfter');
+        $this->registerHook('actionObjectAuthorAddAfter');
+        $this->registerHook('actionObjectEverPsBlogTagAddAfter');
+        $this->registerHook('actionObjectEverPsBlogCategoryAddAfter');
+        $this->registerHook('actionObjectEverPsBlogPostAddAfter');
+        $this->registerHook('actionObjectEverPsBlogCommentAddAfter');
+        $this->registerHook('actionObjectProductDeleteAfter');
+        $this->registerHook('actionFrontControllerAfterInit');
+        $this->registerHook('actionBeforeEverPostInitContent');
+        $this->registerHook('actionBeforeEverCategoryInitContent');
+        $this->registerHook('actionBeforeEverTagInitContent');
+        $this->registerHook('actionBeforeEverBlogInitContent');
+        $this->registerHook('actionBeforeEverBlogInit');
+        $this->registerHook('actionAfterEverBlogInit');
+        $this->registerHook('actionOutputHTMLBefore');
+        return true;
     }
 
     private function exportWordPressFile()
