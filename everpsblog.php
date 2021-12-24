@@ -1908,6 +1908,16 @@ class EverPsBlog extends Module
         return $this->hookDisplayLeftColumn($params);
     }
 
+    public function hookDisplayHome2()
+    {
+        return $this->hookDisplayHome();
+    }
+
+    public function hookDisplayHome4()
+    {
+        return $this->hookDisplayHome();
+    }
+
     public function hookDisplayContainerBottom2()
     {
         return $this->hookDisplayHome();
