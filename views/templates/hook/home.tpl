@@ -37,6 +37,11 @@
                                 {$item->title|escape:'htmlall':'UTF-8'}
                             </a>
                         </h3>
+                        {if isset($item->default_cat_obj) && $item->default_cat_obj}
+                        <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category'=>$item->default_cat_obj->id_ever_category, 'link_rewrite'=>$item->default_cat_obj->link_rewrite])|escape:'htmlall':'UTF-8'}" class="col-md-12 {$blogcolor|escape:'htmlall':'UTF-8'}" title="{$item->default_cat_obj->title|escape:'htmlall':'UTF-8'}">
+                            {$item->default_cat_obj->title|escape:'htmlall':'UTF-8'}
+                        </a>
+                        {/if}
                         <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
                             {if isset($item->excerpt) && !empty($item->excerpt)}{$item->excerpt|escape:'htmlall':'UTF-8'}{else}{$item->content|escape:'htmlall':'UTF-8'}{/if}
                         </div>

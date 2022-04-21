@@ -344,6 +344,14 @@ class EverPsBlogPost extends ObjectModel
                         (int)$id_shop,
                         'post'
                     );
+                    $post_category = new EverPsBlogCategory(
+                        (int)$post->id_default_category,
+                        (int)Context::getContext()->language->id,
+                        (int)Context::getContext()->shop->id
+                    );
+                    if (Validate::isLoadedObject($post_category)) {
+                        $post->default_cat_obj = $post_category;
+                    }
                     $return[] = $post;
             }
             Cache::store($cache_id, $return);
