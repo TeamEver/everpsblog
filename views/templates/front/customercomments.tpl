@@ -54,6 +54,11 @@
 <div class="content">
     <div class="row">
         <p>{l s='There\'s no comments on your account. Feel free to comment our posts on our blog !' mod='everpsblog'}</p>
+        <p>
+            <a href="{$blogUrl|escape:'htmlall':'UTF-8'}">
+                {l s='You can comment whenever on our blog.' mod='everpsblog'}
+            </a>
+        </p>
     </div>
 </div>
 {/if}

@@ -352,6 +352,7 @@ class EverPsBlogPost extends ObjectModel
                     if (Validate::isLoadedObject($post_category)) {
                         $post->default_cat_obj = $post_category;
                     }
+                    // TODO : add default category object as post property
                     $return[] = $post;
             }
             Cache::store($cache_id, $return);
