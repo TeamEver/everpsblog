@@ -46,7 +46,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.3.24';
+        $this->version = '5.3.25';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -84,6 +84,7 @@ class EverPsBlog extends Module
         if (!file_exists(_PS_IMG_DIR_.'author')) {
             mkdir(_PS_IMG_DIR_.'author', 0755, true);
         }
+        Configuration::updateValue('EVERBLOG_SHOW_HOME', true);
         // Creating root category
         $shops = Shop::getShops();
         foreach ($shops as $shop) {
@@ -452,6 +453,11 @@ class EverPsBlog extends Module
             ) {
                 $this->postErrors[] = $this->l('Error : The field "Show post count" is not valid');
             }
+            if (Tools::getValue('EVERBLOG_SHOW_HOME')
+                && !Validate::isBool(Tools::getValue('EVERBLOG_SHOW_HOME'))
+            ) {
+                $this->postErrors[] = $this->l('Error : The field "Show post on homepage" is not valid');
+            }
             if (!Tools::getValue('EVERPSBLOG_PAGINATION')
                 && !Validate::isUnsignedInt(Tools::getValue('EVERPSBLOG_PAGINATION'))
             ) {
@@ -780,6 +786,11 @@ class EverPsBlog extends Module
                 Configuration::updateValue($key, Tools::getValue($key));
             }
         }
+        if ((bool)Tools::getValue('EVERBLOG_SHOW_HOME') === true) {
+            $this->registerHook('displayHome');
+        } else {
+            $this->unregisterHook('displayHome');
+        }
         $handle = fopen(
             _PS_MODULE_DIR_.'/'.$this->name.'/views/css/custom.css',
             'w+'
@@ -831,6 +842,7 @@ class EverPsBlog extends Module
             'EVERPSBLOG_EXCERPT' => Configuration::get('EVERPSBLOG_EXCERPT'),
             'EVERPSBLOG_TITLE_LENGTH' => Configuration::get('EVERPSBLOG_TITLE_LENGTH'),
             'EVERBLOG_SHOW_POST_COUNT' => Configuration::get('EVERBLOG_SHOW_POST_COUNT'),
+            'EVERBLOG_SHOW_HOME' => Configuration::get('EVERBLOG_SHOW_HOME'),
             'EVERPSBLOG_PAGINATION' => Configuration::get('EVERPSBLOG_PAGINATION'),
             'EVERPSBLOG_HOME_NBR' => Configuration::get('EVERPSBLOG_HOME_NBR'),
             'EVERPSBLOG_PRODUCT_NBR' => Configuration::get('EVERPSBLOG_PRODUCT_NBR'),
@@ -1072,6 +1084,27 @@ class EverPsBlog extends Module
                         'hint' => $this->l('Else will only be shown on admin'),
                         'required' => false,
                         'name' => 'EVERBLOG_SHOW_POST_COUNT',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No')
+                            )
+                        ),
+                    ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Show post on homepage ?'),
+                        'desc' => $this->l('Set yes to show posts on homepage'),
+                        'hint' => $this->l('Else posts won\'t be shown on homepage'),
+                        'required' => false,
+                        'name' => 'EVERBLOG_SHOW_HOME',
                         'is_bool' => true,
                         'values' => array(
                             array(
@@ -3158,7 +3191,7 @@ class EverPsBlog extends Module
                 $post->follow = true;
                 $post->sitemap = true;
                 $post->active = true;
-                $post->date_add = $el->date_add;
+                $post->date_add = (string)$el->date_add;
                 $post->date_upd = $post->date_add;
                 $post->post_status = Configuration::get('EVERBLOG_IMPORT_POST_STATE');
                 if (Validate::isLoadedObject($author)) {
@@ -3172,6 +3205,9 @@ class EverPsBlog extends Module
                     $post->post_tags = json_encode($post_tags);
                 }
                 $result &= $post->save();
+                $post->date_add = (string)$el->date_add;
+                $post->date_upd = (string)$el->date_add;
+                $post->save();
             }
         }
         // Reset iframes

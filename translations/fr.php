@@ -15,6 +15,7 @@ $_MODULE['<{everpsblog}prestashop>everpsblog_e58331672aae1a865d7f28c9be84361b'] 
 $_MODULE['<{everpsblog}prestashop>everpsblog_4b3d6fa3ca734b17575969c920c2e1ae'] = 'Erreur : la longueur du résumé n\'est pas valide';
 $_MODULE['<{everpsblog}prestashop>everpsblog_5e17d0e65acf362a05cad800cd061d6b'] = 'Erreur : la longueur des titres n\'est pas valide';
 $_MODULE['<{everpsblog}prestashop>everpsblog_b52499e5db653df1fd1d9e206d7baed5'] = 'Erreur : afficher le compteur de vues n\'est pas valide';
+$_MODULE['<{everpsblog}prestashop>everpsblog_d4969c94cc8cee5967c376e917b5560f'] = 'Erreur : le champ \"afficher les derniers articles sur la page d\'accueil\" n\'est pas valide';
 $_MODULE['<{everpsblog}prestashop>everpsblog_65a15ee0a868e74907c9f025be05483d'] = 'Erreur : le champ \"articles par page\" n\'est pas valide';
 $_MODULE['<{everpsblog}prestashop>everpsblog_122beab22c0186f3c719a12fd9277402'] = 'Erreur : le champ \"nombre d\'articles pour la page d\'accueil\" n\'est pas valide';
 $_MODULE['<{everpsblog}prestashop>everpsblog_e8ca4b49fba05ab8ed92e66d7fd0c565'] = 'Erreur : le champ \"nombre d\'articles pour les produits\" n\'est pas valide';
@@ -92,6 +93,9 @@ $_MODULE['<{everpsblog}prestashop>everpsblog_608fdfce816a2b1cee3f9e3dc1337b00'] 
 $_MODULE['<{everpsblog}prestashop>everpsblog_83fe93a1642ef593be805b269af72d49'] = 'Sinon le compteur de vues des articles ne sera affiché que dans l\'administration du blog';
 $_MODULE['<{everpsblog}prestashop>everpsblog_93cba07454f06a4a960172bbd6e2a435'] = 'Oui';
 $_MODULE['<{everpsblog}prestashop>everpsblog_bafd7322c6e97d25b6299b5d6fe8920b'] = 'Non';
+$_MODULE['<{everpsblog}prestashop>everpsblog_4dfb90b9dd99aea6c3df316c6ff8bd2d'] = 'Afficher les derniers articles sur la page d\'accueil ?';
+$_MODULE['<{everpsblog}prestashop>everpsblog_156f324d4b6390cb5cecac801e21f3b5'] = 'Mettez à oui pour afficher les derniers articles sur la page d\'accueil';
+$_MODULE['<{everpsblog}prestashop>everpsblog_0f2c11a738ec16a56a735ca9a93351cf'] = 'Sinon, les derniers articles ne seront pas affichés sur la page d\'accueil';
 $_MODULE['<{everpsblog}prestashop>everpsblog_71a306aa27073f87fd45923fa3d255ec'] = 'Nombre d\'articles pour la page d\'accueil';
 $_MODULE['<{everpsblog}prestashop>everpsblog_9b1c5d1579d2cc4ada87dbe38c792cec'] = 'Laisser vide mettra 4 articles';
 $_MODULE['<{everpsblog}prestashop>everpsblog_4280536d861b6769f3407d309483b8c8'] = 'Les articles sont de 4 par ligne';
