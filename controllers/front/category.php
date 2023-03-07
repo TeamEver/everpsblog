@@ -79,8 +79,7 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
         parent::initContent();
         if (Tools::getValue('id_ever_category')) {
             $this->post_number = EverPsBlogPost::countPostsByCategory(
-                (int)Tools::getValue('id_ever_category'),
-                (int)$this->context->language->id,
+                (int)Tools::getValue('id_ever_category')
                 (int)$this->context->shop->id
             );
             // Pagination only if there is still some posts
