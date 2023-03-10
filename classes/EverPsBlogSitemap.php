@@ -295,8 +295,8 @@ class EverPsBlogSitemap extends ObjectModel
 
     public static function getSitemapIndexes()
     {
-        $siteUrl = Tools::getHttpHost(true).__PS_BASE_URI__;
-        $indexes = array();
+        $siteUrl = Tools::getHttpHost(true) . __PS_BASE_URI__;
+        $indexes = [];
         $sitemap_indexes_dir = glob(_PS_ROOT_DIR_.'/*');
         foreach ($sitemap_indexes_dir as $index) {
             if (is_file($index)
@@ -311,8 +311,8 @@ class EverPsBlogSitemap extends ObjectModel
 
     public static function getSitemaps()
     {
-        $siteUrl = Tools::getHttpHost(true).__PS_BASE_URI__;
-        $sitemaps = array();
+        $siteUrl = Tools::getHttpHost(true) . __PS_BASE_URI__;
+        $sitemaps = [];
         $sitemap_dir = glob(_PS_ROOT_DIR_.'/*');
         foreach ($sitemap_dir as $sitemap) {
             if (is_file($sitemap)

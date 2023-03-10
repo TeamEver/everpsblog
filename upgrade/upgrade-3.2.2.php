@@ -26,24 +26,24 @@ function upgrade_module_3_2_2()
     set_time_limit(0);
     $result = false;
     // Preparing new taxonomies
-    $sql = array();
+    $sql = [];
     $sql[] =
-        'ALTER TABLE '._DB_PREFIX_.'ever_blog_post
+        'ALTER TABLE ' . _DB_PREFIX_ . 'ever_blog_post
          ADD `sitemap` int(1) DEFAULT 1
          AFTER `follow`
     ';
     $sql[] =
-        'ALTER TABLE '._DB_PREFIX_.'ever_blog_tag
+        'ALTER TABLE ' . _DB_PREFIX_ . 'ever_blog_tag
          ADD `sitemap` int(1) DEFAULT 1
          AFTER `follow`
     ';
     $sql[] =
-        'ALTER TABLE '._DB_PREFIX_.'ever_blog_category
+        'ALTER TABLE ' . _DB_PREFIX_ . 'ever_blog_category
          ADD `sitemap` int(1) DEFAULT 1
          AFTER `follow`
     ';
     $sql[] =
-        'ALTER TABLE '._DB_PREFIX_.'ever_blog_author
+        'ALTER TABLE ' . _DB_PREFIX_ . 'ever_blog_author
          ADD `sitemap` int(1) DEFAULT 1
          AFTER `follow`
     ';

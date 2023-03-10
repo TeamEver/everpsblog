@@ -31,7 +31,7 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
     public function getTemplateVarPage()
     {
         $page_name = $this->getPageName();
-        $id_lang = (int)$this->context->language->id;
+        $id_lang = (int) $this->context->language->id;
         $seo = array(
             'title' => '',
             'description' => '',
@@ -43,49 +43,49 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
             && ($id_ever_category = Tools::getValue('id_ever_category'))
         ) {
             $sql = 'SELECT `title`,`meta_title`, `meta_description`, `index`, `follow`
-                FROM `'._DB_PREFIX_.'ever_blog_category_lang` ebcl
-                LEFT JOIN `'._DB_PREFIX_.'ever_blog_category` ebc
+                FROM `' . _DB_PREFIX_ . 'ever_blog_category_lang` ebcl
+                LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category` ebc
                 ON ebcl.`id_ever_category` = ebc.`id_ever_category`
-                WHERE ebcl.`id_lang` = '.(int)$id_lang.'
-                AND ebcl.`id_ever_category` = '.(int)$id_ever_category;
+                WHERE ebcl.`id_lang` = '.(int) $id_lang.'
+                AND ebcl.`id_ever_category` = '.(int) $id_ever_category;
         } elseif ($page_name == 'module-everpsblog-post'
             && ($id_ever_post = Tools::getValue('id_ever_post'))
         ) {
             $sql = 'SELECT `title`,`meta_title`, `meta_description`, `index`, `follow`
-                FROM `'._DB_PREFIX_.'ever_blog_post_lang` ebpl
-                LEFT JOIN `'._DB_PREFIX_.'ever_blog_post` ebp
+                FROM `' . _DB_PREFIX_ . 'ever_blog_post_lang` ebpl
+                LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_post` ebp
                 ON ebpl.`id_ever_post` = ebp.`id_ever_post`
-                WHERE ebpl.`id_lang` = '.(int)$id_lang.'
-                AND ebpl.`id_ever_post` = '.(int)$id_ever_post;
+                WHERE ebpl.`id_lang` = '.(int) $id_lang.'
+                AND ebpl.`id_ever_post` = '.(int) $id_ever_post;
         } elseif ($page_name == 'module-everpsblog-tag'
             && ($id_ever_tag = Tools::getValue('id_ever_tag'))
         ) {
             $sql = 'SELECT `title`,`meta_title`, `meta_description`, `index`, `follow`
-                FROM `'._DB_PREFIX_.'ever_blog_tag_lang` ebtl
-                LEFT JOIN `'._DB_PREFIX_.'ever_blog_tag` ebt
+                FROM `' . _DB_PREFIX_ . 'ever_blog_tag_lang` ebtl
+                LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_tag` ebt
                 ON ebtl.`id_ever_tag` = ebt.`id_ever_tag`
-                WHERE ebtl.`id_lang` = '.(int)$id_lang.'
-                AND ebtl.`id_ever_tag` = '.(int)$id_ever_tag;
+                WHERE ebtl.`id_lang` = '.(int) $id_lang.'
+                AND ebtl.`id_ever_tag` = '.(int) $id_ever_tag;
         } elseif ($page_name == 'module-everpsblog-author'
             && ($id_ever_author = Tools::getValue('id_ever_author'))
         ) {
             $sql = 'SELECT `nickhandle`,`meta_title`, `meta_description`, `index`, `follow`
-                FROM `'._DB_PREFIX_.'ever_blog_author_lang` ebtl
-                LEFT JOIN `'._DB_PREFIX_.'ever_blog_author` ebt
+                FROM `' . _DB_PREFIX_ . 'ever_blog_author_lang` ebtl
+                LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_author` ebt
                 ON ebtl.`id_ever_author` = ebt.`id_ever_author`
-                WHERE ebtl.`id_lang` = '.(int)$id_lang.'
-                AND ebtl.`id_ever_author` = '.(int)$id_ever_author;
+                WHERE ebtl.`id_lang` = '.(int) $id_lang.'
+                AND ebtl.`id_ever_author` = '.(int) $id_ever_author;
         }
 
         // Set SEO metas per object
         if (isset($sql)) {
             $seo_metas = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
-            if ((int)$seo_metas['index']) {
+            if ((int) $seo_metas['index']) {
                 $index = 'index';
             } else {
                 $index = 'noindex';
             }
-            if ((int)$seo_metas['follow']) {
+            if ((int) $seo_metas['follow']) {
                 $follow = 'follow';
             } else {
                 $follow = 'nofollow';
@@ -107,7 +107,7 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
     public function init()
     {
         parent::init();
-        $param = array();
+        $param = [];
         $controller_name = Dispatcher::getInstance()->getController();
         // die(var_dump($this->getPageName()));
         Hook::exec('beforeEverBlogInit', array(
@@ -119,8 +119,8 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
                 if (!$this->post) {
                     $this->post = new EverPsBlogPost(
                         (int)Tools::getValue('id_ever_post'),
-                        (int)$this->context->language->id,
-                        (int)$this->context->shop->id
+                        (int) $this->context->language->id,
+                        (int) $this->context->shop->id
                     );
                 }
                 $param = array(
@@ -133,8 +133,8 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
                 if (!$this->category) {
                     $this->category = new EverPsBlogCategory(
                         (int)Tools::getValue('id_ever_category'),
-                        (int)$this->context->language->id,
-                        (int)$this->context->shop->id
+                        (int) $this->context->language->id,
+                        (int) $this->context->shop->id
                     );
                 }
                 $param = array(
@@ -147,8 +147,8 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
                 if (!$this->tag) {
                     $this->tag = new EverPsBlogTag(
                         (int)Tools::getValue('id_ever_tag'),
-                        (int)$this->context->language->id,
-                        (int)$this->context->shop->id
+                        (int) $this->context->language->id,
+                        (int) $this->context->shop->id
                     );
                 }
                 $param = array(
@@ -161,8 +161,8 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
                 if (!$this->author) {
                     $this->author = new EverPsBlogAuthor(
                         (int)Tools::getValue('id_ever_author'),
-                        (int)$this->context->language->id,
-                        (int)$this->context->shop->id
+                        (int) $this->context->language->id,
+                        (int) $this->context->shop->id
                     );
                 }
                 $param = array(
@@ -188,7 +188,7 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
 
     protected function getTemplateVarPagination($total = 0)
     {
-        $totalItems = (int)$total;
+        $totalItems = (int) $total;
         $page = (int)Tools::getValue('page');
         $page = (int)Tools::getValue('page') ? (int)Tools::getValue('page') : 1;
         $totalPerPage = (int)Configuration::get(
@@ -200,7 +200,7 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
         $pagination
             ->setPage($page)
             ->setPagesCount(
-                (int)ceil((int)$totalItems / $totalPerPage)
+                (int)ceil((int) $totalItems / $totalPerPage)
             )
         ;
         $pages = array_map(function ($link) {
@@ -257,7 +257,7 @@ class EverPsBlogModuleFrontController extends ModuleFrontController
             '/^'.Tools::pRegexp(rawurldecode($canonical_url), '/').'([&?].*)?$/',
             $match_url
         )) {
-            $params = array();
+            $params = [];
             $str_params = '';
             $url_details = parse_url($canonical_url);
 

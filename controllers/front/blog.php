@@ -63,16 +63,16 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
     {
         parent::initContent();
         $this->post_number = EverPsBlogPost::countPosts(
-            (int)$this->context->language->id,
-            (int)$this->context->shop->id
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
         );
         $this->featured_category = new Category(
             (int)Configuration::get('EVERBLOG_CAT_FEATURED'),
-            (int)$this->context->language->id,
-            (int)$this->context->shop->id
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
         );
         $featured_products = $this->featured_category->getProducts(
-            (int)$this->context->language->id,
+            (int) $this->context->language->id,
             1,
             (int)Configuration::get('EVERPSBLOG_PAGINATION')
         );
@@ -91,7 +91,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
                 $this->context->getTranslator()
             );
 
-            $productsForTemplate = array();
+            $productsForTemplate = [];
 
             $presentationSettings->showPrices = $showPrice;
 
@@ -112,9 +112,9 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         $pagination = $this->getTemplateVarPagination($this->post_number);
         // SEO title and meta desc
         $everblog_title = Configuration::getInt('EVERBLOG_TITLE');
-        $meta_title = $everblog_title[(int)Context::getContext()->language->id];
+        $meta_title = $everblog_title[(int) Context::getContext()->language->id];
         $everblog_desc = Configuration::getInt('EVERBLOG_META_DESC');
-        $meta_desc = $everblog_desc[(int)Context::getContext()->language->id];
+        $meta_desc = $everblog_desc[(int) Context::getContext()->language->id];
         $page = $this->context->controller->getTemplateVarPage();
         if (Tools::getValue('page')) {
             $meta_title = $this->l('Page : ').Tools::getValue('page').' | '.$meta_title;
@@ -129,13 +129,13 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         }
         $this->context->smarty->assign('page', $page);
         $everpsblogposts = EverPsBlogPost::getPosts(
-            (int)$this->context->language->id,
-            (int)$this->context->shop->id,
-            (int)$pagination['items_shown_from'] - 1
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id,
+            (int) $pagination['items_shown_from'] - 1
         );
         $evercategories = EverPsBlogCategory::getAllCategories(
-            (int)$this->context->language->id,
-            (int)$this->context->shop->id,
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id,
             true,
             1
         );
@@ -144,16 +144,16 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         );
         // Default blog text
         $everblog_top_text = Configuration::getInt('EVERBLOG_TOP_TEXT');
-        $default_blog_top_text = $everblog_top_text[(int)Context::getContext()->language->id];
+        $default_blog_top_text = $everblog_top_text[(int) Context::getContext()->language->id];
         $default_blog_top_text = EverPsBlogPost::changeShortcodes(
             $default_blog_top_text,
-            (int)Context::getContext()->customer->id
+            (int) Context::getContext()->customer->id
         );
         $everblog_bottom_text = Configuration::getInt('EVERBLOG_BOTTOM_TEXT');
-        $default_blog_bottom_text = $everblog_bottom_text[(int)Context::getContext()->language->id];
+        $default_blog_bottom_text = $everblog_bottom_text[(int) Context::getContext()->language->id];
         $default_blog_bottom_text = EverPsBlogPost::changeShortcodes(
             $default_blog_bottom_text,
-            (int)Context::getContext()->customer->id
+            (int) Context::getContext()->customer->id
         );
         Hook::exec('actionBeforeEverBlogInitContent', array(
             'blog_post_number' => $this->post_number,
@@ -168,8 +168,8 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
                 'feed' => 'blog'
             ),
             true,
-            (int)$this->context->language->id,
-            (int)$this->context->shop->id
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
         );
         $this->context->smarty->assign(
             array(
@@ -181,13 +181,13 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
                 'default_blog_top_text' => $default_blog_top_text,
                 'default_blog_bottom_text' => $default_blog_bottom_text,
                 'paginated' => Tools::getValue('page'),
-                'post_number' => (int)$this->post_number,
+                'post_number' => (int) $this->post_number,
                 'pagination' => $pagination,
                 'everpsblog' => $everpsblogposts,
                 'evercategory' => $evercategories,
-                'default_lang' => (int)$this->context->language->id,
-                'id_lang' => (int)$this->context->language->id,
-                'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'modules/everpsblog/views/img/',
+                'default_lang' => (int) $this->context->language->id,
+                'id_lang' => (int) $this->context->language->id,
+                'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'modules/everpsblog/views/img/',
                 'animated' => $animate,
                 'pagination' => $pagination,
                 'show_featured_cat' => (bool)Configuration::get('EVERBLOG_SHOW_FEAT_CAT'),

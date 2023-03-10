@@ -67,7 +67,7 @@ class EverPsBlogCleaner extends ObjectModel
         }
         foreach ($array as $key => $value) {
             if (Validate::isInt($value)) {
-                $array[$key] = (int)$value;
+                $array[$key] = (int) $value;
             }
         }
         return $array;

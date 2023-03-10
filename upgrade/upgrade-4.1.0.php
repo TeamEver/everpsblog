@@ -23,13 +23,13 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_4_1_0()
 {
-    require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogImage.php';
+    require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogImage.php';
     set_time_limit(0);
     $result = false;
     // Preparing new taxonomies
-    $sql = array();
+    $sql = [];
     $sql[] =
-        'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_image` (
+        'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_image` (
             `id_ever_image` int(10) unsigned NOT NULL auto_increment,
             `image_type` varchar(255) DEFAULT NULL,
             `image_link` varchar(255) DEFAULT NULL,
@@ -41,20 +41,20 @@ function upgrade_module_4_1_0()
     foreach ($sql as $s) {
         $result &= Db::getInstance()->execute($s);
     }
-    $shops = Db::getInstance()->executeS('SELECT id_shop FROM `'._DB_PREFIX_.'shop`');
+    $shops = Db::getInstance()->executeS('SELECT id_shop FROM `' . _DB_PREFIX_ . 'shop`');
 
     foreach ($shops as $shop) {
         $result &= EverPsBlogImage::migratePostsImages(
-            (int)$shop['id_shop']
+            (int) $shop['id_shop']
         );
         $result &= EverPsBlogImage::migrateCategoriesImages(
-            (int)$shop['id_shop']
+            (int) $shop['id_shop']
         );
         $result &= EverPsBlogImage::migrateTagsImages(
-            (int)$shop['id_shop']
+            (int) $shop['id_shop']
         );
         $result &= EverPsBlogImage::migrateAuthorsImages(
-            (int)$shop['id_shop']
+            (int) $shop['id_shop']
         );
     }
     return $result;

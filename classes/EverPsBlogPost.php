@@ -30,8 +30,8 @@ use PrestaShop\PrestaShop\Core\Addon\Module\ModuleManagerBuilder;
 use PrestaShop\PrestaShop\Core\Product\ProductExtraContentFinder;
 use PrestaShop\PrestaShop\Core\Product\ProductInterface;
 
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCleaner.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogImage.php';
+require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogCleaner.php';
+require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogImage.php';
 
 class EverPsBlogPost extends ObjectModel
 {
@@ -183,19 +183,19 @@ class EverPsBlogPost extends ObjectModel
         $is_feed = false
     ) {
         $cache_id = 'EverPsBlogPost::getPosts_'
-        .(int)$id_lang
+        .(int) $id_lang
         .'_'
-        .(int)$id_shop
+        .(int) $id_shop
         .'_'
-        .(int)$start
+        .(int) $start
         .'_'
-        .(int)$limit
+        .(int) $limit
         .'_'
         .$post_status
         .'_'
         .$is_feed;
         if (!Cache::isStored($cache_id)) {
-            if (!(int)$limit) {
+            if (!(int) $limit) {
                 $limit = (int)Configuration::get('EVERPSBLOG_PAGINATION');
             }
             $current_context = Context::getContext();
@@ -208,31 +208,31 @@ class EverPsBlogPost extends ObjectModel
                 'bp.id_ever_post = bpl.id_ever_post'
             );
             $sql->where('bp.post_status = "'.pSQL($post_status).'"');
-            $sql->where('bp.id_shop = '.(int)$id_shop);
-            $sql->where('bpl.id_lang = '.(int)$id_lang);
+            $sql->where('bp.id_shop = '.(int) $id_shop);
+            $sql->where('bpl.id_lang = '.(int) $id_lang);
             $sql->orderBy('bp.date_add DESC');
-            $sql->limit((int)$limit, (int)$start);
+            $sql->limit((int) $limit, (int) $start);
             $posts = Db::getInstance()->executeS($sql);
-            $return = array();
+            $return = [];
             if ($current_context->controller->controller_type == 'front'
                 || $current_context->controller->controller_type == 'modulefront'
             ) {
                 foreach ($posts as $post) {
                     $post['title'] = self::changeShortcodes(
                         $post['title'],
-                        (int)Context::getContext()->customer->id
+                        (int) Context::getContext()->customer->id
                     );
                     $post['content'] = self::changeShortcodes(
                         $post['content'],
-                        (int)Context::getContext()->customer->id
+                        (int) Context::getContext()->customer->id
                     );
                     $post['excerpt'] = self::changeShortcodes(
                         $post['excerpt'],
-                        (int)Context::getContext()->customer->id
+                        (int) Context::getContext()->customer->id
                     );
                     $post['date_add'] = date('d/m/Y', strtotime($post['date_add']));
                     $post['date_upd'] = date('d/m/Y', strtotime($post['date_upd']));
-                    if ((bool)$is_feed === false) {
+                    if ((bool) $is_feed === false) {
                         // Length
                         $post['title'] = Tools::substr(
                             $post['title'],
@@ -251,8 +251,8 @@ class EverPsBlogPost extends ObjectModel
                         );
                     }
                     $post['featured_image'] = EverPsBlogImage::getBlogImageUrl(
-                        (int)$post['id_ever_post'],
-                        (int)$id_shop,
+                        (int) $post['id_ever_post'],
+                        (int) $id_shop,
                         'post'
                     );
                     $return[] = $post;
@@ -274,17 +274,17 @@ class EverPsBlogPost extends ObjectModel
     public static function getLatestPosts($id_lang, $id_shop, $start = 0, $limit = null, $post_status = 'published')
     {
         $cache_id = 'EverPsBlogPost::getLatestPosts_'
-        .(int)$id_lang
+        .(int) $id_lang
         .'_'
-        .(int)$id_shop
+        .(int) $id_shop
         .'_'
-        .(int)$start
+        .(int) $start
         .'_'
-        .(int)$limit
+        .(int) $limit
         .'_'
         .$post_status;
         if (!Cache::isStored($cache_id)) {
-            if (!(int)$limit) {
+            if (!(int) $limit) {
                 $limit = (int)Configuration::get('EVERPSBLOG_PAGINATION');
             }
             $sql = new DbQuery;
@@ -296,30 +296,30 @@ class EverPsBlogPost extends ObjectModel
                 'bp.id_ever_post = bpl.id_ever_post'
             );
             $sql->where('bp.post_status = "'.pSQL($post_status).'"');
-            $sql->where('bp.id_shop = '.(int)$id_shop);
-            $sql->where('bpl.id_lang = '.(int)$id_lang);
-            $sql->limit((int)$limit, (int)$start);
+            $sql->where('bp.id_shop = '.(int) $id_shop);
+            $sql->where('bpl.id_lang = '.(int) $id_lang);
+            $sql->limit((int) $limit, (int) $start);
             $sql->orderBy('bp.date_add DESC');
             $sql->orderBy('bp.id_ever_post DESC');
             $posts = Db::getInstance()->executeS($sql);
-            $return = array();
+            $return = [];
             foreach ($posts as $post_array) {
                     $post = new self(
-                        (int)$post_array['id_ever_post'],
-                        (int)$id_lang,
-                        (int)$id_shop
+                        (int) $post_array['id_ever_post'],
+                        (int) $id_lang,
+                        (int) $id_shop
                     );
                     $post->title = self::changeShortcodes(
                         $post->title,
-                        (int)Context::getContext()->customer->id
+                        (int) Context::getContext()->customer->id
                     );
                     $post->content = self::changeShortcodes(
                         $post->content,
-                        (int)Context::getContext()->customer->id
+                        (int) Context::getContext()->customer->id
                     );
                     $post->excerpt = self::changeShortcodes(
                         $post->excerpt,
-                        (int)Context::getContext()->customer->id
+                        (int) Context::getContext()->customer->id
                     );
                     $post->date_add = date('d/m/Y', strtotime($post->date_add));
                     $post->date_upd = date('d/m/Y', strtotime($post->date_upd));
@@ -340,14 +340,14 @@ class EverPsBlogPost extends ObjectModel
                         (int)Configuration::get('EVERPSBLOG_EXCERPT')
                     );
                     $post->featured_image = EverPsBlogImage::getBlogImageUrl(
-                        (int)$post->id,
-                        (int)$id_shop,
+                        (int) $post->id,
+                        (int) $id_shop,
                         'post'
                     );
                     $post_category = new EverPsBlogCategory(
-                        (int)$post->id_default_category,
-                        (int)Context::getContext()->language->id,
-                        (int)Context::getContext()->shop->id
+                        (int) $post->id_default_category,
+                        (int) Context::getContext()->language->id,
+                        (int) Context::getContext()->shop->id
                     );
                     if (Validate::isLoadedObject($post_category)) {
                         $post->default_cat_obj = $post_category;
@@ -377,21 +377,21 @@ class EverPsBlogPost extends ObjectModel
         $is_feed = false
     ) {
         $cache_id = 'EverPsBlogPost::getPostsByTag_'
-        .(int)$id_lang
+        .(int) $id_lang
         .'_'
-        .(int)$id_shop
+        .(int) $id_shop
         .'_'
-        .(int)$id_tag
+        .(int) $id_tag
         .'_'
-        .(int)$start
+        .(int) $start
         .'_'
-        .(int)$limit
+        .(int) $limit
         .'_'
         .$post_status
         .'_'
         .$is_feed;
         if (!Cache::isStored($cache_id)) {
-            if (!(int)$limit) {
+            if (!(int) $limit) {
                 $limit = (int)Configuration::get('EVERPSBLOG_PAGINATION');
             }
             $sql = new DbQuery;
@@ -408,34 +408,34 @@ class EverPsBlogPost extends ObjectModel
                 'bpt.id_ever_post = bpl.id_ever_post'
             );
             $sql->where('bp.post_status = "'.pSQL($post_status).'"');
-            $sql->where('bp.id_shop = '.(int)$id_shop);
-            $sql->where('bpl.id_lang = '.(int)$id_lang);
-            $sql->where('bpt.id_ever_post_tag = '.(int)$id_tag);
+            $sql->where('bp.id_shop = '.(int) $id_shop);
+            $sql->where('bpl.id_lang = '.(int) $id_lang);
+            $sql->where('bpt.id_ever_post_tag = '.(int) $id_tag);
             $sql->orderBy('bp.date_add DESC');
-            $sql->limit((int)$limit, (int)$start);
+            $sql->limit((int) $limit, (int) $start);
             $posts = Db::getInstance()->executeS($sql);
-            $return = array();
+            $return = [];
             foreach ($posts as $post) {
                 $post = new self(
-                    (int)$post['id_ever_post'],
-                    (int)$id_lang,
-                    (int)$id_shop
+                    (int) $post['id_ever_post'],
+                    (int) $id_lang,
+                    (int) $id_shop
                 );
                 $post->title = self::changeShortcodes(
                     $post->title,
-                    (int)Context::getContext()->customer->id
+                    (int) Context::getContext()->customer->id
                 );
                 $post->content = self::changeShortcodes(
                     $post->content,
-                    (int)Context::getContext()->customer->id
+                    (int) Context::getContext()->customer->id
                 );
                 $post->excerpt = self::changeShortcodes(
                     $post->excerpt,
-                    (int)Context::getContext()->customer->id
+                    (int) Context::getContext()->customer->id
                 );
                 $post->date_add = date('d/m/Y', strtotime($post->date_add));
                 $post->date_upd = date('d/m/Y', strtotime($post->date_upd));
-                if ((bool)$is_feed === false) {
+                if ((bool) $is_feed === false) {
                     // Length
                     $post->title = Tools::substr(
                         $post->title,
@@ -454,8 +454,8 @@ class EverPsBlogPost extends ObjectModel
                     );
                 }
                 $post->featured_image = EverPsBlogImage::getBlogImageUrl(
-                    (int)$post->id,
-                    (int)$id_shop,
+                    (int) $post->id,
+                    (int) $id_shop,
                     'post'
                 );
                 $return[] = $post;
@@ -484,21 +484,21 @@ class EverPsBlogPost extends ObjectModel
         $is_feed = false
     ) {
         $cache_id = 'EverPsBlogPost::getPostsByTag_'
-        .(int)$id_lang
+        .(int) $id_lang
         .'_'
-        .(int)$id_shop
+        .(int) $id_shop
         .'_'
-        .(int)$id_category
+        .(int) $id_category
         .'_'
-        .(int)$start
+        .(int) $start
         .'_'
-        .(int)$limit
+        .(int) $limit
         .'_'
         .$post_status
         .'_'
         .$is_feed;
         if (!Cache::isStored($cache_id)) {
-            if (!(int)$limit) {
+            if (!(int) $limit) {
                 $limit = (int)Configuration::get('EVERPSBLOG_PAGINATION');
             }
             $sql = new DbQuery;
@@ -517,34 +517,34 @@ class EverPsBlogPost extends ObjectModel
                 'bpc.id_ever_post = bpl.id_ever_post'
             );
             $sql->where('bp.post_status = "'.pSQL($post_status).'"');
-            $sql->where('bp.id_shop = '.(int)$id_shop);
-            $sql->where('bpl.id_lang = '.(int)$id_lang);
-            $sql->where('bpc.id_ever_post_category = '.(int)$id_category);
+            $sql->where('bp.id_shop = '.(int) $id_shop);
+            $sql->where('bpl.id_lang = '.(int) $id_lang);
+            $sql->where('bpc.id_ever_post_category = '.(int) $id_category);
             $sql->orderBy('bp.date_add DESC');
-            $sql->limit((int)$limit, (int)$start);
+            $sql->limit((int) $limit, (int) $start);
             $posts = Db::getInstance()->executeS($sql);
-            $return = array();
+            $return = [];
             foreach ($posts as $post_array) {
                 $post = new self(
-                    (int)$post_array['id_ever_post'],
-                    (int)$id_lang,
-                    (int)$id_shop
+                    (int) $post_array['id_ever_post'],
+                    (int) $id_lang,
+                    (int) $id_shop
                 );
                 $post->title = self::changeShortcodes(
                     $post->title,
-                    (int)Context::getContext()->customer->id
+                    (int) Context::getContext()->customer->id
                 );
                 $post->content = self::changeShortcodes(
                     $post->content,
-                    (int)Context::getContext()->customer->id
+                    (int) Context::getContext()->customer->id
                 );
                 $post->excerpt = self::changeShortcodes(
                     $post->excerpt,
-                    (int)Context::getContext()->customer->id
+                    (int) Context::getContext()->customer->id
                 );
                 $post->date_add = date('d/m/Y', strtotime($post->date_add));
                 $post->date_upd = date('d/m/Y', strtotime($post->date_upd));
-                if ((bool)$is_feed === false) {
+                if ((bool) $is_feed === false) {
                     // Length
                     $post->title = Tools::substr(
                         $post->title,
@@ -563,8 +563,8 @@ class EverPsBlogPost extends ObjectModel
                     );
                 }
                 $post->featured_image = EverPsBlogImage::getBlogImageUrl(
-                    (int)$post->id,
-                    (int)$id_shop,
+                    (int) $post->id,
+                    (int) $id_shop,
                     'post'
                 );
                 $return[] = $post;
@@ -593,21 +593,21 @@ class EverPsBlogPost extends ObjectModel
         $is_feed = false
     ) {
         $cache_id = 'EverPsBlogPost::getPostsByAuthor_'
-        .(int)$id_lang
+        .(int) $id_lang
         .'_'
-        .(int)$id_shop
+        .(int) $id_shop
         .'_'
-        .(int)$id_author
+        .(int) $id_author
         .'_'
-        .(int)$start
+        .(int) $start
         .'_'
-        .(int)$limit
+        .(int) $limit
         .'_'
         .$post_status
         .'_'
         .$is_feed;
         if (!Cache::isStored($cache_id)) {
-            if (!(int)$limit) {
+            if (!(int) $limit) {
                 $limit = (int)Configuration::get('EVERPSBLOG_PAGINATION');
             }
             $sql = new DbQuery;
@@ -619,34 +619,34 @@ class EverPsBlogPost extends ObjectModel
                 'bp.id_ever_post = bpl.id_ever_post'
             );
             $sql->where('bp.post_status = "'.pSQL($post_status).'"');
-            $sql->where('bp.id_author = '.(int)$id_author);
-            $sql->where('bp.id_shop = '.(int)$id_shop);
-            $sql->where('bpl.id_lang = '.(int)$id_lang);
+            $sql->where('bp.id_author = '.(int) $id_author);
+            $sql->where('bp.id_shop = '.(int) $id_shop);
+            $sql->where('bpl.id_lang = '.(int) $id_lang);
             $sql->orderBy('bp.date_add DESC');
-            $sql->limit((int)$limit, (int)$start);
+            $sql->limit((int) $limit, (int) $start);
             $posts = Db::getInstance()->executeS($sql);
-            $return = array();
+            $return = [];
             foreach ($posts as $post) {
                 $post = new self(
-                    (int)$post['id_ever_post'],
-                    (int)$id_lang,
-                    (int)$id_shop
+                    (int) $post['id_ever_post'],
+                    (int) $id_lang,
+                    (int) $id_shop
                 );
                 $post->title = self::changeShortcodes(
                     $post->title,
-                    (int)Context::getContext()->customer->id
+                    (int) Context::getContext()->customer->id
                 );
                 $post->content = self::changeShortcodes(
                     $post->content,
-                    (int)Context::getContext()->customer->id
+                    (int) Context::getContext()->customer->id
                 );
                 $post->excerpt = self::changeShortcodes(
                     $post->excerpt,
-                    (int)Context::getContext()->customer->id
+                    (int) Context::getContext()->customer->id
                 );
                 $post->date_add = date('d/m/Y', strtotime($post->date_add));
                 $post->date_upd = date('d/m/Y', strtotime($post->date_upd));
-                if ((bool)$is_feed === false) {
+                if ((bool) $is_feed === false) {
                     // Length
                     $post->title = Tools::substr(
                         $post->title,
@@ -665,8 +665,8 @@ class EverPsBlogPost extends ObjectModel
                     );
                 }
                 $post->featured_image = EverPsBlogImage::getBlogImageUrl(
-                    (int)$post->id,
-                    (int)$id_shop,
+                    (int) $post->id,
+                    (int) $id_shop,
                     'post'
                 );
                 $return[] = $post;
@@ -693,19 +693,19 @@ class EverPsBlogPost extends ObjectModel
         $post_status = 'published'
     ) {
         $cache_id = 'EverPsBlogPost::getPostsByProduct_'
-        .(int)$id_lang
+        .(int) $id_lang
         .'_'
-        .(int)$id_shop
+        .(int) $id_shop
         .'_'
-        .(int)$id_product
+        .(int) $id_product
         .'_'
-        .(int)$start
+        .(int) $start
         .'_'
-        .(int)$limit
+        .(int) $limit
         .'_'
         .$post_status;
         if (!Cache::isStored($cache_id)) {
-            if (!(int)$limit) {
+            if (!(int) $limit) {
                 $limit = (int)Configuration::get('EVERPSBLOG_PAGINATION');
             }
             $sql = new DbQuery;
@@ -722,30 +722,30 @@ class EverPsBlogPost extends ObjectModel
                 'bpp.id_ever_post = bpl.id_ever_post'
             );
             $sql->where('bp.post_status = "'.pSQL($post_status).'"');
-            $sql->where('bp.id_shop = '.(int)$id_shop);
-            $sql->where('bpl.id_lang = '.(int)$id_lang);
-            $sql->where('bpp.id_ever_post_product = '.(int)$id_product);
+            $sql->where('bp.id_shop = '.(int) $id_shop);
+            $sql->where('bpl.id_lang = '.(int) $id_lang);
+            $sql->where('bpp.id_ever_post_product = '.(int) $id_product);
             $sql->orderBy('bp.date_add DESC');
-            $sql->limit((int)$limit, (int)$start);
+            $sql->limit((int) $limit, (int) $start);
             $posts = Db::getInstance()->executeS($sql);
-            $return = array();
+            $return = [];
             foreach ($posts as $post_array) {
                 $post = new self(
-                    (int)$post_array['id_ever_post'],
-                    (int)$id_lang,
-                    (int)$id_shop
+                    (int) $post_array['id_ever_post'],
+                    (int) $id_lang,
+                    (int) $id_shop
                 );
                 $post->title = self::changeShortcodes(
                     $post->title,
-                    (int)Context::getContext()->customer->id
+                    (int) Context::getContext()->customer->id
                 );
                 $post->content = self::changeShortcodes(
                     $post->content,
-                    (int)Context::getContext()->customer->id
+                    (int) Context::getContext()->customer->id
                 );
                 $post->excerpt = self::changeShortcodes(
                     $post->content,
-                    (int)Context::getContext()->customer->id
+                    (int) Context::getContext()->customer->id
                 );
                 $post->date_add = date('d/m/Y', strtotime($post->date_add));
                 $post->date_upd = date('d/m/Y', strtotime($post->date_upd));
@@ -766,8 +766,8 @@ class EverPsBlogPost extends ObjectModel
                     (int)Configuration::get('EVERPSBLOG_EXCERPT')
                 );
                 $post->featured_image = EverPsBlogImage::getBlogImageUrl(
-                    (int)$post->id,
-                    (int)$id_shop,
+                    (int) $post->id,
+                    (int) $id_shop,
                     'post'
                 );
                 $return[] = $post;
@@ -788,13 +788,13 @@ class EverPsBlogPost extends ObjectModel
     public static function getPostCategories($id_ever_post, $id_shop, $id_lang, $active = true)
     {
         $cache_id = 'EverPsBlogPost::getPostCategories_'
-        .(int)$id_ever_post
+        .(int) $id_ever_post
         .'_'
-        .(int)$id_shop
+        .(int) $id_shop
         .'_'
-        .(int)$id_lang
+        .(int) $id_lang
         .'_'
-        .(int)$active;
+        .(int) $active;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery();
             $sql->select('post_categories');
@@ -805,19 +805,19 @@ class EverPsBlogPost extends ObjectModel
                 'ep.id_ever_post = bpl.id_ever_post'
             );
             $sql->where(
-                'ep.id_ever_post = '.(int)$id_ever_post
+                'ep.id_ever_post = '.(int) $id_ever_post
             );
             $sql->where(
-                'ep.id_shop = '.(int)$id_shop
+                'ep.id_shop = '.(int) $id_shop
             );
             $sql->where(
-                'ep.id_lang = '.(int)$id_lang
+                'ep.id_lang = '.(int) $id_lang
             );
             $sql->where(
-                'ep.active = '.(int)$active
+                'ep.active = '.(int) $active
             );
             $sql->orderBy('ep.date_add DESC');
-            // $sql->limit((int)$limit);
+            // $sql->limit((int) $limit);
             $post_categories = Db::getInstance()->getValue($sql);
             $return = json_decode($post_categories);
             Cache::store($cache_id, $return);
@@ -835,7 +835,7 @@ class EverPsBlogPost extends ObjectModel
         $link_rewrite
     ) {
         $cache_id = 'EverPsBlogPost::getPostByLinkRewrite_'
-        .(string)$link_rewrite;
+        .(string) $link_rewrite;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
             $sql->select('id_ever_post');
@@ -843,7 +843,7 @@ class EverPsBlogPost extends ObjectModel
             $sql->where('link_rewrite = "'.pSQL($link_rewrite).'"');
             $id_ever_post = Db::getInstance()->getValue($sql);
             $return = new self(
-                (int)$id_ever_post
+                (int) $id_ever_post
             );
             Cache::store($cache_id, $return);
             return $return;
@@ -859,9 +859,9 @@ class EverPsBlogPost extends ObjectModel
     public static function countPosts($id_lang, $id_shop, $post_status = 'published')
     {
         $cache_id = 'EverPsBlogPost::countPosts_'
-        .(int)$id_lang
+        .(int) $id_lang
         .'_'
-        .(int)$id_shop
+        .(int) $id_shop
         .'_'
         .$post_status;
         if (!Cache::isStored($cache_id)) {
@@ -874,12 +874,12 @@ class EverPsBlogPost extends ObjectModel
                 'bp.id_ever_post = bpl.id_ever_post'
             );
             $sql->where('bp.post_status = "'.pSQL($post_status).'"');
-            $sql->where('bp.id_shop = '.(int)$id_shop);
-            $sql->where('bpl.id_lang = '.(int)$id_lang);
+            $sql->where('bp.id_shop = '.(int) $id_shop);
+            $sql->where('bpl.id_lang = '.(int) $id_lang);
             $count = Db::getInstance()->getValue($sql);
             if ($count) {
                 Cache::store($cache_id, $count);
-                return (int)$count;
+                return (int) $count;
             }
         }
         return Cache::retrieve($cache_id);
@@ -893,11 +893,11 @@ class EverPsBlogPost extends ObjectModel
     public static function countPostsByTag($id_tag, $id_lang, $id_shop, $post_status = 'published')
     {
         $cache_id = 'EverPsBlogPost::countPostsByTag_'
-        .(int)$id_tag
+        .(int) $id_tag
         .'_'
-        .(int)$id_lang
+        .(int) $id_lang
         .'_'
-        .(int)$id_shop
+        .(int) $id_shop
         .'_'
         .$post_status;
         if (!Cache::isStored($cache_id)) {
@@ -914,10 +914,10 @@ class EverPsBlogPost extends ObjectModel
                 'bpc',
                 'bpc.id_ever_post = bpl.id_ever_post'
             );
-            $sql->where('bpc.id_ever_post_tag = '.(int)$id_tag);
+            $sql->where('bpc.id_ever_post_tag = '.(int) $id_tag);
             $sql->where('bp.post_status = "'.pSQL($post_status).'"');
-            $sql->where('bp.id_shop = '.(int)$id_shop);
-            $sql->where('bpl.id_lang = '.(int)$id_lang);
+            $sql->where('bp.id_shop = '.(int) $id_shop);
+            $sql->where('bpl.id_lang = '.(int) $id_lang);
             $posts = Db::getInstance()->executeS($sql);
             Cache::store($cache_id, count($posts));
             return count($posts);
@@ -933,11 +933,11 @@ class EverPsBlogPost extends ObjectModel
     public static function countPostsByCategory($id_category, $id_lang, $id_shop, $post_status = 'published')
     {
         $cache_id = 'EverPsBlogPost::countPostsByCategory_'
-        .(int)$id_category
+        .(int) $id_category
         .'_'
-        .(int)$id_lang
+        .(int) $id_lang
         .'_'
-        .(int)$id_shop
+        .(int) $id_shop
         .'_'
         .$post_status;
         if (!Cache::isStored($cache_id)) {
@@ -954,10 +954,10 @@ class EverPsBlogPost extends ObjectModel
                 'bpc',
                 'bpc.id_ever_post = bpl.id_ever_post'
             );
-            $sql->where('bpc.id_ever_post_category = '.(int)$id_category);
+            $sql->where('bpc.id_ever_post_category = '.(int) $id_category);
             $sql->where('bp.post_status = "'.pSQL($post_status).'"');
-            $sql->where('bp.id_shop = '.(int)$id_shop);
-            $sql->where('bpl.id_lang = '.(int)$id_lang);
+            $sql->where('bp.id_shop = '.(int) $id_shop);
+            $sql->where('bpl.id_lang = '.(int) $id_lang);
             $posts = Db::getInstance()->executeS($sql);
             Cache::store($cache_id, count($posts));
             return count($posts);
@@ -973,11 +973,11 @@ class EverPsBlogPost extends ObjectModel
     public static function countPostsByAuthor($id_author, $id_lang, $id_shop, $post_status = 'published')
     {
         $cache_id = 'EverPsBlogPost::countPostsByAuthor_'
-        .(int)$id_author
+        .(int) $id_author
         .'_'
-        .(int)$id_lang
+        .(int) $id_lang
         .'_'
-        .(int)$id_shop
+        .(int) $id_shop
         .'_'
         .$post_status;
         if (!Cache::isStored($cache_id)) {
@@ -990,9 +990,9 @@ class EverPsBlogPost extends ObjectModel
                 'bp.id_ever_post = bpl.id_ever_post'
             );
             $sql->where('bp.post_status = "'.pSQL($post_status).'"');
-            $sql->where('bp.id_author = '.(int)$id_author);
-            $sql->where('bp.id_shop = '.(int)$id_shop);
-            $sql->where('bpl.id_lang = '.(int)$id_lang);
+            $sql->where('bp.id_author = '.(int) $id_author);
+            $sql->where('bp.id_shop = '.(int) $id_shop);
+            $sql->where('bpl.id_lang = '.(int) $id_lang);
             $posts = Db::getInstance()->executeS($sql);
             Cache::store($cache_id, count($posts));
             return count($posts);
@@ -1014,11 +1014,11 @@ class EverPsBlogPost extends ObjectModel
         }
         if ($id_entity && $id_entity > 0) {
             $entity = new Customer(
-                (int)$id_entity
+                (int) $id_entity
             );
             $gender = new Gender(
-                (int)$entity->id_gender,
-                (int)$entity->id_lang
+                (int) $entity->id_gender,
+                (int) $entity->id_lang
             );
             $entityShortcodes = array(
                 '[entity_lastname]' => $entity->lastname,
@@ -1152,9 +1152,9 @@ class EverPsBlogPost extends ObjectModel
     */
     public static function dropBlogAuthorPosts($id_ever_author)
     {
-        $sql = 'UPDATE '._DB_PREFIX_.'ever_blog_post
+        $sql = 'UPDATE ' . _DB_PREFIX_ . 'ever_blog_post
             SET id_author = 0
-            WHERE id_author = '.(int)$id_ever_author.';
+            WHERE id_author = '.(int) $id_ever_author.';
         ';
         if (!Db::getInstance()->execute($sql)) {
             return false;
@@ -1177,13 +1177,13 @@ class EverPsBlogPost extends ObjectModel
         $cache_id = 'EverPsBlogPost::searchPosts_'
         .$cached_string
         .'_'
-        .(int)$id_shop
+        .(int) $id_shop
         .'_'
-        .(int)$id_lang
+        .(int) $id_lang
         .'_'
-        .(int)$start
+        .(int) $start
         .'_'
-        .(int)$limit;
+        .(int) $limit;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
             $sql->select('*');
@@ -1193,13 +1193,13 @@ class EverPsBlogPost extends ObjectModel
                 'bp',
                 'bp.id_ever_post = bpl.id_ever_post'
             );
-            $sql->where('bp.id_shop = '.(int)$id_shop);
-            $sql->where('bpl.id_lang = '.(int)$id_lang);
+            $sql->where('bp.id_shop = '.(int) $id_shop);
+            $sql->where('bpl.id_lang = '.(int) $id_lang);
             $sql->where('INSTR(title, "'.pSQL($query).'") OR INSTR(content, "'.pSQL($query).'")');
             $sql->orderBy('bp.date_add DESC');
-            $sql->limit((int)$limit, (int)$start);
+            $sql->limit((int) $limit, (int) $start);
             $posts = Db::getInstance()->executeS($sql);
-            $return = array();
+            $return = [];
             $current_context = Context::getContext();
             if ($current_context->controller->controller_type == 'front'
                 || $current_context->controller->controller_type == 'modulefront'
@@ -1207,19 +1207,19 @@ class EverPsBlogPost extends ObjectModel
                 foreach ($posts as $post) {
                     $post['title'] = self::changeShortcodes(
                         $post['title'],
-                        (int)Context::getContext()->customer->id
+                        (int) Context::getContext()->customer->id
                     );
                     $post['content'] = self::changeShortcodes(
                         $post['content'],
-                        (int)Context::getContext()->customer->id
+                        (int) Context::getContext()->customer->id
                     );
                     $post['excerpt'] = self::changeShortcodes(
                         $post['excerpt'],
-                        (int)Context::getContext()->customer->id
+                        (int) Context::getContext()->customer->id
                     );
                     $post['date_add'] = date('d/m/Y', strtotime($post['date_add']));
                     $post['date_upd'] = date('d/m/Y', strtotime($post['date_upd']));
-                    if ((bool)$is_feed === false) {
+                    if ((bool) $is_feed === false) {
                         // Length
                         $post['title'] = Tools::substr(
                             $post['title'],
@@ -1238,8 +1238,8 @@ class EverPsBlogPost extends ObjectModel
                         );
                     }
                     $post['featured_image'] = EverPsBlogImage::getBlogImageUrl(
-                        (int)$post['id_ever_post'],
-                        (int)$id_shop,
+                        (int) $post['id_ever_post'],
+                        (int) $id_shop,
                         'post'
                     );
                     $return[] = $post;
@@ -1257,18 +1257,18 @@ class EverPsBlogPost extends ObjectModel
     {
         $count =
             'SELECT count
-            FROM `'._DB_PREFIX_.'ever_blog_post`
-            WHERE id_ever_post = "'.(int)$id_ever_post.'"
-                AND id_shop = '.(int)$id_shop;
+            FROM `' . _DB_PREFIX_ . 'ever_blog_post`
+            WHERE id_ever_post = "'.(int) $id_ever_post.'"
+                AND id_shop = '.(int) $id_shop;
 
         $currentCount = Db::getInstance()->getValue($count);
 
         $update = Db::getInstance()->update(
             'ever_blog_post',
             array(
-                'count' => (int)$currentCount + 1,
+                'count' => (int) $currentCount + 1,
             ),
-            'id_ever_post = '.(int)$id_ever_post
+            'id_ever_post = '.(int) $id_ever_post
         );
 
         return $update;

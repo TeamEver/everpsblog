@@ -133,19 +133,19 @@ class EverPsBlogTag extends ObjectModel
     public static function getAllTags($id_lang, $id_shop, $active = 1)
     {
         $cache_id = 'EverPsBlogTag::getAllTags_'
-        .(int)$id_lang
+        .(int) $id_lang
         .'_'
-        .(int)$id_shop
+        .(int) $id_shop
         .'_'
-        .(int)$active;
+        .(int) $active;
         if (!Cache::isStored($cache_id)) {
             $return = Db::getInstance()->executeS(
-                'SELECT * FROM `'._DB_PREFIX_.'ever_blog_tag_lang` btl
-                INNER JOIN `'._DB_PREFIX_.'ever_blog_tag` bt
+                'SELECT * FROM `' . _DB_PREFIX_ . 'ever_blog_tag_lang` btl
+                INNER JOIN `' . _DB_PREFIX_ . 'ever_blog_tag` bt
                 ON bt.id_ever_tag = btl.id_ever_tag
-                WHERE bt.active = "'.(bool)$active.'"
-                AND bt.id_shop = '.(int)$id_shop.'
-                AND btl.id_lang = '.(int)$id_lang.''
+                WHERE bt.active = "'.(bool) $active.'"
+                AND bt.id_shop = '.(int) $id_shop.'
+                AND btl.id_lang = '.(int) $id_lang.''
             );
             Cache::store($cache_id, $return);
             return $return;

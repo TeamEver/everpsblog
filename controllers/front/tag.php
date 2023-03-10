@@ -44,12 +44,12 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
         $this->module_name = 'everpsblog';
         $this->tag = new EverPsBlogTag(
             (int)Tools::getValue('id_ever_tag'),
-            (int)$this->context->language->id,
-            (int)$this->context->shop->id
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
         );
         parent::init();
         // if inactive tag or unexists, redirect
-        if ((bool)$this->tag->active === false) {
+        if ((bool) $this->tag->active === false) {
             Tools::redirect('index.php');
         }
         $this->tag->count = $this->tag->count + 1;
@@ -75,8 +75,8 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
         if (Tools::getValue('id_ever_tag')) {
             $this->post_number = EverPsBlogPost::countPostsByTag(
                 (int)Tools::getValue('id_ever_tag'),
-                (int)$this->context->language->id,
-                (int)$this->context->shop->id
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id
             );
             // Pagination only if there is still some posts
             $pagination = $this->getTemplateVarPagination($this->post_number);
@@ -111,18 +111,18 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
             $page['meta']['description'] = $this->tag->meta_description;
             $this->context->smarty->assign('page', $page);
             $posts = EverPsBlogPost::getPostsByTag(
-                (int)$this->context->language->id,
-                (int)$this->context->shop->id,
-                (int)$this->tag->id,
-                (int)$pagination['items_shown_from'] - 1
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id,
+                (int) $this->tag->id,
+                (int) $pagination['items_shown_from'] - 1
             );
             Hook::exec('actionBeforeEverTagInitContent', array(
                 'blog_tag' => $this->tag,
                 'blog_posts' => $posts
             ));
             $file_url = EverPsBlogImage::getBlogImageUrl(
-                (int)$this->tag->id,
-                (int)$this->context->shop->id,
+                (int) $this->tag->id,
+                (int) $this->context->shop->id,
                 'tag'
             );
             $feed_url = $this->context->link->getModuleLink(
@@ -133,8 +133,8 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
                     'id_obj' => $this->tag->id
                 ),
                 true,
-                (int)$this->context->language->id,
-                (int)$this->context->shop->id
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id
             );
             $this->context->smarty->assign(
                 array(
@@ -144,13 +144,13 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
                     'feed_url' => $feed_url,
                     'featured_image' => $file_url,
                     'paginated' => Tools::getValue('page'),
-                    'post_number' => (int)$this->post_number,
+                    'post_number' => (int) $this->post_number,
                     'pagination' => $pagination,
                     'tag' => $this->tag,
                     'posts' => $posts,
-                    'default_lang' => (int)$this->context->language->id,
+                    'default_lang' => (int) $this->context->language->id,
                     'id_lang' => $this->context->language->id,
-                    'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'modules/everpsblog/views/img/',
+                    'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'modules/everpsblog/views/img/',
                     'animated' => $animate,
                     'show_featured_tag' => (bool)Configuration::get('EVERBLOG_SHOW_FEAT_TAG'),
                 )
@@ -197,7 +197,7 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
                 'everpsblog',
                 'tag',
                 array(
-                    'id_ever_tag' => (int)$this->tag->id,
+                    'id_ever_tag' => (int) $this->tag->id,
                     'link_rewrite' => $this->tag->link_rewrite
                 )
             ),
@@ -210,7 +210,7 @@ class EverPsBlogtagModuleFrontController extends EverPsBlogModuleFrontController
         $page = parent::getTemplateVarPage();
         $page['body_classes']['page-everblog'] = true;
         $page['body_classes']['page-everblog-tag'] = true;
-        $page['body_classes']['page-everblog-tag-id-'.(int)$this->tag->id] = true;
+        $page['body_classes']['page-everblog-tag-id-'.(int) $this->tag->id] = true;
         if ((bool)Context::getContext()->customer->isLogged()) {
             $page['body_classes']['page-everblog-logged-in'] = true;
         }

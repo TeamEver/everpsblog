@@ -148,14 +148,14 @@ class EverPsBlogCategory extends ObjectModel
             $sql->select('id_ever_category');
             $sql->from('ever_blog_category');
             $sql->where('is_root_category = 1');
-            $sql->where('id_shop = '.(int)Context::getContext()->shop->id);
+            $sql->where('id_shop = '.(int) Context::getContext()->shop->id);
             $return = Db::getInstance()->getValue($sql);
             $return = new self($return);
             if (!Validate::isLoadedObject($return)) {
                 $return = new self();
                 $return->is_root_category = 1;
                 $return->active = 1;
-                $return->id_shop = (int)Context::getContext()->shop->id;
+                $return->id_shop = (int) Context::getContext()->shop->id;
                 foreach (Language::getLanguages(false) as $language) {
                     $return->title[$language['id_lang']] = 'Root';
                     $return->content[$language['id_lang']] = 'Root';
@@ -177,12 +177,12 @@ class EverPsBlogCategory extends ObjectModel
     public function hasParentCategory($id_parent_category)
     {
         $cache_id = 'EverPsBlogCategory::hasParentCategory_'
-        .(int)$id_parent_category;
+        .(int) $id_parent_category;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
             $sql->select('id_ever_category');
             $sql->from('ever_blog_category');
-            $sql->where('id_ever_category = '.(int)$id_parent_category);
+            $sql->where('id_ever_category = '.(int) $id_parent_category);
             $return = Db::getInstance()->getValue($sql);
             Cache::store($cache_id, $return);
             return $return;
@@ -201,9 +201,9 @@ class EverPsBlogCategory extends ObjectModel
             $sql = new DbQuery;
             $sql->select('id_ever_category');
             $sql->from('ever_blog_category');
-            $sql->where('id_parent_category = '.(int)$this->id);
+            $sql->where('id_parent_category = '.(int) $this->id);
             $return = Db::getInstance()->getValue($sql);
-            if ((int)$return > 0) {
+            if ((int) $return > 0) {
                 Cache::store($cache_id, true);
                 return true;
             }
@@ -221,15 +221,15 @@ class EverPsBlogCategory extends ObjectModel
     public static function getAllCategories($id_lang, $id_shop, $active = 1, $only_parent = 0, $without_parent = false)
     {
         $cache_id = 'EverPsBlogCategory::getAllCategories_'
-        .(int)$id_lang
+        .(int) $id_lang
         .'_'
-        .(int)$id_shop
+        .(int) $id_shop
         .'_'
-        .(int)$active
+        .(int) $active
         .'_'
-        .(int)$only_parent
+        .(int) $only_parent
         .'_'
-        .(int)$without_parent;
+        .(int) $without_parent;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
             $sql->select('*');
@@ -239,25 +239,25 @@ class EverPsBlogCategory extends ObjectModel
                 'bc',
                 'bc.id_ever_category = bcl.id_ever_category'
             );
-            $sql->where('bc.active = '.(int)$active);
-            $sql->where('bc.id_shop = '.(int)$id_shop);
-            $sql->where('bcl.id_lang = '.(int)$id_lang);
-            if ((int)$only_parent > 0) {
+            $sql->where('bc.active = '.(int) $active);
+            $sql->where('bc.id_shop = '.(int) $id_shop);
+            $sql->where('bcl.id_lang = '.(int) $id_lang);
+            if ((int) $only_parent > 0) {
                 $sql->where('bc.id_parent_category = 1');
             }
             $sql->orderBy('bc.date_add DESC');
             $categories = Db::getInstance()->executeS($sql);
-            $return = array();
+            $return = [];
             foreach ($categories as $blog_cat) {
                 $root = EverPsBlogCategory::getRootCategory();
-                if ((bool)$without_parent === true
-                    && (int)$root->id == (int)$blog_cat['id_ever_category']
+                if ((bool) $without_parent === true
+                    && (int) $root->id == (int) $blog_cat['id_ever_category']
                 ) {
                     continue;
                 }
                 $blog_cat['featured_image'] = EverPsBlogImage::getBlogImageUrl(
-                    (int)$blog_cat['id_ever_category'],
-                    (int)$id_shop,
+                    (int) $blog_cat['id_ever_category'],
+                    (int) $id_shop,
                     'category'
                 );
                 $return[] = $blog_cat;
@@ -276,15 +276,15 @@ class EverPsBlogCategory extends ObjectModel
     public static function getParentCategories($id_ever_category, $id_lang, $id_shop, $active = 1)
     {
         $cache_id = 'EverPsBlogCategory::getParentCategories_'
-        .(int)$id_ever_category
+        .(int) $id_ever_category
         .'_'
-        .(int)$id_lang
+        .(int) $id_lang
         .'_'
-        .(int)$id_shop
+        .(int) $id_shop
         .'_'
-        .(int)$active;
+        .(int) $active;
         if (!Cache::isStored($cache_id)) {
-            $category = new self((int)$id_ever_category);
+            $category = new self((int) $id_ever_category);
             $sql = new DbQuery;
             $sql->select('bc.*, bcl.*');
             $sql->from('ever_blog_category_lang', 'bcl');
@@ -293,12 +293,12 @@ class EverPsBlogCategory extends ObjectModel
                 'bc',
                 'bc.id_ever_category = bcl.id_ever_category'
             );
-            $sql->where('bc.active = '.(int)$active);
-            $sql->where('bc.id_shop = '.(int)$id_shop);
-            $sql->where('bcl.id_lang = '.(int)$id_lang);
-            $sql->where('bc.id_parent_category = '.(int)$category->id_parent_category);
+            $sql->where('bc.active = '.(int) $active);
+            $sql->where('bc.id_shop = '.(int) $id_shop);
+            $sql->where('bcl.id_lang = '.(int) $id_lang);
+            $sql->where('bc.id_parent_category = '.(int) $category->id_parent_category);
             $return = Db::getInstance()->executeS($sql);
-            $categories = array();
+            $categories = [];
             if (!isset($return[0])) {
                 $root = EverPsBlogCategory::getRootCategory();
                 $categories[] = array(
@@ -324,13 +324,13 @@ class EverPsBlogCategory extends ObjectModel
     public static function getChildrenCategories($id_ever_category, $id_lang, $id_shop, $active = 1)
     {
         $cache_id = 'EverPsBlogCategory::getChildrenCategories_'
-        .(int)$id_ever_category
+        .(int) $id_ever_category
         .'_'
-        .(int)$id_lang
+        .(int) $id_lang
         .'_'
-        .(int)$id_shop
+        .(int) $id_shop
         .'_'
-        .(int)$active;
+        .(int) $active;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
             $sql->select('bc.*, bcl.*');
@@ -340,22 +340,22 @@ class EverPsBlogCategory extends ObjectModel
                 'bc',
                 'bc.id_ever_category = bcl.id_ever_category'
             );
-            $sql->where('bc.active = '.(int)$active);
-            $sql->where('bc.id_shop = '.(int)$id_shop);
-            $sql->where('bcl.id_lang = '.(int)$id_lang);
-            $sql->where('bc.id_parent_category = '.(int)$id_ever_category);
+            $sql->where('bc.active = '.(int) $active);
+            $sql->where('bc.id_shop = '.(int) $id_shop);
+            $sql->where('bcl.id_lang = '.(int) $id_lang);
+            $sql->where('bc.id_parent_category = '.(int) $id_ever_category);
             $return = Db::getInstance()->executeS($sql);
-            $categories = array();
+            $categories = [];
             foreach ($return as $child_cat) {
                 $featured_image = EverPsBlogImage::getBlogImageUrl(
-                    (int)$child_cat['id_ever_category'],
-                    (int)$id_shop,
+                    (int) $child_cat['id_ever_category'],
+                    (int) $id_shop,
                     'category'
                 );
                 $category = new self(
                     $child_cat['id_ever_category'],
-                    (int)$id_lang,
-                    (int)$id_shop
+                    (int) $id_lang,
+                    (int) $id_shop
                 );
                 $category->featured_image = $featured_image;
                 $categories[] = $category;

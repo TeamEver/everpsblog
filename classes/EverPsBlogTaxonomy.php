@@ -67,8 +67,8 @@ class EverPsBlogTaxonomy extends ObjectModel
                     id_ever_post
                 )
                 VALUES (
-                    '.(int)$id_obj.',
-                    '.(int)$id_post.'
+                    '.(int) $id_obj.',
+                    '.(int) $id_post.'
                 )';
             if (!Db::getInstance()->execute($sql)) {
                 return false;
@@ -105,7 +105,7 @@ class EverPsBlogTaxonomy extends ObjectModel
         if (isset($table) && !empty($table) && isset($key) && !empty($key)) {
             set_time_limit(0);
             $sql = 'DELETE FROM '.pSQL($table).'
-            WHERE id_ever_post = '.(int)$id_post;
+            WHERE id_ever_post = '.(int) $id_post;
             // If dropped, return insert as kind of update
             if (!Db::getInstance()->Execute($sql)) {
                 return false;
@@ -137,8 +137,8 @@ class EverPsBlogTaxonomy extends ObjectModel
     public static function dropProductTaxonomy($id_product)
     {
         set_time_limit(0);
-        $sql = 'DELETE FROM `'._DB_PREFIX_.'ever_blog_post_product`
-        WHERE id_ever_post_product = '.(int)$id_product.'
+        $sql = 'DELETE FROM `' . _DB_PREFIX_ . 'ever_blog_post_product`
+        WHERE id_ever_post_product = '.(int) $id_product.'
         ';
         if (!Db::getInstance()->Execute($sql)) {
             return false;
@@ -154,8 +154,8 @@ class EverPsBlogTaxonomy extends ObjectModel
     public static function dropCategoryTaxonomy($id_category)
     {
         set_time_limit(0);
-        $sql = 'DELETE FROM `'._DB_PREFIX_.'ever_blog_post_category`
-        WHERE id_ever_post_category = '.(int)$id_category.'
+        $sql = 'DELETE FROM `' . _DB_PREFIX_ . 'ever_blog_post_category`
+        WHERE id_ever_post_category = '.(int) $id_category.'
         ';
         if (!Db::getInstance()->Execute($sql)) {
             return false;
@@ -171,8 +171,8 @@ class EverPsBlogTaxonomy extends ObjectModel
     public static function dropTagTaxonomy($id_tag)
     {
         set_time_limit(0);
-        $sql = 'DELETE FROM `'._DB_PREFIX_.'ever_blog_post_tag`
-        WHERE id_ever_post_tag = '.(int)$id_tag.'
+        $sql = 'DELETE FROM `' . _DB_PREFIX_ . 'ever_blog_post_tag`
+        WHERE id_ever_post_tag = '.(int) $id_tag.'
         ';
         if (!Db::getInstance()->Execute($sql)) {
             return false;
@@ -188,12 +188,12 @@ class EverPsBlogTaxonomy extends ObjectModel
     public static function getPostTagsTaxonomies($id_post)
     {
         $cache_id = 'EverPsBlogTaxonomy::getPostTagsTaxonomies_'
-        .(int)$id_post;
+        .(int) $id_post;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
             $sql->select('id_ever_post_tag');
             $sql->from('ever_blog_post_tag');
-            $sql->where('id_ever_post = '.(int)$id_post);
+            $sql->where('id_ever_post = '.(int) $id_post);
             $taxonomies = Db::getInstance()->executeS($sql);
             Cache::store($cache_id, $taxonomies);
             return $taxonomies;
@@ -210,7 +210,7 @@ class EverPsBlogTaxonomy extends ObjectModel
     public static function getPostCategoriesTaxonomies($id_post)
     {
         $cache_id = 'EverPsBlogTaxonomy::getPostCategoriesTaxonomies_'
-        .(int)$id_post;
+        .(int) $id_post;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
             $sql->select('epc.id_ever_post_category');
@@ -220,7 +220,7 @@ class EverPsBlogTaxonomy extends ObjectModel
                 'bc',
                 'bc.id_ever_category = epc.id_ever_post_category'
             );
-            $sql->where('epc.id_ever_post = '.(int)$id_post);
+            $sql->where('epc.id_ever_post = '.(int) $id_post);
             $sql->orderBy('bc.id_parent_category ASC');
             $sql->groupBy('bc.id_ever_category');
             $taxonomies = Db::getInstance()->executeS($sql);
@@ -238,26 +238,26 @@ class EverPsBlogTaxonomy extends ObjectModel
     public static function getCategoryParentsTaxonomy($id_category, $active = 1)
     {
         $cache_id = 'EverPsBlogTaxonomy::getCategoryParentsTaxonomy_'
-        .(int)$id_category
+        .(int) $id_category
         .'_'
-        .(int)$active;
+        .(int) $active;
         if (!Cache::isStored($cache_id)) {
-            $taxonomies = array();
+            $taxonomies = [];
             $root_category = EverPsBlogCategory::getRootCategory();
             $sql = new DbQuery;
             $sql->select('id_parent_category');
             $sql->from('ever_blog_category');
-            $sql->where('id_ever_category = '.(int)$id_category);
-            $sql->where('active = '.(int)$active);
+            $sql->where('id_ever_category = '.(int) $id_category);
+            $sql->where('active = '.(int) $active);
             $taxonomy = Db::getInstance()->getValue($sql);
-            if (isset($taxonomy) && (int)$taxonomy > 0) {
+            if (isset($taxonomy) && (int) $taxonomy > 0) {
                 $taxonomies[] = $taxonomy;
                 $category = new EverPsBlogCategory(
-                    (int)$taxonomy
+                    (int) $taxonomy
                 );
-                if ((int)$category->id_parent_category > 0
-                    && (int)$root_category->id != (int)$category->id_parent_category) {
-                    $taxonomies[] = (int)$category->id_parent_category;
+                if ((int) $category->id_parent_category > 0
+                    && (int) $root_category->id != (int) $category->id_parent_category) {
+                    $taxonomies[] = (int) $category->id_parent_category;
                 }
             }
             Cache::store($cache_id, $taxonomies);
@@ -269,14 +269,14 @@ class EverPsBlogTaxonomy extends ObjectModel
     public static function getPostHighestCategory($id_post)
     {
         $cache_id = 'EverPsBlogTaxonomy::getPostHighestCategory_'
-        .(int)$id_post;
+        .(int) $id_post;
         if (!Cache::isStored($cache_id)) {
             $root_category = EverPsBlogCategory::getRootCategory();
             $sql = new DbQuery;
             $sql->from('ever_blog_post_category');
             $sql->select('id_ever_post_category');
-            $sql->where('id_ever_post = '.(int)$id_post);
-            $sql->where('id_ever_post_category != '.(int)$root_category->id);
+            $sql->where('id_ever_post = '.(int) $id_post);
+            $sql->where('id_ever_post_category != '.(int) $root_category->id);
             $sql->orderBy('id_ever_post_category DESC');
             $taxonomies = Db::getInstance()->getValue($sql);
             Cache::store($cache_id, $taxonomies);
@@ -288,12 +288,12 @@ class EverPsBlogTaxonomy extends ObjectModel
     public static function getPostProductsTaxonomies($id_post)
     {
         $cache_id = 'EverPsBlogTaxonomy::getPostProductsTaxonomies_'
-        .(int)$id_post;
+        .(int) $id_post;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
             $sql->from('ever_blog_post_product');
             $sql->select('id_ever_post_product');
-            $sql->where('id_ever_post = '.(int)$id_post);
+            $sql->where('id_ever_post = '.(int) $id_post);
             $taxonomies = Db::getInstance()->executeS($sql);
             Cache::store($cache_id, $taxonomies);
             return $taxonomies;
@@ -323,7 +323,7 @@ class EverPsBlogTaxonomy extends ObjectModel
     public static function taxonomyExists($id_obj, $obj_name)
     {
         $cache_id = 'EverPsBlogTaxonomy::taxonomyExists_'
-        .(int)$id_obj
+        .(int) $id_obj
         .'_'
         .$obj_name;
         if (!Cache::isStored($cache_id)) {
@@ -347,7 +347,7 @@ class EverPsBlogTaxonomy extends ObjectModel
                 $sql = new DbQuery;
                 $sql->select(pSQL($key));
                 $sql->from(pSQL($table));
-                $sql->where(pSQL($key).' = '.(int)$id_obj);
+                $sql->where(pSQL($key).' = '.(int) $id_obj);
                 $return = Db::getInstance()->getValue($sql);
                 Cache::store($cache_id, $return);
                 return $return;
@@ -372,15 +372,15 @@ class EverPsBlogTaxonomy extends ObjectModel
         $posts = Db::getInstance()->executeS($sql);
         foreach ($posts as $post_array) {
             $post = new EverPsBlogPost(
-                (int)$post_array['id_ever_post']
+                (int) $post_array['id_ever_post']
             );
             $post_categories = json_decode(
                 $post->post_categories
             );
             foreach ($post_categories as $post_category) {
                 self::insertTaxonomy(
-                    (int)$post_category,
-                    (int)$post->id,
+                    (int) $post_category,
+                    (int) $post->id,
                     'category'
                 );
             }
@@ -389,8 +389,8 @@ class EverPsBlogTaxonomy extends ObjectModel
             );
             foreach ($post_tags as $post_tag) {
                 self::insertTaxonomy(
-                    (int)$post_tag,
-                    (int)$post->id,
+                    (int) $post_tag,
+                    (int) $post->id,
                     'tag'
                 );
             }
@@ -399,8 +399,8 @@ class EverPsBlogTaxonomy extends ObjectModel
             );
             foreach ($post_products as $post_product) {
                 self::insertTaxonomy(
-                    (int)$post_product,
-                    (int)$post->id,
+                    (int) $post_product,
+                    (int) $post->id,
                     'product'
                 );
             }

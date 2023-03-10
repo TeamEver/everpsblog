@@ -26,19 +26,19 @@ function upgrade_module_4_4_1()
     set_time_limit(0);
     $result = false;
     // Preparing new taxonomies
-    $sql = array();
+    $sql = [];
     $sql[] =
-        'ALTER TABLE '._DB_PREFIX_.'ever_blog_category_lang
+        'ALTER TABLE ' . _DB_PREFIX_ . 'ever_blog_category_lang
          ADD `bottom_content` text DEFAULT NULL
          AFTER `content`;
     ';
     $sql[] =
-        'ALTER TABLE '._DB_PREFIX_.'ever_blog_tag_lang
+        'ALTER TABLE ' . _DB_PREFIX_ . 'ever_blog_tag_lang
          ADD `bottom_content` text DEFAULT NULL
          AFTER `content`;
     ';
     $sql[] =
-        'ALTER TABLE '._DB_PREFIX_.'ever_blog_author_lang
+        'ALTER TABLE ' . _DB_PREFIX_ . 'ever_blog_author_lang
          ADD `bottom_content` text DEFAULT NULL
          AFTER `content`;
     ';

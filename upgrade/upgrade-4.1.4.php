@@ -26,18 +26,18 @@ function upgrade_module_4_1_4()
     set_time_limit(0);
     $result = false;
     // Preparing new taxonomies
-    $sql = array();
+    $sql = [];
     $sql[] =
-        'UPDATE `'._DB_PREFIX_.'ever_blog_post` 
+        'UPDATE `' . _DB_PREFIX_ . 'ever_blog_post` 
         SET sitemap = 1';
     $sql[] =
-        'UPDATE `'._DB_PREFIX_.'ever_blog_category` 
+        'UPDATE `' . _DB_PREFIX_ . 'ever_blog_category` 
         SET sitemap = 1';
     $sql[] =
-        'UPDATE `'._DB_PREFIX_.'ever_blog_tag` 
+        'UPDATE `' . _DB_PREFIX_ . 'ever_blog_tag` 
         SET sitemap = 1';
     $sql[] =
-        'UPDATE `'._DB_PREFIX_.'ever_blog_author` 
+        'UPDATE `' . _DB_PREFIX_ . 'ever_blog_author` 
         SET sitemap = 1';
 
     foreach ($sql as $s) {

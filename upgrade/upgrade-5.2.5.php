@@ -25,14 +25,14 @@ function upgrade_module_5_2_5()
 {
     set_time_limit(0);
     $result = true;
-    $sql = array();
+    $sql = [];
     $sql[] =
-        'ALTER TABLE '._DB_PREFIX_.'ever_blog_post
+        'ALTER TABLE ' . _DB_PREFIX_ . 'ever_blog_post
          ADD `id_default_category` int(10) unsigned NOT NULL DEFAULT 1
          AFTER `id_author`;
     ';
     $sql[] =
-        'ALTER TABLE '._DB_PREFIX_.'ever_blog_post_lang
+        'ALTER TABLE ' . _DB_PREFIX_ . 'ever_blog_post_lang
          ADD `excerpt` varchar(255) DEFAULT NULL
          AFTER `content`;
     ';

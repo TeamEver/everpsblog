@@ -44,14 +44,14 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
         $this->module_name = 'everpsblog';
         $this->category = new EverPsBlogCategory(
             (int)Tools::getValue('id_ever_category'),
-            (int)$this->context->language->id,
-            (int)$this->context->shop->id
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
         );
         $this->category->count = $this->category->count + 1;
         $this->category->save();
         parent::init();
         $this->parent_categories = EverPsBlogTaxonomy::getCategoryParentsTaxonomy(
-            (int)$this->category->id
+            (int) $this->category->id
         );
         // if inactive category or unexists, redirect
         if (!$this->category->active
@@ -80,7 +80,7 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
         if (Tools::getValue('id_ever_category')) {
             $this->post_number = EverPsBlogPost::countPostsByCategory(
                 (int)Tools::getValue('id_ever_category')
-                (int)$this->context->shop->id
+                (int) $this->context->shop->id
             );
             // Pagination only if there is still some posts
             $pagination = $this->getTemplateVarPagination(
@@ -115,35 +115,35 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
             $page['meta']['description'] = $meta_description;
             $this->context->smarty->assign('page', $page);
             $posts = EverPsBlogPost::getPostsByCategory(
-                (int)$this->context->language->id,
-                (int)$this->context->shop->id,
-                (int)$this->category->id,
-                (int)$pagination['items_shown_from'] - 1
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id,
+                (int) $this->category->id,
+                (int) $pagination['items_shown_from'] - 1
             );
             if ($this->category->hasChildren()) {
                 $children_categories = EverPsBlogCategory::getChildrenCategories(
-                    (int)$this->category->id,
-                    (int)$this->context->language->id,
-                    (int)$this->context->shop->id
+                    (int) $this->category->id,
+                    (int) $this->context->language->id,
+                    (int) $this->context->shop->id
                 );
             } else {
                 $children_categories = false;
             }
             $this->category->content = EverPsBlogPost::changeShortcodes(
-                (string)$this->category->content,
-                (int)Context::getContext()->customer->id
+                (string) $this->category->content,
+                (int) Context::getContext()->customer->id
             );
             $this->category->bottom_content = EverPsBlogPost::changeShortcodes(
-                (string)$this->category->bottom_content,
-                (int)Context::getContext()->customer->id
+                (string) $this->category->bottom_content,
+                (int) Context::getContext()->customer->id
             );
             Hook::exec('actionBeforeEverCategoryInitContent', array(
                 'blog_category' => $this->category,
                 'blog_posts' => $posts
             ));
             $file_url = EverPsBlogImage::getBlogImageUrl(
-                (int)$this->category->id,
-                (int)$this->context->shop->id,
+                (int) $this->category->id,
+                (int) $this->context->shop->id,
                 'category'
             );
             $feed_url = $this->context->link->getModuleLink(
@@ -154,8 +154,8 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                     'id_obj' => $this->category->id
                 ),
                 true,
-                (int)$this->context->language->id,
-                (int)$this->context->shop->id
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id
             );
             $this->context->smarty->assign(
                 array(
@@ -166,13 +166,13 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                     'feed_url' => $feed_url,
                     'featured_image' => $file_url,
                     'paginated' => Tools::getValue('page'),
-                    'post_number' => (int)$this->post_number,
+                    'post_number' => (int) $this->post_number,
                     'pagination' => $pagination,
                     'category' => $this->category,
                     'posts' => $posts,
-                    'default_lang' => (int)$this->context->language->id,
+                    'default_lang' => (int) $this->context->language->id,
                     'id_lang' => $this->context->language->id,
-                    'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'modules/everpsblog/views/img/',
+                    'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'modules/everpsblog/views/img/',
                     'animated' => $animate,
                     'show_featured_cat' => (bool)Configuration::get('EVERBLOG_SHOW_FEAT_CAT'),
                 )
@@ -215,14 +215,14 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
         );
         foreach ($this->parent_categories as $parent_category) {
             $category = new EverPsBlogCategory(
-                (int)$parent_category,
-                (int)$this->context->language->id,
-                (int)$this->context->shop->id
+                (int) $parent_category,
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id
             );
-            if ((bool)$category->is_root_category === false
-                && (int)$category->id > 0
+            if ((bool) $category->is_root_category === false
+                && (int) $category->id > 0
                 && !empty($category->title)
-                && (bool)$category->active === true
+                && (bool) $category->active === true
             ) {
                 $breadcrumb['links'][] = array(
                     'title' => $category->title,
@@ -243,7 +243,7 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                 'everpsblog',
                 'category',
                 array(
-                    'id_ever_category' => (int)$this->category->id,
+                    'id_ever_category' => (int) $this->category->id,
                     'link_rewrite' => $this->category->link_rewrite
                 )
             ),
@@ -256,7 +256,7 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
         $page = parent::getTemplateVarPage();
         $page['body_classes']['page-everblog'] = true;
         $page['body_classes']['page-everblog-category'] = true;
-        $page['body_classes']['page-everblog-category-id-'.(int)$this->category->id] = true;
+        $page['body_classes']['page-everblog-category-id-'.(int) $this->category->id] = true;
         if ((bool)Context::getContext()->customer->isLogged()) {
             $page['body_classes']['page-everblog-logged-in'] = true;
         }

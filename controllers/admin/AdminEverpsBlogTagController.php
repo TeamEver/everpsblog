@@ -21,11 +21,11 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogPost.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCategory.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogImage.php';
+require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogPost.php';
+require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogCategory.php';
+require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogTag.php';
+require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogComment.php';
+require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogImage.php';
 
 class AdminEverPsBlogTagController extends ModuleAdminController
 {
@@ -39,7 +39,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
         $this->table = 'ever_blog_tag';
         $this->className = 'EverPsBlogTag';
         $this->module_name = 'everpsblog';
-        $this->shop_url = Tools::getHttpHost(true).__PS_BASE_URI__;
+        $this->shop_url = Tools::getHttpHost(true) . __PS_BASE_URI__;
         $this->img_url = $this->shop_url.'modules/'.$this->module_name.'/views/img/';
         $this->context = Context::getContext();
         $this->identifier = "id_ever_tag";
@@ -102,17 +102,17 @@ class AdminEverPsBlogTagController extends ModuleAdminController
         $this->_select = 'l.title, CONCAT("'.$this->img_url.'",ai.image_link) AS featured_img';
 
         $this->_join =
-            'LEFT JOIN `'._DB_PREFIX_.'ever_blog_tag_lang` l
+            'LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_tag_lang` l
                 ON (
                     l.`id_ever_tag` = a.`id_ever_tag`
                 )
-            LEFT JOIN `'._DB_PREFIX_.'ever_blog_image` ai
+            LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_image` ai
                 ON (
                     ai.`id_ever_image` = a.`id_ever_tag`
                     AND ai.`image_type` = "tag"
                 )';
-        $this->_where = 'AND a.id_shop = '.(int)$this->context->shop->id;
-        $this->_where = 'AND l.id_lang = '.(int)$this->context->language->id;
+        $this->_where = 'AND a.id_shop = '.(int) $this->context->shop->id;
+        $this->_where = 'AND l.id_lang = '.(int) $this->context->language->id;
         $moduleConfUrl  = 'index.php?controller=AdminModules&configure=everpsblog&token=';
         $moduleConfUrl .= Tools::getAdminTokenLite('AdminModules');
         $postUrl  = 'index.php?controller=AdminEverPsBlogPost&token=';
@@ -137,36 +137,36 @@ class AdminEverPsBlogTagController extends ModuleAdminController
             'emptytrash',
             array(
                 'token' => $ever_blog_token,
-                'id_shop' => (int)$this->context->shop->id
+                'id_shop' => (int) $this->context->shop->id
             ),
             true,
-            (int)$this->context->language->id,
-            (int)$this->context->shop->id
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
         );
         $pending = $this->context->link->getModuleLink(
             $this->module_name,
             'pending',
             array(
                 'token' => $ever_blog_token,
-                'id_shop' => (int)$this->context->shop->id
+                'id_shop' => (int) $this->context->shop->id
             ),
             true,
-            (int)$this->context->language->id,
-            (int)$this->context->shop->id
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
         );
         $planned = $this->context->link->getModuleLink(
             $this->module_name,
             'planned',
             array(
                 'token' => $ever_blog_token,
-                'id_shop' => (int)$this->context->shop->id
+                'id_shop' => (int) $this->context->shop->id
             ),
             true,
-            (int)$this->context->language->id,
-            (int)$this->context->shop->id
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
         );
         $this->context->smarty->assign(array(
-            'image_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'/modules/everpsblog/views/img/',
+            'image_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'/modules/everpsblog/views/img/',
             'everpsblogcron' => $emptytrash,
             'everpsblogcronpending' => $pending,
             'everpsblogcronplanned' => $planned,
@@ -266,12 +266,12 @@ class AdminEverPsBlogTagController extends ModuleAdminController
         $tag_id = Tools::getValue('id_ever_tag');
 
         $file_url = EverPsBlogImage::getBlogImageUrl(
-            (int)$tag_id,
-            (int)$this->context->shop->id,
+            (int) $tag_id,
+            (int) $this->context->shop->id,
             'tag'
         );
         // die(var_dump($tag_img));
-        $tagImg = '<image src="'.(string)$file_url.'" style="max-width:150px;"/>';
+        $tagImg = '<image src="'.(string) $file_url.'" style="max-width:150px;"/>';
 
         // Building the Add/Edit form
         $this->fields_form = array(
@@ -464,28 +464,28 @@ class AdminEverPsBlogTagController extends ModuleAdminController
             $everObj = new EverPsBlogTag(
                 (int)Tools::getValue('id_ever_tag')
             );
-            (int)$everObj->active = !(int)$everObj->active;
+            (int) $everObj->active = !(int) $everObj->active;
             $everObj->save();
         }
         if (Tools::getIsset('statusindexever_blog_tag')) {
             $everObj = new EverPsBlogTag(
                 (int)Tools::getValue('id_ever_tag')
             );
-            (int)$everObj->index = !(int)$everObj->index;
+            (int) $everObj->index = !(int) $everObj->index;
             $everObj->save();
         }
         if (Tools::getIsset('statusfollowever_blog_tag')) {
             $everObj = new EverPsBlogTag(
                 (int)Tools::getValue('id_ever_tag')
             );
-            (int)$everObj->follow = !(int)$everObj->follow;
+            (int) $everObj->follow = !(int) $everObj->follow;
             $everObj->save();
         }
         if (Tools::getIsset('statussitemapever_blog_tag')) {
             $everObj = new EverPsBlogTag(
                 (int)Tools::getValue('id_ever_tag')
             );
-            (int)$everObj->sitemap = !(int)$everObj->sitemap;
+            (int) $everObj->sitemap = !(int) $everObj->sitemap;
             $everObj->save();
         }
         if (Tools::isSubmit('save')) {
@@ -524,7 +524,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
             } else {
                 $tag->active = Tools::getValue('active');
             }
-            $tag->id_shop = (int)$this->context->shop->id;
+            $tag->id_shop = (int) $this->context->shop->id;
             if (!(int)Tools::getValue('id_ever_tag')) {
                 $tag->date_add = date('Y-m-d H:i:s');
             }
@@ -584,14 +584,14 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                 $tag->save();
                 /* upload the image */
                 $tag_img_link = 'img/tag/'
-                .(int)$tag->id
+                .(int) $tag->id
                 .'.jpg';
                 $ps_tags_destination = _PS_IMG_DIR_
                 .'tag/'
-                .(int)$tag->id
+                .(int) $tag->id
                 .'.jpg';
-                if (!file_exists(_PS_IMG_DIR_.'tag')) {
-                    mkdir(_PS_IMG_DIR_.'tag', 0755, true);
+                if (!file_exists(_PS_IMG_DIR_ . 'tag')) {
+                    mkdir(_PS_IMG_DIR_ . 'tag', 0755, true);
                 }
                 if (isset($_FILES['tag_image'])
                     && isset($_FILES['tag_image']['tmp_name'])
@@ -616,17 +616,17 @@ class AdminEverPsBlogTagController extends ModuleAdminController
                         unlink($tmp_name);
                     }
                     $featured_image = EverPsBlogImage::getBlogImage(
-                        (int)$tag->id,
-                        (int)Context::getContext()->shop->id,
+                        (int) $tag->id,
+                        (int) Context::getContext()->shop->id,
                         'tag'
                     );
                     if (!$featured_image) {
                         $featured_image = new EverPsBlogImage();
                     }
-                    $featured_image->id_element = (int)$tag->id;
+                    $featured_image->id_element = (int) $tag->id;
                     $featured_image->image_type = 'tag';
                     $featured_image->image_link = $tag_img_link;
-                    $featured_image->id_shop = (int)Context::getContext()->shop->id;
+                    $featured_image->id_shop = (int) Context::getContext()->shop->id;
                     return $featured_image->save();
                 }
             } else {
@@ -644,7 +644,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
         }
         $tag = new EverPsBlogTag($id_ever_tag);
         $link = new Link();
-        $id_lang = (int)Context::getContext()->language->id;
+        $id_lang = (int) Context::getContext()->language->id;
         $see_url = $link->getModuleLink(
             'everpsblog',
             'tag',
@@ -661,14 +661,14 @@ class AdminEverPsBlogTagController extends ModuleAdminController
         ));
 
         return $this->context->smarty->fetch(
-            _PS_MODULE_DIR_.'everpsblog/views/templates/admin/helpers/lists/list_action_view_obj.tpl'
+            _PS_MODULE_DIR_ . 'everpsblog/views/templates/admin/helpers/lists/list_action_view_obj.tpl'
         );
     }
 
     protected function processBulkDelete()
     {
         foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
-            $everObj = new EverPsBlogCategory((int)$idEverObj);
+            $everObj = new EverPsBlogCategory((int) $idEverObj);
             
             if (!$everObj->delete()) {
                 $this->errors[] = $this->l('An error has occurred: Can\'t delete the current object');
@@ -679,7 +679,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
     protected function processBulkDisable()
     {
         foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
-            $everObj = new EverPsBlogTag((int)$idEverObj);
+            $everObj = new EverPsBlogTag((int) $idEverObj);
             if ($everObj->active) {
                 $everObj->active = false;
             }
@@ -693,7 +693,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
     protected function processBulkEnable()
     {
         foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
-            $everObj = new EverPsBlogTag((int)$idEverObj);
+            $everObj = new EverPsBlogTag((int) $idEverObj);
             if (!$everObj->active) {
                 $everObj->active = true;
             }

@@ -81,19 +81,19 @@ class EverPsBlogplannedModuleFrontController extends ModuleFrontController
             Tools::redirect('index.php');
         }
         /* Check if the requested shop exists */
-        $shops = Db::getInstance()->ExecuteS('SELECT id_shop FROM `'._DB_PREFIX_.'shop`');
+        $shops = Db::getInstance()->ExecuteS('SELECT id_shop FROM `' . _DB_PREFIX_ . 'shop`');
 
-        $list_id_shop = array();
+        $list_id_shop = [];
         foreach ($shops as $shop) {
-            $list_id_shop[] = (int)$shop['id_shop'];
+            $list_id_shop[] = (int) $shop['id_shop'];
         }
 
         $id_shop = (Tools::getIsset('id_shop') && in_array(Tools::getValue('id_shop'), $list_id_shop))
             ? (int)Tools::getValue('id_shop') : (int)Configuration::get('PS_SHOP_DEFAULT');
 
         $everpsblog->cron = true;
-        $published_planned = $everpsblog->publishPlannedPosts((int)$id_shop);
-        if ((bool)$published_planned === true) {
+        $published_planned = $everpsblog->publishPlannedPosts((int) $id_shop);
+        if ((bool) $published_planned === true) {
             die(
                 $this->smileys[$this->randSmiley]
                 .' All planned posts have been checked and published '

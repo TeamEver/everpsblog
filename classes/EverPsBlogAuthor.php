@@ -153,11 +153,11 @@ class EverPsBlogAuthor extends ObjectModel
     public static function getAllAuthors($id_lang, $id_shop, $active = 1)
     {
         $cache_id = 'EverPsBlogAuthor::getAllAuthors_'
-        .(int)$id_lang
+        .(int) $id_lang
         .'_'
-        .(int)$id_shop
+        .(int) $id_shop
         .'_'
-        .(int)$active;
+        .(int) $active;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
             $sql->select('*');
@@ -167,9 +167,9 @@ class EverPsBlogAuthor extends ObjectModel
                 'ebl',
                 'ebl.id_ever_author = eba.id_ever_author'
             );
-            $sql->where('eba.active = '.(int)$active);
-            $sql->where('eba.id_shop = '.(int)$id_shop);
-            $sql->where('ebl.id_lang = '.(int)$id_lang);
+            $sql->where('eba.active = '.(int) $active);
+            $sql->where('eba.id_shop = '.(int) $id_shop);
+            $sql->where('ebl.id_lang = '.(int) $id_lang);
             $sql->orderBy('eba.date_add DESC');
             $authors = Db::getInstance()->executeS($sql);
             if (count($authors)) {

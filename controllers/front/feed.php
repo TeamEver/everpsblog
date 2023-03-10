@@ -21,7 +21,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-include_once(dirname(__FILE__).'/../../classes/controller/FrontController.php');
+include_once dirname(__FILE__).'/../../classes/controller/FrontController.php';
 
 class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontController
 {
@@ -37,7 +37,7 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
     {
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         $this->module_name = 'everpsblog';
-        $this->errors = array();
+        $this->errors = [];
         if ((bool)Configuration::get('EVERBLOG_RSS') === false) {
             Tools::redirect('index.php');
         }
@@ -71,13 +71,13 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
             case 'category':
                 $feed_obj = new EverPsBlogCategory(
                     (int)Tools::getValue('id_obj'),
-                    (int)$this->context->language->id,
-                    (int)$this->context->shop->id
+                    (int) $this->context->language->id,
+                    (int) $this->context->shop->id
                 );
                 $posts = EverPsBlogPost::getPostsByCategory(
-                    (int)$this->context->language->id,
-                    (int)$this->context->shop->id,
-                    (int)$feed_obj->id,
+                    (int) $this->context->language->id,
+                    (int) $this->context->shop->id,
+                    (int) $feed_obj->id,
                     0,
                     null,
                     'published',
@@ -88,13 +88,13 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
             case 'tag':
                 $feed_obj = new EverPsBlogTag(
                     (int)Tools::getValue('id_obj'),
-                    (int)$this->context->language->id,
-                    (int)$this->context->shop->id
+                    (int) $this->context->language->id,
+                    (int) $this->context->shop->id
                 );
                 $posts = EverPsBlogPost::getPostsByTag(
-                    (int)$this->context->language->id,
-                    (int)$this->context->shop->id,
-                    (int)$feed_obj->id,
+                    (int) $this->context->language->id,
+                    (int) $this->context->shop->id,
+                    (int) $feed_obj->id,
                     0,
                     null,
                     'published',
@@ -105,14 +105,14 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
             case 'author':
                 $feed_obj = new EverPsBlogAuthor(
                     (int)Tools::getValue('id_obj'),
-                    (int)$this->context->language->id,
-                    (int)$this->context->shop->id
+                    (int) $this->context->language->id,
+                    (int) $this->context->shop->id
                 );
                 $feed_obj->title = $feed_obj->nickhandle;
                 $posts = EverPsBlogPost::getPostsByAuthor(
-                    (int)$this->context->language->id,
-                    (int)$this->context->shop->id,
-                    (int)$feed_obj->id,
+                    (int) $this->context->language->id,
+                    (int) $this->context->shop->id,
+                    (int) $feed_obj->id,
                     0,
                     null,
                     'published',
@@ -124,13 +124,13 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
                 $feed_obj = new stdClass();
                 // SEO title and meta desc
                 $everblog_title = Configuration::getInt('EVERBLOG_TITLE');
-                $meta_title = $everblog_title[(int)Context::getContext()->language->id];
+                $meta_title = $everblog_title[(int) Context::getContext()->language->id];
                 // Default blog text
                 $everblog_top_text = Configuration::getInt('EVERBLOG_TOP_TEXT');
-                $default_blog_top_text = $everblog_top_text[(int)Context::getContext()->language->id];
+                $default_blog_top_text = $everblog_top_text[(int) Context::getContext()->language->id];
                 $default_blog_top_text = EverPsBlogPost::changeShortcodes(
                     $default_blog_top_text,
-                    (int)Context::getContext()->customer->id
+                    (int) Context::getContext()->customer->id
                 );
                 $feed_obj->title = $meta_title;
                 $feed_obj->content = $default_blog_top_text;
@@ -139,18 +139,18 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
                     'blog',
                     array(),
                     true,
-                    (int)$this->context->language->id,
-                    (int)$this->context->shop->id
+                    (int) $this->context->language->id,
+                    (int) $this->context->shop->id
                 );
                 $posts_array = EverPsBlogPost::getPosts(
-                    (int)$this->context->language->id,
-                    (int)$this->context->shop->id,
+                    (int) $this->context->language->id,
+                    (int) $this->context->shop->id,
                     0,
                     null,
                     'published',
                     true
                 );
-                $posts = array();
+                $posts = [];
                 foreach ($posts_array as $post_array) {
                     $post_obj = new stdClass();
                     $post_obj->id_ever_post = $post_array['id_ever_post'];
@@ -170,8 +170,8 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
                 'id_obj' => Tools::getValue('id_obj')
             ),
             true,
-            (int)$this->context->language->id,
-            (int)$this->context->shop->id
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
         );
         $this->context->smarty->assign(
             array(

@@ -37,16 +37,16 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
     {
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         $this->module_name = 'everpsblog';
-        $this->errors = array();
+        $this->errors = [];
         $this->author = new EverPsBlogAuthor(
             (int)Tools::getValue('id_ever_author'),
-            (int)$this->context->language->id,
-            (int)$this->context->shop->id
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
         );
         parent::init();
         // if inactive post or unexists, redirect
         if (!(int)Tools::getValue('id_ever_author')
-            || (bool)$this->author->active === false
+            || (bool) $this->author->active === false
         ) {
             Tools::redirect('index.php?controller=404');
         }
@@ -73,8 +73,8 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
         if (Tools::getValue('id_ever_author')) {
             $this->post_number = EverPsBlogPost::countPostsByAuthor(
                 (int)Tools::getValue('id_ever_author'),
-                (int)$this->context->language->id,
-                (int)$this->context->shop->id
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id
             );
             // Pagination only if there is still some posts
             $pagination = $this->getTemplateVarPagination(
@@ -108,22 +108,22 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
             // Now prepare template and show it
             // Prepare shortcodes
             $this->author->content = EverPsBlogPost::changeShortcodes(
-                (string)$this->author->content,
-                (int)Context::getContext()->customer->id
+                (string) $this->author->content,
+                (int) Context::getContext()->customer->id
             );
             $this->author->bottom_content = EverPsBlogPost::changeShortcodes(
-                (string)$this->author->bottom_content,
-                (int)Context::getContext()->customer->id
+                (string) $this->author->bottom_content,
+                (int) Context::getContext()->customer->id
             );
             $this->author->nickhandle = EverPsBlogPost::changeShortcodes(
-                (string)$this->author->nickhandle,
-                (int)Context::getContext()->customer->id
+                (string) $this->author->nickhandle,
+                (int) Context::getContext()->customer->id
             );
             $posts = EverPsBlogPost::getPostsByAuthor(
-                (int)$this->context->language->id,
-                (int)$this->context->shop->id,
-                (int)$this->author->id,
-                (int)$pagination['items_shown_from'] - 1
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id,
+                (int) $this->author->id,
+                (int) $pagination['items_shown_from'] - 1
             );
             Hook::exec('actionBeforeEverAuthorInitContent', array(
                 'blog_author' => $this->author
@@ -140,8 +140,8 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
                 'url' => 'https://twitter.com/intent/tweet?text='.$this->author->nickhandle.' '.$page['canonical'],
             ];
             $file_url = EverPsBlogImage::getBlogImageUrl(
-                (int)$this->author->id,
-                (int)$this->context->shop->id,
+                (int) $this->author->id,
+                (int) $this->context->shop->id,
                 'author'
             );
             $feed_url = $this->context->link->getModuleLink(
@@ -152,8 +152,8 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
                     'id_obj' => $this->author->id
                 ),
                 true,
-                (int)$this->context->language->id,
-                (int)$this->context->shop->id
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id
             );
             $this->context->smarty->assign(
                 array(
@@ -164,15 +164,15 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
                     'featured_image' => $file_url,
                     'posts' => $posts,
                     'paginated' => Tools::getValue('page'),
-                    'post_number' => (int)$this->post_number,
+                    'post_number' => (int) $this->post_number,
                     'pagination' => $pagination,
                     'social_share_links' => $social_share_links,
                     'author' => $this->author,
-                    'default_lang' => (int)$this->context->language->id,
-                    'id_lang' => (int)$this->context->language->id,
-                    'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'modules/everpsblog/views/img/',
-                    'animated' => (bool)$animate,
-                    'logged' => (bool)$this->context->customer->isLogged(),
+                    'default_lang' => (int) $this->context->language->id,
+                    'id_lang' => (int) $this->context->language->id,
+                    'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'modules/everpsblog/views/img/',
+                    'animated' => (bool) $animate,
+                    'logged' => (bool) $this->context->customer->isLogged(),
                 )
             );
             $this->setTemplate('module:everpsblog/views/templates/front/author.tpl');
@@ -188,8 +188,8 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
     {
         $this->author = new EverPsBlogAuthor(
             (int)Tools::getValue('id_ever_author'),
-            (int)$this->context->language->id,
-            (int)$this->context->shop->id
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
         );
         $breadcrumb = parent::getBreadcrumbLinks();
         $breadcrumb['links'][] = array(
@@ -236,7 +236,7 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
         $page = parent::getTemplateVarPage();
         $page['body_classes']['page-everblog'] = true;
         $page['body_classes']['page-everblog-author'] = true;
-        $page['body_classes']['page-everblog-author-id-'.(int)$this->author->id] = true;
+        $page['body_classes']['page-everblog-author-id-'.(int) $this->author->id] = true;
         if ((bool)Context::getContext()->customer->isLogged()) {
             $page['body_classes']['page-everblog-logged-in'] = true;
         }

@@ -21,11 +21,11 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogPost.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogCategory.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogTag.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogComment.php';
-require_once _PS_MODULE_DIR_.'everpsblog/classes/EverPsBlogImage.php';
+require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogPost.php';
+require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogCategory.php';
+require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogTag.php';
+require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogComment.php';
+require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogImage.php';
 
 class AdminEverPsBlogCommentController extends ModuleAdminController
 {
@@ -47,7 +47,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
         $this->_select = 'pl.title AS pltitle';
 
         $this->_join =
-            'LEFT JOIN `'._DB_PREFIX_.'ever_blog_post_lang` pl
+            'LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_post_lang` pl
                 ON (
                     pl.`id_lang` = a.`id_lang`
                 )';
@@ -108,36 +108,36 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
             'emptytrash',
             array(
                 'token' => $ever_blog_token,
-                'id_shop' => (int)$this->context->shop->id
+                'id_shop' => (int) $this->context->shop->id
             ),
             true,
-            (int)$this->context->language->id,
-            (int)$this->context->shop->id
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
         );
         $pending = $this->context->link->getModuleLink(
             $this->module_name,
             'pending',
             array(
                 'token' => $ever_blog_token,
-                'id_shop' => (int)$this->context->shop->id
+                'id_shop' => (int) $this->context->shop->id
             ),
             true,
-            (int)$this->context->language->id,
-            (int)$this->context->shop->id
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
         );
         $planned = $this->context->link->getModuleLink(
             $this->module_name,
             'planned',
             array(
                 'token' => $ever_blog_token,
-                'id_shop' => (int)$this->context->shop->id
+                'id_shop' => (int) $this->context->shop->id
             ),
             true,
-            (int)$this->context->language->id,
-            (int)$this->context->shop->id
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
         );
         $this->context->smarty->assign(array(
-            'image_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'/modules/everpsblog/views/img/',
+            'image_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'/modules/everpsblog/views/img/',
             'everpsblogcron' => $emptytrash,
             'everpsblogcronpending' => $pending,
             'everpsblogcronplanned' => $planned,
@@ -245,8 +245,8 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
         }
         
         $posts_published = EverPsBlogPost::getPosts(
-            (int)$this->context->language->id,
-            (int)$this->context->shop->id
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
         );
         if (!$posts_published) {
             $this->errors[] = $this->l('There is no post, please create at least one');
@@ -348,14 +348,14 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
             $everObj = new EverPsBlogComment(
                 (int)Tools::getValue('id_ever_comment')
             );
-            (int)$everObj->active = !(int)$everObj->active;
+            (int) $everObj->active = !(int) $everObj->active;
             $everObj->delete();
         }
         if (Tools::getValue('statusever_blog_comments')) {
             $everObj = new EverPsBlogComment(
                 (int)Tools::getValue('id_ever_comment')
             );
-            (int)$everObj->active = !(int)$everObj->active;
+            (int) $everObj->active = !(int) $everObj->active;
             $everObj->save();
         }
         if ((bool)Tools::isSubmit('save')) {
@@ -435,7 +435,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
         ));
 
         return $this->context->smarty->fetch(
-            _PS_MODULE_DIR_.'everpsblog/views/templates/admin/helpers/lists/list_action_delete_post.tpl'
+            _PS_MODULE_DIR_ . 'everpsblog/views/templates/admin/helpers/lists/list_action_delete_post.tpl'
         );
     }
 
@@ -445,11 +445,11 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
             return;
         }
         $comment = new EverPsBlogComment(
-            (int)$id_ever_comment
+            (int) $id_ever_comment
         );
         $post = new EverPsBlogPost($comment->id_ever_post);
         $link = new Link();
-        $id_lang = (int)Context::getContext()->language->id;
+        $id_lang = (int) Context::getContext()->language->id;
         $see_url = $link->getModuleLink(
             'everpsblog',
             'post',
@@ -466,14 +466,14 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
         ));
 
         return $this->context->smarty->fetch(
-            _PS_MODULE_DIR_.'everpsblog/views/templates/admin/helpers/lists/list_action_view_obj.tpl'
+            _PS_MODULE_DIR_ . 'everpsblog/views/templates/admin/helpers/lists/list_action_view_obj.tpl'
         );
     }
 
     protected function processBulkDelete()
     {
         foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
-            $everObj = new EverPsBlogComment((int)$idEverObj);
+            $everObj = new EverPsBlogComment((int) $idEverObj);
 
             if (!$everObj->delete()) {
                 $this->errors[] = $this->l('An error has occurred: Can\'t delete the current object');
@@ -484,7 +484,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
     protected function processBulkDisable()
     {
         foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
-            $everObj = new EverPsBlogComment((int)$idEverObj);
+            $everObj = new EverPsBlogComment((int) $idEverObj);
             if ($everObj->active) {
                 $everObj->active = false;
             }
@@ -498,7 +498,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
     protected function processBulkEnable()
     {
         foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
-            $everObj = new EverPsBlogComment((int)$idEverObj);
+            $everObj = new EverPsBlogComment((int) $idEverObj);
             if (!$everObj->active) {
                 $everObj->active = true;
             }

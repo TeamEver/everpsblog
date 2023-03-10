@@ -75,19 +75,19 @@ class EverPsBlogcustomercommentsModuleFrontController extends EverPsBlogModuleFr
             'EVERBLOG_ANIMATE'
         );
         $comments = EverPsBlogComment::getCommentsByEmail(
-            (string)$this->context->customer->email,
-            (int)$this->context->language->id
+            (string) $this->context->customer->email,
+            (int) $this->context->language->id
         );
-        $cust_comments = array();
+        $cust_comments = [];
         foreach ($comments as $comment) {
             $post = new EverPsBlogPost(
-                (int)$comment->id_ever_post,
-                (int)$this->context->shop->id,
-                (int)$this->context->language->id
+                (int) $comment->id_ever_post,
+                (int) $this->context->shop->id,
+                (int) $this->context->language->id
             );
             $post->featured_image = EverPsBlogImage::getBlogImageUrl(
-                (int)$post->id,
-                (int)$this->context->shop->id,
+                (int) $post->id,
+                (int) $this->context->shop->id,
                 'post'
             );
             $cust_comments[] = array(
@@ -107,9 +107,9 @@ class EverPsBlogcustomercommentsModuleFrontController extends EverPsBlogModuleFr
                 'blogUrl' => $blogUrl,
                 'comments' => $comments,
                 'cust_comments' => $cust_comments,
-                'default_lang' => (int)$this->context->language->id,
-                'id_lang' => (int)$this->context->language->id,
-                'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'/modules/everpsblog/views/img/',
+                'default_lang' => (int) $this->context->language->id,
+                'id_lang' => (int) $this->context->language->id,
+                'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'/modules/everpsblog/views/img/',
                 'animated' => $animate,
             )
         );
@@ -138,7 +138,7 @@ class EverPsBlogcustomercommentsModuleFrontController extends EverPsBlogModuleFr
     {
         $page = parent::getTemplateVarPage();
         $page['body_classes']['page-everblog-customercomments'] = true;
-        $page['body_classes']['page-everblog-customer-id-'.(int)$this->context->customer->id] = true;
+        $page['body_classes']['page-everblog-customer-id-'.(int) $this->context->customer->id] = true;
         if ((bool)Context::getContext()->customer->isLogged()) {
             $page['body_classes']['page-everblog-logged-in'] = true;
         }

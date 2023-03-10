@@ -48,19 +48,19 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
         } else {
             $this->allow_comments = (bool)Configuration::get('EVERBLOG_ALLOW_COMMENTS');
         }
-        $this->errors = array();
+        $this->errors = [];
         $this->post = new EverPsBlogPost(
             (int)Tools::getValue('id_ever_post'),
-            (int)$this->context->language->id,
-            (int)$this->context->shop->id
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
         );
-        if (isset($this->post->id_author) && (int)$this->post->id_author > 0) {
+        if (isset($this->post->id_author) && (int) $this->post->id_author > 0) {
             $this->author = new EverPsBlogAuthor(
-                (int)$this->post->id_author,
-                (int)$this->context->language->id,
-                (int)$this->context->shop->id
+                (int) $this->post->id_author,
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id
             );
-            if ((bool)$this->author->active === true) {
+            if ((bool) $this->author->active === true) {
                 $this->author->url = $this->context->link->getModuleLink(
                     'everpsblog',
                     'author',
@@ -74,29 +74,29 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 $this->author->id_ever_author = 0;
                 $this->author->id = 0;
                 $this->author->nickhandle = Configuration::get('PS_SHOP_NAME');
-                $this->author->url = Tools::getHttpHost(true).__PS_BASE_URI__;
+                $this->author->url = Tools::getHttpHost(true) . __PS_BASE_URI__;
             }
         } else {
             $this->author = new stdClass();
             $this->author->id_ever_author = 0;
             $this->author->id = 0;
             $this->author->nickhandle = Configuration::get('PS_SHOP_NAME');
-            $this->author->url = Tools::getHttpHost(true).__PS_BASE_URI__;
+            $this->author->url = Tools::getHttpHost(true) . __PS_BASE_URI__;
         }
         // Get author cover if exists, else get shop logo
         $this->author_cover = EverPsBlogImage::getBlogImageUrl(
-            (int)$this->author->id,
-            (int)Context::getContext()->shop->id,
+            (int) $this->author->id,
+            (int) Context::getContext()->shop->id,
             'author'
         );
         $this->post_tags = EverPsBlogTaxonomy::getPostTagsTaxonomies(
-            (int)$this->post->id
+            (int) $this->post->id
         );
         $this->post_categories = EverPsBlogTaxonomy::getPostCategoriesTaxonomies(
-            (int)$this->post->id
+            (int) $this->post->id
         );
         $this->post_products = EverPsBlogTaxonomy::getPostProductsTaxonomies(
-            (int)$this->post->id
+            (int) $this->post->id
         );
         parent::init();
         // if inactive post or unexists, redirect
@@ -111,8 +111,8 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
         if (!Tools::getValue('preview')) {
             if ((bool)Tools::isSubmit('everpostcomment') === false) {
                 EverPsBlogPost::updatePostViewCount(
-                    (int)$this->post->id,
-                    (int)$this->context->shop->id
+                    (int) $this->post->id,
+                    (int) $this->context->shop->id
                 );
             }
         }
@@ -135,8 +135,8 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
     {
         parent::initContent();
         if (Tools::getValue('id_ever_post')) {
-            $errors = array();
-            $success = array();
+            $errors = [];
+            $success = [];
             $animate = Configuration::get(
                 'EVERBLOG_ANIMATE'
             );
@@ -165,7 +165,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                     );
                 }
                 // So now, u're unlogged ? Right, email is required, must be unbanned
-                if (!(bool)$this->context->customer->isLogged()) {
+                if (!(bool) $this->context->customer->isLogged()) {
                     if (!Tools::getValue('customerEmail')
                         || !Validate::isEmail(Tools::getValue('customerEmail'))
                     ) {
@@ -196,7 +196,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 $comment = new EverPsBlogComment();
                 $latest = $comment->getLatestCommentByEmail(
                     Tools::getValue('customerEmail'),
-                    (int)$this->context->language->id
+                    (int) $this->context->language->id
                 );
                 // Safety before : don't allow comment before specific time
                 if ($latest->date_add
@@ -214,7 +214,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 } else {
                     $comment->id_ever_post = $this->post->id;
                     $comment->id_lang = $this->context->language->id;
-                    if (!(bool)$this->context->customer->isLogged()) {
+                    if (!(bool) $this->context->customer->isLogged()) {
                         $customer = new Customer();
                         if ($customer->getByEmail(
                             Tools::getValue('customerEmail')
@@ -225,7 +225,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                         $comment->name = Tools::getValue('name');
                     } else {
                         $customer = new Customer(
-                            (int)Context::getContext()->customer->id
+                            (int) Context::getContext()->customer->id
                         );
                         $comment->user_email = $customer->email;
                         $comment->name = $customer->firstname;
@@ -234,7 +234,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                     $comment->active = 0;
                     $comment->save();
                     // alert admin ! comment saved ! whouhouhouhou !
-                    if ($this->sendCommentAlert((int)$comment->id)) {
+                    if ($this->sendCommentAlert((int) $comment->id)) {
                         $success[] = $this->l('Your comment has been submitted');
                         $this->context->smarty->assign(
                             array(
@@ -252,7 +252,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 }
             }
             // Now prepare template and show it
-            $ps_products = array();
+            $ps_products = [];
             if (isset($this->post_products) && !empty($this->post_products)) {
                 $showPrice = true;
                 $assembler = new ProductAssembler(Context::getContext());
@@ -270,16 +270,16 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 $presentationSettings->showPrices = $showPrice;
                 foreach ($this->post_products as $post_product) {
                     $pproduct = new Product(
-                        (int)$post_product['id_ever_post_product'],
+                        (int) $post_product['id_ever_post_product'],
                         true,
-                        (int)Context::getContext()->language->id,
-                        (int)Context::getContext()->shop->id
+                        (int) Context::getContext()->language->id,
+                        (int) Context::getContext()->shop->id
                     );
-                    if (Product::checkAccessStatic((int)$pproduct->id, false)) {
+                    if (Product::checkAccessStatic((int) $pproduct->id, false)) {
                         $pproduct_cover = Product::getCover(
-                            (int)$pproduct->id
+                            (int) $pproduct->id
                         );
-                        $pproduct->cover = (int)$pproduct_cover['id_image'];
+                        $pproduct->cover = (int) $pproduct_cover['id_image'];
                         $ps_products[] = $presenter->present(
                             $presentationSettings,
                             $assembler->assembleProduct(array('id_product' => $pproduct->id)),
@@ -289,35 +289,35 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 }
             }
             $count_products = count($ps_products);
-            $tags = array();
+            $tags = [];
             if (isset($this->post_tags) && !empty($this->post_tags)) {
                 foreach ($this->post_tags as $post_tag) {
                     $current_post_tag = new EverPsBlogTag(
-                        (int)$post_tag['id_ever_post_tag'],
-                        (int)$this->context->shop->id,
-                        (int)$this->context->language->id
+                        (int) $post_tag['id_ever_post_tag'],
+                        (int) $this->context->shop->id,
+                        (int) $this->context->language->id
                     );
-                    if ((bool)$current_post_tag->active === true) {
+                    if ((bool) $current_post_tag->active === true) {
                         $tags[] = $current_post_tag;
                     }
                 }
             }
             $commentsCount = EverPsBlogComment::commentsCount(
-                (int)$this->post->id,
-                (int)$this->context->language->id
+                (int) $this->post->id,
+                (int) $this->context->language->id
             );
             $comments = EverPsBlogComment::getCommentsByPost(
-                (int)$this->post->id,
-                (int)$this->context->language->id
+                (int) $this->post->id,
+                (int) $this->context->language->id
             );
             // Prepare shortcodes
             $this->post->content = EverPsBlogPost::changeShortcodes(
-                (string)$this->post->content,
-                (int)Context::getContext()->customer->id
+                (string) $this->post->content,
+                (int) Context::getContext()->customer->id
             );
             $this->post->title = EverPsBlogPost::changeShortcodes(
-                (string)$this->post->title,
-                (int)Context::getContext()->customer->id
+                (string) $this->post->title,
+                (int) Context::getContext()->customer->id
             );
             $this->post->date_add = date('d-m-Y', strtotime($this->post->date_add));
             Hook::exec('actionBeforeEverPostInitContent', array(
@@ -338,8 +338,8 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 'url' => 'https://twitter.com/intent/tweet?text='.$this->post->title.' '.$page['canonical'],
             ];
             $file_url = EverPsBlogImage::getBlogImageUrl(
-                (int)$this->post->id,
-                (int)$this->context->shop->id,
+                (int) $this->post->id,
+                (int) $this->context->shop->id,
                 'post'
             );
             $this->context->smarty->assign(
@@ -355,14 +355,14 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                     'post' => $this->post,
                     'tags' => $tags,
                     'ps_products' => $ps_products,
-                    'default_lang' => (int)$this->context->language->id,
-                    'id_lang' => (int)$this->context->language->id,
-                    'blogImg_dir' => Tools::getHttpHost(true).__PS_BASE_URI__.'modules/everpsblog/views/img/',
+                    'default_lang' => (int) $this->context->language->id,
+                    'id_lang' => (int) $this->context->language->id,
+                    'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'modules/everpsblog/views/img/',
                     'allow_comments' => $this->allow_comments,
-                    'animated' => (bool)$animate,
-                    'logged' => (bool)$this->context->customer->isLogged(),
+                    'animated' => (bool) $animate,
+                    'logged' => (bool) $this->context->customer->isLogged(),
                     'comments' => (array)$comments,
-                    'commentsCount' => (int)$commentsCount,
+                    'commentsCount' => (int) $commentsCount,
                     'allow_views_count' => (bool)Configuration::get('EVERBLOG_SHOW_POST_COUNT'),
                     'only_logged_comment' => (bool)Configuration::get('EVERBLOG_ONLY_LOGGED_COMMENT'),
                 )
@@ -380,8 +380,8 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
     {
         $this->post = new EverPsBlogPost(
             (int)Tools::getValue('id_ever_post'),
-            (int)$this->context->language->id,
-            (int)$this->context->shop->id
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
         );
         $breadcrumb = parent::getBreadcrumbLinks();
         $breadcrumb['links'][] = array(
@@ -391,11 +391,11 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 'blog'
             ),
         );
-        if ((int)$this->post->id_default_category > 1) {
+        if ((int) $this->post->id_default_category > 1) {
             $parent_category = new EverPsBlogCategory(
-                (int)$this->post->id_default_category,
-                (int)$this->context->language->id,
-                (int)$this->context->shop->id
+                (int) $this->post->id_default_category,
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id
             );
             $breadcrumb['links'][] = array(
                 'title' => $parent_category->title,
@@ -408,17 +408,17 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                     )
                 ),
             );
-            if ((bool)$parent_category->hasChildren() === true) {
+            if ((bool) $parent_category->hasChildren() === true) {
                 $children_categories = EverPsBlogCategory::getChildrenCategories(
-                    (int)$this->post->id_default_category,
-                    (int)$this->context->language->id,
-                    (int)$this->context->shop->id
+                    (int) $this->post->id_default_category,
+                    (int) $this->context->language->id,
+                    (int) $this->context->shop->id
                 );
                 foreach ($children_categories as $cat) {
-                    if ((bool)$cat->is_root_category === false
-                        && (int)$cat->id > 0
+                    if ((bool) $cat->is_root_category === false
+                        && (int) $cat->id > 0
                         && !empty($cat->title)
-                        && (bool)$cat->active === true
+                        && (bool) $cat->active === true
                         && in_array($cat->id, $this->post_categories)
                     ) {
                         $breadcrumb['links'][] = array(
@@ -469,13 +469,13 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
     {
         $employee = new Employee((int)Configuration::get('EVERBLOG_ADMIN_EMAIL'));
         $comment = new EverPsBlogComment(
-            (int)$id_ever_comment
+            (int) $id_ever_comment
         );
 
-        $mailDir = _PS_MODULE_DIR_.'everpsblog/mails/';
+        $mailDir = _PS_MODULE_DIR_ . 'everpsblog/mails/';
         $everShopEmail = Configuration::get('PS_SHOP_EMAIL');
         $mail = Mail::send(
-            (int)$this->context->language->id,
+            (int) $this->context->language->id,
             'everpsblog',
             $this->l('A new comment is pending'),
             array(
@@ -484,22 +484,22 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                     'PS_LOGO',
                     null,
                     null,
-                    (int)$this->context->shop->id
+                    (int) $this->context->shop->id
                 ),
-                '{comment}' => (string)$comment->comment,
-                '{email}' => (string)$comment->user_email,
+                '{comment}' => (string) $comment->comment,
+                '{email}' => (string) $comment->user_email,
             ),
-            (string)$employee->email,
+            (string) $employee->email,
             null,
-            (string)$everShopEmail,
+            (string) $everShopEmail,
             Configuration::get('PS_SHOP_NAME'),
             null,
             null,
             $mailDir,
             false,
             null,
-            (string)$everShopEmail,
-            (string)$everShopEmail,
+            (string) $everShopEmail,
+            (string) $everShopEmail,
             Configuration::get('PS_SHOP_NAME')
         );
         return $mail;
@@ -510,7 +510,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
         $page = parent::getTemplateVarPage();
         $page['body_classes']['page-everblog'] = true;
         $page['body_classes']['page-everblog-post'] = true;
-        $page['body_classes']['page-everblog-post-id-'.(int)$this->post->id] = true;
+        $page['body_classes']['page-everblog-post-id-'.(int) $this->post->id] = true;
         if ((bool)Context::getContext()->customer->isLogged()) {
             $page['body_classes']['page-everblog-logged-in'] = true;
         }

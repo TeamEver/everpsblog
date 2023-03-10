@@ -21,10 +21,10 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 // SQL
-$sql = array();
+$sql = [];
 
 $sql[] =
-    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_post` (
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_post` (
         `id_ever_post` int(10) unsigned NOT NULL auto_increment,
         `id_shop` int(10) unsigned NOT NULL,
         `id_author` int(10) unsigned NOT NULL,
@@ -44,7 +44,7 @@ $sql[] =
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
-    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_post_lang` (
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_post_lang` (
         `id_ever_post` int(10) unsigned NOT NULL,
         `title` varchar(255) NOT NULL,
         `meta_title` varchar(255) DEFAULT NULL,
@@ -57,7 +57,7 @@ $sql[] =
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
-    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_category` (
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_category` (
         `id_ever_category` int(10) unsigned NOT NULL auto_increment,
         `id_parent_category` int(10) DEFAULT NULL,
         `id_shop` int(10) unsigned NOT NULL,
@@ -74,7 +74,7 @@ $sql[] =
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
-    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_category_lang` (
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_category_lang` (
         `id_ever_category` int(10) unsigned NOT NULL,
         `title` varchar(255) NOT NULL,
         `meta_title` varchar(255) DEFAULT NULL,
@@ -87,7 +87,7 @@ $sql[] =
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
-    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_tag` (
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_tag` (
         `id_ever_tag` int(10) unsigned NOT NULL auto_increment,
         `id_shop` int(10) unsigned NOT NULL,
         `date_add` DATETIME DEFAULT NULL,
@@ -102,7 +102,7 @@ $sql[] =
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
-    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_tag_lang` (
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_tag_lang` (
         `id_ever_tag` int(10) unsigned NOT NULL,
         `title` varchar(255) NOT NULL,
         `meta_title` varchar(255) DEFAULT NULL,
@@ -115,7 +115,7 @@ $sql[] =
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
-    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_comments` (
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_comments` (
         `id_ever_comment` int(10) unsigned NOT NULL auto_increment,
         `id_ever_post` int(10) unsigned NOT NULL,
         `id_lang` int(10) unsigned NOT NULL,
@@ -129,7 +129,7 @@ $sql[] =
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
-    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_author` (
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_author` (
         `id_ever_author` int(10) unsigned NOT NULL auto_increment,
         `id_employee` int(10) unsigned NOT NULL,
         `id_shop` int(10) unsigned NOT NULL,
@@ -149,7 +149,7 @@ $sql[] =
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
-    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_author_lang` (
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_author_lang` (
         `id_ever_author` int(10) unsigned NOT NULL,
         `meta_title` varchar(255) DEFAULT NULL,
         `meta_description` varchar(255) DEFAULT NULL,
@@ -161,7 +161,7 @@ $sql[] =
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
-    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_image` (
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_image` (
         `id_ever_image` int(10) unsigned NOT NULL auto_increment,
         `image_type` varchar(255) DEFAULT NULL,
         `image_link` varchar(255) DEFAULT NULL,
@@ -171,42 +171,42 @@ $sql[] =
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
-    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_post_category` (
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_post_category` (
         `id_ever_post_category` int(10) NOT NULL,
         `id_ever_post` int(10) unsigned NOT NULL,
         PRIMARY KEY (`id_ever_post`, `id_ever_post_category`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
-    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_post_tag` (
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_post_tag` (
         `id_ever_post_tag` int(10) NOT NULL,
         `id_ever_post` int(10) unsigned NOT NULL,
         PRIMARY KEY (`id_ever_post`, `id_ever_post_tag`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
-    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_post_product` (
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_post_product` (
         `id_ever_post_product` int(10) NOT NULL,
         `id_ever_post` int(10) unsigned NOT NULL,
         PRIMARY KEY (`id_ever_post`, `id_ever_post_product`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
-    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_category_product` (
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_category_product` (
         `id_ever_category_product` int(10) NOT NULL,
         `id_ever_category` int(10) unsigned NOT NULL,
         PRIMARY KEY (`id_ever_category`, `id_ever_category_product`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
-    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_tag_product` (
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_tag_product` (
         `id_ever_tag_product` int(10) NOT NULL,
         `id_ever_tag` int(10) unsigned NOT NULL,
         PRIMARY KEY (`id_ever_tag`, `id_ever_tag_product`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
-    'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ever_blog_author_product` (
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_author_product` (
         `id_ever_author_product` int(10) NOT NULL,
         `id_ever_author` int(10) unsigned NOT NULL,
         PRIMARY KEY (`id_ever_author`, `id_ever_author_product`)

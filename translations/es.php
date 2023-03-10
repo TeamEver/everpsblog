@@ -1,7 +1,7 @@
 <?php
 
 global $_MODULE;
-$_MODULE = array();
+$_MODULE = [];
 $_MODULE['<{everpsblog}prestashop>everpsblog_38a9087bf0172e47955af7a6ec4df4fa'] = 'Ever Blog';
 $_MODULE['<{everpsblog}prestashop>everpsblog_29aa7c4ed01fef6c60c3d498b1b129f1'] = 'Solo un blog 😀';
 $_MODULE['<{everpsblog}prestashop>everpsblog_83c815afa0e8015bed7035360a91541c'] = '¿De verdad quiere desinstalar este módulo gratuito?';
