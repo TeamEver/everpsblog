@@ -98,7 +98,7 @@ class EverPsBlogcustomercommentsModuleFrontController extends EverPsBlogModuleFr
         $blogUrl = Context::getContext()->link->getModuleLink(
             'everpsblog',
             'blog',
-            array(),
+            [],
             true
         );
 

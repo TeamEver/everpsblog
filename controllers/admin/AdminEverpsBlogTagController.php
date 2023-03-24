@@ -33,7 +33,6 @@ class AdminEverPsBlogTagController extends ModuleAdminController
 
     public function __construct()
     {
-        $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         $this->bootstrap = true;
         $this->display = $this->l('Ever Blog Tags');
         $this->table = 'ever_blog_tag';
@@ -128,7 +127,7 @@ class AdminEverPsBlogTagController extends ModuleAdminController
         $blogUrl = Context::getContext()->link->getModuleLink(
             'everpsblog',
             'blog',
-            array(),
+            [],
             true
         );
         $ever_blog_token = Tools::encrypt('everpsblog/cron');
@@ -184,15 +183,11 @@ class AdminEverPsBlogTagController extends ModuleAdminController
 
     public function l($string, $class = null, $addslashes = false, $htmlentities = true)
     {
-        if ($this->isSeven) {
-            return Context::getContext()->getTranslator()->trans(
-                $string,
-                [],
-                'Modules.Everpsblog.Admineverpsblogtagcontroller'
-            );
-        }
-
-        return parent::l($string, $class, $addslashes, $htmlentities);
+        return Context::getContext()->getTranslator()->trans(
+            $string,
+            [],
+            'Modules.Everpsblog.Admineverpsblogtagcontroller'
+        );
     }
 
     public function initPageHeaderToolbar()

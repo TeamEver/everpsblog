@@ -137,7 +137,7 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
                 $feed_obj->link_rewrite = $this->context->link->getModuleLink(
                     $this->module_name,
                     'blog',
-                    array(),
+                    [],
                     true,
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id

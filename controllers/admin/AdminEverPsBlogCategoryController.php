@@ -131,7 +131,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
         $blogUrl = Context::getContext()->link->getModuleLink(
             'everpsblog',
             'blog',
-            array(),
+            [],
             true
         );
         $ever_blog_token = Tools::encrypt('everpsblog/cron');
@@ -187,15 +187,11 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
 
     public function l($string, $class = null, $addslashes = false, $htmlentities = true)
     {
-        if ($this->isSeven) {
-            return Context::getContext()->getTranslator()->trans(
-                $string,
-                [],
-                'Modules.Everpsblog.Admineverpsblogcategorycontroller'
-            );
-        }
-
-        return parent::l($string, $class, $addslashes, $htmlentities);
+        return Context::getContext()->getTranslator()->trans(
+            $string,
+            [],
+            'Modules.Everpsblog.Admineverpsblogcategorycontroller'
+        );
     }
 
     public function initPageHeaderToolbar()

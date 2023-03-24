@@ -45,7 +45,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.3.26';
+        $this->version = '5.3.27';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -404,7 +404,7 @@ class EverPsBlog extends Module
         $default_blog = $this->context->link->getModuleLink(
             $this->name,
             'blog',
-            array(),
+            [],
             true,
             (int) $this->context->language->id,
             (int) $this->context->shop->id
@@ -420,12 +420,12 @@ class EverPsBlog extends Module
         ));
 
         if ($this->checkLatestEverModuleVersion($this->name, $this->version)) {
-            $this->html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/upgrade.tpl');
+            $this->html .= $this->context->smarty->fetch($this->local_path . 'views/templates/admin/upgrade.tpl');
         }
-        $this->html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/header.tpl');
-        $this->html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
+        $this->html .= $this->context->smarty->fetch($this->local_path . 'views/templates/admin/header.tpl');
+        $this->html .= $this->context->smarty->fetch($this->local_path . 'views/templates/admin/configure.tpl');
         $this->html .= $this->renderForm();
-        $this->html .= $this->context->smarty->fetch($this->local_path.'views/templates/admin/footer.tpl');
+        $this->html .= $this->context->smarty->fetch($this->local_path . 'views/templates/admin/footer.tpl');
 
         return $this->html;
     }
@@ -1830,7 +1830,7 @@ class EverPsBlog extends Module
     public function hookDisplayAdminAfterHeader()
     {
         if ($this->checkLatestEverModuleVersion($this->name, $this->version)) {
-            return $this->context->smarty->fetch($this->local_path.'views/templates/admin/upgrade.tpl');
+            return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/upgrade.tpl');
         }
     }
 
@@ -1839,6 +1839,10 @@ class EverPsBlog extends Module
         $controller_name = Tools::getValue('controller');
         $module_name = Tools::getValue('module');
         if ($module_name == 'everpsblog') {
+            $this->context->controller->addCSS(
+                $this->module_folder.'/views/css/everpsblog-all.css',
+                'all'
+            );
             $this->context->controller->addCSS(
                 $this->module_folder.'/views/css/everpsblog.css',
                 'all'
@@ -1861,10 +1865,6 @@ class EverPsBlog extends Module
         }
         $this->context->controller->addCSS(
             $this->module_folder.'/views/css/everpsblog-columns.css',
-            'all'
-        );
-        $this->context->controller->addCSS(
-            $this->module_folder.'/views/css/everpsblog-all.css',
             'all'
         );
         $css_file = Configuration::get('EVERBLOG_CSS_FILE');
@@ -1892,7 +1892,7 @@ class EverPsBlog extends Module
         $blogUrl = Context::getContext()->link->getModuleLink(
             $this->name,
             'blog',
-            array(),
+            [],
             true
         );
         $tags = EverPsBlogTag::getAllTags(
@@ -1966,7 +1966,7 @@ class EverPsBlog extends Module
         $blogUrl = Context::getContext()->link->getModuleLink(
             $this->name,
             'blog',
-            array(),
+            [],
             true
         );
         $latest_posts = EverPsBlogPost::getLatestPosts(
@@ -2025,7 +2025,7 @@ class EverPsBlog extends Module
         $blogUrl = Context::getContext()->link->getModuleLink(
             $this->name,
             'blog',
-            array(),
+            [],
             true
         );
         $posts = EverPsBlogPost::getPostsByProduct(
@@ -2143,7 +2143,7 @@ class EverPsBlog extends Module
         $blogUrl = Context::getContext()->link->getModuleLink(
             $this->name,
             'blog',
-            array(),
+            [],
             true
         );
         $post_category = new EverPsBlogCategory(
@@ -3229,6 +3229,8 @@ class EverPsBlog extends Module
         . $version;
         $handle = curl_init($upgrade_link);
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
         curl_exec($handle);
         $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
         curl_close($handle);
