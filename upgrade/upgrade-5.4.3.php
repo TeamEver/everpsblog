@@ -27,7 +27,7 @@ function upgrade_module_5_2_5()
     $sql = [];
     $sql[] =
         'ALTER TABLE ' . _DB_PREFIX_ . 'ever_blog_post
-         ADD `psswd` varchar(255) DEFAULT NULL,
+         ADD `psswd` varchar(255) DEFAULT NULL
          AFTER `post_products`;
     ';
     foreach ($sql as $s) {
