@@ -57,6 +57,7 @@ class EverPsBlogPost extends ObjectModel
     public $sitemap;
     public $active;
     public $limit;
+    public $psswd;
     public $count;
 
     public static $definition = array(
@@ -160,6 +161,11 @@ class EverPsBlogPost extends ObjectModel
                 'type' => self::TYPE_STRING,
                 'validate' => 'isJson',
                 'required' => false
+            ),
+            'psswd' => array(
+                'type' => self::TYPE_STRING,
+                'lang' => false,
+                'validate' => 'isPlaintextPassword'
             ),
             'count' => array(
                 'type' => self::TYPE_INT,

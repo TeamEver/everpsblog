@@ -385,6 +385,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 'post_status' => (!empty(Tools::getValue('post_status')))
                 ? Tools::getValue('post_status')
                 : $obj->post_status,
+                'psswd' => (!empty(Tools::getValue('psswd')))
+                ? Tools::getValue('psswd')
+                : $obj->psswd,
             );
         } else {
             $cat_taxonomies = [];
@@ -458,6 +461,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 : '',
                 'post_status' => (!empty(Tools::getValue('post_status')))
                 ? Tools::getValue('post_status')
+                : '',
+                'psswd' => (!empty(Tools::getValue('psswd')))
+                ? Tools::getValue('psswd')
                 : '',
             );
         }
@@ -815,6 +821,18 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                             'name' => 'name',
                         ),
                     ),
+                    // array(
+                    //     'type' => 'text',
+                    //     'label' => $this->l('Protect this post with password'),
+                    //     'desc' => $this->l('If you enter a password here, the article will be protected'),
+                    //     'hint' => $this->l('Leave empty for no use'),
+                    //     'required' => false,
+                    //     'name' => 'psswd',
+                    //     'lang' => false,
+                    //     'autoload_rte' => true,
+                    //     'cols' => 60,
+                    //     'rows' => 30
+                    // ),
                 )
             )
         );
@@ -961,6 +979,13 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             $post->post_tags = json_encode(Tools::getValue('post_tags'));
             $post->post_products = json_encode(Tools::getValue('post_products'));
             $post->date_upd = date('Y-m-d H:i:s');
+            if (Tools::getValue('psswd')
+                && !Validate::isPlaintextPassword(Tools::getValue('psswd'))
+            ) {
+                $this->errors[] = $this->l('Password is not valid');
+            } else {
+                $post->psswd = Tools::getValue('psswd');
+            }
             // Multilingual fields
             foreach (Language::getLanguages(false) as $lang) {
                 if (Tools::getValue('title_'.$lang['id_lang'])
