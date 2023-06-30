@@ -301,6 +301,18 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
                 : $obj->active,
             );
         } else {
+            $metaTitles = [];
+            $metaDescriptions = [];
+            $linkrewrite = [];
+            $content = [];
+            $bottomContent = [];
+            foreach (Language::getLanguages(false) as $lang) {
+                $metaTitles[$lang['id_lang']] = '';
+                $metaDescriptions[$lang['id_lang']] = '';
+                $linkrewrite[$lang['id_lang']] = '';
+                $content[$lang['id_lang']] = '';
+                $bottomContent[$lang['id_lang']] = '';
+            }
             $formValues[] = array(
                 'id_ever_author' => (!empty(Tools::getValue('id_ever_author')))
                 ? Tools::getValue('id_ever_author')
@@ -310,12 +322,12 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
                 : '',
                 'meta_title' => (!empty(Tools::getValue('meta_title')))
                 ? Tools::getValue('meta_title')
-                : '',
+                : $metaTitles,
                 'meta_description' => (!empty(Tools::getValue('meta_description')))
-                ? Tools::getValue('meta_description') : '',
+                ? Tools::getValue('meta_description') : $metaDescriptions,
                 'link_rewrite' => (!empty(Tools::getValue('link_rewrite')))
                 ? Tools::getValue('link_rewrite')
-                : '',
+                : $linkrewrite,
                 'twitter' => (!empty(Tools::getValue('twitter')))
                 ? Tools::getValue('twitter')
                 : '',
@@ -327,10 +339,10 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
                 : '',
                 'content' => (!empty(Tools::getValue('content')))
                 ? Tools::getValue('content')
-                : '',
+                : $content,
                 'bottom_content' => (!empty(Tools::getValue('bottom_content')))
                 ? Tools::getValue('bottom_content')
-                : '',
+                : $bottomContent,
                 'date_add' => (!empty(Tools::getValue('date_add')))
                 ? Tools::getValue('date_add')
                 : '',

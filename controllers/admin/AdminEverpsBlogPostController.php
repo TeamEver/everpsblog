@@ -382,31 +382,45 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             $cat_taxonomies = [];
             $tag_taxonomies = [];
             $product_taxonomies = [];
+            $titles = [];
+            $metaTitles = [];
+            $metaDescriptions = [];
+            $linkrewrite = [];
+            $content = [];
+            $excerpt = [];
+            foreach (Language::getLanguages(false) as $lang) {
+                $titles[$lang['id_lang']] = '';
+                $metaTitles[$lang['id_lang']] = '';
+                $metaDescriptions[$lang['id_lang']] = '';
+                $linkrewrite[$lang['id_lang']] = '';
+                $content[$lang['id_lang']] = '';
+                $excerpt[$lang['id_lang']] = '';
+            }
             $formValues[] = array(
                 'id_ever_post' => (!empty(Tools::getValue('id_ever_post')))
                 ? Tools::getValue('id_ever_post')
                 : '',
                 'title' => (!empty(Tools::getValue('title')))
                 ? Tools::getValue('title')
-                : '',
+                : $titles,
                 'id_author' => (!empty(Tools::getValue('id_author')))
                 ? Tools::getValue('id_author')
                 : '',
                 'meta_title' => (!empty(Tools::getValue('meta_title')))
                 ? Tools::getValue('meta_title')
-                : '',
+                : $metaTitles,
                 'meta_description' => (!empty(Tools::getValue('meta_description')))
                 ? Tools::getValue('meta_description')
-                : '',
+                : $metaDescriptions,
                 'link_rewrite' => (!empty(Tools::getValue('link_rewrite')))
                 ? Tools::getValue('link_rewrite')
-                : '',
+                : $linkrewrite,
                 'content' => (!empty(Tools::getValue('content')))
                 ? Tools::getValue('content')
-                : '',
+                : $content,
                 'excerpt' => (!empty(Tools::getValue('excerpt')))
                 ? Tools::getValue('excerpt')
-                : '',
+                : $excerpt,
                 'date_add' => (!empty(Tools::getValue('date_add')))
                 ? Tools::getValue('date_add')
                 : '',
@@ -421,10 +435,10 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 : '',
                 'post_tags[]' => (!empty(Tools::getValue('post_tags')))
                 ? Tools::getValue('post_tags')
-                :'',
+                : '',
                 'post_products[]' => (!empty(Tools::getValue('post_products')))
                 ? Tools::getValue('post_products')
-                :'',
+                : '',
                 'index' => (!empty(Tools::getValue('index')))
                 ? Tools::getValue('index')
                 : '',

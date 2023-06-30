@@ -45,7 +45,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.3.27';
+        $this->version = '5.4.1';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -113,7 +113,7 @@ class EverPsBlog extends Module
             && $this->registerHook('displayCustomerAccount')
             && $this->registerHook('moduleRoutes')
             && $this->registerHook('overrideLayoutTemplate')
-            && $this->registerHook('backofficeHeader')
+            && $this->registerHook('displayBackOfficeHeader')
             && $this->registerHook('actionObjectProductDeleteAfter')
             && $this->registerHook('actionAdminMetaAfterWriteRobotsFile')
             && $this->registerHook('displayAdminAfterHeader')
@@ -865,24 +865,16 @@ class EverPsBlog extends Module
             'EVERBLOG_CATEG_COLUMNS' => Configuration::get('EVERBLOG_CATEG_COLUMNS'),
             'EVERBLOG_FANCYBOX' => Configuration::get('EVERBLOG_FANCYBOX'),
             'EVERBLOG_CAT_FEATURED' => Configuration::get('EVERBLOG_CAT_FEATURED'),
-            'EVERBLOG_TITLE' => (!empty(
-                $everblog_title[(int)Configuration::get('PS_LANG_DEFAULT')]
-            )) ? $everblog_title : Configuration::getInt(
+            'EVERBLOG_TITLE' => Configuration::getConfigInMultipleLangs(
                 'EVERBLOG_TITLE'
             ),
-            'EVERBLOG_META_DESC' => (!empty(
-                $everblog_meta_desc[(int)Configuration::get('PS_LANG_DEFAULT')]
-            )) ? $everblog_meta_desc : Configuration::getInt(
+            'EVERBLOG_META_DESC' => Configuration::getConfigInMultipleLangs(
                 'EVERBLOG_META_DESC'
             ),
-            'EVERBLOG_TOP_TEXT' => (!empty(
-                $everblog_top_text[(int)Configuration::get('PS_LANG_DEFAULT')]
-            )) ? $everblog_top_text : Configuration::getInt(
+            'EVERBLOG_TOP_TEXT' => Configuration::getConfigInMultipleLangs(
                 'EVERBLOG_TOP_TEXT'
             ),
-            'EVERBLOG_BOTTOM_TEXT' => (!empty(
-                $everblog_bottom_text[(int)Configuration::get('PS_LANG_DEFAULT')]
-            )) ? $everblog_bottom_text : Configuration::getInt(
+            'EVERBLOG_BOTTOM_TEXT' => Configuration::getConfigInMultipleLangs(
                 'EVERBLOG_BOTTOM_TEXT'
             ),
             'EVERPSBLOG_BLOG_LAYOUT' => Configuration::get('EVERPSBLOG_BLOG_LAYOUT'),
@@ -1822,7 +1814,7 @@ class EverPsBlog extends Module
         }
     }
 
-    public function hookBackofficeHeader()
+    public function hookDisplayBackOfficeHeader()
     {
         return $this->hookActionAdminControllerSetMedia();
     }

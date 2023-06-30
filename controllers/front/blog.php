@@ -111,9 +111,9 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         // pagination
         $pagination = $this->getTemplateVarPagination($this->post_number);
         // SEO title and meta desc
-        $everblog_title = Configuration::getInt('EVERBLOG_TITLE');
+        $everblog_title = Configuration::getConfigInMultipleLangs('EVERBLOG_TITLE');
         $meta_title = $everblog_title[(int) Context::getContext()->language->id];
-        $everblog_desc = Configuration::getInt('EVERBLOG_META_DESC');
+        $everblog_desc = Configuration::getConfigInMultipleLangs('EVERBLOG_META_DESC');
         $meta_desc = $everblog_desc[(int) Context::getContext()->language->id];
         $page = $this->context->controller->getTemplateVarPage();
         if (Tools::getValue('page')) {
@@ -143,13 +143,13 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             'EVERBLOG_ANIMATE'
         );
         // Default blog text
-        $everblog_top_text = Configuration::getInt('EVERBLOG_TOP_TEXT');
+        $everblog_top_text = Configuration::getConfigInMultipleLangs('EVERBLOG_TOP_TEXT');
         $default_blog_top_text = $everblog_top_text[(int) Context::getContext()->language->id];
         $default_blog_top_text = EverPsBlogPost::changeShortcodes(
             $default_blog_top_text,
             (int) Context::getContext()->customer->id
         );
-        $everblog_bottom_text = Configuration::getInt('EVERBLOG_BOTTOM_TEXT');
+        $everblog_bottom_text = Configuration::getConfigInMultipleLangs('EVERBLOG_BOTTOM_TEXT');
         $default_blog_bottom_text = $everblog_bottom_text[(int) Context::getContext()->language->id];
         $default_blog_bottom_text = EverPsBlogPost::changeShortcodes(
             $default_blog_bottom_text,
