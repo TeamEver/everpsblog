@@ -1,7 +1,7 @@
 <?php
 
 global $_MODULE;
-$_MODULE = [];
+$_MODULE = array();
 $_MODULE['<{everpsblog}prestashop>everpsblog_38a9087bf0172e47955af7a6ec4df4fa'] = 'Ever Blog';
 $_MODULE['<{everpsblog}prestashop>everpsblog_29aa7c4ed01fef6c60c3d498b1b129f1'] = 'Juste un blog 😀';
 $_MODULE['<{everpsblog}prestashop>everpsblog_83c815afa0e8015bed7035360a91541c'] = 'Désirez-vous réellement désinstaller ce module gratuit ?';
@@ -420,6 +420,8 @@ $_MODULE['<{everpsblog}prestashop>admineverpsblogpostcontroller_b8ecf0476559a85f
 $_MODULE['<{everpsblog}prestashop>admineverpsblogpostcontroller_48a688e2c614f9afa08c207d3556c2c8'] = 'Supprimer les articles sélectionnés ?';
 $_MODULE['<{everpsblog}prestashop>admineverpsblogpostcontroller_34e3bd31e37b7e8bfa4fa7445241aee0'] = 'Dupliquer les articles sélectionnés';
 $_MODULE['<{everpsblog}prestashop>admineverpsblogpostcontroller_ecca24871c31fed63c45303448575944'] = 'Dupliquer les articles sélectionnés ?';
+$_MODULE['<{everpsblog}prestashop>admineverpsblogpostcontroller_882045933d32e005e355e9765f4c0933'] = 'Publier les articles sélectionnés';
+$_MODULE['<{everpsblog}prestashop>admineverpsblogpostcontroller_3dff6c00b5a14f11b7da047bc0b8bff8'] = 'Publier les articles sélectionnés ?';
 $_MODULE['<{everpsblog}prestashop>admineverpsblogpostcontroller_d8bb1113e22fea32cf55d045b6fdd04d'] = 'Vous devez sélectionner une boutique avant de créer ou de modifier un nouvel élément.';
 $_MODULE['<{everpsblog}prestashop>admineverpsblogpostcontroller_f91b2829bf8603e358094e1dedb6f947'] = 'brouillon';
 $_MODULE['<{everpsblog}prestashop>admineverpsblogpostcontroller_7c6c2e5d48ab37a007cbf70d3ea25fa4'] = 'en attente de relecture';
@@ -493,6 +495,7 @@ $_MODULE['<{everpsblog}prestashop>admineverpsblogpostcontroller_24a073c2b7e1be56
 $_MODULE['<{everpsblog}prestashop>admineverpsblogpostcontroller_2c042f43b2422ee1b9282f36df05b269'] = 'Supprimer l\'article';
 $_MODULE['<{everpsblog}prestashop>admineverpsblogpostcontroller_a3824eb0533064953073384a35c740e7'] = 'Voir l\'article';
 $_MODULE['<{everpsblog}prestashop>admineverpsblogpostcontroller_5056d83dfa11a4fcf25b0eec55bf4817'] = 'Une erreur est survenue : impossible de supprimer l\'objet';
+$_MODULE['<{everpsblog}prestashop>admineverpsblogpostcontroller_bb3c6d8fcdb2f83c555324ed3a911ca4'] = 'Une erreur est survenue : impossible de publier l\'objet';
 $_MODULE['<{everpsblog}prestashop>admineverpsblogtagcontroller_60edb97c78a8086b05fde249f539dd51'] = 'Tags du blog';
 $_MODULE['<{everpsblog}prestashop>admineverpsblogtagcontroller_39e228c29a33759cfcf3987a99a23091'] = 'ID';
 $_MODULE['<{everpsblog}prestashop>admineverpsblogtagcontroller_52beb68a9235031e0c52fcdca6a5e692'] = 'Image à la une';

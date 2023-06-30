@@ -250,6 +250,10 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 'text' => $this->l('Duplicate selected items'),
                 'confirm' => $this->l('Duplicate selected items ?')
             ),
+            'publishall' => array(
+                'text' => $this->l('Publish selected items'),
+                'confirm' => $this->l('Publish selected items ?')
+            ),
         );
 
         if (Tools::getIsset('deletePost'.$this->table)) {
@@ -267,6 +271,10 @@ class AdminEverPsBlogPostController extends ModuleAdminController
 
         if (Tools::isSubmit('submitBulkduplicateall'.$this->table)) {
             $this->processBulkDuplicate();
+        }
+
+        if (Tools::isSubmit('submitBulkpublishall'.$this->table)) {
+            $this->processBulkPublish();
         }
 
         $lists = parent::renderList();
@@ -1127,6 +1135,17 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             }
         }
         return $duplicate;
+    }
+
+    protected function processBulkPublish()
+    {
+        foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
+            $everObj = new EverPsBlogPost((int) $idEverObj);
+            $everObj->post_status = 'published';
+            if (!$everObj->save()) {
+                $this->errors[] = $this->l('An error has occurred: Can\'t publish the current object');
+            }
+        }
     }
 
     protected function duplicatePost($id_ever_post)
