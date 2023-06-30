@@ -118,7 +118,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         $page = $this->context->controller->getTemplateVarPage();
         if (Tools::getValue('page')) {
             $meta_title = $this->l('Page : ').Tools::getValue('page').' | '.$meta_title;
-            $meta_description = $this->l('Page : ').Tools::getValue('page').' | '.$meta_description;
+            $meta_description = $this->l('Page : ').Tools::getValue('page').' | '.$everblog_desc;
         }
         $page['meta']['title'] = $meta_title;
         $page['meta']['description'] = $meta_desc;
