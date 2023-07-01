@@ -45,7 +45,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.5.2';
+        $this->version = '5.5.3';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -453,6 +453,11 @@ class EverPsBlog extends Module
             ) {
                 $this->postErrors[] = $this->l('Error : The field "Show post count" is not valid');
             }
+            if (Tools::getValue('EVERBLOG_TINYMCE')
+                && !Validate::isBool(Tools::getValue('EVERBLOG_TINYMCE'))
+            ) {
+                $this->postErrors[] = $this->l('Error : The field "Extends TinyMCE" is not valid');
+            }
             if (Tools::getValue('EVERBLOG_SHOW_HOME')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_SHOW_HOME'))
             ) {
@@ -841,6 +846,7 @@ class EverPsBlog extends Module
             'EVERPSBLOG_ROUTE' => Configuration::get('EVERPSBLOG_ROUTE'),
             'EVERPSBLOG_EXCERPT' => Configuration::get('EVERPSBLOG_EXCERPT'),
             'EVERPSBLOG_TITLE_LENGTH' => Configuration::get('EVERPSBLOG_TITLE_LENGTH'),
+            'EVERBLOG_TINYMCE' => Configuration::get('EVERBLOG_TINYMCE'),
             'EVERBLOG_SHOW_POST_COUNT' => Configuration::get('EVERBLOG_SHOW_POST_COUNT'),
             'EVERBLOG_SHOW_HOME' => Configuration::get('EVERBLOG_SHOW_HOME'),
             'EVERPSBLOG_PAGINATION' => Configuration::get('EVERPSBLOG_PAGINATION'),
@@ -1068,6 +1074,27 @@ class EverPsBlog extends Module
                         'desc' => $this->l('Post title length for content on listing'),
                         'hint' => $this->l('Please set post title length'),
                         'required' => true,
+                    ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Extends TinyMCE on blog management ?'),
+                        'desc' => $this->l('Set yes to extends TinyMCE on blog management pages'),
+                        'hint' => $this->l('Else TinyMCE will be default'),
+                        'required' => false,
+                        'name' => 'EVERBLOG_TINYMCE',
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No')
+                            )
+                        ),
                     ),
                     array(
                         'type' => 'switch',
@@ -1811,6 +1838,20 @@ class EverPsBlog extends Module
         $this->context->controller->addCss($this->_path.'views/css/ever.css');
         if (Tools::getValue('configure') == $this->name) {
             $this->context->controller->addJs($this->_path.'views/js/ever.js');
+        }
+        if ((bool) Configuration::get('EVERBLOG_TINYMCE') === true) {
+            $blogAdminControllers = [
+                'AdminEverPsBlogPost',
+                'AdminEverPsBlogTag',
+                'AdminEverPsBlogAuthor',
+                'AdminEverPsBlogCategory',
+                'AdminEverPsBlogComment',
+            ];
+            if (in_array(Tools::getValue('controller'), $blogAdminControllers)
+                || Tools::getValue('configure') == $this->name
+            ) {
+                $this->context->controller->addJs($this->_path . 'views/js/adminTinyMce.js');
+            }
         }
     }
 
@@ -2666,15 +2707,10 @@ class EverPsBlog extends Module
 
     public function generateBlogSitemap($id_shop = null, $cron = false)
     {
-        set_time_limit(0);
         if (!$id_shop) {
             $id_shop = (int) $this->context->shop->id;
         }
-        if (_PS_VERSION_ >= '1.6.1.7') {
-            $languages = Language::getIDs(true);
-        } else {
-            $languages = $this->getLanguagesIds(true);
-        }
+        $languages = $this->getLanguagesIds(true);
         $result = false;
         foreach ($languages as $id_lang) {
             $result &= $this->processSitemapAuthor((int) $id_shop, (int) $id_lang);
@@ -2691,7 +2727,6 @@ class EverPsBlog extends Module
 
     private function processSitemapPost($id_shop, $id_lang)
     {
-        set_time_limit(0);
         $iso_lang = Language::getIsoById((int) $id_lang);
 
         $sitemap = new EverPsBlogSitemap(
@@ -2735,7 +2770,6 @@ class EverPsBlog extends Module
 
     private function processSitemapAuthor($id_shop, $id_lang)
     {
-        set_time_limit(0);
         $iso_lang = Language::getIsoById((int) $id_lang);
 
         $sitemap = new EverPsBlogSitemap(
@@ -2781,7 +2815,6 @@ class EverPsBlog extends Module
 
     private function processSitemapTag($id_shop, $id_lang)
     {
-        set_time_limit(0);
         $iso_lang = Language::getIsoById((int) $id_lang);
 
         $sitemap = new EverPsBlogSitemap(
@@ -2827,7 +2860,6 @@ class EverPsBlog extends Module
 
     private function processSitemapCategory($id_shop, $id_lang)
     {
-        set_time_limit(0);
         $iso_lang = Language::getIsoById((int) $id_lang);
 
         $sitemap = new EverPsBlogSitemap(

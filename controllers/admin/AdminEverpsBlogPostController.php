@@ -241,6 +241,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         $this->addRowAction('duplicate');
         $this->addRowAction('deletePost');
         $this->addRowAction('ViewPost');
+        $this->addRowAction('UnprotectPost');
         $this->bulk_actions = array(
             'delete' => array(
                 'text' => $this->l('Delete selected items'),
@@ -253,6 +254,18 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             'publishall' => array(
                 'text' => $this->l('Publish selected items'),
                 'confirm' => $this->l('Publish selected items ?')
+            ),
+            'draftall' => array(
+                'text' => $this->l('Draft selected items'),
+                'confirm' => $this->l('Draft selected items ?')
+            ),
+            'trashall' => array(
+                'text' => $this->l('Trash selected items'),
+                'confirm' => $this->l('Trash selected items ?')
+            ),
+            'unprotectall' => array(
+                'text' => $this->l('Remove password on selected items'),
+                'confirm' => $this->l('Remove password on selected items ?')
             ),
         );
 
@@ -275,6 +288,18 @@ class AdminEverPsBlogPostController extends ModuleAdminController
 
         if (Tools::isSubmit('submitBulkpublishall'.$this->table)) {
             $this->processBulkPublish();
+        }
+
+        if (Tools::isSubmit('submitBulkdraftall'.$this->table)) {
+            $this->processBulkDraft();
+        }
+
+        if (Tools::isSubmit('submitBulktrashall'.$this->table)) {
+            $this->processBulkTrash();
+        }
+
+        if (Tools::isSubmit('submitBulkunprotectall'.$this->table)) {
+            $this->processBulkUnprotect();
         }
 
         $lists = parent::renderList();
@@ -387,7 +412,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 : $obj->post_status,
                 'psswd' => (!empty(Tools::getValue('psswd')))
                 ? Tools::getValue('psswd')
-                : $obj->psswd,
+                : '',
             );
         } else {
             $cat_taxonomies = [];
@@ -526,11 +551,16 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     'preview' => $this->preview_token
                 )
             );
+            if (!empty($obj->psswd)) {
+                $viewPostTxt = $this->l('See post (password protected)');
+            } else {
+                $viewPostTxt = $this->l('See post');
+            }
             $object_html = '<a href="'
-            .$objectUrl
-            .'" target="_blank" class="btn btn-info">'
-            .$this->l('See post')
-            .'</a>';
+            . $objectUrl
+            . '" target="_blank" class="btn btn-lg btn-info">'
+            . $viewPostTxt
+            . '</a>';
             $fields_form[] = array(
                 'form' => array(
                     'input' => array(
@@ -551,7 +581,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 'submit' => array(
                     'name' => 'save',
                     'title' => $this->l('Save'),
-                    'class' => 'button pull-right'
+                    'class' => 'btn pull-right'
                 ),
                 'buttons' => array(
                     array(
@@ -821,18 +851,18 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                             'name' => 'name',
                         ),
                     ),
-                    // array(
-                    //     'type' => 'text',
-                    //     'label' => $this->l('Protect this post with password'),
-                    //     'desc' => $this->l('If you enter a password here, the article will be protected'),
-                    //     'hint' => $this->l('Leave empty for no use'),
-                    //     'required' => false,
-                    //     'name' => 'psswd',
-                    //     'lang' => false,
-                    //     'autoload_rte' => true,
-                    //     'cols' => 60,
-                    //     'rows' => 30
-                    // ),
+                    array(
+                        'type' => 'password',
+                        'label' => $this->l('Protect this post with password'),
+                        'desc' => $this->l('If you enter a password here, the article will be protected. Don\'t forget to write down the password, it won\'t be shown to you again for security reasons!'),
+                        'hint' => $this->l('Leave empty for no use'),
+                        'required' => false,
+                        'name' => 'psswd',
+                        'lang' => false,
+                        'autoload_rte' => true,
+                        'cols' => 60,
+                        'rows' => 30
+                    ),
                 )
             )
         );
@@ -864,6 +894,13 @@ class AdminEverPsBlogPostController extends ModuleAdminController
 
     public function postProcess()
     {
+        if (Tools::getIsset('unprotect_post')) {
+            $everObj = new EverPsBlogPost(
+                (int)Tools::getValue('id_ever_post')
+            );
+            $everObj->psswd = null;
+            $everObj->save();
+        }
         if (Tools::getIsset('duplicateever_blog_post')) {
             return $this->duplicatePost(
                 (int)Tools::getValue('id_ever_post')
@@ -984,7 +1021,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             ) {
                 $this->errors[] = $this->l('Password is not valid');
             } else {
-                $post->psswd = Tools::getValue('psswd');
+                $post->psswd = md5(_COOKIE_KEY_ . Tools::getValue('psswd'));
             }
             // Multilingual fields
             foreach (Language::getLanguages(false) as $lang) {
@@ -1140,6 +1177,33 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         );
     }
 
+    public function displayUnprotectPostLink($token, $id_ever_post)
+    {
+        if (!$token) {
+            return;
+        }
+        $post = new EverPsBlogPost($id_ever_post);
+        if (empty($post->psswd)) {
+            return;
+        }
+        $link = new Link();
+        $id_lang = (int) Context::getContext()->language->id;
+        $unprotect_url  = 'index.php?controller=AdminEverPsBlogPost&token=';
+        $unprotect_url .= Tools::getAdminTokenLite('AdminEverPsBlogPost');
+        $unprotect_url .= '&id_ever_post='.(int)$id_ever_post;
+        $unprotect_url .= '&unprotect_post';
+
+        $this->context->smarty->assign(array(
+            'href' => $unprotect_url,
+            'confirm' => null,
+            'action' => $this->l('Unprotect post')
+        ));
+
+        return $this->context->smarty->fetch(
+            _PS_MODULE_DIR_ . 'everpsblog/views/templates/admin/helpers/lists/list_action_unprotect_obj.tpl'
+        );
+    }
+
     protected function processBulkDelete()
     {
         foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
@@ -1173,6 +1237,39 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         }
     }
 
+    protected function processBulkDraft()
+    {
+        foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
+            $everObj = new EverPsBlogPost((int) $idEverObj);
+            $everObj->post_status = 'draft';
+            if (!$everObj->save()) {
+                $this->errors[] = $this->l('An error has occurred: Can\'t draft the current object');
+            }
+        }
+    }
+
+    protected function processBulkUnprotect()
+    {
+        foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
+            $everObj = new EverPsBlogPost((int) $idEverObj);
+            $everObj->psswd = null;
+            if (!$everObj->save()) {
+                $this->errors[] = $this->l('An error has occurred: Can\'t unprotect the current object');
+            }
+        }
+    }
+
+    protected function processBulkTrash()
+    {
+        foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
+            $everObj = new EverPsBlogPost((int) $idEverObj);
+            $everObj->post_status = 'trash';
+            if (!$everObj->save()) {
+                $this->errors[] = $this->l('An error has occurred: Can\'t trash the current object');
+            }
+        }
+    }
+
     protected function duplicatePost($id_ever_post)
     {
         $everObj = new EverPsBlogPost(
@@ -1189,6 +1286,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         $new_everObj->post_categories = $everObj->post_categories;
         $new_everObj->post_tags = $everObj->post_tags;
         $new_everObj->post_products = $everObj->post_products;
+        $new_everObj->psswd = $everObj->psswd;
         $new_everObj->date_add = $everObj->date_add;
         $new_everObj->date_upd = $everObj->date_upd;
         foreach (Language::getLanguages(false) as $language) {

@@ -1279,4 +1279,28 @@ class EverPsBlogPost extends ObjectModel
 
         return $update;
     }
+
+    /**
+     * Check if post password is the right one.
+     *
+     * @param string $passwordHash Password
+     *
+     * @return bool result
+     */
+    public static function checkPassword($idPost, $passwordHash)
+    {
+        if (!Validate::isUnsignedId($idPost)) {
+            die(Tools::displayError());
+        }
+
+        $sql = new DbQuery();
+        $sql->select('`id_ever_post`');
+        $sql->from('ever_blog_post');
+        $sql->where('`id_ever_post` = ' . (int) $idPost);
+        $sql->where('`psswd` = \'' . pSQL($passwordHash) . '\'');
+        $sql->where('`post_status` = "published"');
+
+        // Get result from DB
+        return (bool) Db::getInstance()->getValue($sql);
+    }
 }

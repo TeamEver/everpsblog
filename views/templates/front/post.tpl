@@ -96,10 +96,23 @@
     </div>
     <div class="row">
         <div class="col-12 col-md-12 postcontent {if $animated}zoomed{/if}">
+            {if isset($post->password_protected) && $post->password_protected}
+            <div class="alert alert-warning">
+                {$post->content nofilter}
+            </div>
+            <form method="POST">
+                <div class="form-group">
+                    <input type="password" class="form-control" id="post_psswd" name="post_psswd" placeholder="{l s='Password' mod='everpsblog'}" required>
+                </div>
+                <button type="submit" class="btn btn-primary">{l s='Validate' mod='everpsblog'}</button>
+            </form>
+            {else}
             {$post->content nofilter}
+            {/if}
         </div>
     </div>
 </div>
+{if !isset($post->password_protected)}
 <div class="container">
     <div class="row mt-2">
         <div class="col-xs-12 col-12 col-md-6">
@@ -129,8 +142,9 @@
         </div>
     </div>
 </div>
+{/if}
 
-{if isset($allow_comments) && $allow_comments}
+{if isset($allow_comments) && $allow_comments && !isset($post->password_protected)}
 
 {if isset($logged) && $logged ==  false && isset($only_logged_comment) && $only_logged_comment == true}
 <div class="card card-block mt-2">

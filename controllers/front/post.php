@@ -83,6 +83,9 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             $this->author->nickhandle = Configuration::get('PS_SHOP_NAME');
             $this->author->url = Tools::getHttpHost(true) . __PS_BASE_URI__;
         }
+        if ($this->post->psswd && !empty($this->post->psswd)) {
+            // code...
+        }
         // Get author cover if exists, else get shop logo
         $this->author_cover = EverPsBlogImage::getBlogImageUrl(
             (int) $this->author->id,
@@ -100,7 +103,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
         );
         parent::init();
         // if inactive post or unexists, redirect
-        if (!(int)Tools::getValue('id_ever_post')) {
+        if (!Tools::getValue('id_ever_post')) {
             Tools::redirect('index.php?controller=404');
         }
         if (Tools::getValue('preview') != Tools::encrypt('everpsblog/preview')
@@ -109,7 +112,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             Tools::redirect('index.php?controller=404');
         }
         if (!Tools::getValue('preview')) {
-            if ((bool)Tools::isSubmit('everpostcomment') === false) {
+            if ((bool) Tools::isSubmit('everpostcomment') === false) {
                 EverPsBlogPost::updatePostViewCount(
                     (int) $this->post->id,
                     (int) $this->context->shop->id
@@ -310,11 +313,39 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 (int) $this->post->id,
                 (int) $this->context->language->id
             );
-            // Prepare shortcodes
-            $this->post->content = EverPsBlogPost::changeShortcodes(
-                (string) $this->post->content,
-                (int) Context::getContext()->customer->id
-            );
+            // die(var_dump($this->post->psswd));
+            // Password protected
+            $cookieName = $this->context->shop->id . $this->post->id . Tools::encrypt('everpsblog/post-' . $this->post->id);
+            if ($this->post->psswd
+                && !empty($this->post->psswd)
+                && !$this->context->cookie->__isset($cookieName)
+            ) {
+                if (Tools::getValue('post_psswd')) {
+                    if ($this->post->checkPassword($this->post->id, md5(_COOKIE_KEY_ . Tools::getValue('post_psswd'))) === false) {
+                        $this->post->password_protected = true;
+                        $this->post->content = $this->l('This post is password protected');
+                    }
+                    if ($this->post->checkPassword($this->post->id, md5(_COOKIE_KEY_ . Tools::getValue('post_psswd'))) === true) {
+                        $this->context->cookie->__set(
+                            $cookieName,
+                            true
+                        );
+                        $this->post->content = EverPsBlogPost::changeShortcodes(
+                            (string) $this->post->content,
+                            (int) Context::getContext()->customer->id
+                        );
+                    }
+                } else {
+                    $this->post->password_protected = true;
+                    $this->post->content = $this->l('This post is password protected');
+                }
+            } else {
+                // Prepare shortcodes
+                $this->post->content = EverPsBlogPost::changeShortcodes(
+                    (string) $this->post->content,
+                    (int) Context::getContext()->customer->id
+                );
+            }
             $this->post->title = EverPsBlogPost::changeShortcodes(
                 (string) $this->post->title,
                 (int) Context::getContext()->customer->id

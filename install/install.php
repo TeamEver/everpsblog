@@ -39,6 +39,7 @@ $sql[] =
         `post_categories` varchar(255) DEFAULT NULL,
         `post_tags` varchar(255) DEFAULT NULL,
         `post_products` varchar(255) DEFAULT NULL,
+        `psswd` varchar(255) DEFAULT NULL,
         `count` int(10) unsigned DEFAULT 0,
         PRIMARY KEY (`id_ever_post`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
