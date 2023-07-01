@@ -101,6 +101,7 @@ class EverPsBlog extends Module
         }
         // Install
         return parent::install()
+            && $this->registerBlogHook()
             && $this->registerHook('actionFrontControllerAfterInit')
             && $this->registerHook('header')
             && $this->registerHook('actionAdminControllerSetMedia')
@@ -325,7 +326,6 @@ class EverPsBlog extends Module
 
     public function getContent()
     {
-        $this->registerBlogHook();
         $this->html = '';
         // Process internal linking
         if (Tools::isSubmit('submitGenerateBlogSitemap')) {
