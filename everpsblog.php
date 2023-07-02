@@ -45,7 +45,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.5.4';
+        $this->version = '5.5.5';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -101,6 +101,7 @@ class EverPsBlog extends Module
         }
         // Install
         return parent::install()
+            && $this->registerBlogHook()
             && $this->registerHook('actionFrontControllerAfterInit')
             && $this->registerHook('header')
             && $this->registerHook('actionAdminControllerSetMedia')
@@ -325,7 +326,6 @@ class EverPsBlog extends Module
 
     public function getContent()
     {
-        $this->registerBlogHook();
         $this->html = '';
         // Process internal linking
         if (Tools::isSubmit('submitGenerateBlogSitemap')) {
@@ -3268,5 +3268,119 @@ class EverPsBlog extends Module
             return true;
         }
         return false;
+    }
+
+    public function hookActionBeforeEverPostInitContent($params)
+    {
+        //  your code here
+    } 
+    public function hookActionBeforeEverCategoryInitContent($params)
+    {
+        //  your code here
+    }
+
+    public function hookActionBeforeEverTagInitContent($params)
+    {
+        //  your code here
+    }
+
+    public function hookActionBeforeEverBlogInitContent($params)
+    {
+        //  your code here
+    }
+
+    public function hookActionBeforeEverBlogInit($params)
+    {
+        //  your code here
+    }
+
+    public function hookAisplayBeforeEverPost($params)
+    {
+        //  your code here
+    }
+
+    public function hookAisplayAfterEverPost($params)
+    {
+        //  your code here
+    }
+
+    public function hookAisplayBeforeEverCategory($params)
+    {
+        //  your code here
+    }
+
+    public function hookAisplayAfterEverCategory($params)
+    {
+        //  your code here
+    }
+
+    public function hookAisplayBeforeEverTag($params)
+    {
+        //  your code here
+    }
+
+    public function hookAisplayAfterEverTag($params)
+    {
+        //  your code here
+    }
+
+    public function hookAisplayBeforeEverComment($params)
+    {
+        //  your code here
+    }
+
+    public function hookAisplayAfterEverComment($params)
+    {
+        //  your code here
+    }
+
+    public function hookAisplayBeforeEverLoop($params)
+    {
+        //  your code here
+    }
+
+    public function hookAisplayAfterEverLoop($params)
+    {
+        //  your code here
+    }
+
+    public function hookActionObjectEverPsBlogCommentDeleteAfter($params)
+    {
+        //  your code here
+    }
+
+    public function hookActionObjectProductUpdateAfter($params)
+    {
+        //  your code here
+    }
+
+    public function hookActionObjectEverPsBlogCommentUpdateAfter($params)
+    {
+        //  your code here
+    }
+
+    public function hookActionObjectProductAddAfter($params)
+    {
+        //  your code here
+    }
+
+    public function hookActionObjectAuthorAddAfter($params)
+    {
+        //  your code here
+    }
+
+    public function hookActionObjectEverPsBlogTagAddAfter($params)
+    {
+        //  your code here
+    }
+
+    public function hookActionObjectEverPsBlogCategoryAddAfter($params)
+    {
+        //  your code here
+    }
+
+    public function hookActionObjectEverPsBlogCommentAddAfter($params)
+    {
+        //  your code here
     }
 }
