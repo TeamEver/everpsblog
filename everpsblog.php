@@ -2710,7 +2710,10 @@ class EverPsBlog extends Module
         if (!$id_shop) {
             $id_shop = (int) $this->context->shop->id;
         }
-        $languages = $this->getLanguagesIds(true);
+        $languages = Language::getLanguages(
+            true,
+            (int) $id_shop
+        );
         $result = false;
         foreach ($languages as $id_lang) {
             $result &= $this->processSitemapAuthor((int) $id_shop, (int) $id_lang);
