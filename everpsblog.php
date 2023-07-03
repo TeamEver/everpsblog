@@ -45,7 +45,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.5.6';
+        $this->version = '5.5.7';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -112,7 +112,6 @@ class EverPsBlog extends Module
             && $this->registerHook('displayFooter')
             && $this->registerHook('displayCustomerAccount')
             && $this->registerHook('moduleRoutes')
-            && $this->registerHook('overrideLayoutTemplate')
             && $this->registerHook('displayBackOfficeHeader')
             && $this->registerHook('actionObjectProductDeleteAfter')
             && $this->registerHook('actionAdminMetaAfterWriteRobotsFile')
@@ -173,11 +172,46 @@ class EverPsBlog extends Module
         include dirname(__FILE__).'/install/uninstall.php';
         include dirname(__FILE__).'/install/hooks-uninstall.php';
         include dirname(__FILE__).'/install/images-uninstall.php';
-
-        Db::getInstance()->delete(
-            'hook_module',
-            'id_module = '.(int) $this->id
-        );
+        $this->unregisterHook('actionObjectEverPsBlogTagDeleteAfter');
+        $this->unregisterHook('actionObjectEverPsBlogCategoryDeleteAfter');
+        $this->unregisterHook('actionObjectEverPsBlogPostDeleteAfter');
+        $this->unregisterHook('actionObjectEverPsBlogCommentDeleteAfter');
+        $this->unregisterHook('actionObjectProductUpdateAfter');
+        $this->unregisterHook('actionObjectEverPsBlogAuthorUpdateAfter');
+        $this->unregisterHook('actionObjectEverPsBlogTagUpdateAfter');
+        $this->unregisterHook('actionObjectEverPsBlogCategoryUpdateAfter');
+        $this->unregisterHook('actionObjectEverPsBlogPostUpdateAfter');
+        $this->unregisterHook('actionObjectEverPsBlogCommentUpdateAfter');
+        $this->unregisterHook('actionBeforeEverPostInitContent');
+        $this->unregisterHook('actionBeforeEverCategoryInitContent');
+        $this->unregisterHook('actionBeforeEverTagInitContent');
+        $this->unregisterHook('actionBeforeEverBlogInitContent');
+        $this->unregisterHook('actionBeforeEverBlogInit');
+        $this->unregisterHook('displayBeforeEverPost');
+        $this->unregisterHook('displayAfterEverPost');
+        $this->unregisterHook('displayBeforeEverCategory');
+        $this->unregisterHook('displayAfterEverCategory');
+        $this->unregisterHook('displayBeforeEverTag');
+        $this->unregisterHook('displayAfterEverTag');
+        $this->unregisterHook('displayBeforeEverComment');
+        $this->unregisterHook('displayAfterEverComment');
+        $this->unregisterHook('displayBeforeEverLoop');
+        $this->unregisterHook('displayAfterEverLoop');
+        $this->unregisterHook('actionObjectEverPsBlogAuthorUpdateAfter');
+        $this->unregisterHook('actionObjectEverPsBlogTagUpdateAfter');
+        $this->unregisterHook('actionObjectEverPsBlogCategoryUpdateAfter');
+        $this->unregisterHook('actionObjectEverPsBlogPostUpdateAfter');
+        $this->unregisterHook('actionObjectEverPsBlogCommentUpdateAfter');
+        $this->unregisterHook('actionObjectEverPsBlogTagAddAfter');
+        $this->unregisterHook('actionObjectEverPsBlogCategoryAddAfter');
+        $this->unregisterHook('actionObjectEverPsBlogPostAddAfter');
+        $this->unregisterHook('actionObjectEverPsBlogCommentAddAfter');
+        $this->unregisterHook('actionBeforeEverPostInitContent');
+        $this->unregisterHook('actionBeforeEverCategoryInitContent');
+        $this->unregisterHook('actionBeforeEverTagInitContent');
+        $this->unregisterHook('actionBeforeEverBlogInitContent');
+        $this->unregisterHook('actionBeforeEverBlogInit');
+        $this->unregisterHook('actionAfterEverBlogInit');
         
         return parent::uninstall()
             && $this->uninstallModuleTab('AdminEverPsBlog')
@@ -3383,6 +3417,56 @@ class EverPsBlog extends Module
     }
 
     public function hookActionObjectEverPsBlogCommentAddAfter($params)
+    {
+        //  your code here
+    }
+
+    public function hookDisplayBeforeEverPost($params)
+    {
+        //  your code here
+    }
+
+    public function hookDisplayAfterEverPost($params)
+    {
+        //  your code here
+    }
+
+    public function hookDisplayBeforeEverCategory($params)
+    {
+        //  your code here
+    }
+
+    public function hookDisplayAfterEverCategory($params)
+    {
+        //  your code here
+    }
+
+    public function hookDisplayBeforeEverTag($params)
+    {
+        //  your code here
+    }
+
+    public function hookDisplayAfterEverTag($params)
+    {
+        //  your code here
+    }
+
+    public function hookDisplayBeforeEverComment($params)
+    {
+        //  your code here
+    }
+
+    public function hookDisplayAfterEverComment($params)
+    {
+        //  your code here
+    }
+
+    public function hookDisplayBeforeEverLoop($params)
+    {
+        //  your code here
+    }
+
+    public function hookDisplayAfterEverLoop($params)
     {
         //  your code here
     }
