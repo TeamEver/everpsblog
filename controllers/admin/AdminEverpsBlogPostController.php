@@ -1021,7 +1021,11 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             ) {
                 $this->errors[] = $this->l('Password is not valid');
             } else {
-                $post->psswd = md5(_COOKIE_KEY_ . Tools::getValue('psswd'));
+                if (!empty($post->psswd)) {
+                    $post->psswd = md5(_COOKIE_KEY_ . Tools::getValue('psswd'));
+                } else {
+                    $post->psswd = null;
+                }
             }
             // Multilingual fields
             foreach (Language::getLanguages(false) as $lang) {
