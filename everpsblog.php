@@ -45,7 +45,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.5.8';
+        $this->version = '5.5.9';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -271,6 +271,7 @@ class EverPsBlog extends Module
 
     public function getContent()
     {
+        $this->checkObligatoryHooks();
         $this->html = '';
         // Process internal linking
         if (Tools::isSubmit('submitGenerateBlogSitemap')) {
@@ -2906,6 +2907,38 @@ class EverPsBlog extends Module
         $this->registerHook('actionObjectProductDeleteAfter');
         $this->registerHook('actionObjectProductDeleteAfter');
         $this->registerHook('actionOutputHTMLBefore');
+
+        return true;
+    }
+
+    /**
+     * Register module blog and PS hooks
+    */
+    private function checkObligatoryHooks()
+    {
+        $this->registerHook('actionFrontControllerAfterInit');
+        $this->registerHook('moduleRoutes');
+        $this->registerHook('displayBackOfficeHeader');
+        $this->registerHook('actionObjectProductDeleteAfter');
+        $this->registerHook('actionAdminMetaAfterWriteRobotsFile');
+        $this->registerHook('displayAdminAfterHeader');
+        $this->registerHook('actionAdminMetaAfterWriteRobotsFile');
+        $this->registerHook('actionObjectProductDeleteAfter');
+        $this->registerHook('actionObjectProductDeleteAfter');
+        $this->registerHook('actionOutputHTMLBefore');
+        $this->registerHook('actionObjectEverPsBlogPostUpdateAfter');
+        $this->registerHook('actionObjectEverPsBlogPostAddAfter');
+        $this->registerHook('actionObjectEverPsBlogPostUpdateAfter');
+        $this->registerHook('actionObjectEverPsBlogCategoryUpdateAfter');
+        $this->registerHook('actionObjectEverPsBlogTagUpdateAfter');
+        $this->registerHook('actionObjectEverPsBlogAuthorUpdateAfter');
+        $this->registerHook('actionObjectShopDeleteAfter');
+        $this->registerHook('actionObjectEverPsBlogPostDeleteAfter');
+        $this->registerHook('actionObjectEverPsBlogCategoryDeleteAfter');
+        $this->registerHook('actionObjectEverPsBlogTagDeleteAfter');
+        $this->registerHook('actionObjectAuthorDeleteAfter');
+        $this->registerHook('actionObjectProductDeleteAfter');
+
         return true;
     }
 

@@ -41,6 +41,7 @@ $sql[] =
         `post_products` varchar(255) DEFAULT NULL,
         `psswd` varchar(255) DEFAULT NULL,
         `count` int(10) unsigned DEFAULT 0,
+        `groups` text DEFAULT NULL,
         PRIMARY KEY (`id_ever_post`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
@@ -71,6 +72,7 @@ $sql[] =
         `category_products` varchar(255) DEFAULT NULL,
         `is_root_category` int(1) unsigned DEFAULT NULL,
         `count` int(10) unsigned DEFAULT 0,
+        `groups` text DEFAULT NULL,
         PRIMARY KEY (`id_ever_category`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
@@ -99,6 +101,7 @@ $sql[] =
         `active` int(1) unsigned DEFAULT NULL,
         `tag_products` varchar(255) DEFAULT NULL,
         `count` int(10) unsigned DEFAULT 0,
+        `groups` text DEFAULT NULL,
         PRIMARY KEY (`id_ever_tag`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 

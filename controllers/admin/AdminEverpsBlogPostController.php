@@ -537,6 +537,10 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 'id_status' => 'planned',
                 'name' => $this->l('planned')
             ),
+            array(
+                'id_status' => 'protected',
+                'name' => $this->l('password protected')
+            ),
         );
 
         if (Validate::isLoadedObject($obj)) {
@@ -1016,16 +1020,10 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             $post->post_tags = json_encode(Tools::getValue('post_tags'));
             $post->post_products = json_encode(Tools::getValue('post_products'));
             $post->date_upd = date('Y-m-d H:i:s');
-            if (Tools::getValue('psswd')
-                && !Validate::isPlaintextPassword(Tools::getValue('psswd'))
-            ) {
-                $this->errors[] = $this->l('Password is not valid');
+            if (Tools::getValue('post_status') != 'protected') {
+                $post->psswd = null;
             } else {
-                if (!empty($post->psswd)) {
-                    $post->psswd = md5(_COOKIE_KEY_ . Tools::getValue('psswd'));
-                } else {
-                    $post->psswd = null;
-                }
+                $post->psswd = md5(_COOKIE_KEY_ . Tools::getValue('psswd'));
             }
             // Multilingual fields
             foreach (Language::getLanguages(false) as $lang) {
