@@ -45,7 +45,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.5.9';
+        $this->version = '5.5.10';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -271,6 +271,7 @@ class EverPsBlog extends Module
 
     public function getContent()
     {
+        $this->checkAndFixDatabase();
         $this->checkObligatoryHooks();
         $this->html = '';
         // Process internal linking
@@ -3223,5 +3224,65 @@ class EverPsBlog extends Module
             return true;
         }
         return false;
+    }
+
+    public function checkAndFixDatabase()
+    {
+        $db = Db::getInstance();
+        // Ajoute les colonnes manquantes à la table ever_blog_post
+        $columnsToAdd = [
+            'id_ever_post' => 'int(10) unsigned NOT NULL auto_increment',
+            'id_shop' => 'int(10) unsigned NOT NULL',
+            'id_author' => 'int(10) unsigned NOT NULL',
+            'id_default_category' => 'int(10) unsigned NOT NULL',
+            'post_status' => 'varchar(255) NOT NULL',
+            'date_add' => 'DATETIME DEFAULT NULL',
+            'date_upd' => 'DATETIME DEFAULT NULL',
+            'index' => 'int(1) unsigned DEFAULT NULL',
+            'follow' => 'int(1) unsigned DEFAULT NULL',
+            'sitemap' => 'int(1) unsigned DEFAULT 1',
+            'active' => 'int(1) unsigned DEFAULT NULL',
+            'post_categories' => 'varchar(255) DEFAULT NULL',
+            'post_tags' => 'varchar(255) DEFAULT NULL',
+            'post_products' => 'varchar(255) DEFAULT NULL',
+            'psswd' => 'varchar(255) DEFAULT NULL',
+            'count' => 'int(10) unsigned DEFAULT 0',
+            'groups' => 'text DEFAULT NULL',
+        ];
+
+        foreach ($columnsToAdd as $columnName => $columnDefinition) {
+            $columnExists = $db->ExecuteS('DESCRIBE `' . _DB_PREFIX_ . 'ever_blog_post` `' . pSQL($columnName) . '`');
+            if (!$columnExists) {
+                try {
+                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_post` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
+                    $db->execute($query);
+                } catch (Exception $e) {
+                    PrestaShopLogger::addLog('Unable to update Ever blog post table');
+                }
+            }
+        }
+
+        // Ajoute les colonnes manquantes à la table ps_ever_blog_post_lang
+        $columnsToAdd = [
+            'title' => 'varchar(255) NOT NULL',
+            'meta_title' => 'varchar(255) DEFAULT NULL',
+            'meta_description' => 'varchar(255) DEFAULT NULL',
+            'link_rewrite' => 'varchar(255) DEFAULT NULL',
+            'content' => 'text NOT NULL',
+            'excerpt' => 'varchar(255) DEFAULT NULL',
+            'id_lang' => 'int(10) unsigned NOT NULL',
+        ];
+
+        foreach ($columnsToAdd as $columnName => $columnDefinition) {
+            $columnExists = $db->ExecuteS('DESCRIBE `' . _DB_PREFIX_ . 'ever_blog_post_lang` `' . pSQL($columnName) . '`');
+            if (!$columnExists) {
+                try {
+                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_post_lang` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
+                    $db->execute($query);
+                } catch (Exception $e) {
+                    PrestaShopLogger::addLog('Unable to update Ever blog post lang table');
+                }
+            }
+        }
     }
 }
