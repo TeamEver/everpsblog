@@ -45,7 +45,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.5.10';
+        $this->version = '5.5.11';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -149,7 +149,8 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERPSBLOG_AUTHOR_LAYOUT', 'layouts/layout-right-column.tpl')
             && Configuration::updateValue('EVERPSBLOG_TAG_LAYOUT', 'layouts/layout-right-column.tpl')
             && Configuration::updateValue('EVERBLOG_SITEMAP_NUMBER', 5000)
-            && $this->checkHooks();
+            && $this->checkHooks()
+            && $this->checkObligatoryHooks();
     }
 
     public function uninstall()
@@ -272,7 +273,6 @@ class EverPsBlog extends Module
     public function getContent()
     {
         $this->checkAndFixDatabase();
-        $this->checkObligatoryHooks();
         $this->html = '';
         // Process internal linking
         if (Tools::isSubmit('submitGenerateBlogSitemap')) {
