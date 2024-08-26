@@ -36,105 +36,111 @@ class EverPsBlogCategory extends ObjectModel
     public $id_lang;
     public $id_shop;
     public $active;
-    public $index;
+    public $indexable;
     public $follow;
+    public $allowed_groups;
     public $sitemap;
     public $category_products;
     public $is_root_category;
     public $count;
 
-    public static $definition = array(
+    public static $definition = [
         'table' => 'ever_blog_category',
         'primary' => 'id_ever_category',
         'multilang' => true,
-        'fields' => array(
-            'title' => array(
+        'fields' => [
+            'title' => [
                 'type' => self::TYPE_STRING,
                 'lang' => true,
-                'validate' => 'isString'
-            ),
-            'meta_title' => array(
+                'validate' => 'isString',
+            ],
+            'meta_title' => [
                 'type' => self::TYPE_STRING,
                 'lang' => true,
-                'validate' => 'isString'
-            ),
-            'meta_description' => array(
+                'validate' => 'isString',
+            ],
+            'meta_description' => [
                 'type' => self::TYPE_STRING,
                 'lang' => true,
-                'validate' => 'isString'
-            ),
-            'link_rewrite' => array(
+                'validate' => 'isString',
+            ],
+            'link_rewrite' => [
                 'type' => self::TYPE_STRING,
                 'lang' => true,
-                'validate' => 'isString'
-            ),
-            'content' => array(
+                'validate' => 'isString',
+            ],
+            'content' => [
                 'type' => self::TYPE_HTML,
                 'lang' => true,
-                'validate' => 'isCleanHtml'
-            ),
-            'bottom_content' => array(
+                'validate' => 'isCleanHtml',
+            ],
+            'bottom_content' => [
                 'type' => self::TYPE_HTML,
                 'lang' => true,
-                'validate' => 'isCleanHtml'
-            ),
-            'date_add' => array(
+                'validate' => 'isCleanHtml',
+            ],
+            'date_add' => [
                 'type' => self::TYPE_DATE,
                 'validate' => 'isDate',
-                'required' => false
-            ),
-            'date_upd' => array(
+                'required' => false,
+            ],
+            'date_upd' => [
                 'type' => self::TYPE_DATE,
                 'validate' => 'isDate',
-                'required' => false
-            ),
-            'id_parent_category' => array(
+                'required' => false,
+            ],
+            'id_parent_category' => [
                 'type' => self::TYPE_INT,
-                'validate' => 'isunsignedInt',
-                'required' => false
-            ),
-            'id_shop' => array(
+                'validate' => 'isUnsignedInt',
+                'required' => false,
+            ],
+            'id_shop' => [
                 'type' => self::TYPE_INT,
-                'validate' => 'isunsignedInt',
-                'required' => false
-            ),
-            'index' => array(
+                'validate' => 'isUnsignedInt',
+                'required' => false,
+            ],
+            'indexable' => [
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
-                'required' => false
-            ),
-            'follow' => array(
+                'required' => false,
+            ],
+            'follow' => [
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
-                'required' => false
-            ),
-            'sitemap' => array(
+                'required' => false,
+            ],
+            'sitemap' => [
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
-                'required' => false
-            ),
-            'category_products' => array(
+                'required' => false,
+            ],
+            'category_products' => [
                 'type' => self::TYPE_STRING,
                 'validate' => 'isJson',
-                'required' => false
-            ),
-            'active' => array(
+                'required' => false,
+            ],
+            'allowed_groups' => [
+                'type' => self::TYPE_STRING,
+                'validate' => 'isJson',
+                'required' => false,
+            ],
+            'active' => [
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
-                'required' => false
-            ),
-            'is_root_category' => array(
+                'required' => false,
+            ],
+            'is_root_category' => [
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
-                'required' => false
-            ),
-            'count' => array(
+                'required' => false,
+            ],
+            'count' => [
                 'type' => self::TYPE_INT,
-                'validate' => 'isunsignedInt',
-                'required' => false
-            ),
-        )
-    );
+                'validate' => 'isUnsignedInt',
+                'required' => false,
+            ],
+        ],
+    ];
 
     /**
      * Get current blog root category
@@ -145,11 +151,11 @@ class EverPsBlogCategory extends ObjectModel
         $cache_id = 'EverPsBlogCategory::getRootCategory';
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
-            $sql->select('id_ever_category');
-            $sql->from('ever_blog_category');
+            $sql->select(self::$definition['primary']);
+            $sql->from(self::$definition['table']);
             $sql->where('is_root_category = 1');
-            $sql->where('id_shop = '.(int) Context::getContext()->shop->id);
-            $return = Db::getInstance()->getValue($sql);
+            $sql->where('id_shop = ' . (int) Context::getContext()->shop->id);
+            $return = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
             $return = new self($return);
             if (!Validate::isLoadedObject($return)) {
                 $return = new self();
@@ -177,13 +183,13 @@ class EverPsBlogCategory extends ObjectModel
     public function hasParentCategory($id_parent_category)
     {
         $cache_id = 'EverPsBlogCategory::hasParentCategory_'
-        .(int) $id_parent_category;
+        . (int) $id_parent_category;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
-            $sql->select('id_ever_category');
-            $sql->from('ever_blog_category');
-            $sql->where('id_ever_category = '.(int) $id_parent_category);
-            $return = Db::getInstance()->getValue($sql);
+            $sql->select(self::$definition['primary']);
+            $sql->from(self::$definition['table']);
+            $sql->where(self::$definition['primary'] . ' = ' . (int) $id_parent_category);
+            $return = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
             Cache::store($cache_id, $return);
             return $return;
         }
@@ -199,10 +205,10 @@ class EverPsBlogCategory extends ObjectModel
         $cache_id = 'EverPsBlogCategory::hasChildren';
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
-            $sql->select('id_ever_category');
-            $sql->from('ever_blog_category');
-            $sql->where('id_parent_category = '.(int) $this->id);
-            $return = Db::getInstance()->getValue($sql);
+            $sql->select(self::$definition['primary']);
+            $sql->from(self::$definition['table']);
+            $sql->where('id_parent_category = ' . (int) $this->id);
+            $return = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
             if ((int) $return > 0) {
                 Cache::store($cache_id, true);
                 return true;
@@ -221,42 +227,66 @@ class EverPsBlogCategory extends ObjectModel
     public static function getAllCategories($id_lang, $id_shop, $active = 1, $only_parent = 0, $without_parent = false)
     {
         $cache_id = 'EverPsBlogCategory::getAllCategories_'
-        .(int) $id_lang
-        .'_'
-        .(int) $id_shop
-        .'_'
-        .(int) $active
-        .'_'
-        .(int) $only_parent
-        .'_'
-        .(int) $without_parent;
+        . (int) $id_lang
+        . '_'
+        . (int) $id_shop
+        . '_'
+        . (int) $active
+        . '_'
+        . (int) $only_parent
+        . '_'
+        . (int) $without_parent;
         if (!Cache::isStored($cache_id)) {
+            $context = Context::getContext();
             $sql = new DbQuery;
             $sql->select('*');
-            $sql->from('ever_blog_category_lang', 'bcl');
+            $sql->from(self::$definition['table'] . '_lang', 'bcl');
             $sql->leftJoin(
-                'ever_blog_category',
+                self::$definition['table'],
                 'bc',
-                'bc.id_ever_category = bcl.id_ever_category'
+                'bc.' . self::$definition['primary'] . ' = bcl.' . self::$definition['primary'] . ''
             );
-            $sql->where('bc.active = '.(int) $active);
-            $sql->where('bc.id_shop = '.(int) $id_shop);
-            $sql->where('bcl.id_lang = '.(int) $id_lang);
+            $sql->where('bc.active = ' . (int) $active);
+            $sql->where('bc.id_shop = ' . (int) $id_shop);
+            $sql->where('bcl.id_lang = ' . (int) $id_lang);
             if ((int) $only_parent > 0) {
                 $sql->where('bc.id_parent_category = 1');
             }
             $sql->orderBy('bc.date_add DESC');
-            $categories = Db::getInstance()->executeS($sql);
+            $categories = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
             $return = [];
             foreach ($categories as $blog_cat) {
-                $root = EverPsBlogCategory::getRootCategory();
-                if ((bool) $without_parent === true
-                    && (int) $root->id == (int) $blog_cat['id_ever_category']
+                if ($context->controller->controller_type == 'front'
+                    || $context->controller->controller_type == 'modulefront'
                 ) {
-                    continue;
+                    if (isset($blog_cat['allowed_groups'])
+                        && $blog_cat['allowed_groups']
+                    ) {
+                        $allowedGroups = json_decode($blog_cat['allowed_groups']);
+                        $customerGroups = Customer::getGroupsStatic(
+                            (int) $context->customer->id
+                        );
+                        if (isset($customerGroups)
+                            && !empty($allowedGroups)
+                            && !array_intersect($allowedGroups, $customerGroups)
+                        ) {
+                            continue;
+                        }
+                    }
+                }
+                if ($context->controller->controller_type == 'front'
+                    || $context->controller->controller_type == 'modulefront'
+                ) {
+                    $root = EverPsBlogCategory::getRootCategory();
+                    if ((int) $root->id == (int) $blog_cat[self::$definition['primary']]) {
+                        continue;
+                    }
+                }
+                if ((bool) $without_parent === true) {
+                    // continue;
                 }
                 $blog_cat['featured_image'] = EverPsBlogImage::getBlogImageUrl(
-                    (int) $blog_cat['id_ever_category'],
+                    (int) $blog_cat[self::$definition['primary']],
                     (int) $id_shop,
                     'category'
                 );
@@ -276,37 +306,37 @@ class EverPsBlogCategory extends ObjectModel
     public static function getParentCategories($id_ever_category, $id_lang, $id_shop, $active = 1)
     {
         $cache_id = 'EverPsBlogCategory::getParentCategories_'
-        .(int) $id_ever_category
-        .'_'
-        .(int) $id_lang
-        .'_'
-        .(int) $id_shop
-        .'_'
-        .(int) $active;
+        . (int) $id_ever_category
+        . '_'
+        . (int) $id_lang
+        . '_'
+        . (int) $id_shop
+        . '_'
+        . (int) $active;
         if (!Cache::isStored($cache_id)) {
             $category = new self((int) $id_ever_category);
             $sql = new DbQuery;
             $sql->select('bc.*, bcl.*');
-            $sql->from('ever_blog_category_lang', 'bcl');
+            $sql->from(self::$definition['table'] . '_lang', 'bcl');
             $sql->leftJoin(
-                'ever_blog_category',
+                self::$definition['table'],
                 'bc',
-                'bc.id_ever_category = bcl.id_ever_category'
+                'bc.' . self::$definition['primary'] . ' = bcl.' . self::$definition['primary'] . ''
             );
-            $sql->where('bc.active = '.(int) $active);
-            $sql->where('bc.id_shop = '.(int) $id_shop);
-            $sql->where('bcl.id_lang = '.(int) $id_lang);
-            $sql->where('bc.id_parent_category = '.(int) $category->id_parent_category);
-            $return = Db::getInstance()->executeS($sql);
+            $sql->where('bc.active = ' . (int) $active);
+            $sql->where('bc.id_shop = ' . (int) $id_shop);
+            $sql->where('bcl.id_lang = ' . (int) $id_lang);
+            $sql->where('bc.id_parent_category = ' . (int) $category->id_parent_category);
+            $return = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
             $categories = [];
             if (!isset($return[0])) {
                 $root = EverPsBlogCategory::getRootCategory();
-                $categories[] = array(
-                    'id_ever_category' => $root->id,
+                $categories[] = [
+                    self::$definition['primary'] => $root->id,
                     'id_parent_category' => $root->id_parent_category,
                     'title' => $root->title,
-                    'active' => $root->active
-                );
+                    'active' => $root->active,
+                ];
             }
             if (!$return || $return[0]['id_parent_category'] == 0) {
                 Cache::store($cache_id, $categories);
@@ -324,36 +354,51 @@ class EverPsBlogCategory extends ObjectModel
     public static function getChildrenCategories($id_ever_category, $id_lang, $id_shop, $active = 1)
     {
         $cache_id = 'EverPsBlogCategory::getChildrenCategories_'
-        .(int) $id_ever_category
-        .'_'
-        .(int) $id_lang
-        .'_'
-        .(int) $id_shop
-        .'_'
-        .(int) $active;
+        . (int) $id_ever_category
+        . '_'
+        . (int) $id_lang
+        . '_'
+        . (int) $id_shop
+        . '_'
+        . (int) $active;
         if (!Cache::isStored($cache_id)) {
+            $context = Context::getContext();
             $sql = new DbQuery;
             $sql->select('bc.*, bcl.*');
-            $sql->from('ever_blog_category_lang', 'bcl');
+            $sql->from(self::$definition['table'] . '_lang', 'bcl');
             $sql->leftJoin(
-                'ever_blog_category',
+                self::$definition['table'],
                 'bc',
-                'bc.id_ever_category = bcl.id_ever_category'
+                'bc.' . self::$definition['primary'] . ' = bcl.' . self::$definition['primary'] . ''
             );
-            $sql->where('bc.active = '.(int) $active);
-            $sql->where('bc.id_shop = '.(int) $id_shop);
-            $sql->where('bcl.id_lang = '.(int) $id_lang);
-            $sql->where('bc.id_parent_category = '.(int) $id_ever_category);
-            $return = Db::getInstance()->executeS($sql);
+            $sql->where('bc.active = ' . (int) $active);
+            $sql->where('bc.id_shop = ' . (int) $id_shop);
+            $sql->where('bcl.id_lang = ' . (int) $id_lang);
+            $sql->where('bc.id_parent_category = ' . (int) $id_ever_category);
+            $return = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
             $categories = [];
             foreach ($return as $child_cat) {
+                if (isset($child_cat['allowed_groups'])
+                    && $child_cat['allowed_groups']
+                ) {
+                    $allowedGroups = json_decode($child_cat['allowed_groups']);
+                    $customerGroups = Customer::getGroupsStatic(
+                        (int) $context->customer->id
+                    );
+                    if (isset($customerGroups)
+                        && !empty($allowedGroups)
+                        && !array_intersect($allowedGroups, $customerGroups)
+                    ) {
+                        continue;
+                    }
+                }
                 $featured_image = EverPsBlogImage::getBlogImageUrl(
-                    (int) $child_cat['id_ever_category'],
+                    (int) $child_cat[self::$definition['primary']],
                     (int) $id_shop,
                     'category'
                 );
                 $category = new self(
-                    $child_cat['id_ever_category'],
+                    $child_cat[self::$definition['primary']],
                     (int) $id_lang,
                     (int) $id_shop
                 );
@@ -378,10 +423,10 @@ class EverPsBlogCategory extends ObjectModel
     public static function getCategoryByLinkRewrite($link_rewrite)
     {
         $sql = new DbQuery;
-        $sql->select('id_ever_category');
-        $sql->from('ever_blog_category_lang');
-        $sql->where('link_rewrite = "'.pSQL($link_rewrite).'"');
-        $id_cat = Db::getInstance()->getValue($sql);
+        $sql->select(self::$definition['primary']);
+        $sql->from(self::$definition['table'] . '_lang');
+        $sql->where('link_rewrite = "' . pSQL($link_rewrite) . '"');
+        $id_cat = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
         if ($id_cat) {
             $return = new self($id_cat);
             return $return;

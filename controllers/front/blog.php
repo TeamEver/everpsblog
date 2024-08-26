@@ -41,22 +41,16 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
     public function init()
     {
         parent::init();
-        $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         $this->blog_path = str_replace('\\', '/', _PS_MODULE_DIR_).'everpsblog/views/templates/front';
-        $this->module_name = 'everpsblog';
     }
 
     public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
     {
-        if ($this->isSeven) {
-            return Context::getContext()->getTranslator()->trans(
-                $string,
-                [],
-                'Modules.Everpsblog.blog'
-            );
-        }
-
-        return parent::l($string, $specific, $class, $addslashes, $htmlentities);
+        return Context::getContext()->getTranslator()->trans(
+            $string,
+            [],
+            'Modules.Everpsblog.blog'
+        );
     }
 
     public function initContent()
@@ -67,14 +61,14 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             (int) $this->context->shop->id
         );
         $this->featured_category = new Category(
-            (int)Configuration::get('EVERBLOG_CAT_FEATURED'),
+            (int) Configuration::get('EVERBLOG_CAT_FEATURED'),
             (int) $this->context->language->id,
             (int) $this->context->shop->id
         );
         $featured_products = $this->featured_category->getProducts(
             (int) $this->context->language->id,
             1,
-            (int)Configuration::get('EVERPSBLOG_PAGINATION')
+            (int) Configuration::get('EVERPSBLOG_PAGINATION')
         );
         if (!empty($featured_products)) {
             $showPrice = true;
@@ -90,35 +84,37 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
                 new ProductColorsRetriever(),
                 $this->context->getTranslator()
             );
-
             $productsForTemplate = [];
-
             $presentationSettings->showPrices = $showPrice;
-
             if (is_array($featured_products)) {
                 foreach ($featured_products as $productId) {
                     $productsForTemplate[] = $presenter->present(
                         $presentationSettings,
-                        $assembler->assembleProduct(array('id_product' => $productId['id_product'])),
+                        $assembler->assembleProduct(['id_product' => $productId['id_product']]),
                         $this->context->language
                     );
                 }
             }
-            $this->context->smarty->assign(array(
+            $this->context->smarty->assign([
                 'everhome_products' => $productsForTemplate,
-            ));
-        }
+            ]);
+        }    
+
+        $sortOrders = EverPsBlogSortOrders::getSortOrders();
+        $sortSelected = array_filter($sortOrders, function ($sortOrder) { return $sortOrder['current']; });
+        $sortSelected = $sortSelected ? $sortSelected[array_key_first($sortSelected)] : null;
+        
         // pagination
         $pagination = $this->getTemplateVarPagination($this->post_number);
         // SEO title and meta desc
-        $everblog_title = Configuration::getConfigInMultipleLangs('EVERBLOG_TITLE');
+        $everblog_title = $this->module::getConfigInMultipleLangs('EVERBLOG_TITLE');
         $meta_title = $everblog_title[(int) Context::getContext()->language->id];
-        $everblog_desc = Configuration::getConfigInMultipleLangs('EVERBLOG_META_DESC');
+        $everblog_desc = $this->module::getConfigInMultipleLangs('EVERBLOG_META_DESC');
         $meta_desc = $everblog_desc[(int) Context::getContext()->language->id];
         $page = $this->context->controller->getTemplateVarPage();
         if (Tools::getValue('page')) {
-            $meta_title = $this->l('Page : ').Tools::getValue('page').' | '.$meta_title;
-            $meta_description = $this->l('Page : ').Tools::getValue('page').' | '.$meta_desc;
+            $meta_title = $this->l('Page : ') . Tools::getValue('page') . ' | ' . $meta_title;
+            $meta_description = $this->l('Page : ') . Tools::getValue('page') . ' | ' . $meta_desc;
         }
         $page['meta']['title'] = $meta_title;
         $page['meta']['description'] = $meta_desc;
@@ -133,6 +129,17 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             (int) $this->context->shop->id,
             (int) $pagination['items_shown_from'] - 1
         );
+        $starredPosts = EverPsBlogPost::getPosts(
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id,
+            (int) $pagination['items_shown_from'] - 1,
+            null,
+            'published',
+            false,
+            true,
+            $sortSelected && Validate::isOrderBy($sortSelected['order_by']) ? $sortSelected['order_by'] : null,
+            $sortSelected && Validate::isOrderWay($sortSelected['order_way']) ? $sortSelected['order_way'] : null,
+        );
         $evercategories = EverPsBlogCategory::getAllCategories(
             (int) $this->context->language->id,
             (int) $this->context->shop->id,
@@ -143,56 +150,63 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             'EVERBLOG_ANIMATE'
         );
         // Default blog text
-        $everblog_top_text = Configuration::getConfigInMultipleLangs('EVERBLOG_TOP_TEXT');
+        $everblog_top_text = $this->module::getConfigInMultipleLangs('EVERBLOG_TOP_TEXT');
         $default_blog_top_text = $everblog_top_text[(int) Context::getContext()->language->id];
         $default_blog_top_text = EverPsBlogPost::changeShortcodes(
             $default_blog_top_text,
             (int) Context::getContext()->customer->id
         );
-        $everblog_bottom_text = Configuration::getConfigInMultipleLangs('EVERBLOG_BOTTOM_TEXT');
+        $everblog_bottom_text = $this->module::getConfigInMultipleLangs('EVERBLOG_BOTTOM_TEXT');
         $default_blog_bottom_text = $everblog_bottom_text[(int) Context::getContext()->language->id];
         $default_blog_bottom_text = EverPsBlogPost::changeShortcodes(
             $default_blog_bottom_text,
             (int) Context::getContext()->customer->id
         );
-        Hook::exec('actionBeforeEverBlogInitContent', array(
-            'blog_post_number' => $this->post_number,
-            'everpsblog' => $everpsblogposts,
-            'everpsblogcategories' => $evercategories,
-            'blog_page' => Tools::getValue('page')
-        ));
+        Hook::exec('actionBeforeEverBlogInitContent', [
+            'blog_post_number' => &$this->post_number,
+            'starred' => &$starredPosts,
+            'everpsblog' => &$everpsblogposts,
+            'everpsblogcategories' => &$evercategories,
+            'blog_page' => Tools::getValue('page'),
+        ]);
         $feed_url = $this->context->link->getModuleLink(
-            $this->module_name,
+            $this->module->name,
             'feed',
-            array(
-                'feed' => 'blog'
-            ),
+            ['feed' => 'blog'],
             true,
             (int) $this->context->language->id,
             (int) $this->context->shop->id
         );
-        $this->context->smarty->assign(
-            array(
-                'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
-                'blog_path' => $this->blog_path,
-                'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
-                'allow_feed' => (bool)Configuration::get('EVERBLOG_RSS'),
-                'feed_url' => $feed_url,
-                'default_blog_top_text' => $default_blog_top_text,
-                'default_blog_bottom_text' => $default_blog_bottom_text,
-                'paginated' => Tools::getValue('page'),
-                'post_number' => (int) $this->post_number,
-                'pagination' => $pagination,
-                'everpsblog' => $everpsblogposts,
-                'evercategory' => $evercategories,
-                'default_lang' => (int) $this->context->language->id,
-                'id_lang' => (int) $this->context->language->id,
-                'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'modules/everpsblog/views/img/',
-                'animated' => $animate,
-                'pagination' => $pagination,
-                'show_featured_cat' => (bool)Configuration::get('EVERBLOG_SHOW_FEAT_CAT'),
-            )
-        );
+        $this->context->smarty->assign([
+            'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
+            'blog_path' => $this->blog_path,
+            'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
+            'allow_feed' => (bool) Configuration::get('EVERBLOG_RSS'),
+            'feed_url' => $feed_url,
+            'default_blog_top_text' => $default_blog_top_text,
+            'default_blog_bottom_text' => $default_blog_bottom_text,
+            'paginated' => Tools::getValue('page'),
+            'post_number' => (int) $this->post_number,
+            'pagination' => $pagination,
+            'everpsblog' => $everpsblogposts,
+            'starredPosts' => $starredPosts,
+            'evercategory' => $evercategories,
+            'default_lang' => (int) $this->context->language->id,
+            'id_lang' => (int) $this->context->language->id,
+            'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__ . 'modules/everpsblog/views/img/',
+            'animated' => $animate,
+            'pagination' => $pagination,
+            'show_featured_cat' => (bool) Configuration::get('EVERBLOG_SHOW_FEAT_CAT'),
+            'sort_orders' => $sortOrders,
+            'sort_selected' => $sortSelected ? $sortSelected['label'] : null,
+        ]);
+        if (Module::isInstalled('prettyblocks')
+            && Module::isEnabled('prettyblocks')
+        ) {
+            $this->context->smarty->assign([
+                'prettyblocks_enabled' => true,
+            ]);
+        }
         $this->setTemplate('module:everpsblog/views/templates/front/blog.tpl');
     }
 
@@ -207,7 +221,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             return;
         }
         return $this->context->link->getModuleLink(
-            'everpsblog',
+            $this->module->name,
             'blog'
         );
     }
@@ -215,13 +229,13 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
     public function getBreadcrumbLinks()
     {
         $breadcrumb = parent::getBreadcrumbLinks();
-        $breadcrumb['links'][] = array(
+        $breadcrumb['links'][] = [
             'title' => $this->l('Blog'),
             'url' => $this->context->link->getModuleLink(
-                'everpsblog',
+                $this->module->name,
                 'blog'
             ),
-        );
+        ];
         return $breadcrumb;
     }
 
@@ -229,10 +243,10 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
     {
         $page = parent::getTemplateVarPage();
         $page['body_classes']['page-everblog'] = true;
-        if ((bool)Context::getContext()->customer->isLogged()) {
+        if ((bool) Context::getContext()->customer->isLogged()) {
             $page['body_classes']['page-everblog-logged-in'] = true;
         }
-        $page['body_classes']['page-everblog-'.Configuration::get('EVERPSBLOG_BLOG_LAYOUT')] = true;
+        $page['body_classes']['page-everblog-' . Configuration::get('EVERPSBLOG_BLOG_LAYOUT')] = true;
         return $page;
     }
 }

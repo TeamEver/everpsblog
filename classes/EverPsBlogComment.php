@@ -33,59 +33,59 @@ class EverPsBlogComment extends ObjectModel
     public $date_upd;
     public $active;
 
-    public static $definition = array(
+    public static $definition = [
         'table' => 'ever_blog_comments',
         'primary' => 'id_ever_comment',
         'multilang' => false,
-        'fields' => array(
-            'id_ever_post' => array(
+        'fields' => [
+            'id_ever_post' => [
                 'type' => self::TYPE_INT,
                 'lang' => false,
-                'validate' => 'isunsignedInt',
-                'required' => true
-            ),
-            'id_lang' => array(
+                'validate' => 'isUnsignedInt',
+                'required' => true,
+            ],
+            'id_lang' => [
                 'type' => self::TYPE_INT,
                 'lang' => false,
-                'validate' => 'isunsignedInt',
-                'required' => true
-            ),
-            'comment' => array(
+                'validate' => 'isUnsignedInt',
+                'required' => true,
+            ],
+            'comment' => [
                 'type' => self::TYPE_HTML,
                 'lang' => false,
-                'validate' => 'isCleanHtml'
-            ),
-            'name' => array(
+                'validate' => 'isCleanHtml',
+            ],
+            'name' => [
                 'type' => self::TYPE_STRING,
                 'lang' => false,
                 'validate' => 'isString',
-                'required' => true
-            ),
-            'user_email' => array(
+                'required' => true,
+            ],
+            'user_email' => [
                 'type' => self::TYPE_STRING,
                 'lang' => false,
                 'validate' => 'isEmail',
-                'required' => true
-            ),
-            'date_add' => array(
+                'required' => true,
+            ],
+            'date_add' => [
                 'type' => self::TYPE_DATE,
                 'lang' => false,
                 'validate' => 'isDate',
-                'required' => false
-            ),
-            'date_upd' => array(
+                'required' => false,
+            ],
+            'date_upd' => [
                 'type' => self::TYPE_DATE,
                 'lang' => false,
                 'validate' => 'isDate',
-                'required' => false
-            ),
-            'active' => array(
+                'required' => false,
+            ],
+            'active' => [
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
-                'required' => false
-            ),
-        )
-    );
+                'required' => false,
+            ],
+        ],
+    ];
 
     /**
      * get latest comment by customer email
@@ -95,17 +95,17 @@ class EverPsBlogComment extends ObjectModel
     public function getLatestCommentByEmail($email, $id_lang)
     {
         $cache_id = 'EverPsBlogComment::getLatestCommentByEmail_'
-        .$email
-        .'_'
-        .(int) $id_lang;
+        . $email
+        . '_'
+        . (int) $id_lang;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
-            $sql->select('id_ever_comment');
-            $sql->from('ever_blog_comments');
-            $sql->where('id_lang = '.(int) $id_lang);
-            $sql->where('user_email = "'.pSQL($email).'"');
+            $sql->select(self::$definition['primary']);
+            $sql->from(self::$definition['table']);
+            $sql->where('id_lang = ' . (int) $id_lang);
+            $sql->where('user_email = "' . pSQL($email) . '"');
             $sql->orderBy('date_add DESC');
-            $return = new self(Db::getInstance()->getValue($sql));
+            $return = new self(Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql));
             Cache::store($cache_id, $return);
             return $return;
         }
@@ -120,7 +120,7 @@ class EverPsBlogComment extends ObjectModel
     {
         $cache_id = 'EverPsBlogComment::getComments';
         if (!Cache::isStored($cache_id)) {
-            if ($res = Db::getInstance()->executeS(
+            if ($res = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
                 'SELECT * FROM `' . _DB_PREFIX_ . 'everpsblog_comments`'
             )) {
                 Cache::store($cache_id, $res);
@@ -138,25 +138,25 @@ class EverPsBlogComment extends ObjectModel
     public static function getCommentsByPost($id_ever_post, $id_lang, $active = 1)
     {
         $cache_id = 'EverPsBlogComment::getCommentsByPost_'
-        .(int) $id_ever_post
-        .'_'
-        .(int) $id_lang
-        .'_'
-        .(int) $active;
+        . (int) $id_ever_post
+        . '_'
+        . (int) $id_lang
+        . '_'
+        . (int) $active;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
-            $sql->select('id_ever_comment');
-            $sql->from('ever_blog_comments');
-            $sql->where('id_lang = '.(int) $id_lang);
-            $sql->where('id_ever_post = '.(int) $id_ever_post);
-            $sql->where('active = '.(int) $active);
-            $sql->groupBy('id_ever_comment');
+            $sql->select(self::$definition['primary']);
+            $sql->from(self::$definition['table']);
+            $sql->where('id_lang = ' . (int) $id_lang);
+            $sql->where('id_ever_post = ' . (int) $id_ever_post);
+            $sql->where('active = ' . (int) $active);
+            $sql->groupBy(self::$definition['primary']);
             $sql->orderBy('date_add DESC');
-            $comments = Db::getInstance()->executeS($sql);
+            $comments = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
             $return = [];
             // die(var_dump($return));
             foreach ($comments as $comment) {
-                $loop_comment = new self((int) $comment['id_ever_comment']);
+                $loop_comment = new self((int) $comment[self::$definition['primary']]);
                 $loop_comment->date_add = date('d/m/Y', strtotime($loop_comment->date_add));
                 $loop_comment->date_upd = date('d/m/Y', strtotime($loop_comment->date_upd));
                 $return[] = $loop_comment;
@@ -175,24 +175,24 @@ class EverPsBlogComment extends ObjectModel
     public static function getCommentsByEmail($email, $id_lang, $active = 1)
     {
         $cache_id = 'EverPsBlogComment::getCommentsByEmail_'
-        .$email
-        .'_'
-        .(int) $id_lang
-        .'_'
-        .(int) $active;
+        . $email
+        . '_'
+        . (int) $id_lang
+        . '_'
+        . (int) $active;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
-            $sql->select('id_ever_comment');
-            $sql->from('ever_blog_comments');
-            $sql->where('id_lang = '.(int) $id_lang);
-            $sql->where('user_email = \''.pSQL($email).'\'');
-            $sql->where('active = '.(int) $active);
-            $sql->groupBy('id_ever_comment');
+            $sql->select(self::$definition['primary']);
+            $sql->from(self::$definition['table']);
+            $sql->where('id_lang = ' . (int) $id_lang);
+            $sql->where('user_email = \'' . pSQL($email) . '\'');
+            $sql->where('active = ' . (int) $active);
+            $sql->groupBy(self::$definition['primary']);
             $sql->orderBy('date_add DESC');
-            $comments = Db::getInstance()->executeS($sql);
+            $comments = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
             $return = [];
             foreach ($comments as $comment) {
-                $loop_comment = new self((int) $comment['id_ever_comment']);
+                $loop_comment = new self((int) $comment[self::$definition['primary']]);
                 $loop_comment->date_add = date('d/m/Y', strtotime($loop_comment->date_add));
                 $loop_comment->date_upd = date('d/m/Y', strtotime($loop_comment->date_upd));
                 $return[] = $loop_comment;
@@ -211,19 +211,19 @@ class EverPsBlogComment extends ObjectModel
     public static function commentsCount($id_ever_post, $id_lang, $active = 1)
     {
         $cache_id = 'EverPsBlogComment::commentsCount_'
-        .(int) $id_ever_post
-        .'_'
-        .(int) $id_lang
-        .'_'
-        .(int) $active;
+        . (int) $id_ever_post
+        . '_'
+        . (int) $id_lang
+        . '_'
+        . (int) $active;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
             $sql->select('COUNT(*)');
-            $sql->from('ever_blog_comments');
-            $sql->where('id_ever_post = '.(int) $id_ever_post);
-            $sql->where('id_lang = '.(int) $id_lang);
-            $sql->where('active = '.(int) $active);
-            $count = Db::getInstance()->getValue($sql);
+            $sql->from(self::$definition['table']);
+            $sql->where('id_ever_post = ' . (int) $id_ever_post);
+            $sql->where('id_lang = ' . (int) $id_lang);
+            $sql->where('active = ' . (int) $active);
+            $count = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
             if ($count) {
                 Cache::store($cache_id, $count);
                 return (int) $count;

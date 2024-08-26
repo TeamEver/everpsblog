@@ -40,19 +40,33 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
 
     public function init()
     {
-        $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
-        $this->module_name = 'everpsblog';
         $this->category = new EverPsBlogCategory(
-            (int)Tools::getValue('id_ever_category'),
+            (int) Tools::getValue('id_ever_category'),
             (int) $this->context->language->id,
             (int) $this->context->shop->id
         );
+        if (isset($this->category->allowed_groups) && $this->category->allowed_groups) {
+            if (is_array($this->category->allowed_groups)) {
+                $allowedGroups = [];
+            } else {
+                $allowedGroups = json_decode($this->category->allowed_groups);
+            }
+            $customerGroups = Customer::getGroupsStatic(
+                (int) $this->context->customer->id
+            );
+            if (isset($customerGroups)
+                && !empty($allowedGroups)
+                && !array_intersect($allowedGroups, $customerGroups)
+            ) {
+                Tools::redirect('index.php?controller=404');
+            }
+        }
         $this->category->count = $this->category->count + 1;
         $this->category->save();
         parent::init();
         $this->parent_categories = EverPsBlogTaxonomy::getCategoryParentsTaxonomy(
             (int) $this->category->id
-        );
+        ) ?: [];
         // if inactive category or unexists, redirect
         if (!$this->category->active
             || $this->category->is_root_category
@@ -63,15 +77,11 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
 
     public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
     {
-        if ($this->isSeven) {
-            return Context::getContext()->getTranslator()->trans(
-                $string,
-                [],
-                'Modules.Everpsblog.category'
-            );
-        }
-
-        return parent::l($string, $specific, $class, $addslashes, $htmlentities);
+        return $this->context->getTranslator()->trans(
+            $string,
+            [],
+            'Modules.Everpsblog.category'
+        );
     }
 
     public function initContent()
@@ -79,20 +89,24 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
         parent::initContent();
         if (Tools::getValue('id_ever_category')) {
             $this->post_number = EverPsBlogPost::countPostsByCategory(
-                (int)Tools::getValue('id_ever_category'),
+                (int) Tools::getValue('id_ever_category'),
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id
             );
+
+            $sortOrders = EverPsBlogSortOrders::getSortOrders();
+            $sortSelected = array_filter($sortOrders, function ($sortOrder) { return $sortOrder['current']; });
+            $sortSelected = $sortSelected ? $sortSelected[array_key_first($sortSelected)] : null;
+            
             // Pagination only if there is still some posts
             $pagination = $this->getTemplateVarPagination(
                 $this->post_number
             );
-            // die(var_dump($pagination['total_items']));
             // end pagination
             $animate = Configuration::get(
                 'EVERBLOG_ANIMATE'
             );
-            if ($this->category->index) {
+            if ($this->category->indexable) {
                 $seo_index = 'index';
             } else {
                 $seo_index = 'noindex';
@@ -104,10 +118,10 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
             }
             $page = $this->context->controller->getTemplateVarPage();
             // SEO opti on pagination; thx FoP ! Awesome channel !
-            $page['meta']['robots'] = $seo_index.', '.$seo_follow;
+            $page['meta']['robots'] = $seo_index . ', ' . $seo_follow;
             if (Tools::getValue('page')) {
-                $meta_title = $this->l('Page : ').Tools::getValue('page').' | '.$this->category->meta_title;
-                $meta_description = $this->l('Page : ').Tools::getValue('page').' | '.$this->category->meta_description;
+                $meta_title = $this->l('Page : ') . Tools::getValue('page') . ' | ' . $this->category->meta_title;
+                $meta_description = $this->l('Page : ') . Tools::getValue('page') . ' | ' . $this->category->meta_description;
             } else {
                 $meta_title = $this->category->meta_title;
                 $meta_description = $this->category->meta_description;
@@ -131,56 +145,63 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                 $children_categories = false;
             }
             $this->category->content = EverPsBlogPost::changeShortcodes(
-                (string) $this->category->content,
-                (int) Context::getContext()->customer->id
+                $this->category->content,
+                (int) $this->context->customer->id
             );
             $this->category->bottom_content = EverPsBlogPost::changeShortcodes(
-                (string) $this->category->bottom_content,
-                (int) Context::getContext()->customer->id
+                $this->category->bottom_content,
+                (int) $this->context->customer->id
             );
-            Hook::exec('actionBeforeEverCategoryInitContent', array(
+            Hook::exec('actionBeforeEverCategoryInitContent', [
                 'blog_category' => $this->category,
-                'blog_posts' => $posts
-            ));
+                'blog_posts' => $posts,
+            ]);
             $file_url = EverPsBlogImage::getBlogImageUrl(
                 (int) $this->category->id,
                 (int) $this->context->shop->id,
                 'category'
             );
             $feed_url = $this->context->link->getModuleLink(
-                $this->module_name,
+                $this->module->name,
                 'feed',
-                array(
+                [
                     'feed' => 'category',
-                    'id_obj' => $this->category->id
-                ),
+                    'id_obj' => $this->category->id,
+                ],
                 true,
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id
             );
-            $this->context->smarty->assign(
-                array(
-                    'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
-                    'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
-                    'children_categories' => $children_categories,
-                    'allow_feed' => (bool)Configuration::get('EVERBLOG_RSS'),
-                    'feed_url' => $feed_url,
-                    'featured_image' => $file_url,
-                    'paginated' => Tools::getValue('page'),
-                    'post_number' => (int) $this->post_number,
-                    'pagination' => $pagination,
-                    'category' => $this->category,
-                    'posts' => $posts,
-                    'default_lang' => (int) $this->context->language->id,
-                    'id_lang' => $this->context->language->id,
-                    'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'modules/everpsblog/views/img/',
-                    'animated' => $animate,
-                    'show_featured_cat' => (bool)Configuration::get('EVERBLOG_SHOW_FEAT_CAT'),
-                )
-            );
-            $this->setTemplate('module:everpsblog/views/templates/front/category.tpl');
+            $this->context->smarty->assign([
+                'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
+                'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
+                'children_categories' => $children_categories,
+                'allow_feed' => (bool) Configuration::get('EVERBLOG_RSS'),
+                'feed_url' => $feed_url,
+                'featured_image' => $file_url,
+                'paginated' => Tools::getValue('page'),
+                'post_number' => (int) $this->post_number,
+                'pagination' => $pagination,
+                'category' => $this->category,
+                'posts' => array_map(function ($post) { return (array) $post; }, $posts ?: []),
+                'default_lang' => (int) $this->context->language->id,
+                'id_lang' => $this->context->language->id,
+                'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'modules/' . $this->module->name . '/views/img/',
+                'animated' => $animate,
+                'show_featured_cat' => (bool)Configuration::get('EVERBLOG_SHOW_FEAT_CAT'),
+                'sort_orders' => $sortOrders,
+                'sort_selected' => $sortSelected ? $sortSelected['label'] : null,
+            ]);
+            if (Module::isInstalled('prettyblocks')
+                && Module::isEnabled('prettyblocks')
+            ) {
+                $this->context->smarty->assign([
+                    'prettyblocks_enabled' => true,
+                ]);
+            }
+            $this->setTemplate('module:' . $this->module->name . '/views/templates/front/category.tpl');
         } else {
-            Tools::redirect('index.php');
+            Tools::redirect('index.php?controller=404');
         }
     }
 
@@ -195,25 +216,25 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
             return;
         }
         return $this->context->link->getModuleLink(
-            'everpsblog',
+            $this->module->name,
             'category',
-            array(
+            [
                 'id_ever_category' => $this->category->id,
-                'link_rewrite' => $this->category->link_rewrite
-            )
+                'link_rewrite' => $this->category->link_rewrite,
+            ]
         );
     }
 
     public function getBreadcrumbLinks()
     {
         $breadcrumb = parent::getBreadcrumbLinks();
-        $breadcrumb['links'][] = array(
+        $breadcrumb['links'][] = [
             'title' => $this->l('Blog'),
             'url' => $this->context->link->getModuleLink(
-                'everpsblog',
+                $this->module->name,
                 'blog'
             ),
-        );
+        ];
         foreach ($this->parent_categories as $parent_category) {
             $category = new EverPsBlogCategory(
                 (int) $parent_category,
@@ -228,12 +249,12 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                 $breadcrumb['links'][] = array(
                     'title' => $category->title,
                     'url' => $this->context->link->getModuleLink(
-                        'everpsblog',
+                        $this->module->name,
                         'category',
-                        array(
+                        [
                             'id_ever_category' => $category->id,
-                            'link_rewrite' => $category->link_rewrite
-                        )
+                            'link_rewrite' => $category->link_rewrite,
+                        ]
                     ),
                 );
             }
@@ -241,12 +262,12 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
         $breadcrumb['links'][] = array(
             'title' => $this->category->title,
             'url' => $this->context->link->getModuleLink(
-                'everpsblog',
+                $this->module->name,
                 'category',
-                array(
+                [
                     'id_ever_category' => (int) $this->category->id,
-                    'link_rewrite' => $this->category->link_rewrite
-                )
+                    'link_rewrite' => $this->category->link_rewrite,
+                ]
             ),
         );
         return $breadcrumb;
@@ -257,11 +278,11 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
         $page = parent::getTemplateVarPage();
         $page['body_classes']['page-everblog'] = true;
         $page['body_classes']['page-everblog-category'] = true;
-        $page['body_classes']['page-everblog-category-id-'.(int) $this->category->id] = true;
-        if ((bool)Context::getContext()->customer->isLogged()) {
+        $page['body_classes']['page-everblog-category-id-' . (int) $this->category->id] = true;
+        if ((bool) $this->context->customer->isLogged()) {
             $page['body_classes']['page-everblog-logged-in'] = true;
         }
-        $page['body_classes']['page-everblog-'.Configuration::get('EVERPSBLOG_CAT_LAYOUT')] = true;
+        $page['body_classes']['page-everblog-' . Configuration::get('EVERPSBLOG_CAT_LAYOUT')] = true;
         return $page;
     }
 }

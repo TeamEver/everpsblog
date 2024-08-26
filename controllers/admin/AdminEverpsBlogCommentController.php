@@ -188,7 +188,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
 
         if (Tools::getIsset('deleteComment'.$this->table)) {
             $everObj = new EverPsBlogComment(
-                (int)Tools::getValue('id_ever_comment')
+                (int) Tools::getValue('id_ever_comment')
             );
             if (Validate::isLoadedObject($everObj)) {
                 $everObj->delete();
@@ -212,7 +212,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
             .'/everpsblog/views/templates/admin/headerController.tpl'
         );
         $blog_instance = Module::getInstanceByName($this->module_name);
-        if ($blog_instance->checkLatestEverModuleVersion($this->module_name, $blog_instance->version)) {
+        if ($blog_instance->checkLatestEverModuleVersion()) {
             $this->html .= $this->context->smarty->fetch(
                 _PS_MODULE_DIR_
                 .'/'
@@ -342,14 +342,14 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
         parent::postProcess();
         if (Tools::getValue('deleteever_blog_comments')) {
             $everObj = new EverPsBlogComment(
-                (int)Tools::getValue('id_ever_comment')
+                (int) Tools::getValue('id_ever_comment')
             );
             (int) $everObj->active = !(int) $everObj->active;
             $everObj->delete();
         }
         if (Tools::getValue('statusever_blog_comments')) {
             $everObj = new EverPsBlogComment(
-                (int)Tools::getValue('id_ever_comment')
+                (int) Tools::getValue('id_ever_comment')
             );
             (int) $everObj->active = !(int) $everObj->active;
             $everObj->save();
@@ -359,7 +359,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
                 $comment = new EverPsBlogComment();
             } else {
                 $comment = new EverPsBlogComment(
-                    (int)Tools::getValue('id_ever_comment')
+                    (int) Tools::getValue('id_ever_comment')
                 );
             }
             if (!Tools::getValue('id_lang')

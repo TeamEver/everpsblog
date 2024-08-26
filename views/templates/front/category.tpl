@@ -83,6 +83,9 @@
         {$category->date_add|escape:'htmlall':'UTF-8'}
     </div>
     <div class="row categorycontent">
+        {if isset($prettyblocks_enabled) && $prettyblocks_enabled}
+        {widget name="prettyblocks" zone_name="displayBeforeCategory{$category->id}"}
+        {/if}
         {$category->content nofilter}
     </div>
 </div>
@@ -103,11 +106,18 @@
 {include file='module:everpsblog/views/templates/front/loop/post_object.tpl'}
 {/foreach}
 </div>
-{include file='_partials/pagination.tpl' pagination=$pagination}
+{if isset($post_number) && $post_number > 0}
+<div class="row">
+    {include file='_partials/pagination.tpl' pagination=$pagination}
+</div>
+{/if}
 {hook h="displayAfterEverLoop"}
 {if isset($paginated) && !$paginated}
 <div class="container">
     <div class="row categorybottomcontent {if $animated}zoomed{/if}" itemprop="articleBody">
+        {if isset($prettyblocks_enabled) && $prettyblocks_enabled}
+        {widget name="prettyblocks" zone_name="displayAfterCategory{$category->id}"}
+        {/if}
         {$category->bottom_content nofilter}
     </div>
 </div>

@@ -34,7 +34,7 @@ class EverPsBlogSitemap extends ObjectModel
     const SCHEMA = 'http://www.sitemaps.org/schemas/sitemap/0.9';
     const DEFAULT_PRIORITY = 0.5;
     const SEPERATOR = '-';
-    const INDEX_SUFFIX = 'index';
+    const INDEX_SUFFIX = 'indexable';
 
     /**
      *
@@ -178,10 +178,10 @@ class EverPsBlogSitemap extends ObjectModel
         if ($this->getCurrentSitemap()) {
             $this->getWriter()->openURI(
                 $this->getPath()
-                .$this->getFilename()
-                .self::SEPERATOR
-                .$this->getCurrentSitemap()
-                .self::EXT
+                . $this->getFilename()
+                . self::SEPERATOR
+                . $this->getCurrentSitemap()
+                . self::EXT
             );
         } else {
             $this->getWriter()->openURI(
@@ -268,10 +268,10 @@ class EverPsBlogSitemap extends ObjectModel
         $indexwriter = new \XMLWriter();
         $indexwriter->openURI(
             $this->getPath()
-            .$this->getFilename()
-            .self::SEPERATOR
-            .self::INDEX_SUFFIX
-            .self::EXT
+            . $this->getFilename()
+            . self::SEPERATOR
+            . self::INDEX_SUFFIX
+            . self::EXT
         );
         $indexwriter->startDocument('1.0', 'UTF-8');
         $indexwriter->setIndent(true);
@@ -282,9 +282,9 @@ class EverPsBlogSitemap extends ObjectModel
             $indexwriter->writeElement(
                 'loc',
                 $loc
-                .$this->getFilename()
-                .($index ? self::SEPERATOR . $index : '')
-                .self::EXT
+                . $this->getFilename()
+                . ($index ? self::SEPERATOR . $index : '')
+                . self::EXT
             );
             $indexwriter->writeElement('lastmod', $this->getLastModifiedDate($lastmod));
             $indexwriter->endElement();
@@ -297,31 +297,31 @@ class EverPsBlogSitemap extends ObjectModel
     {
         $siteUrl = Tools::getHttpHost(true) . __PS_BASE_URI__;
         $indexes = [];
-        $sitemap_indexes_dir = glob(_PS_ROOT_DIR_.'/*');
+        $sitemap_indexes_dir = glob(_PS_ROOT_DIR_ . '/*');
         foreach ($sitemap_indexes_dir as $index) {
             if (is_file($index)
                 && pathinfo($index, PATHINFO_EXTENSION) == 'xml'
-                && strpos(basename($index), 'index')
+                && strpos(basename($index), 'indexable')
             ) {
-                $indexes[] = $siteUrl.basename($index);
+                $indexes[] = $siteUrl . basename($index);
             }
         }
-        return (array)$indexes;
+        return (array) $indexes;
     }
 
     public static function getSitemaps()
     {
         $siteUrl = Tools::getHttpHost(true) . __PS_BASE_URI__;
         $sitemaps = [];
-        $sitemap_dir = glob(_PS_ROOT_DIR_.'/*');
+        $sitemap_dir = glob(_PS_ROOT_DIR_ . '/*');
         foreach ($sitemap_dir as $sitemap) {
             if (is_file($sitemap)
                 && pathinfo($sitemap, PATHINFO_EXTENSION) == 'xml'
-                && !strpos(basename($sitemap), 'index')
+                && !strpos(basename($sitemap), 'indexable')
             ) {
-                $sitemaps[] = $siteUrl.basename($sitemap);
+                $sitemaps[] = $siteUrl . basename($sitemap);
             }
         }
-        return (array)$sitemaps;
+        return (array) $sitemaps;
     }
 }

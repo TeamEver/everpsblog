@@ -29,6 +29,7 @@ class EverPsBlogTaxonomy extends ObjectModel
     public $id_product;
     public $id_category;
     public $id_tag;
+    public $allowed_groups;
 
     /**
      * Insert new taxonomy from table
@@ -40,17 +41,17 @@ class EverPsBlogTaxonomy extends ObjectModel
     {
         switch ($obj_name) {
             case 'category':
-                $table = _DB_PREFIX_.'ever_blog_post_category';
+                $table = _DB_PREFIX_ . 'ever_blog_post_category';
                 $key = 'id_ever_post_category';
                 break;
 
             case 'tag':
-                $table = _DB_PREFIX_.'ever_blog_post_tag';
+                $table = _DB_PREFIX_ . 'ever_blog_post_tag';
                 $key = 'id_ever_post_tag';
                 break;
 
             case 'product':
-                $table = _DB_PREFIX_.'ever_blog_post_product';
+                $table = _DB_PREFIX_ . 'ever_blog_post_product';
                 $key = 'id_ever_post_product';
                 break;
         }
@@ -62,13 +63,13 @@ class EverPsBlogTaxonomy extends ObjectModel
         ) {
             set_time_limit(0);
             $sql =
-                'INSERT IGNORE INTO `'.pSQL($table).'` (
-                    '.pSQL($key).',
+                'INSERT IGNORE INTO `' . pSQL($table) . '` (
+                    ' . pSQL($key) . ',
                     id_ever_post
                 )
                 VALUES (
-                    '.(int) $id_obj.',
-                    '.(int) $id_post.'
+                    ' . (int) $id_obj . ',
+                    ' . (int) $id_post . '
                 )';
             if (!Db::getInstance()->execute($sql)) {
                 return false;
@@ -88,24 +89,24 @@ class EverPsBlogTaxonomy extends ObjectModel
     {
         switch ($obj_name) {
             case 'category':
-                $table = _DB_PREFIX_.'ever_blog_post_category';
+                $table = _DB_PREFIX_ . 'ever_blog_post_category';
                 $key = 'id_ever_post_category';
                 break;
 
             case 'tag':
-                $table = _DB_PREFIX_.'ever_blog_post_tag';
+                $table = _DB_PREFIX_ . 'ever_blog_post_tag';
                 $key = 'id_ever_post_tag';
                 break;
 
             case 'product':
-                $table = _DB_PREFIX_.'ever_blog_post_product';
+                $table = _DB_PREFIX_ . 'ever_blog_post_product';
                 $key = 'id_ever_post_product';
                 break;
         }
         if (isset($table) && !empty($table) && isset($key) && !empty($key)) {
             set_time_limit(0);
-            $sql = 'DELETE FROM '.pSQL($table).'
-            WHERE id_ever_post = '.(int) $id_post;
+            $sql = 'DELETE FROM ' . pSQL($table) . '
+            WHERE id_ever_post = ' . (int) $id_post;
             // If dropped, return insert as kind of update
             if (!Db::getInstance()->Execute($sql)) {
                 return false;
@@ -123,8 +124,8 @@ class EverPsBlogTaxonomy extends ObjectModel
      */
     public static function updateTaxonomy($id_obj, $id_post, $obj_name)
     {
-        if ((bool)self::dropTaxonomy($id_post, $obj_name) === true) {
-            return (bool)self::insertTaxonomy($id_obj, $id_post, $obj_name);
+        if ((bool) self::dropTaxonomy($id_post, $obj_name) === true) {
+            return (bool) self::insertTaxonomy($id_obj, $id_post, $obj_name);
         }
     }
 
@@ -138,8 +139,7 @@ class EverPsBlogTaxonomy extends ObjectModel
     {
         set_time_limit(0);
         $sql = 'DELETE FROM `' . _DB_PREFIX_ . 'ever_blog_post_product`
-        WHERE id_ever_post_product = '.(int) $id_product.'
-        ';
+        WHERE id_ever_post_product = ' . (int) $id_product;
         if (!Db::getInstance()->Execute($sql)) {
             return false;
         }
@@ -153,10 +153,8 @@ class EverPsBlogTaxonomy extends ObjectModel
      */
     public static function dropCategoryTaxonomy($id_category)
     {
-        set_time_limit(0);
         $sql = 'DELETE FROM `' . _DB_PREFIX_ . 'ever_blog_post_category`
-        WHERE id_ever_post_category = '.(int) $id_category.'
-        ';
+        WHERE id_ever_post_category = ' . (int) $id_category;
         if (!Db::getInstance()->Execute($sql)) {
             return false;
         }
@@ -170,10 +168,8 @@ class EverPsBlogTaxonomy extends ObjectModel
      */
     public static function dropTagTaxonomy($id_tag)
     {
-        set_time_limit(0);
         $sql = 'DELETE FROM `' . _DB_PREFIX_ . 'ever_blog_post_tag`
-        WHERE id_ever_post_tag = '.(int) $id_tag.'
-        ';
+        WHERE id_ever_post_tag = ' . (int) $id_tag;
         if (!Db::getInstance()->Execute($sql)) {
             return false;
         }
@@ -188,15 +184,36 @@ class EverPsBlogTaxonomy extends ObjectModel
     public static function getPostTagsTaxonomies($id_post)
     {
         $cache_id = 'EverPsBlogTaxonomy::getPostTagsTaxonomies_'
-        .(int) $id_post;
+        . (int) $id_post;
         if (!Cache::isStored($cache_id)) {
+            $context = Context::getContext();
             $sql = new DbQuery;
-            $sql->select('id_ever_post_tag');
+            $sql->select('*');
             $sql->from('ever_blog_post_tag');
-            $sql->where('id_ever_post = '.(int) $id_post);
+            $sql->where('id_ever_post = ' . (int) $id_post);
             $taxonomies = Db::getInstance()->executeS($sql);
-            Cache::store($cache_id, $taxonomies);
-            return $taxonomies;
+            $return = [];
+            foreach ($taxonomies as $taxonomy) {
+                if (isset($taxonomy['allowed_groups'])
+                    && $taxonomy['allowed_groups']
+                ) {
+                    $allowedGroups = json_decode($taxonomy['allowed_groups']);
+                    $customerGroups = Customer::getGroupsStatic(
+                        (int) $context->customer->id
+                    );
+                    if (isset($customerGroups)
+                        && !empty($allowedGroups)
+                        && !array_intersect($allowedGroups, $customerGroups)
+                    ) {
+                        continue;
+                    }
+                    $return[] = $taxonomy['id_ever_post_tag'];
+                } else {
+                    $return[] = $taxonomy['id_ever_post_tag'];
+                }
+            }
+            Cache::store($cache_id, $return);
+            return $return;
         }
         return Cache::retrieve($cache_id);
     }
@@ -210,22 +227,42 @@ class EverPsBlogTaxonomy extends ObjectModel
     public static function getPostCategoriesTaxonomies($id_post)
     {
         $cache_id = 'EverPsBlogTaxonomy::getPostCategoriesTaxonomies_'
-        .(int) $id_post;
+        . (int) $id_post;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
-            $sql->select('epc.id_ever_post_category');
+            $sql->select('epc.*');
             $sql->from('ever_blog_post_category', 'epc');
             $sql->leftJoin(
                 'ever_blog_category',
                 'bc',
                 'bc.id_ever_category = epc.id_ever_post_category'
             );
-            $sql->where('epc.id_ever_post = '.(int) $id_post);
+            $sql->where('epc.id_ever_post = ' . (int) $id_post);
             $sql->orderBy('bc.id_parent_category ASC');
             $sql->groupBy('bc.id_ever_category');
             $taxonomies = Db::getInstance()->executeS($sql);
-            Cache::store($cache_id, $taxonomies);
-            return $taxonomies;
+            $return = [];
+            foreach ($taxonomies as $taxonomy) {
+                if (isset($taxonomy['allowed_groups'])
+                    && $taxonomy['allowed_groups']
+                ) {
+                    $allowedGroups = json_decode($taxonomy['allowed_groups']);
+                    $customerGroups = Customer::getGroupsStatic(
+                        (int) $context->customer->id
+                    );
+                    if (isset($customerGroups)
+                        && !empty($allowedGroups)
+                        && !array_intersect($allowedGroups, $customerGroups)
+                    ) {
+                        continue;
+                    }
+                    $return[] = $taxonomy['id_ever_post_category'];
+                } else {
+                    $return[] = $taxonomy['id_ever_post_category'];
+                }
+            }
+            Cache::store($cache_id, $return);
+            return $return;
         }
         return Cache::retrieve($cache_id);
     }
@@ -238,23 +275,36 @@ class EverPsBlogTaxonomy extends ObjectModel
     public static function getCategoryParentsTaxonomy($id_category, $active = 1)
     {
         $cache_id = 'EverPsBlogTaxonomy::getCategoryParentsTaxonomy_'
-        .(int) $id_category
-        .'_'
-        .(int) $active;
+        . (int) $id_category
+        . '_'
+        . (int) $active;
         if (!Cache::isStored($cache_id)) {
+            $context = Context::getContext();
             $taxonomies = [];
             $root_category = EverPsBlogCategory::getRootCategory();
             $sql = new DbQuery;
             $sql->select('id_parent_category');
             $sql->from('ever_blog_category');
-            $sql->where('id_ever_category = '.(int) $id_category);
-            $sql->where('active = '.(int) $active);
+            $sql->where('id_ever_category = ' . (int) $id_category);
+            $sql->where('active = ' . (int) $active);
             $taxonomy = Db::getInstance()->getValue($sql);
             if (isset($taxonomy) && (int) $taxonomy > 0) {
                 $taxonomies[] = $taxonomy;
                 $category = new EverPsBlogCategory(
                     (int) $taxonomy
                 );
+                if (isset($category->allowed_groups) && $category->allowed_groups) {
+                    $allowedGroups = array_keys($category->allowed_groups);
+                    $customerGroups = Customer::getGroupsStatic(
+                        (int) $context->customer->id
+                    );
+                    if (isset($customerGroups)
+                        && !empty($allowedGroups)
+                        && !array_intersect($allowedGroups, $customerGroups)
+                    ) {
+                        return false;
+                    }
+                }
                 if ((int) $category->id_parent_category > 0
                     && (int) $root_category->id != (int) $category->id_parent_category) {
                     $taxonomies[] = (int) $category->id_parent_category;
@@ -269,18 +319,38 @@ class EverPsBlogTaxonomy extends ObjectModel
     public static function getPostHighestCategory($id_post)
     {
         $cache_id = 'EverPsBlogTaxonomy::getPostHighestCategory_'
-        .(int) $id_post;
+        . (int) $id_post;
         if (!Cache::isStored($cache_id)) {
             $root_category = EverPsBlogCategory::getRootCategory();
             $sql = new DbQuery;
+            $sql->select('*');
             $sql->from('ever_blog_post_category');
-            $sql->select('id_ever_post_category');
-            $sql->where('id_ever_post = '.(int) $id_post);
-            $sql->where('id_ever_post_category != '.(int) $root_category->id);
+            $sql->where('id_ever_post = ' . (int) $id_post);
+            $sql->where('id_ever_post_category != ' . (int) $root_category->id);
             $sql->orderBy('id_ever_post_category DESC');
             $taxonomies = Db::getInstance()->getValue($sql);
-            Cache::store($cache_id, $taxonomies);
-            return $taxonomies;
+            $return = [];
+            foreach ($taxonomies as $taxonomy) {
+                if (isset($taxonomy['allowed_groups'])
+                    && $taxonomy['allowed_groups']
+                ) {
+                    $allowedGroups = json_decode($taxonomy['allowed_groups']);
+                    $customerGroups = Customer::getGroupsStatic(
+                        (int) $context->customer->id
+                    );
+                    if (isset($customerGroups)
+                        && !empty($allowedGroups)
+                        && !array_intersect($allowedGroups, $customerGroups)
+                    ) {
+                        continue;
+                    }
+                    $return[] = $taxonomy['id_ever_post_category'];
+                } else {
+                    $return[] = $taxonomy['id_ever_post_category'];
+                }
+            }
+            Cache::store($cache_id, $return);
+            return $return;
         }
         return Cache::retrieve($cache_id);
     }
@@ -288,15 +358,35 @@ class EverPsBlogTaxonomy extends ObjectModel
     public static function getPostProductsTaxonomies($id_post)
     {
         $cache_id = 'EverPsBlogTaxonomy::getPostProductsTaxonomies_'
-        .(int) $id_post;
+        . (int) $id_post;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
+            $sql->select('*');
             $sql->from('ever_blog_post_product');
-            $sql->select('id_ever_post_product');
-            $sql->where('id_ever_post = '.(int) $id_post);
+            $sql->where('id_ever_post = ' . (int) $id_post);
             $taxonomies = Db::getInstance()->executeS($sql);
-            Cache::store($cache_id, $taxonomies);
-            return $taxonomies;
+            $return = [];
+            foreach ($taxonomies as $taxonomy) {
+                if (isset($taxonomy['allowed_groups'])
+                    && $taxonomy['allowed_groups']
+                ) {
+                    $allowedGroups = json_decode($taxonomy['allowed_groups']);
+                    $customerGroups = Customer::getGroupsStatic(
+                        (int) $context->customer->id
+                    );
+                    if (isset($customerGroups)
+                        && !empty($allowedGroups)
+                        && !array_intersect($allowedGroups, $customerGroups)
+                    ) {
+                        continue;
+                    }
+                    $return[] = $taxonomy['id_ever_post_product'];
+                } else {
+                    $return[] = $taxonomy['id_ever_post_product'];
+                }
+            }
+            Cache::store($cache_id, $return);
+            return $return;
         }
         return Cache::retrieve($cache_id);
     }
@@ -323,9 +413,9 @@ class EverPsBlogTaxonomy extends ObjectModel
     public static function taxonomyExists($id_obj, $obj_name)
     {
         $cache_id = 'EverPsBlogTaxonomy::taxonomyExists_'
-        .(int) $id_obj
-        .'_'
-        .$obj_name;
+        . (int) $id_obj
+        . '_'
+        . $obj_name;
         if (!Cache::isStored($cache_id)) {
             switch ($obj_name) {
                 case 'category':
@@ -347,7 +437,7 @@ class EverPsBlogTaxonomy extends ObjectModel
                 $sql = new DbQuery;
                 $sql->select(pSQL($key));
                 $sql->from(pSQL($table));
-                $sql->where(pSQL($key).' = '.(int) $id_obj);
+                $sql->where(pSQL($key).' = ' . (int) $id_obj);
                 $return = Db::getInstance()->getValue($sql);
                 Cache::store($cache_id, $return);
                 return $return;

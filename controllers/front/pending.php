@@ -27,7 +27,7 @@ class EverPsBlogpendingModuleFrontController extends ModuleFrontController
 
     public function init()
     {
-        $this->smileys = array(
+        $this->smileys = [
             '😀',
             '😁',
             '😃',
@@ -53,8 +53,8 @@ class EverPsBlogpendingModuleFrontController extends ModuleFrontController
             '🙄',
             '🤐',
             '🤫',
-            '🧐'
-        );
+            '🧐',
+        ];
         $this->randSmiley = array_rand($this->smileys);
         if (!Tools::getValue('token')
             || Tools::encrypt('everpsblog/cron') != Tools::getValue('token')
@@ -82,21 +82,20 @@ class EverPsBlogpendingModuleFrontController extends ModuleFrontController
         }
         /* Check if the requested shop exists */
         $shops = Db::getInstance()->ExecuteS('SELECT id_shop FROM `' . _DB_PREFIX_ . 'shop`');
-
         $list_id_shop = [];
         foreach ($shops as $shop) {
             $list_id_shop[] = (int) $shop['id_shop'];
         }
 
         $id_shop = (Tools::getIsset('id_shop') && in_array(Tools::getValue('id_shop'), $list_id_shop))
-            ? (int)Tools::getValue('id_shop') : (int)Configuration::get('PS_SHOP_DEFAULT');
+            ? (int) Tools::getValue('id_shop') : (int)Configuration::get('PS_SHOP_DEFAULT');
 
         $everpsblog->cron = true;
         if ($everpsblog->sendPendingNotification((int) $id_shop)) {
             die(
                 $this->smileys[$this->randSmiley]
-                .' All emails for pending posts have been sent '
-                .$this->smileys[$this->randSmiley]
+                . ' All emails for pending posts have been sent '
+                . $this->smileys[$this->randSmiley]
             );
         }
         Tools::redirect('index.php');

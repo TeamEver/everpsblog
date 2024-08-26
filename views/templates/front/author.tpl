@@ -120,7 +120,11 @@
 {include file='module:everpsblog/views/templates/front/loop/post_object.tpl'}
 {/foreach}
 </div>
-{include file='_partials/pagination.tpl' pagination=$pagination}
+{if isset($post_number) && $post_number > 0}
+<div class="row">
+    {include file='_partials/pagination.tpl' pagination=$pagination}
+</div>
+{/if}
 {hook h="displayAfterEverLoop"}
 {else}
 <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>

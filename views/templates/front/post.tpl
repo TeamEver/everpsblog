@@ -89,6 +89,7 @@
         <p class="text-center author_cover_container">
             <a href="{$author->url|escape:'htmlall':'UTF-8'}" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
                 <img src="{$author_cover|escape:'htmlall':'UTF-8'}" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" class="img-fluid author-icon rounded-circle" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'}" title="{$author->nickhandle|escape:'htmlall':'UTF-8'}">
+                <br>
                 {l s='By' mod='everpsblog'} {$author->nickhandle|escape:'htmlall':'UTF-8'}
             </a>
         </p>
@@ -98,6 +99,9 @@
         <div class="col-12 col-md-12 postcontent {if $animated}zoomed{/if}">
             {if isset($post->password_protected) && $post->password_protected}
             <div class="alert alert-warning">
+                {if isset($prettyblocks_enabled) && $prettyblocks_enabled}
+                {widget name="prettyblocks" zone_name="displayPost{$post->id}"}
+                {/if}
                 {$post->content nofilter}
             </div>
             <form method="POST">
@@ -107,6 +111,9 @@
                 <button type="submit" class="btn btn-primary">{l s='Validate' mod='everpsblog'}</button>
             </form>
             {else}
+            {if isset($prettyblocks_enabled) && $prettyblocks_enabled}
+            {widget name="prettyblocks" zone_name="displayPost{$post->id}"}
+            {/if}
             {$post->content nofilter}
             {/if}
         </div>

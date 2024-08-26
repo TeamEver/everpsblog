@@ -56,6 +56,9 @@
 {if isset($paginated) && !$paginated}
 <div class="container">
     <div class="row tagcontent">
+        {if isset($prettyblocks_enabled) && $prettyblocks_enabled}
+        {widget name="prettyblocks" zone_name="displayBeforeTag{$tag->id}"}
+        {/if}
         {$tag->content nofilter}
     </div>
 </div>
@@ -68,11 +71,18 @@
 {include file='module:everpsblog/views/templates/front/loop/post_object.tpl'}
 {/foreach}
 </div>
-{include file='_partials/pagination.tpl' pagination=$pagination}
+{if isset($post_number) && $post_number > 0}
+<div class="row">
+    {include file='_partials/pagination.tpl' pagination=$pagination}
+</div>
+{/if}
 {hook h="displayAfterEverLoop"}
 {if isset($paginated) && !$paginated}
 <div class="container">
     <div class="row tagbottomcontent {if $animated}zoomed{/if}" itemprop="articleBody">
+        {if isset($prettyblocks_enabled) && $prettyblocks_enabled}
+        {widget name="prettyblocks" zone_name="displayAfterTag{$tag->id}"}
+        {/if}
         {$tag->bottom_content nofilter}
     </div>
 </div>

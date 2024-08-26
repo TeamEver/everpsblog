@@ -21,16 +21,18 @@
     </div>
     <div class="panel-body">
         <div class="col-xs-12 col-lg-6">
-            <a href="#everbottom" id="evertop">
-               <img id="everlogo" src="{$image_dir|escape:'htmlall':'UTF-8'}/ever.png" style="max-width: 120px;">
-            </a>
             <p>
-                <a href="{$blog_url|escape:'htmlall':'UTF-8'}" target="_blank" class="btn btn-info">
+                <a href="#everbottom" id="evertop">
+                   <img id="everlogo" src="{$image_dir|escape:'htmlall':'UTF-8'}/ever.png" style="max-width: 120px;">
+                </a>
+            </p>
+            <p>
+                <a href="{$blog_url|escape:'htmlall':'UTF-8'}" target="_blank" class="btn btn-info btn-lg">
                     {l s='See blog !' mod='everpsblog'}
                 </a>
                 {if $blog_sitemaps}
                     <div class="dropdown">
-                      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {l s='See all sitemaps' mod='everpsblog'}
                       </button>
                       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -43,7 +45,7 @@
                     </div>
                 {/if}
             </p>
-            <strong>{l s='Welcome to Ever Blog !' mod='everpsblog'}</strong><br />{l s='Please configure your this form to set first parameters for your blog' mod='everpsblog'}<br />
+            <p><strong>{l s='Welcome to Ever Blog !' mod='everpsblog'}</strong><br />{l s='Please configure your this form to set first parameters for your blog' mod='everpsblog'}</p>
             <p>
                 <strong>
                     {l s='Click on our logo to go direct to bottom' mod='everpsblog'}

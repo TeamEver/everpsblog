@@ -78,6 +78,9 @@
     {$default_blog_top_text nofilter}
 </div>
 {/if}
+{if isset($prettyblocks_enabled) && $prettyblocks_enabled}
+{widget name="prettyblocks" zone_name="displayBeforeBlog"}
+{/if}
 <div class="row mt-2">
 {foreach from=$evercategory item=item}
     {if !$item.is_root_category}
@@ -97,9 +100,11 @@
 {else}
 <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>
 {/if}
+{if isset($post_number) && $post_number > 0}
 <div class="row">
     {include file='_partials/pagination.tpl' pagination=$pagination}
 </div>
+{/if}
 {hook h="displayAfterEverLoop"}
 
 {if isset($paginated) && !$paginated}
@@ -107,6 +112,9 @@
 <div class="row mt-2">
     {$default_blog_bottom_text nofilter}
 </div>
+{/if}
+{if isset($prettyblocks_enabled) && $prettyblocks_enabled}
+{widget name="prettyblocks" zone_name="displayAfterBlog"}
 {/if}
 {/if}
 {if isset($everhome_products) && $everhome_products}

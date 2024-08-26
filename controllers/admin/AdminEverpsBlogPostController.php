@@ -42,21 +42,20 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         $this->display = $this->l('Ever Blog Posts');
         $this->table = 'ever_blog_post';
         $this->className = 'EverPsBlogPost';
-        $this->module_name = 'everpsblog';
         $this->shop_url = Tools::getHttpHost(true) . __PS_BASE_URI__;
-        $this->img_url = $this->shop_url.'modules/'.$this->module_name.'/views/img/';
+        $this->img_url = $this->shop_url . 'modules/everpsblog/views/img/';
         $this->context = Context::getContext();
-        $this->identifier = "id_ever_post";
-        $this->_orderBy = 'id_ever_post';
+        $this->identifier = 'id_ever_post';
+        $this->_orderBy = $this->identifier;
         $this->_orderWay = 'DESC';
         $this->preview_token = Tools::encrypt('everpsblog/preview');
-        $this->fields_list = array(
-            'id_ever_post' => array(
+        $this->fields_list = [
+            'id_ever_post' => [
                 'title' => $this->l('ID'),
                 'align' => 'left',
-                'width' => 25
-            ),
-            'featured_img' => array(
+                'width' => 25,
+            ],
+            'featured_img' => [
                 'title' => $this->l('Featured image'),
                 'align' => 'center',
                 'width' => 25,
@@ -64,60 +63,67 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 'filter' => false,
                 'search' => false,
                 'image' => 'post',
-            ),
-            'title' => array(
+            ],
+            'title' => [
                 'title' => $this->l('Post title'),
                 'align' => 'left',
                 'havingFilter' => true,
-                'filter_key' => 'l!title'
-            ),
-            'excerpt' => array(
+                'filter_key' => 'l!title',
+            ],
+            'excerpt' => [
                 'title' => $this->l('Post excerpt'),
-                'align' => 'left'
-            ),
-            'cat_title' => array(
+                'align' => 'left',
+            ],
+            'cat_title' => [
                 'title' => $this->l('Default category'),
                 'align' => 'left',
                 'havingFilter' => true,
-                'filter_key' => 'acl!title'
-            ),
-            'nickhandle' => array(
+                'filter_key' => 'acl!title',
+            ],
+            'nickhandle' => [
                 'title' => $this->l('Author'),
                 'align' => 'left',
-                'width' => 25
-            ),
-            'post_status' => array(
+                'width' => 25,
+            ],
+            'post_status' => [
                 'title' => $this->l('Post status'),
                 'align' => 'left',
-                'width' => 25
-            ),
-            'index' => array(
+                'width' => 25,
+            ],
+            'indexable' => [
                 'title' => $this->l('Index'),
                 'type' => 'bool',
                 'active' => 'statusindex',
                 'orderby' => false,
-                'class' => 'fixed-width-sm'
-            ),
-            'follow' => array(
+                'class' => 'fixed-width-sm',
+            ],
+            'follow' => [
                 'title' => $this->l('Follow'),
                 'type' => 'bool',
                 'active' => 'statusfollow',
                 'orderby' => false,
-                'class' => 'fixed-width-sm'
-            ),
-            'sitemap' => array(
+                'class' => 'fixed-width-sm',
+            ],
+            'sitemap' => [
                 'title' => $this->l('Sitemap'),
                 'type' => 'bool',
                 'active' => 'statussitemap',
                 'orderby' => false,
-                'class' => 'fixed-width-sm'
-            ),
-            'count' => array(
+                'class' => 'fixed-width-sm',
+            ],
+            'starred' => [
+                'title' => $this->l('Starred'),
+                'type' => 'bool',
+                'active' => 'statusstarred',
+                'orderby' => false,
+                'class' => 'fixed-width-sm',
+            ],
+            'count' => [
                 'title' => $this->l('Views count'),
-                'align' => 'left'
-            ),
-        );
-
+                'align' => 'left',
+            ],
+        ];
+        $this->unclassedCategory = (int) Configuration::get('EVERBLOG_UNCLASSED_ID');
         $this->colorOnBackground = true;
         $this->_select = 'l.title,
         l.excerpt,
@@ -128,8 +134,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         $this->_join =
             'LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_post_lang` l
                 ON (
-                    l.`id_ever_post` = a.`id_ever_post`
-                    AND l.`id_lang` = '.(int) Context::getContext()->language->id.'
+                    l.`' . $this->identifier . '` = a.`' . $this->identifier . '`
+                    AND l.`id_lang` = ' . (int) $this->context->language->id . '
                 )
             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_author` au
                 ON (
@@ -137,16 +143,16 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 )
             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_image` ai
                 ON (
-                    ai.`id_ever_image` = a.`id_ever_post`
+                    ai.`id_ever_image` = a.`' . $this->identifier . '`
                     AND ai.`image_type` = "post"
                 )
             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category_lang` acl
                 ON (
                     acl.`id_ever_category` = a.`id_default_category`
-                    AND acl.`id_lang` = '.(int) Context::getContext()->language->id.'
+                    AND acl.`id_lang` = ' . (int) $this->context->language->id . '
                 )';
-        $this->_where = 'AND a.id_shop = '.(int) Context::getContext()->shop->id;
-        $this->_where = 'AND l.id_lang = '.(int) Context::getContext()->language->id;
+        $this->_where = 'AND a.id_shop = ' . (int) $this->context->shop->id;
+        $this->_where = 'AND l.id_lang = ' . (int) $this->context->language->id;
         $moduleConfUrl  = 'index.php?controller=AdminModules&configure=everpsblog&token=';
         $moduleConfUrl .= Tools::getAdminTokenLite('AdminModules');
         $postUrl  = 'index.php?controller=AdminEverPsBlogPost&token=';
@@ -159,7 +165,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         $tagUrl .= Tools::getAdminTokenLite('AdminEverPsBlogTag');
         $commentUrl  = 'index.php?controller=AdminEverPsBlogComment&token=';
         $commentUrl .= Tools::getAdminTokenLite('AdminEverPsBlogComment');
-        $blogUrl = Context::getContext()->link->getModuleLink(
+        $blogUrl = $this->context->link->getModuleLink(
             'everpsblog',
             'blog',
             [],
@@ -167,40 +173,40 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         );
         $ever_blog_token = Tools::encrypt('everpsblog/cron');
         $emptytrash = $this->context->link->getModuleLink(
-            $this->module_name,
+            'everpsblog',
             'emptytrash',
-            array(
+            [
                 'token' => $ever_blog_token,
-                'id_shop' => (int) $this->context->shop->id
-            ),
+                'id_shop' => (int) $this->context->shop->id,
+            ],
             true,
             (int) $this->context->language->id,
             (int) $this->context->shop->id
         );
         $pending = $this->context->link->getModuleLink(
-            $this->module_name,
+            'everpsblog',
             'pending',
-            array(
+            [
                 'token' => $ever_blog_token,
-                'id_shop' => (int) $this->context->shop->id
-            ),
+                'id_shop' => (int) $this->context->shop->id,
+            ],
             true,
             (int) $this->context->language->id,
             (int) $this->context->shop->id
         );
         $planned = $this->context->link->getModuleLink(
-            $this->module_name,
+            'everpsblog',
             'planned',
-            array(
+            [
                 'token' => $ever_blog_token,
-                'id_shop' => (int) $this->context->shop->id
-            ),
+                'id_shop' => (int) $this->context->shop->id,
+            ],
             true,
             (int) $this->context->language->id,
             (int) $this->context->shop->id
         );
-        $this->context->smarty->assign(array(
-            'image_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'/modules/everpsblog/views/img/',
+        $this->context->smarty->assign([
+            'image_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__ . '/modules/everpsblog/views/img/',
             'everpsblogcron' => $emptytrash,
             'everpsblogcronpending' => $pending,
             'everpsblogcronplanned' => $planned,
@@ -211,8 +217,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             'tagUrl' => $tagUrl,
             'commentUrl' => $commentUrl,
             'blogUrl' => $blogUrl,
-        ));
-
+        ]);
         parent::__construct();
     }
 
@@ -227,11 +232,11 @@ class AdminEverPsBlogPostController extends ModuleAdminController
 
     public function initPageHeaderToolbar()
     {
-        $this->page_header_toolbar_btn['new'] = array(
+        $this->page_header_toolbar_btn['new'] = [
             'href' => self::$currentIndex . '&add' . $this->table . '&token=' . $this->token,
             'desc' => $this->l('Add new element'),
-            'icon' => 'process-icon-new'
-        );
+            'icon' => 'process-icon-new',
+        ];
         parent::initPageHeaderToolbar();
     }
 
@@ -242,91 +247,81 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         $this->addRowAction('deletePost');
         $this->addRowAction('ViewPost');
         $this->addRowAction('UnprotectPost');
-        $this->bulk_actions = array(
-            'delete' => array(
+        $this->bulk_actions = [
+            'delete' => [
                 'text' => $this->l('Delete selected items'),
-                'confirm' => $this->l('Delete selected items ?')
-            ),
-            'duplicateall' => array(
+                'confirm' => $this->l('Delete selected items ?'),
+            ],
+            'duplicateall' => [
                 'text' => $this->l('Duplicate selected items'),
-                'confirm' => $this->l('Duplicate selected items ?')
-            ),
-            'publishall' => array(
+                'confirm' => $this->l('Duplicate selected items ?'),
+            ],
+            'publishall' => [
                 'text' => $this->l('Publish selected items'),
-                'confirm' => $this->l('Publish selected items ?')
-            ),
-            'draftall' => array(
+                'confirm' => $this->l('Publish selected items ?'),
+            ],
+            'draftall' => [
                 'text' => $this->l('Draft selected items'),
-                'confirm' => $this->l('Draft selected items ?')
-            ),
-            'trashall' => array(
+                'confirm' => $this->l('Draft selected items ?'),
+            ],
+            'trashall' => [
                 'text' => $this->l('Trash selected items'),
-                'confirm' => $this->l('Trash selected items ?')
-            ),
-            'unprotectall' => array(
+                'confirm' => $this->l('Trash selected items ?'),
+            ],
+            'unprotectall' => [
                 'text' => $this->l('Remove password on selected items'),
-                'confirm' => $this->l('Remove password on selected items ?')
-            ),
-        );
-
+                'confirm' => $this->l('Remove password on selected items ?'),
+            ],
+        ];
         if (Tools::getIsset('deletePost'.$this->table)) {
-            $everObj = new EverPsBlogPost(
-                (int)Tools::getValue('id_ever_post')
+            $everObj = new $this->className(
+                (int) Tools::getValue($this->identifier)
             );
             if (Validate::isLoadedObject($everObj)) {
                 $everObj->delete();
             }
         }
-
-        if (Tools::isSubmit('submitBulkdelete'.$this->table)) {
+        if (Tools::isSubmit('submitBulkdelete' . $this->table)) {
             $this->processBulkDelete();
         }
-
-        if (Tools::isSubmit('submitBulkduplicateall'.$this->table)) {
+        if (Tools::isSubmit('submitBulkduplicateall' . $this->table)) {
             $this->processBulkDuplicate();
         }
-
-        if (Tools::isSubmit('submitBulkpublishall'.$this->table)) {
+        if (Tools::isSubmit('submitBulkpublishall' . $this->table)) {
             $this->processBulkPublish();
         }
-
-        if (Tools::isSubmit('submitBulkdraftall'.$this->table)) {
+        if (Tools::isSubmit('submitBulkdraftall' . $this->table)) {
             $this->processBulkDraft();
         }
-
-        if (Tools::isSubmit('submitBulktrashall'.$this->table)) {
+        if (Tools::isSubmit('submitBulktrashall' . $this->table)) {
             $this->processBulkTrash();
         }
-
-        if (Tools::isSubmit('submitBulkunprotectall'.$this->table)) {
+        if (Tools::isSubmit('submitBulkunprotectall' . $this->table)) {
             $this->processBulkUnprotect();
         }
-
         $lists = parent::renderList();
-
         $this->html .= $this->context->smarty->fetch(
             _PS_MODULE_DIR_
-            .'/everpsblog/views/templates/admin/headerController.tpl'
+            . '/' . $this->module->name . '/views/templates/admin/headerController.tpl'
         );
-        $blog_instance = Module::getInstanceByName($this->module_name);
-        if ($blog_instance->checkLatestEverModuleVersion($this->module_name, $blog_instance->version)) {
+        $blog_instance = Module::getInstanceByName($this->module->name);
+        if ($blog_instance->checkLatestEverModuleVersion()) {
             $this->html .= $this->context->smarty->fetch(
                 _PS_MODULE_DIR_
-                .'/'
-                .$this->module_name
-                .'/views/templates/admin/upgrade.tpl'
+                . '/'
+                . $this->module->name
+                . '/views/templates/admin/upgrade.tpl'
             );
         }
         $this->html .= $lists;
         $this->html .= $this->context->smarty->fetch(
             _PS_MODULE_DIR_
-            .'/everpsblog/views/templates/admin/shortcodes.tpl'
+            .'/' . $this->module->name . '/views/templates/admin/shortcodes.tpl'
         );
         $this->html .= $this->context->smarty->fetch(
             _PS_MODULE_DIR_
-            .'/everpsblog/views/templates/admin/footer.tpl'
+            .'/' . $this->module->name . '/views/templates/admin/footer.tpl'
         );
-
         return $this->html;
     }
 
@@ -337,27 +332,15 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             $cat_taxonomies = EverPsBlogTaxonomy::getPostCategoriesTaxonomies(
                 (int) $obj->id
             );
-            if (isset($cat_taxonomies) && count($cat_taxonomies) > 0) {
-                $cat_taxonomies = array_values(array_map('array_values', $cat_taxonomies));
-                $cat_taxonomies = call_user_func_array('array_merge', $cat_taxonomies);
-            }
             $tag_taxonomies = EverPsBlogTaxonomy::getPostTagsTaxonomies(
                 (int) $obj->id
             );
-            if (isset($tag_taxonomies) && count($tag_taxonomies) > 0) {
-                $tag_taxonomies = array_values(array_map('array_values', $tag_taxonomies));
-                $tag_taxonomies = call_user_func_array('array_merge', $tag_taxonomies);
-            }
             $product_taxonomies = EverPsBlogTaxonomy::getPostProductsTaxonomies(
                 (int) $obj->id
             );
-            if (isset($product_taxonomies) && count($product_taxonomies) > 0) {
-                $product_taxonomies = array_values(array_map('array_values', $product_taxonomies));
-                $product_taxonomies = call_user_func_array('array_merge', $product_taxonomies);
-            }
-            $formValues[] = array(
-                'id_ever_post' => (!empty(Tools::getValue('id_ever_post')))
-                ? Tools::getValue('id_ever_post')
+            $formValues[] = [
+                $this->identifier => (!empty(Tools::getValue($this->identifier)))
+                ? Tools::getValue($this->identifier)
                 : $obj->id,
                 'title' => (!empty(Tools::getValue('title')))
                 ? Tools::getValue('title')
@@ -389,6 +372,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 'post_categories[]' => (!empty(Tools::getValue('post_categories')))
                 ? Tools::getValue('post_categories')
                 : $cat_taxonomies,
+                'allowed_groups[]' => (!empty(Tools::getValue('allowed_groups')))
+                ? Tools::getValue('allowed_groups')
+                : json_decode($obj->allowed_groups),
                 'id_default_category' => (!empty(Tools::getValue('id_default_category')))
                 ? Tools::getValue('id_default_category')
                 : $obj->id_default_category,
@@ -398,22 +384,25 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 'post_products[]' => (!empty(Tools::getValue('post_products')))
                 ? Tools::getValue('post_products')
                 : $product_taxonomies,
-                'index' => (!empty(Tools::getValue('index')))
-                ? Tools::getValue('index')
-                : $obj->index,
+                'indexable' => (!empty(Tools::getValue('indexable')))
+                ? Tools::getValue('indexable')
+                : $obj->indexable,
                 'follow' => (!empty(Tools::getValue('follow')))
                 ? Tools::getValue('follow')
                 : $obj->follow,
                 'sitemap' => (!empty(Tools::getValue('sitemap')))
                 ? Tools::getValue('sitemap')
                 : $obj->sitemap,
+                'starred' => (!empty(Tools::getValue('starred')))
+                ? Tools::getValue('starred')
+                : $obj->starred,
                 'post_status' => (!empty(Tools::getValue('post_status')))
                 ? Tools::getValue('post_status')
                 : $obj->post_status,
                 'psswd' => (!empty(Tools::getValue('psswd')))
                 ? Tools::getValue('psswd')
                 : '',
-            );
+            ];
         } else {
             $cat_taxonomies = [];
             $tag_taxonomies = [];
@@ -432,9 +421,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 $content[$lang['id_lang']] = '';
                 $excerpt[$lang['id_lang']] = '';
             }
-            $formValues[] = array(
-                'id_ever_post' => (!empty(Tools::getValue('id_ever_post')))
-                ? Tools::getValue('id_ever_post')
+            $formValues[] = [
+                $this->identifier => (!empty(Tools::getValue($this->identifier)))
+                ? Tools::getValue($this->identifier)
                 : '',
                 'title' => (!empty(Tools::getValue('title')))
                 ? Tools::getValue('title')
@@ -466,6 +455,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 'post_categories[]' => (!empty(Tools::getValue('post_categories')))
                 ? Tools::getValue('post_categories')
                 :'',
+                'allowed_groups[]' => (!empty(Tools::getValue('allowed_groups')))
+                ? Tools::getValue('allowed_groups')
+                :'',
                 'id_default_category' => (!empty(Tools::getValue('id_default_category')))
                 ? Tools::getValue('id_default_category')
                 : '',
@@ -475,8 +467,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 'post_products[]' => (!empty(Tools::getValue('post_products')))
                 ? Tools::getValue('post_products')
                 : '',
-                'index' => (!empty(Tools::getValue('index')))
-                ? Tools::getValue('index')
+                'indexable' => (!empty(Tools::getValue('indexable')))
+                ? Tools::getValue('indexable')
                 : '',
                 'follow' => (!empty(Tools::getValue('follow')))
                 ? Tools::getValue('follow')
@@ -484,13 +476,16 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 'sitemap' => (!empty(Tools::getValue('sitemap')))
                 ? Tools::getValue('sitemap')
                 : '',
+                'starred' => (!empty(Tools::getValue('starred')))
+                ? Tools::getValue('starred')
+                : '',
                 'post_status' => (!empty(Tools::getValue('post_status')))
                 ? Tools::getValue('post_status')
                 : '',
                 'psswd' => (!empty(Tools::getValue('psswd')))
                 ? Tools::getValue('psswd')
                 : '',
-            );
+            ];
         }
         $values = call_user_func_array('array_merge', $formValues);
         return $values;
@@ -498,16 +493,17 @@ class AdminEverPsBlogPostController extends ModuleAdminController
 
     public function renderForm()
     {
-        if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP && Shop::isFeatureActive()) {
+        if ($this->context->shop->getContext() != Shop::CONTEXT_SHOP && Shop::isFeatureActive()) {
             $this->errors[] = $this->l('You have to select a shop before creating or editing new element.');
             return false;
         }
-
-        $post_id = Tools::getValue('id_ever_post');
-        $obj = new EverPsBlogPost(
-            (int)Tools::getValue('id_ever_post')
+        $groups = Group::getGroups(
+            (int) $this->context->language->id
         );
-        $fields_form = [];
+        $post_id = Tools::getValue($this->identifier);
+        $obj = new $this->className(
+            (int) Tools::getValue($this->identifier)
+        );
 
         $file_url = EverPsBlogImage::getBlogImageUrl(
             (int) $post_id,
@@ -516,44 +512,45 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         );
         $post_img = '<image src="'.(string) $file_url.'" style="max-width:150px;"/>';
 
-        $post_status = array(
-            array(
+        $post_status = [
+            [
                 'id_status' => 'draft',
-                'name' => $this->l('draft')
-            ),
-            array(
+                'name' => $this->l('draft'),
+            ],
+            [
                 'id_status' => 'pending',
-                'name' => $this->l('pending')
-            ),
-            array(
+                'name' => $this->l('pending'),
+            ],
+            [
                 'id_status' => 'published',
-                'name' => $this->l('published')
-            ),
-            array(
+                'name' => $this->l('published'),
+            ],
+            [
                 'id_status' => 'trash',
-                'name' => $this->l('trash')
-            ),
-            array(
+                'name' => $this->l('trash'),
+            ],
+            [
                 'id_status' => 'planned',
-                'name' => $this->l('planned')
-            ),
-            array(
+                'name' => $this->l('planned'),
+            ],
+            [
                 'id_status' => 'protected',
-                'name' => $this->l('password protected')
-            ),
-        );
+                'name' => $this->l('password protected'),
+            ],
+        ];
 
+        $fields_form = [];
         if (Validate::isLoadedObject($obj)) {
             $link = new Link();
-            $id_lang = (int) Context::getContext()->language->id;
+            $id_lang = (int) $this->context->language->id;
             $objectUrl = $link->getModuleLink(
                 'everpsblog',
                 'post',
-                array(
-                    'id_ever_post' => $obj->id_ever_post,
+                [
+                    $this->identifier => $obj->id_ever_post,
                     'link_rewrite' => $obj->link_rewrite[$id_lang],
-                    'preview' => $this->preview_token
-                )
+                    'preview' => $this->preview_token,
+                ]
             );
             if (!empty($obj->psswd)) {
                 $viewPostTxt = $this->l('See post (password protected)');
@@ -565,41 +562,56 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             . '" target="_blank" class="btn btn-lg btn-info">'
             . $viewPostTxt
             . '</a>';
-            $fields_form[] = array(
-                'form' => array(
-                    'input' => array(
-                        array(
+            $fields_form[] = [
+                'form' => [
+                    'input' => [
+                        [
                             'type' => 'html',
                             'name' => 'view_obj',
                             'html_content' => $object_html,
-                        ),
-                    ),
-                )
-            );
+                        ],
+                    ],
+                ],
+            ];
         }
 
-        $fields_form[] = array(
-            'form' => array(
+        $fields_form[] = [
+            'form' => [
                 'tinymce' => true,
                 'description' => $this->l('Please specify your post informations'),
-                'submit' => array(
+                'submit' => [
                     'name' => 'save',
                     'title' => $this->l('Save'),
-                    'class' => 'btn pull-right'
-                ),
-                'buttons' => array(
-                    array(
-                        'href' => Context::getContext()->link->getAdminLink('AdminEverPsBlogPost', true),
+                    'class' => 'btn pull-right',
+                ],
+                'buttons' => [
+                    [
+                        'href' => $this->context->link->getAdminLink('AdminEverPsBlogPost', true),
                         'title' => $this->l('Cancel'),
-                        'icon' => 'process-icon-cancel'
-                    )
-                ),
-                'input' => array(
-                    array(
+                        'icon' => 'process-icon-cancel',
+                    ],
+                ],
+                'input' => [
+                    [
                         'type' => 'hidden',
-                        'name' => 'id_ever_post'
-                    ),
-                    array(
+                        'name' => $this->identifier,
+                    ],
+                    [
+                        'type' => 'select',
+                        'class' => 'chosen',
+                        'multiple' => true,
+                        'label' => $this->l('Allowed groups'),
+                        'desc' => $this->l('Please select allowed groups for viewing'),
+                        'hint' => $this->l('Leave empty for no use'),
+                        'name' => 'allowed_groups[]',
+                        'identifier' => 'name',
+                        'options' => [
+                            'query' => $groups,
+                            'id' => 'id_group',
+                            'name' => 'name',
+                        ],
+                    ],
+                    [
                         'type' => 'select',
                         'label' => $this->l('Associated categories'),
                         'desc' => $this->l('Please choose at least one category'),
@@ -608,34 +620,34 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'class' => 'chosen',
                         'identifier' => 'name',
                         'multiple' => true,
-                        'options' => array(
+                        'options' => [
                             'query' => EverPsBlogCategory::getAllCategories(
-                                (int) Context::getContext()->language->id,
-                                (int) Context::getContext()->shop->id
+                                (int) $this->context->language->id,
+                                (int) $this->context->shop->id
                             ),
                             'id' => 'id_ever_category',
                             'name' => 'title',
-                        ),
-                    ),
-                    array(
+                        ],
+                    ],
+                    [
                         'type' => 'select',
                         'label' => $this->l('Default categories'),
                         'desc' => $this->l('Please choose default category'),
                         'hint' => $this->l('Will be used on breadcrumb'),
                         'name' => 'id_default_category',
-                        'options' => array(
+                        'options' => [
                             'query' => EverPsBlogCategory::getAllCategories(
-                                (int) Context::getContext()->language->id,
-                                (int) Context::getContext()->shop->id,
+                                (int) $this->context->language->id,
+                                (int) $this->context->shop->id,
                                 1,
                                 0,
                                 true
                             ),
                             'id' => 'id_ever_category',
                             'name' => 'title',
-                        ),
-                    ),
-                    array(
+                        ],
+                    ],
+                    [
                         'type' => 'select',
                         'label' => $this->l('Associated tags'),
                         'desc' => $this->l('Please choose at least one tag'),
@@ -643,16 +655,16 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'name' => 'post_tags[]',
                         'class' => 'chosen',
                         'multiple' => true,
-                        'options' => array(
+                        'options' => [
                             'query' => EverPsBlogTag::getAllTags(
-                                (int) Context::getContext()->language->id,
-                                (int) Context::getContext()->shop->id
+                                (int) $this->context->language->id,
+                                (int) $this->context->shop->id
                             ),
                             'id' => 'id_ever_tag',
                             'name' => 'title',
-                        ),
-                    ),
-                    array(
+                        ],
+                    ],
+                    [
                         'type' => 'select',
                         'label' => $this->l('Associated products'),
                         'desc' => $this->l('Please choose at least one product'),
@@ -660,9 +672,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'name' => 'post_products[]',
                         'class' => 'chosen',
                         'multiple' => true,
-                        'options' => array(
+                        'options' => [
                             'query' => Product::getProducts(
-                                (int) Context::getContext()->language->id,
+                                (int) $this->context->language->id,
                                 0,
                                 0,
                                 'name',
@@ -670,24 +682,24 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                             ),
                             'id' => 'id_product',
                             'name' => 'name',
-                        ),
-                    ),
-                    array(
+                        ],
+                    ],
+                    [
                         'type' => 'select',
                         'label' => $this->l('Author'),
                         'desc' => $this->l('Please choose post author'),
                         'hint' => $this->l('Else will be shop name'),
                         'name' => 'id_author',
-                        'options' => array(
+                        'options' => [
                             'query' => EverPsBlogAuthor::getAllAuthors(
-                                (int) Context::getContext()->language->id,
-                                (int) Context::getContext()->shop->id
+                                (int) $this->context->language->id,
+                                (int) $this->context->shop->id
                             ),
                             'id' => 'id_ever_author',
                             'name' => 'nickhandle',
-                        ),
-                    ),
-                    array(
+                        ],
+                    ],
+                    [
                         'type' => 'text',
                         'label' => $this->l('Post meta title'),
                         'desc' => $this->l('Most of search engines do not accept more that 65 characters'),
@@ -698,9 +710,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'lang' => true,
                         'autoload_rte' => true,
                         'cols' => 60,
-                        'rows' => 30
-                    ),
-                    array(
+                        'rows' => 30,
+                    ],
+                    [
                         'type' => 'text',
                         'label' => $this->l('Post meta description'),
                         'desc' => $this->l('Most of search engines do not accept more that 165 characters'),
@@ -711,9 +723,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'lang' => true,
                         'autoload_rte' => true,
                         'cols' => 60,
-                        'rows' => 30
-                    ),
-                    array(
+                        'rows' => 30,
+                    ],
+                    [
                         'type' => 'text',
                         'label' => $this->l('Post link rewrite'),
                         'desc' => $this->l('For rewrite rules, required for SEO'),
@@ -724,9 +736,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'lang' => true,
                         'autoload_rte' => true,
                         'cols' => 60,
-                        'rows' => 30
-                    ),
-                    array(
+                        'rows' => 30,
+                    ],
+                    [
                         'type' => 'text',
                         'label' => $this->l('Post title'),
                         'desc' => $this->l('Add here post title'),
@@ -736,9 +748,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'lang' => true,
                         'autoload_rte' => true,
                         'cols' => 60,
-                        'rows' => 30
-                    ),
-                    array(
+                        'rows' => 30,
+                    ],
+                    [
                         'type' => 'textarea',
                         'label' => $this->l('Post content'),
                         'desc' => $this->l('Add here post content'),
@@ -748,9 +760,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'lang' => true,
                         'autoload_rte' => true,
                         'cols' => 60,
-                        'rows' => 30
-                    ),
-                    array(
+                        'rows' => 30,
+                    ],
+                    [
                         'type' => 'textarea',
                         'label' => $this->l('Post excerpt'),
                         'desc' => $this->l('Add here post excerpt'),
@@ -760,9 +772,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'lang' => true,
                         'autoload_rte' => false,
                         'cols' => 60,
-                        'rows' => 30
-                    ),
-                    array(
+                        'rows' => 30,
+                    ],
+                    [
                         'type' => 'file',
                         'label' => $this->l('Post image'),
                         'desc' => $this->l('Will be shown on post top'),
@@ -770,69 +782,89 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'name' => 'post_image',
                         'display_image' => true,
                         'required' => true,
-                        'image' => $post_img
-                    ),
-                    array(
+                        'image' => $post_img,
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('SEO index post ?'),
                         'desc' => $this->l('Set yes to index, no to noindex'),
                         'hint' => $this->l('Else post won\'t be available on Google'),
-                        'name' => 'index',
+                        'name' => 'indexable',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('SEO follow post ?'),
                         'desc' => $this->l('Set yes to follow, no to nofollow'),
                         'hint' => $this->l('Nofollow will block search engines from following links on this post'),
                         'name' => 'follow',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('SEO sitemap post ?'),
                         'desc' => $this->l('Set yes to sitemap, no to nositemap'),
                         'hint' => $this->l('Please generate sitemaps after changing this rule'),
                         'name' => 'sitemap',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'switch',
+                        'label' => $this->l('Star post on homepage ?'),
+                        'desc' => $this->l('Set yes to set post on homepage'),
+                        'hint' => $this->l('If no articles are highlighted on the home page, the latest articles will be displayed'),
+                        'name' => 'starred',
+                        'is_bool' => true,
+                        'values' => [
+                            [
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'datetime',
                         'label' => $this->l('Date add'),
                         'desc' => $this->l('Add here post date'),
@@ -841,21 +873,21 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'name' => 'date_add',
                         'lang' => false,
                         'cols' => 60,
-                        'rows' => 30
-                    ),
-                    array(
+                        'rows' => 30,
+                    ],
+                    [
                         'type' => 'select',
                         'label' => $this->l('Post status'),
                         'desc' => $this->l('Select if published, draft or more'),
                         'hint' => $this->l('Pending is "waiting for review"'),
                         'name' => 'post_status',
-                        'options' => array(
+                        'options' => [
                             'query' => $post_status,
                             'id' => 'id_status',
                             'name' => 'name',
-                        ),
-                    ),
-                    array(
+                        ],
+                    ],
+                    [
                         'type' => 'password',
                         'label' => $this->l('Protect this post with password'),
                         'desc' => $this->l('If you enter a password here, the article will be protected. Don\'t forget to write down the password, it won\'t be shown to you again for security reasons!'),
@@ -865,11 +897,11 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                         'lang' => false,
                         'autoload_rte' => true,
                         'cols' => 60,
-                        'rows' => 30
-                    ),
-                )
-            )
-        );
+                        'rows' => 30,
+                    ],
+                ],
+            ],
+        ];
         $helper = new HelperForm();
         $helper->show_toolbar = false;
         $helper->module = $this;
@@ -887,11 +919,11 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         $helper->currentIndex = AdminController::$currentIndex;
         $helper->token = Tools::getValue('token');
         $helper->submit_action = 'save';
-        $helper->tpl_vars = array(
-            'fields_value' => $this->getConfigFormValues($obj), /* Add values for your inputs */
+        $helper->tpl_vars = [
+            'fields_value' => $this->getConfigFormValues($obj),
             'languages' => $this->context->controller->getLanguages(),
-            'id_language' => (int) Context::getContext()->language->id,
-        );
+            'id_language' => (int) $this->context->language->id,
+        ];
         $helper->currentIndex = AdminController::$currentIndex;
         return $helper->generateForm($fields_form);
     }
@@ -899,61 +931,68 @@ class AdminEverPsBlogPostController extends ModuleAdminController
     public function postProcess()
     {
         if (Tools::getIsset('unprotect_post')) {
-            $everObj = new EverPsBlogPost(
-                (int)Tools::getValue('id_ever_post')
+            $everObj = new $this->className(
+                (int) Tools::getValue($this->identifier)
             );
             $everObj->psswd = null;
             $everObj->save();
         }
         if (Tools::getIsset('duplicateever_blog_post')) {
             return $this->duplicatePost(
-                (int)Tools::getValue('id_ever_post')
+                (int) Tools::getValue($this->identifier)
             );
         }
         if (Tools::getIsset('deleteever_blog_post')) {
-            $everObj = new EverPsBlogPost(
-                (int)Tools::getValue('id_ever_post')
+            $everObj = new $this->className(
+                (int) Tools::getValue($this->identifier)
             );
             $everObj->delete();
         }
         if (Tools::getIsset('statusindexever_blog_post')) {
-            $everObj = new EverPsBlogPost(
-                (int)Tools::getValue('id_ever_post')
+            $everObj = new $this->className(
+                (int) Tools::getValue($this->identifier)
             );
-            (int) $everObj->index = !(int) $everObj->index;
+            (int) $everObj->indexable = !(int) $everObj->indexable;
             $everObj->save();
         }
         if (Tools::getIsset('statusfollowever_blog_post')) {
-            $everObj = new EverPsBlogPost(
-                (int)Tools::getValue('id_ever_post')
+            $everObj = new $this->className(
+                (int) Tools::getValue($this->identifier)
             );
             (int) $everObj->follow = !(int) $everObj->follow;
             $everObj->save();
         }
+        if (Tools::getIsset('statusstarredever_blog_post')) {
+            $everObj = new $this->className(
+                (int) Tools::getValue($this->identifier)
+            );
+            (int) $everObj->starred = !(int) $everObj->starred;
+            $everObj->save();
+        }
         if (Tools::getIsset('statussitemapever_blog_post')) {
-            $everObj = new EverPsBlogPost(
-                (int)Tools::getValue('id_ever_post')
+            $everObj = new $this->className(
+                (int) Tools::getValue($this->identifier)
             );
             (int) $everObj->sitemap = !(int) $everObj->sitemap;
             $everObj->save();
         }
         if (Tools::isSubmit('save')) {
-            if (!Tools::getValue('id_ever_post')) {
-                $post = new EverPsBlogPost();
+            if (!Tools::getValue($this->identifier)) {
+                $post = new $this->className();
             } else {
-                $post = new EverPsBlogPost(
-                    (int)Tools::getValue('id_ever_post')
+                $post = new $this->className(
+                    (int) Tools::getValue($this->identifier)
                 );
             }
             // Validate functions
-            $post->id_shop = (int) Context::getContext()->shop->id;
+            $post->id_shop = (int) $this->context->shop->id;
             // SEO
-            if (Tools::getValue('index')
-                && !Validate::isBool(Tools::getValue('index'))
+            if (Tools::getValue('indexable')
+                && !Validate::isBool(Tools::getValue('indexable'))
             ) {
                  $this->errors[] = $this->l('Index is not valid');
             } else {
-                $post->index = Tools::getValue('index');
+                $post->indexable = Tools::getValue('indexable');
             }
             if (Tools::getValue('follow')
                 && !Validate::isBool(Tools::getValue('follow'))
@@ -975,6 +1014,13 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                  $this->errors[] = $this->l('Sitemap is not valid');
             } else {
                 $post->sitemap = Tools::getValue('sitemap');
+            }
+            if (Tools::getValue('starred')
+                && !Validate::isBool(Tools::getValue('starred'))
+            ) {
+                 $this->errors[] = $this->l('Starred is not valid');
+            } else {
+                $post->starred = Tools::getValue('starred');
             }
             // Date add
             if (!Tools::getValue('date_add')) {
@@ -1005,18 +1051,19 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             if (!Tools::getValue('id_default_category')
                 || !Validate::isInt(Tools::getValue('id_default_category'))
             ) {
-                 $this->errors[] = $this->l('Default category is not valid');
+                $post->id_parent_category = $this->unclassedCategory;
             } else {
                 $post->id_default_category = Tools::getValue('id_default_category');
             }
             $post_categories = Tools::getValue('post_categories');
             if (!is_array($post_categories)) {
-                $post_categories = array($post_categories);
+                $post_categories = [$post_categories];
             }
             if (!in_array(Tools::getValue('id_default_category'), $post_categories)) {
-                $post_categories[] = Tools::getValue('id_default_category');
+                $post_categories[] = $this->unclassedCategory;
             }
             $post->post_categories = json_encode($post_categories);
+            $post->allowed_groups = json_encode(Tools::getValue('allowed_groups'));
             $post->post_tags = json_encode(Tools::getValue('post_tags'));
             $post->post_products = json_encode(Tools::getValue('post_products'));
             $post->date_upd = date('Y-m-d H:i:s');
@@ -1027,99 +1074,105 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             }
             // Multilingual fields
             foreach (Language::getLanguages(false) as $lang) {
-                if (Tools::getValue('title_'.$lang['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('title_'.$lang['id_lang']))
+                if (Tools::getValue('title_' . $lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('title_' . $lang['id_lang']))
                 ) {
-                    $this->errors[] = $this->l('Title is not valid for lang ').$lang['id_lang'];
+                    $this->errors[] = $this->l('Title is not valid for lang ') . $lang['id_lang'];
                 } else {
-                    $post->title[$lang['id_lang']] = Tools::getValue('title_'.$lang['id_lang']);
+                    $post->title[$lang['id_lang']] = Tools::getValue('title_' . $lang['id_lang']);
                 }
-                if (Tools::getValue('content_'.$lang['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('content_'.$lang['id_lang']), true)
+                if (Tools::getValue('content_' . $lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('content_' . $lang['id_lang']), true)
                 ) {
-                    $this->errors[] = $this->l('Content is not valid for lang ').$lang['id_lang'];
+                    $this->errors[] = $this->l('Content is not valid for lang ') . $lang['id_lang'];
                 } else {
-                    $post->content[$lang['id_lang']] = Tools::getValue('content_'.$lang['id_lang']);
+                    $post->content[$lang['id_lang']] = Tools::getValue('content_' . $lang['id_lang']);
                 }
-                if (Tools::getValue('excerpt_'.$lang['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('excerpt_'.$lang['id_lang']), true)
+                if (Tools::getValue('excerpt_' . $lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('excerpt_' . $lang['id_lang']), true)
                 ) {
-                    $this->errors[] = $this->l('Excerpt is not valid for lang ').$lang['id_lang'];
+                    $this->errors[] = $this->l('Excerpt is not valid for lang ') . $lang['id_lang'];
                 } else {
-                    $post->excerpt[$lang['id_lang']] = Tools::getValue('excerpt_'.$lang['id_lang']);
+                    $post->excerpt[$lang['id_lang']] = Tools::getValue('excerpt_' . $lang['id_lang']);
                 }
-                if (Tools::getValue('meta_title_'.$lang['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('meta_title_'.$lang['id_lang']))
+                if (Tools::getValue('meta_title_' . $lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('meta_title_' . $lang['id_lang']))
                 ) {
-                    $this->errors[] = $this->l('Meta title is not valid for lang ').$lang['id_lang'];
+                    $this->errors[] = $this->l('Meta title is not valid for lang ') . $lang['id_lang'];
                 } else {
-                    $post->meta_title[$lang['id_lang']] = Tools::getValue('meta_title_'.$lang['id_lang']);
+                    $post->meta_title[$lang['id_lang']] = Tools::getValue('meta_title_' . $lang['id_lang']);
                 }
-                if (Tools::getValue('meta_description_'.$lang['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('meta_description_'.$lang['id_lang']))
+                if (Tools::getValue('meta_description_' . $lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('meta_description_' . $lang['id_lang']))
                 ) {
-                    $this->errors[] = $this->l('Meta description is not valid for lang ').$lang['id_lang'];
+                    $this->errors[] = $this->l('Meta description is not valid for lang ') . $lang['id_lang'];
                 } else {
-                    $post->meta_description[$lang['id_lang']] = Tools::getValue('meta_description_'.$lang['id_lang']);
+                    $post->meta_description[$lang['id_lang']] = Tools::getValue('meta_description_' . $lang['id_lang']);
                 }
-                if (!Tools::getValue('link_rewrite_'.$lang['id_lang'])
-                    || !Validate::isLinkRewrite(Tools::getValue('link_rewrite_'.$lang['id_lang']))
+                if (!Tools::getValue('link_rewrite_' . $lang['id_lang'])
+                    || !Validate::isLinkRewrite(Tools::getValue('link_rewrite_' . $lang['id_lang']))
                 ) {
-                    $post->link_rewrite[$lang['id_lang']] = EverPsBlogCleaner::convertToUrlRewrite(
-                        Tools::getValue('title_'.$lang['id_lang'])
+                    $post->link_rewrite[$lang['id_lang']] = Tools::str2url(
+                        Tools::getValue('title_' . $lang['id_lang'])
                     );
                 } else {
-                    $post->link_rewrite[$lang['id_lang']] = Tools::getValue('link_rewrite_'.$lang['id_lang']);
+                    $post->link_rewrite[$lang['id_lang']] = Tools::str2url(
+                        Tools::getValue('link_rewrite_' . $lang['id_lang'])
+                    );
                 }
             }
             if (!count($this->errors)) {
-                $post->save();
-                $post_img_link = 'img/post/'
-                .(int) $post->id
-                .'.jpg';
-                $ps_posts_destination = _PS_IMG_DIR_
-                .'post/'
-                .(int) $post->id
-                .'.jpg';
-                if (!file_exists(_PS_IMG_DIR_ . 'post')) {
-                    mkdir(_PS_IMG_DIR_ . 'post', 0755, true);
-                }
-                /* upload the image */
-                if (isset($_FILES['post_image'])
-                    && isset($_FILES['post_image']['tmp_name'])
-                    && !empty($_FILES['post_image']['tmp_name'])
-                ) {
-                    Configuration::set('PS_IMAGE_GENERATION_METHOD', 1);
-                    if (file_exists($ps_posts_destination)) {
-                        unlink($ps_posts_destination);
+                try {
+                    $post->save();
+                    $post_img_link = 'img/post/'
+                    . (int) $post->id
+                    . '.jpg';
+                    $ps_posts_destination = _PS_IMG_DIR_
+                    . 'post/'
+                    . (int) $post->id
+                    . '.jpg';
+                    if (!file_exists(_PS_IMG_DIR_ . 'post')) {
+                        mkdir(_PS_IMG_DIR_ . 'post', 0755, true);
                     }
-                    if ($error = ImageManager::validateUpload($_FILES['post_image'])) {
-                        $this->errors .= $error;
-                    } elseif (!($tmp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS'))
-                        || !move_uploaded_file($_FILES['post_image']['tmp_name'], $tmp_name)
+                    /* upload the image */
+                    if (isset($_FILES['post_image'])
+                        && isset($_FILES['post_image']['tmp_name'])
+                        && !empty($_FILES['post_image']['tmp_name'])
                     ) {
-                        return false;
-                    } elseif (!ImageManager::resize($tmp_name, $ps_posts_destination)) {
-                        $this->errors .= $this->l(
-                            'An error occurred while attempting to upload the image.'
+                        Configuration::set('PS_IMAGE_GENERATION_METHOD', 1);
+                        if (file_exists($ps_posts_destination)) {
+                            unlink($ps_posts_destination);
+                        }
+                        if ($error = ImageManager::validateUpload($_FILES['post_image'])) {
+                            $this->errors .= $error;
+                        } elseif (!($tmp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS'))
+                            || !move_uploaded_file($_FILES['post_image']['tmp_name'], $tmp_name)
+                        ) {
+                            return false;
+                        } elseif (!ImageManager::resize($tmp_name, $ps_posts_destination)) {
+                            $this->errors .= $this->l(
+                                'An error occurred while attempting to upload the image.'
+                            );
+                        }
+                        if (isset($tmp_name)) {
+                            unlink($tmp_name);
+                        }
+                        $featured_image = EverPsBlogImage::getBlogImage(
+                            (int) $post->id,
+                            (int) $this->context->shop->id,
+                            'post'
                         );
+                        if (!$featured_image) {
+                            $featured_image = new EverPsBlogImage();
+                        }
+                        $featured_image->id_element = (int) $post->id;
+                        $featured_image->image_type = 'post';
+                        $featured_image->image_link = $post_img_link;
+                        $featured_image->id_shop = (int) $this->context->shop->id;
+                        return $featured_image->save();
                     }
-                    if (isset($tmp_name)) {
-                        unlink($tmp_name);
-                    }
-                    $featured_image = EverPsBlogImage::getBlogImage(
-                        (int) $post->id,
-                        (int) Context::getContext()->shop->id,
-                        'post'
-                    );
-                    if (!$featured_image) {
-                        $featured_image = new EverPsBlogImage();
-                    }
-                    $featured_image->id_element = (int) $post->id;
-                    $featured_image->image_type = 'post';
-                    $featured_image->image_link = $post_img_link;
-                    $featured_image->id_shop = (int) Context::getContext()->shop->id;
-                    return $featured_image->save();
+                } catch (Exception $e) {
+                    PrestaShopLogger::addLog($e->getMessage());
                 }
             } else {
                 $this->display = 'edit';
@@ -1134,20 +1187,18 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         if (!$token) {
             return;
         }
-        $drop_url  = 'index.php?controller=AdminEverPsBlogPost';
-        $drop_url  .= '&deletePost'.$this->table;
-        $drop_url  .= '&id_ever_post='.$id_ever_post;
-        $drop_url  .= '&token=';
+        $drop_url = 'index.php?controller=AdminEverPsBlogPost';
+        $drop_url .= '&deletePost'.$this->table;
+        $drop_url .= '&id_ever_post='.$id_ever_post;
+        $drop_url .= '&token=';
         $drop_url .= Tools::getAdminTokenLite('AdminEverPsBlogPost');
-
-        $this->context->smarty->assign(array(
+        $this->context->smarty->assign([
             'href' => $drop_url,
             'confirm' => $this->l('Delete post ?'),
-            'action' => $this->l('Delete post')
-        ));
-
+            'action' => $this->l('Delete post'),
+        ]);
         return $this->context->smarty->fetch(
-            _PS_MODULE_DIR_ . 'everpsblog/views/templates/admin/helpers/lists/list_action_delete_post.tpl'
+            _PS_MODULE_DIR_ . $this->module->name . '/views/templates/admin/helpers/lists/list_action_delete_post.tpl'
         );
     }
 
@@ -1156,26 +1207,26 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         if (!$token) {
             return;
         }
-        $post = new EverPsBlogPost($id_ever_post);
+        $post = new $this->className($id_ever_post);
         $link = new Link();
-        $id_lang = (int) Context::getContext()->language->id;
+        $id_lang = (int) $this->context->language->id;
         $see_url = $link->getModuleLink(
-            'everpsblog',
+            $this->module->name,
             'post',
-            array(
-                'id_ever_post' => $post->id,
-                'link_rewrite' => $post->link_rewrite[$id_lang]
-            )
+            [
+                $this->identifier => $post->id,
+                'link_rewrite' => $post->link_rewrite[$id_lang],
+            ]
         );
 
-        $this->context->smarty->assign(array(
+        $this->context->smarty->assign([
             'href' => $see_url,
             'confirm' => null,
-            'action' => $this->l('View post')
-        ));
+            'action' => $this->l('View post'),
+        ]);
 
         return $this->context->smarty->fetch(
-            _PS_MODULE_DIR_ . 'everpsblog/views/templates/admin/helpers/lists/list_action_view_obj.tpl'
+            _PS_MODULE_DIR_ . $this->module->name . '/views/templates/admin/helpers/lists/list_action_view_obj.tpl'
         );
     }
 
@@ -1184,33 +1235,32 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         if (!$token) {
             return;
         }
-        $post = new EverPsBlogPost($id_ever_post);
+        $post = new $this->className($id_ever_post);
         if (empty($post->psswd)) {
             return;
         }
         $link = new Link();
-        $id_lang = (int) Context::getContext()->language->id;
+        $id_lang = (int) $this->context->language->id;
         $unprotect_url  = 'index.php?controller=AdminEverPsBlogPost&token=';
         $unprotect_url .= Tools::getAdminTokenLite('AdminEverPsBlogPost');
         $unprotect_url .= '&id_ever_post='.(int)$id_ever_post;
         $unprotect_url .= '&unprotect_post';
 
-        $this->context->smarty->assign(array(
+        $this->context->smarty->assign([
             'href' => $unprotect_url,
             'confirm' => null,
-            'action' => $this->l('Unprotect post')
-        ));
+            'action' => $this->l('Unprotect post'),
+        ]);
 
         return $this->context->smarty->fetch(
-            _PS_MODULE_DIR_ . 'everpsblog/views/templates/admin/helpers/lists/list_action_unprotect_obj.tpl'
+            _PS_MODULE_DIR_ . $this->module->name . '/views/templates/admin/helpers/lists/list_action_unprotect_obj.tpl'
         );
     }
 
     protected function processBulkDelete()
     {
-        foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
-            $everObj = new EverPsBlogPost((int) $idEverObj);
-
+        foreach (Tools::getValue($this->table . 'Box') as $idEverObj) {
+            $everObj = new $this->className((int) $idEverObj);
             if (!$everObj->delete()) {
                 $this->errors[] = $this->l('An error has occurred: Can\'t delete the current object');
             }
@@ -1219,7 +1269,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
 
     protected function processBulkDuplicate()
     {
-        foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
+        foreach (Tools::getValue($this->table . 'Box') as $idEverObj) {
             $duplicate = true;
             if (!$this->duplicatePost((int) $idEverObj)) {
                 $duplicate = false;
@@ -1230,8 +1280,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
 
     protected function processBulkPublish()
     {
-        foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
-            $everObj = new EverPsBlogPost((int) $idEverObj);
+        foreach (Tools::getValue($this->table . 'Box') as $idEverObj) {
+            $everObj = new $this->className((int) $idEverObj);
             $everObj->post_status = 'published';
             if (!$everObj->save()) {
                 $this->errors[] = $this->l('An error has occurred: Can\'t publish the current object');
@@ -1241,8 +1291,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
 
     protected function processBulkDraft()
     {
-        foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
-            $everObj = new EverPsBlogPost((int) $idEverObj);
+        foreach (Tools::getValue($this->table . 'Box') as $idEverObj) {
+            $everObj = new $this->className((int) $idEverObj);
             $everObj->post_status = 'draft';
             if (!$everObj->save()) {
                 $this->errors[] = $this->l('An error has occurred: Can\'t draft the current object');
@@ -1252,8 +1302,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
 
     protected function processBulkUnprotect()
     {
-        foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
-            $everObj = new EverPsBlogPost((int) $idEverObj);
+        foreach (Tools::getValue($this->table . 'Box') as $idEverObj) {
+            $everObj = new $this->className((int) $idEverObj);
             $everObj->psswd = null;
             if (!$everObj->save()) {
                 $this->errors[] = $this->l('An error has occurred: Can\'t unprotect the current object');
@@ -1263,8 +1313,8 @@ class AdminEverPsBlogPostController extends ModuleAdminController
 
     protected function processBulkTrash()
     {
-        foreach (Tools::getValue($this->table.'Box') as $idEverObj) {
-            $everObj = new EverPsBlogPost((int) $idEverObj);
+        foreach (Tools::getValue($this->table . 'Box') as $idEverObj) {
+            $everObj = new $this->className((int) $idEverObj);
             $everObj->post_status = 'trash';
             if (!$everObj->save()) {
                 $this->errors[] = $this->l('An error has occurred: Can\'t trash the current object');
@@ -1274,71 +1324,77 @@ class AdminEverPsBlogPostController extends ModuleAdminController
 
     protected function duplicatePost($id_ever_post)
     {
-        $everObj = new EverPsBlogPost(
-            (int) $id_ever_post
-        );
-        $new_everObj = new EverPsBlogPost();
-        $new_everObj->id_lang = $everObj->id_lang;
-        $new_everObj->id_shop = $everObj->id_shop;
-        $new_everObj->id_author = $everObj->id_author;
-        $new_everObj->index = $everObj->index;
-        $new_everObj->follow = $everObj->follow;
-        $new_everObj->sitemap = $everObj->sitemap;
-        $new_everObj->post_status = 'draft';
-        $new_everObj->post_categories = $everObj->post_categories;
-        $new_everObj->post_tags = $everObj->post_tags;
-        $new_everObj->post_products = $everObj->post_products;
-        $new_everObj->psswd = $everObj->psswd;
-        $new_everObj->date_add = $everObj->date_add;
-        $new_everObj->date_upd = $everObj->date_upd;
-        foreach (Language::getLanguages(false) as $language) {
-            $new_everObj->title[$language['id_lang']] = $everObj->title[$language['id_lang']];
-            $new_everObj->content[$language['id_lang']] = $everObj->content[$language['id_lang']];
-            $new_everObj->excerpt[$language['id_lang']] = $everObj->excerpt[$language['id_lang']];
-            $new_everObj->meta_title[$language['id_lang']] = $everObj->meta_title[$language['id_lang']];
-            $new_everObj->meta_description[$language['id_lang']] = $everObj->meta_description[$language['id_lang']];
-            $new_everObj->link_rewrite[$language['id_lang']] = $everObj->link_rewrite[$language['id_lang']];
-        }
-        if ($new_everObj->save()) {
-            $everObj_featured_image = EverPsBlogImage::getBlogImage(
-                (int) $everObj->id,
-                (int) Context::getContext()->shop->id,
-                'post'
+        try {
+            $everObj = new $this->className(
+                (int) $id_ever_post
             );
-            if (Validate::isLoadedObject($everObj_featured_image)) {
-                $new_everObj_featured_image = new EverPsBlogImage();
-                $new_everObj_featured_image->id_element = (int) $new_everObj->id;
-                $new_everObj_featured_image->image_type = 'post';
-                $post_img_link = 'img/post/'
-                .(int) $new_everObj->id
-                .'.jpg';
-                $new_everObj_featured_image->image_link = $post_img_link;
-                $new_everObj_featured_image->id_shop = (int) $everObj_featured_image->id_shop;
-                $new_everObj_featured_image->save();
-                // Copy featured image file
-                $old_ps_img = _PS_IMG_DIR_
-                .'post/'
-                .(int) $everObj->id
-                .'.jpg';
-                if (file_exists($old_ps_img)) {
-                    $old_img = Tools::getHttpHost(true)
-                    .__PS_BASE_URI__
-                    .'img/post/'
-                    .(int) $id_ever_post
+            $new_everObj = new $this->className();
+            $new_everObj->id_lang = $everObj->id_lang;
+            $new_everObj->id_shop = $everObj->id_shop;
+            $new_everObj->id_author = $everObj->id_author;
+            $new_everObj->indexable = $everObj->indexable;
+            $new_everObj->follow = $everObj->follow;
+            $new_everObj->sitemap = $everObj->sitemap;
+            $new_everObj->starred = $everObj->starred;            
+            $new_everObj->post_status = 'draft';
+            $new_everObj->post_categories = $everObj->post_categories;
+            $new_everObj->allowed_groups = $everObj->allowed_groups;
+            $new_everObj->post_tags = $everObj->post_tags;
+            $new_everObj->post_products = $everObj->post_products;
+            $new_everObj->psswd = $everObj->psswd;
+            $new_everObj->date_add = $everObj->date_add;
+            $new_everObj->date_upd = $everObj->date_upd;
+            foreach (Language::getLanguages(false) as $language) {
+                $new_everObj->title[$language['id_lang']] = $everObj->title[$language['id_lang']];
+                $new_everObj->content[$language['id_lang']] = $everObj->content[$language['id_lang']];
+                $new_everObj->excerpt[$language['id_lang']] = $everObj->excerpt[$language['id_lang']];
+                $new_everObj->meta_title[$language['id_lang']] = $everObj->meta_title[$language['id_lang']];
+                $new_everObj->meta_description[$language['id_lang']] = $everObj->meta_description[$language['id_lang']];
+                $new_everObj->link_rewrite[$language['id_lang']] = $everObj->link_rewrite[$language['id_lang']];
+            }
+            if ($new_everObj->save()) {
+                $everObj_featured_image = EverPsBlogImage::getBlogImage(
+                    (int) $everObj->id,
+                    (int) $this->context->shop->id,
+                    'post'
+                );
+                if (Validate::isLoadedObject($everObj_featured_image)) {
+                    $new_everObj_featured_image = new EverPsBlogImage();
+                    $new_everObj_featured_image->id_element = (int) $new_everObj->id;
+                    $new_everObj_featured_image->image_type = 'post';
+                    $post_img_link = 'img/post/'
+                    .(int) $new_everObj->id
                     .'.jpg';
-                } else {
-                    $old_img = Tools::getHttpHost(true) . __PS_BASE_URI__.'/img/'.Configuration::get(
-                        'PS_LOGO'
-                    );
-                }
-                $new_ps_img = _PS_IMG_DIR_
-                .'post/'
-                .(int) $new_everObj->id
-                .'.jpg';
-                if (copy($old_img, $new_ps_img)) {
-                    return true;
+                    $new_everObj_featured_image->image_link = $post_img_link;
+                    $new_everObj_featured_image->id_shop = (int) $everObj_featured_image->id_shop;
+                    $new_everObj_featured_image->save();
+                    // Copy featured image file
+                    $old_ps_img = _PS_IMG_DIR_
+                    . 'post/'
+                    . (int) $everObj->id
+                    . '.jpg';
+                    if (file_exists($old_ps_img)) {
+                        $old_img = Tools::getHttpHost(true)
+                        . __PS_BASE_URI__
+                        . 'img/post/'
+                        . (int) $id_ever_post
+                        . '.jpg';
+                    } else {
+                        $old_img = Tools::getHttpHost(true) . __PS_BASE_URI__.'/img/'.Configuration::get(
+                            'PS_LOGO'
+                        );
+                    }
+                    $new_ps_img = _PS_IMG_DIR_
+                    . 'post/'
+                    . (int) $new_everObj->id
+                    . '.jpg';
+                    if (copy($old_img, $new_ps_img)) {
+                        return true;
+                    }
                 }
             }
+        } catch (Exception $e) {
+            PrestaShopLogger::addLog($e->getMessage());
         }
     }
 
@@ -1348,7 +1404,6 @@ class AdminEverPsBlogPostController extends ModuleAdminController
          * Set error message and description for the template.
          */
         array_push($this->errors, $this->module->l($message), $description);
-
         return $this->setTemplate('error.tpl');
     }
 }

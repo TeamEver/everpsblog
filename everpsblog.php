@@ -29,6 +29,7 @@ require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogComment.php';
 require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogTaxonomy.php';
 require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogSitemap.php';
 require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogCleaner.php';
+require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogSortOrders.php';
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
@@ -45,7 +46,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.5.11';
+        $this->version = '5.6.1';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -98,6 +99,18 @@ class EverPsBlog extends Module
                 $root_category->link_rewrite[$language['id_lang']] = 'root';
             }
             $root_category->save();
+            // Unclassed
+            $unclassed_category = new EverPsBlogCategory();
+            $unclassed_category->id_parent_category = 0;
+            $unclassed_category->active = 1;
+            $unclassed_category->id_shop = (int) $shop['id_shop'];
+            foreach (Language::getLanguages(false) as $language) {
+                $unclassed_category->title[$language['id_lang']] = $this->l('Unclassed');
+                $unclassed_category->content[$language['id_lang']] = '';
+                $unclassed_category->link_rewrite[$language['id_lang']] = $this->l('Unclassed');
+            }
+            $unclassed_category->save();
+            Configuration::updateValue('EVERBLOG_UNCLASSED_ID', $unclassed_category->id);
         }
         // Install
         return parent::install()
@@ -158,12 +171,10 @@ class EverPsBlog extends Module
         include dirname(__FILE__).'/install/uninstall.php';
         include dirname(__FILE__).'/install/hooks-uninstall.php';
         include dirname(__FILE__).'/install/images-uninstall.php';
-
         Db::getInstance()->delete(
             'hook_module',
-            'id_module = '.(int) $this->id
+            'id_module = ' . (int) $this->id
         );
-        
         return parent::uninstall()
             && $this->uninstallModuleTab('AdminEverPsBlog')
             && $this->uninstallModuleTab('AdminEverPsBlogPost')
@@ -178,24 +189,21 @@ class EverPsBlog extends Module
         $tab = new Tab();
         $tab->active = 1;
         $tab->class_name = $tabClass;
-        $tab->id_parent = (int)Tab::getIdFromClassName($parent);
+        $tab->id_parent = (int) Tab::getIdFromClassName($parent);
         $tab->position = Tab::getNewLastPosition($tab->id_parent);
         $tab->module = $this->name;
         if ($tabClass == 'AdminEverPsBlog') {
             $tab->icon = 'icon-team-ever';
         }
-
         foreach (Language::getLanguages(false) as $lang) {
             $tab->name[(int) $lang['id_lang']] = $tabName;
         }
-
         return $tab->add();
     }
 
     private function uninstallModuleTab($tabClass)
     {
-        $tab = new Tab((int)Tab::getIdFromClassName($tabClass));
-
+        $tab = new Tab((int) Tab::getIdFromClassName($tabClass));
         return $tab->delete();
     }
 
@@ -206,68 +214,67 @@ class EverPsBlog extends Module
     public function hookModuleRoutes($params)
     {
         $base_route = Configuration::get('EVERPSBLOG_ROUTE') ? Configuration::get('EVERPSBLOG_ROUTE') : 'blog';
-
-        return array(
-            'module-everpsblog-blog' => array(
+        return [
+            'module-everpsblog-blog' => [
                 'controller' => 'blog',
                 'rule' => $base_route,
                 'keywords' => [
                 ],
-                'params' => array(
+                'params' => [
                     'fc' => 'module',
                     'module' => 'everpsblog',
                     'controller' => 'blog',
-                )
-            ),
-            'module-everpsblog-category' => array(
+                ],
+            ],
+            'module-everpsblog-category' => [
                 'controller' => 'category',
-                'rule' => $base_route.'/category{/:id_ever_category}-{:link_rewrite}',
-                'keywords' => array(
-                    'id_ever_category' => array('regexp' => '[0-9]+', 'param' => 'id_ever_category'),
+                'rule' => $base_route . '/category{/:id_ever_category}-{:link_rewrite}',
+                'keywords' => [
+                    'id_ever_category' => ['regexp' => '[0-9]+', 'param' => 'id_ever_category'],
                     'link_rewrite' => ['regexp' => '[_a-zA-Z0-9-\pL]*'],
-                ),
-                'params' => array(
+                ],
+                'params' => [
                     'fc' => 'module',
                     'module' => 'everpsblog',
-                )
-            ),
-            'module-everpsblog-post' => array(
+                ],
+            ],
+            'module-everpsblog-post' => [
                 'controller' => 'post',
-                'rule' => $base_route.'/post{/:id_ever_post}-{:link_rewrite}',
-                'keywords' => array(
-                    'id_ever_post' => array('regexp' => '[0-9]+', 'param' => 'id_ever_post'),
-                    'link_rewrite' => array('regexp' => '[_a-zA-Z0-9-\pL]*'),
-                ),
-                'params' => array(
+                'rule' => $base_route . '/post{/:id_ever_post}-{:link_rewrite}',
+                'keywords' => [
+                    'id_ever_post' => ['regexp' => '[0-9]+', 'param' => 'id_ever_post'],
+                    'link_rewrite' => ['regexp' => '[_a-zA-Z0-9-\pL]*'],
+                ],
+                'params' => [
                     'fc' => 'module',
                     'module' => 'everpsblog',
-                )
-            ),
-            'module-everpsblog-tag' => array(
+                ],
+            ],
+            'module-everpsblog-tag' => [
                 'controller' => 'tag',
-                'rule' => $base_route.'/tag{/:id_ever_tag}-{:link_rewrite}',
-                'keywords' => array(
-                    'id_ever_tag' => array('regexp' => '[0-9]+', 'param' => 'id_ever_tag'),
-                    'link_rewrite' => array('regexp' => '[_a-zA-Z0-9-\pL]*'),
-                ),
-                'params' => array(
+                'rule' => $base_route . '/tag{/:id_ever_tag}-{:link_rewrite}',
+                'keywords' => [
+                    'id_ever_tag' => ['regexp' => '[0-9]+', 'param' => 'id_ever_tag'],
+                    'link_rewrite' => ['regexp' => '[_a-zA-Z0-9-\pL]*'],
+                ],
+                'params' => [
                     'fc' => 'module',
                     'module' => 'everpsblog',
-                )
-            ),
-            'module-everpsblog-author' => array(
+                ],
+            ],
+            'module-everpsblog-author' => [
                 'controller' => 'author',
-                'rule' => $base_route.'/author{/:id_ever_author}-{:link_rewrite}',
-                'keywords' => array(
-                    'id_ever_author' => array('regexp' => '[0-9]+', 'param' => 'id_ever_author'),
-                    'link_rewrite' => array('regexp' => '[_a-zA-Z0-9-\pL]*'),
-                ),
-                'params' => array(
+                'rule' => $base_route . '/author{/:id_ever_author}-{:link_rewrite}',
+                'keywords' => [
+                    'id_ever_author' => ['regexp' => '[0-9]+', 'param' => 'id_ever_author'],
+                    'link_rewrite' => ['regexp' => '[_a-zA-Z0-9-\pL]*'],
+                ],
+                'params' => [
                     'fc' => 'module',
                     'module' => 'everpsblog',
-                )
-            )
-        );
+                ],
+            ],
+        ];
     }
 
     public function getContent()
@@ -281,36 +288,31 @@ class EverPsBlog extends Module
                 $this->generateBlogSitemap();
             }
         }
-
         if (Tools::isSubmit('submitEverPsBlogConf')) {
             $this->postValidation();
-
             if (!count($this->postErrors)) {
                 $this->postProcess();
             }
         }
-
         if (count($this->postErrors)) {
             foreach ($this->postErrors as $error) {
                 $this->html .= $this->displayError($error);
             }
         }
-
         // Display confirmations
         if (count($this->postSuccess)) {
             foreach ($this->postSuccess as $success) {
                 $this->html .= $this->displayConfirmation($success);
             }
         }
-
         $ever_blog_token = Tools::encrypt('everpsblog/cron');
         $emptytrash = $this->context->link->getModuleLink(
             $this->name,
             'emptytrash',
-            array(
+            [
                 'token' => $ever_blog_token,
-                'id_shop' => (int) $this->context->shop->id
-            ),
+                'id_shop' => (int) $this->context->shop->id,
+            ],
             true,
             (int) $this->context->language->id,
             (int) $this->context->shop->id
@@ -318,10 +320,10 @@ class EverPsBlog extends Module
         $pending = $this->context->link->getModuleLink(
             $this->name,
             'pending',
-            array(
+            [
                 'token' => $ever_blog_token,
-                'id_shop' => (int) $this->context->shop->id
-            ),
+                'id_shop' => (int) $this->context->shop->id,
+            ],
             true,
             (int) $this->context->language->id,
             (int) $this->context->shop->id
@@ -329,10 +331,10 @@ class EverPsBlog extends Module
         $planned = $this->context->link->getModuleLink(
             $this->name,
             'planned',
-            array(
+            [
                 'token' => $ever_blog_token,
-                'id_shop' => (int) $this->context->shop->id
-            ),
+                'id_shop' => (int) $this->context->shop->id,
+            ],
             true,
             (int) $this->context->language->id,
             (int) $this->context->shop->id
@@ -340,10 +342,10 @@ class EverPsBlog extends Module
         $sitemap_link = $this->context->link->getModuleLink(
             $this->name,
             'sitemaps',
-            array(
+            [
                 'token' => $ever_blog_token,
-                'id_shop' => (int) $this->context->shop->id
-            ),
+                'id_shop' => (int) $this->context->shop->id,
+            ],
             true,
             (int) $this->context->language->id,
             (int) $this->context->shop->id
@@ -356,7 +358,7 @@ class EverPsBlog extends Module
             (int) $this->context->language->id,
             (int) $this->context->shop->id
         );
-        $this->context->smarty->assign(array(
+        $this->context->smarty->assign([
             'blog_sitemaps' => $this->getSitemapIndexes(),
             'image_dir' => $this->_path.'views/img',
             'everpsblogcron' => $emptytrash,
@@ -364,16 +366,14 @@ class EverPsBlog extends Module
             'everpsblogcronplanned' => $planned,
             'everpsblogcronsitemap' => $sitemap_link,
             'blog_url' => $default_blog,
-        ));
-
-        if ($this->checkLatestEverModuleVersion($this->name, $this->version)) {
+        ]);
+        if ($this->checkLatestEverModuleVersion()) {
             $this->html .= $this->context->smarty->fetch($this->local_path . 'views/templates/admin/upgrade.tpl');
         }
         $this->html .= $this->context->smarty->fetch($this->local_path . 'views/templates/admin/header.tpl');
         $this->html .= $this->context->smarty->fetch($this->local_path . 'views/templates/admin/configure.tpl');
         $this->html .= $this->renderForm();
         $this->html .= $this->context->smarty->fetch($this->local_path . 'views/templates/admin/footer.tpl');
-
         return $this->html;
     }
 
@@ -738,29 +738,28 @@ class EverPsBlog extends Module
                 Configuration::updateValue($key, Tools::getValue($key));
             }
         }
-        if ((bool)Tools::getValue('EVERBLOG_SHOW_HOME') === true) {
+        if ((bool) Tools::getValue('EVERBLOG_SHOW_HOME') === true) {
             $this->registerHook('displayHome');
         } else {
             $this->unregisterHook('displayHome');
         }
         $handle = fopen(
-            _PS_MODULE_DIR_ . '/'.$this->name.'/views/css/custom.css',
+            _PS_MODULE_DIR_ . '/' . $this->name . '/views/css/custom.css',
             'w+'
         );
         fclose($handle);
         /* Insert new values to the CSS file */
         file_put_contents(
-            _PS_MODULE_DIR_ . '/'.$this->name.'/views/css/custom.css',
+            _PS_MODULE_DIR_ . '/' . $this->name . '/views/css/custom.css',
             Tools::getValue('EVERBLOG_CSS')
         );
-
         $this->postSuccess[] = $this->l('All settings have been saved');
     }
 
     protected function getConfigFormValues()
     {
         $custom_css = Tools::file_get_contents(
-            _PS_MODULE_DIR_ . '/'.$this->name.'/views/css/custom.css'
+            _PS_MODULE_DIR_ . '/' . $this->name . '/views/css/custom.css'
         );
         $formValues = [];
         $everblog_title = [];
@@ -789,7 +788,7 @@ class EverPsBlog extends Module
                 'EVERBLOG_BOTTOM_TEXT_'.$lang['id_lang']
             ) : '';
         }
-        $formValues[] = array(
+        $formValues[] = [
             'EVERPSBLOG_ROUTE' => Configuration::get('EVERPSBLOG_ROUTE'),
             'EVERPSBLOG_EXCERPT' => Configuration::get('EVERPSBLOG_EXCERPT'),
             'EVERPSBLOG_TITLE_LENGTH' => Configuration::get('EVERPSBLOG_TITLE_LENGTH'),
@@ -818,16 +817,16 @@ class EverPsBlog extends Module
             'EVERBLOG_CATEG_COLUMNS' => Configuration::get('EVERBLOG_CATEG_COLUMNS'),
             'EVERBLOG_FANCYBOX' => Configuration::get('EVERBLOG_FANCYBOX'),
             'EVERBLOG_CAT_FEATURED' => Configuration::get('EVERBLOG_CAT_FEATURED'),
-            'EVERBLOG_TITLE' => Configuration::getConfigInMultipleLangs(
+            'EVERBLOG_TITLE' => static::getConfigInMultipleLangs(
                 'EVERBLOG_TITLE'
             ),
-            'EVERBLOG_META_DESC' => Configuration::getConfigInMultipleLangs(
+            'EVERBLOG_META_DESC' => static::getConfigInMultipleLangs(
                 'EVERBLOG_META_DESC'
             ),
-            'EVERBLOG_TOP_TEXT' => Configuration::getConfigInMultipleLangs(
+            'EVERBLOG_TOP_TEXT' => static::getConfigInMultipleLangs(
                 'EVERBLOG_TOP_TEXT'
             ),
-            'EVERBLOG_BOTTOM_TEXT' => Configuration::getConfigInMultipleLangs(
+            'EVERBLOG_BOTTOM_TEXT' => static::getConfigInMultipleLangs(
                 'EVERBLOG_BOTTOM_TEXT'
             ),
             'EVERPSBLOG_BLOG_LAYOUT' => Configuration::get('EVERPSBLOG_BLOG_LAYOUT'),
@@ -845,7 +844,7 @@ class EverPsBlog extends Module
             'EVERBLOG_ENABLE_TAGS' => Configuration::get('EVERBLOG_ENABLE_TAGS'),
             'EVERBLOG_IMPORT_POST_STATE' => Configuration::get('EVERBLOG_IMPORT_POST_STATE'),
             'wordpress_xml' => ''
-        );
+        ];
         $values = call_user_func_array('array_merge', $formValues);
         return $values;
     }
@@ -853,25 +852,21 @@ class EverPsBlog extends Module
     protected function renderForm()
     {
         $helper = new HelperForm();
-
         $helper->show_toolbar = false;
         $helper->table = $this->table;
         $helper->module = $this;
         $helper->default_form_language = $this->context->language->id;
         $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG', 0);
-
         $helper->identifier = $this->identifier;
         $helper->submit_action = 'submitEverPsBlogConf';
         $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
-            .'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
+            .'&configure='.$this->name.'&tab_module=' . $this->tab . '&module_name=' . $this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
-
-        $helper->tpl_vars = array(
+        $helper->tpl_vars = [
             'fields_value' => $this->getConfigFormValues(), /* Add values for your inputs */
             'languages' => $this->context->controller->getLanguages(),
             'id_language' => (int) $this->context->language->id,
-        );
-
+        ];
         return $helper->generateForm($this->getConfigForm());
     }
 
@@ -885,144 +880,144 @@ class EverPsBlog extends Module
             1,
             true
         );
-        $default_snippet = array(
-            array(
+        $default_snippet = [
+            [
                 'snippet' => 'Article',
-                'name' => $this->l('Simple article')
-            ),
-            array(
+                'name' => $this->l('Simple article'),
+            ],
+            [
                 'snippet' => 'NewsArticle',
-                'name' => $this->l('News article')
-            ),
-        );
-        $layouts = array(
-            array(
+                'name' => $this->l('News article'),
+            ],
+        ];
+        $layouts = [
+            [
                 'layout' => 'layouts/layout-full-width.tpl',
-                'name' => $this->l('Full width')
-            ),
-            array(
+                'name' => $this->l('Full width'),
+            ],
+            [
                 'layout' => 'layouts/layout-left-column.tpl',
-                'name' => $this->l('Left column')
-            ),
-            array(
+                'name' => $this->l('Left column'),
+            ],
+            [
                 'layout' => 'layouts/layout-right-column.tpl',
-                'name' => $this->l('Right column')
-            ),
-            array(
+                'name' => $this->l('Right column'),
+            ],
+            [
                 'layout' => 'layouts/layout-both-columns.tpl',
-                'name' => $this->l('Both columns')
-            ),
-        );
-        $trash_days = array(
-            array(
+                'name' => $this->l('Both columns'),
+            ],
+        ];
+        $trash_days = [
+            [
                 'id_trash' => 0,
-                'name' => $this->l('Do not empty trash')
-            ),
-            array(
+                'name' => $this->l('Do not empty trash'),
+            ],
+            [
                 'id_trash' => 1,
-                'name' => $this->l('One day')
-            ),
-            array(
+                'name' => $this->l('One day'),
+            ],
+            [
                 'id_trash' => 2,
-                'name' => $this->l('Two days')
-            ),
-            array(
+                'name' => $this->l('Two days'),
+            ],
+            [
                 'id_trash' => 3,
-                'name' => $this->l('Three days')
-            ),
-            array(
+                'name' => $this->l('Three days'),
+            ],
+            [
                 'id_trash' => 4,
-                'name' => $this->l('Four days')
-            ),
-            array(
+                'name' => $this->l('Four days'),
+            ],
+            [
                 'id_trash' => 5,
-                'name' => $this->l('Five days')
-            ),
-            array(
+                'name' => $this->l('Five days'),
+            ],
+            [
                 'id_trash' => 6,
-                'name' => $this->l('Six days')
-            ),
-            array(
+                'name' => $this->l('Six days'),
+            ],
+            [
                 'id_trash' => 7,
-                'name' => $this->l('One week')
-            ),
-        );
-        $css_files = array(
-            array(
+                'name' => $this->l('One week'),
+            ],
+        ];
+        $css_files = [
+            [
                 'id_file' => 'default',
-                'name' => $this->l('default.css file')
-            ),
-            array(
+                'name' => $this->l('default.css file'),
+            ],
+            [
                 'id_file' => 'red',
-                'name' => $this->l('red.css file')
-            ),
-            array(
+                'name' => $this->l('red.css file'),
+            ],
+            [
                 'id_file' => 'green',
-                'name' => $this->l('green.css file')
-            ),
-            array(
+                'name' => $this->l('green.css file'),
+            ],
+            [
                 'id_file' => 'yellow',
-                'name' => $this->l('yellow.css file')
-            ),
-            array(
+                'name' => $this->l('yellow.css file'),
+            ],
+            [
                 'id_file' => 'white',
-                'name' => $this->l('white.css file')
-            ),
-        );
-        $post_status = array(
-            array(
+                'name' => $this->l('white.css file'),
+            ],
+        ];
+        $post_status = [
+            [
                 'id_status' => 'draft',
-                'name' => $this->l('draft')
-            ),
-            array(
+                'name' => $this->l('draft'),
+            ],
+            [
                 'id_status' => 'pending',
-                'name' => $this->l('pending')
-            ),
-            array(
+                'name' => $this->l('pending'),
+            ],
+            [
                 'id_status' => 'published',
-                'name' => $this->l('published')
-            ),
-            array(
+                'name' => $this->l('published'),
+            ],
+            [
                 'id_status' => 'trash',
-                'name' => $this->l('trash')
-            ),
-            array(
+                'name' => $this->l('trash'),
+            ],
+            [
                 'id_status' => 'planned',
-                'name' => $this->l('planned')
-            ),
-        );
+                'name' => $this->l('planned'),
+            ],
+        ];
         $form_fields = [];
-        $form_fields[] = array(
-            'form' => array(
-                'legend' => array(
+        $form_fields[] = [
+            'form' => [
+                'legend' => [
                     'title' => $this->l('Blog default Settings'),
                     'icon' => 'icon-smile',
-                ),
-                'input' => array(
-                    array(
+                ],
+                'input' => [
+                    [
                         'type' => 'text',
                         'label' => $this->l('Blog base route'),
                         'name' => 'EVERPSBLOG_ROUTE',
                         'desc' => $this->l('Leaving empty will set "blog"'),
                         'hint' => $this->l('Use a keyword associated to your shop'),
-                    ),
-                    array(
+                    ],
+                    [
                         'type' => 'text',
                         'label' => $this->l('Post content excerpt'),
                         'name' => 'EVERPSBLOG_EXCERPT',
                         'desc' => $this->l('Post excerpt length for content on listing'),
                         'hint' => $this->l('Please set post content excerpt'),
                         'required' => true,
-                    ),
-                    array(
+                    ],
+                    [
                         'type' => 'text',
                         'label' => $this->l('Post title length'),
                         'name' => 'EVERPSBLOG_TITLE_LENGTH',
                         'desc' => $this->l('Post title length for content on listing'),
                         'hint' => $this->l('Please set post title length'),
                         'required' => true,
-                    ),
-                    array(
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Extends TinyMCE on blog management ?'),
                         'desc' => $this->l('Set yes to extends TinyMCE on blog management pages'),
@@ -1030,20 +1025,20 @@ class EverPsBlog extends Module
                         'required' => false,
                         'name' => 'EVERBLOG_TINYMCE',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Show post views count ?'),
                         'desc' => $this->l('Set yes to show views count'),
@@ -1051,20 +1046,20 @@ class EverPsBlog extends Module
                         'required' => false,
                         'name' => 'EVERBLOG_SHOW_POST_COUNT',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Show post on homepage ?'),
                         'desc' => $this->l('Set yes to show posts on homepage'),
@@ -1072,57 +1067,57 @@ class EverPsBlog extends Module
                         'required' => false,
                         'name' => 'EVERBLOG_SHOW_HOME',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'text',
                         'label' => $this->l('Number of posts for home'),
                         'name' => 'EVERPSBLOG_HOME_NBR',
                         'desc' => $this->l('Leaving empty will set 4 posts'),
                         'hint' => $this->l('Posts are 4 per row'),
                         'required' => true,
-                    ),
-                    array(
+                    ],
+                    [
                         'type' => 'text',
                         'label' => $this->l('Number of posts for product'),
                         'name' => 'EVERPSBLOG_PRODUCT_NBR',
                         'desc' => $this->l('Leaving empty will set 4 posts'),
                         'hint' => $this->l('Posts are 4 per row'),
                         'required' => true,
-                    ),
-                    array(
+                    ],
+                    [
                         'type' => 'text',
                         'label' => $this->l('Posts per page'),
                         'name' => 'EVERPSBLOG_PAGINATION',
                         'desc' => $this->l('Leaving empty will set 10 posts per page'),
                         'hint' => $this->l('Will add pagination'),
                         'required' => true,
-                    ),
-                    array(
+                    ],
+                    [
                         'type' => 'select',
                         'label' => $this->l('Admin email'),
                         'desc' => $this->l('Will receive new comments notification by email'),
                         'hint' => $this->l('You can set a new account on your shop'),
                         'required' => true,
                         'name' => 'EVERBLOG_ADMIN_EMAIL',
-                        'options' => array(
+                        'options' => [
                             'query' => $employees,
                             'id' => 'id_employee',
-                            'name' => 'email'
-                        )
-                    ),
-                    array(
+                            'name' => 'email',
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Allow comments on posts ?'),
                         'desc' => $this->l('Set yes to allow comments'),
@@ -1130,20 +1125,20 @@ class EverPsBlog extends Module
                         'required' => false,
                         'name' => 'EVERBLOG_ALLOW_COMMENTS',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Check comments on posts before they are published ?'),
                         'desc' => $this->l('Set yes to check comments before publishing'),
@@ -1151,20 +1146,20 @@ class EverPsBlog extends Module
                         'required' => false,
                         'name' => 'EVERBLOG_CHECK_COMMENTS',
                         'is_bool' => false,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Allow only registered customers to comment ?'),
                         'desc' => $this->l('Set yes to allow only registered customers to comment'),
@@ -1172,34 +1167,34 @@ class EverPsBlog extends Module
                         'required' => false,
                         'name' => 'EVERBLOG_ONLY_LOGGED_COMMENT',
                         'is_bool' => false,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'select',
                         'label' => $this->l('Empty trash'),
                         'desc' => $this->l('Please choose auto empty trash in days'),
                         'hint' => $this->l('Will auto delete trashed posts on CRON task'),
                         'required' => true,
                         'name' => 'EVERBLOG_EMPTY_TRASH',
-                        'options' => array(
+                        'options' => [
                             'query' => $trash_days,
                             'id' => 'id_trash',
                             'name' => 'name',
-                        ),
+                        ],
                         'lang' => false,
-                    ),
-                    array(
+                    ],
+                    [
                         'type' => 'text',
                         'label' => $this->l('Default blog SEO title'),
                         'name' => 'EVERBLOG_TITLE',
@@ -1208,8 +1203,8 @@ class EverPsBlog extends Module
                         'cols' => 36,
                         'rows' => 4,
                         'lang' => true,
-                    ),
-                    array(
+                    ],
+                    [
                         'type' => 'textarea',
                         'label' => $this->l('Default blog SEO meta description'),
                         'name' => 'EVERBLOG_META_DESC',
@@ -1218,21 +1213,21 @@ class EverPsBlog extends Module
                         'cols' => 36,
                         'rows' => 4,
                         'lang' => true,
-                    ),
-                    array(
+                    ],
+                    [
                         'type' => 'select',
                         'label' => $this->l('Default blog type'),
                         'desc' => $this->l('Will be used for structured metadatas'),
                         'hint' => $this->l('Select blog type depending on your posts'),
                         'required' => true,
                         'name' => 'EVERPSBLOG_TYPE',
-                        'options' => array(
+                        'options' => [
                             'query' => $default_snippet,
                             'id' => 'snippet',
-                            'name' => 'name'
-                        )
-                    ),
-                    array(
+                            'name' => 'name',
+                        ],
+                    ],
+                    [
                         'type' => 'textarea',
                         'label' => $this->l('Default blog top text'),
                         'name' => 'EVERBLOG_TOP_TEXT',
@@ -1241,9 +1236,9 @@ class EverPsBlog extends Module
                         'cols' => 36,
                         'rows' => 4,
                         'lang' => true,
-                        'autoload_rte' => true
-                    ),
-                    array(
+                        'autoload_rte' => true,
+                    ],
+                    [
                         'type' => 'textarea',
                         'label' => $this->l('Default blog bottom text'),
                         'name' => 'EVERBLOG_BOTTOM_TEXT',
@@ -1252,9 +1247,9 @@ class EverPsBlog extends Module
                         'cols' => 36,
                         'rows' => 4,
                         'lang' => true,
-                        'autoload_rte' => true
-                    ),
-                    array(
+                        'autoload_rte' => true,
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Use RSS feed ?'),
                         'desc' => $this->l('Will add a link to RSS feed on blog and each tag, category, author'),
@@ -1262,20 +1257,20 @@ class EverPsBlog extends Module
                         'required' => false,
                         'name' => 'EVERBLOG_RSS',
                         'is_bool' => false,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Show author ?'),
                         'desc' => $this->l('Will show author name and avatar on posts'),
@@ -1283,20 +1278,20 @@ class EverPsBlog extends Module
                         'required' => false,
                         'name' => 'EVERBLOG_SHOW_AUTHOR',
                         'is_bool' => false,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'textarea',
                         'label' => $this->l('Banned users'),
                         'name' => 'EVERBLOG_BANNED_USERS',
@@ -1304,8 +1299,8 @@ class EverPsBlog extends Module
                         'hint' => $this->l('Unwanted users won\'t be able to post comments'),
                         'cols' => 36,
                         'rows' => 4,
-                    ),
-                    array(
+                    ],
+                    [
                         'type' => 'textarea',
                         'label' => $this->l('Banned IP'),
                         'name' => 'EVERBLOG_BANNED_IP',
@@ -1313,28 +1308,28 @@ class EverPsBlog extends Module
                         'hint' => $this->l('Unwanted users won\'t be able to post comments'),
                         'cols' => 36,
                         'rows' => 4,
-                    ),
-                    array(
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Show parent categories list on left/right columns ?'),
                         'desc' => $this->l('Set yes show a list of all parent categories on left or right columns'),
                         'hint' => $this->l('Will show ordered parent categories on left/right columns'),
                         'name' => 'EVERBLOG_CATEG_COLUMNS',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Show tags list on left/right columns ?'),
                         'desc' => $this->l('Set yes to activate cool stuff'),
@@ -1342,20 +1337,20 @@ class EverPsBlog extends Module
                         'required' => false,
                         'name' => 'EVERBLOG_TAG_COLUMNS',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Show archives list on left/right columns ?'),
                         'desc' => $this->l('Set yes show links for monthly posts on left or right columns'),
@@ -1363,20 +1358,20 @@ class EverPsBlog extends Module
                         'required' => false,
                         'name' => 'EVERBLOG_ARCHIVE_COLUMNS',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Show related posts on products pages ?'),
                         'desc' => $this->l('Set yes show related posts on product pages footer'),
@@ -1384,100 +1379,100 @@ class EverPsBlog extends Module
                         'required' => false,
                         'name' => 'EVERBLOG_RELATED_POST',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Show featured images on categories ?'),
                         'desc' => $this->l('Set yes to show each category featured image'),
                         'hint' => $this->l('Else category featured image won\'t be shown'),
                         'name' => 'EVERBLOG_SHOW_FEAT_CAT',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Show featured images on tags ?'),
                         'desc' => $this->l('Set yes to show each tag featured image'),
                         'hint' => $this->l('Else tag featured image won\'t be shown'),
                         'name' => 'EVERBLOG_SHOW_FEAT_TAG',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Activate cool CSS animations ?'),
                         'desc' => $this->l('Set yes to activate cool stuff'),
                         'hint' => $this->l('Will add animations on posts, images, etc'),
                         'name' => 'EVERBLOG_ANIMATE',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Enable Fancybox'),
                         'hint' => $this->l('Set no if your theme already uses it'),
                         'desc' => $this->l('Use Fancybox for popups on post images'),
                         'name' => 'EVERBLOG_FANCYBOX',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Enabled')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('Disabled')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'text',
                         'label' => $this->l('Featured category on blog default page'),
                         'name' => 'EVERBLOG_CAT_FEATURED',
@@ -1485,123 +1480,123 @@ class EverPsBlog extends Module
                         'hint' => $this->l('Will show category products on blog page'),
                         'cols' => 36,
                         'rows' => 4,
-                    ),
-                ),
-                'buttons' => array(
-                    'generateBlogSitemap' => array(
+                    ],
+                ],
+                'buttons' => [
+                    'generateBlogSitemap' => [
                         'name' => 'submitGenerateBlogSitemap',
                         'type' => 'submit',
                         'class' => 'btn btn-default pull-right',
                         'icon' => 'process-icon-refresh',
-                        'title' => $this->l('Generate sitemaps')
-                    ),
-                ),
-                'submit' => array(
+                        'title' => $this->l('Generate sitemaps'),
+                    ],
+                ],
+                'submit' => [
                     'name' => 'submit',
                     'title' => $this->l('Save'),
-                ),
-            )
-        );
-        $form_fields[] = array(
-            'form' => array(
-                'legend' => array(
+                ],
+            ],
+        ];
+        $form_fields[] = [
+            'form' => [
+                'legend' => [
                     'title' => $this->l('Blog layout settings'),
                     'icon' => 'icon-smile',
-                ),
-                'input' => array(
-                    array(
+                ],
+                'input' => [
+                    [
                         'type' => 'select',
                         'label' => $this->l('Default blog layout'),
                         'desc' => $this->l('Will add or remove columns from blog page'),
                         'hint' => $this->l('You can add or remove modules from Prestashop positions'),
                         'required' => true,
                         'name' => 'EVERPSBLOG_BLOG_LAYOUT',
-                        'options' => array(
+                        'options' => [
                             'query' => $layouts,
                             'id' => 'layout',
-                            'name' => 'name'
-                        )
-                    ),
-                    array(
+                            'name' => 'name',
+                        ],
+                    ],
+                    [
                         'type' => 'select',
                         'label' => $this->l('Default post layout'),
                         'desc' => $this->l('Will add or remove columns from post page'),
                         'hint' => $this->l('You can add or remove modules from Prestashop positions'),
                         'required' => true,
                         'name' => 'EVERPSBLOG_POST_LAYOUT',
-                        'options' => array(
+                        'options' => [
                             'query' => $layouts,
                             'id' => 'layout',
-                            'name' => 'name'
-                        )
-                    ),
-                    array(
+                            'name' => 'name',
+                        ],
+                    ],
+                    [
                         'type' => 'select',
                         'label' => $this->l('Default category layout'),
                         'desc' => $this->l('Will add or remove columns from category page'),
                         'hint' => $this->l('You can add or remove modules from Prestashop positions'),
                         'required' => true,
                         'name' => 'EVERPSBLOG_CAT_LAYOUT',
-                        'options' => array(
+                        'options' => [
                             'query' => $layouts,
                             'id' => 'layout',
-                            'name' => 'name'
-                        )
-                    ),
-                    array(
+                            'name' => 'name',
+                        ],
+                    ],
+                    [
                         'type' => 'select',
                         'label' => $this->l('Default author layout'),
                         'desc' => $this->l('Will add or remove columns from author page'),
                         'hint' => $this->l('You can add or remove modules from Prestashop positions'),
                         'required' => true,
                         'name' => 'EVERPSBLOG_AUTHOR_LAYOUT',
-                        'options' => array(
+                        'options' => [
                             'query' => $layouts,
                             'id' => 'layout',
-                            'name' => 'name'
-                        )
-                    ),
-                    array(
+                            'name' => 'name',
+                        ],
+                    ],
+                    [
                         'type' => 'select',
                         'label' => $this->l('Default tag layout'),
                         'desc' => $this->l('Will add or remove columns from tag page'),
                         'hint' => $this->l('You can add or remove modules from Prestashop positions'),
                         'required' => true,
                         'name' => 'EVERPSBLOG_TAG_LAYOUT',
-                        'options' => array(
+                        'options' => [
                             'query' => $layouts,
                             'id' => 'layout',
-                            'name' => 'name'
-                        )
-                    ),
-                ),
-                'submit' => array(
+                            'name' => 'name',
+                        ],
+                    ],
+                ],
+                'submit' => [
                     'name' => 'submit',
                     'title' => $this->l('Save'),
-                ),
-            )
-        );
-        $form_fields[] = array(
-            'form' => array(
-                'legend' => array(
+                ],
+            ],
+        ];
+        $form_fields[] = [
+            'form' => [
+                'legend' => [
                     'title' => $this->l('WordPress XML import settings'),
                     'icon' => 'icon-smile',
-                ),
-                'input' => array(
-                    array(
+                ],
+                'input' => [
+                    [
                         'type' => 'select',
                         'label' => $this->l('Default post state on XML import'),
                         'desc' => $this->l('Will set default post state on XML import'),
                         'hint' => $this->l('Please select default post state on XML file import'),
                         'required' => true,
                         'name' => 'EVERBLOG_IMPORT_POST_STATE',
-                        'options' => array(
+                        'options' => [
                             'query' => $post_status,
                             'id' => 'id_status',
                             'name' => 'name',
-                        ),
-                    ),
-                    array(
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Import WordPress authors from xml file ?'),
                         'desc' => $this->l('Set yes to import WordPress authors'),
@@ -1609,20 +1604,20 @@ class EverPsBlog extends Module
                         'required' => false,
                         'name' => 'EVERBLOG_IMPORT_AUTHORS',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Import WordPress categories from xml file ?'),
                         'desc' => $this->l('Set yes to import WordPress categories'),
@@ -1630,20 +1625,20 @@ class EverPsBlog extends Module
                         'required' => false,
                         'name' => 'EVERBLOG_IMPORT_CATS',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Import WordPress tags from xml file ?'),
                         'desc' => $this->l('Set yes to import WordPress tags'),
@@ -1651,20 +1646,20 @@ class EverPsBlog extends Module
                         'required' => false,
                         'name' => 'EVERBLOG_IMPORT_TAGS',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Enable WordPress authors from xml file ?'),
                         'desc' => $this->l('Set yes to enable WordPress authors'),
@@ -1672,20 +1667,20 @@ class EverPsBlog extends Module
                         'required' => false,
                         'name' => 'EVERBLOG_ENABLE_AUTHORS',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Enable WordPress categories from xml file ?'),
                         'desc' => $this->l('Set yes to enable WordPress categories'),
@@ -1693,20 +1688,20 @@ class EverPsBlog extends Module
                         'required' => false,
                         'name' => 'EVERBLOG_ENABLE_CATS',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'switch',
                         'label' => $this->l('Enable WordPress tags from xml file ?'),
                         'desc' => $this->l('Set yes to enable WordPress tags'),
@@ -1714,77 +1709,77 @@ class EverPsBlog extends Module
                         'required' => false,
                         'name' => 'EVERBLOG_ENABLE_TAGS',
                         'is_bool' => true,
-                        'values' => array(
-                            array(
+                        'values' => [
+                            [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
-                            ),
-                            array(
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
-                        ),
-                    ),
-                    array(
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
                         'type' => 'file',
                         'label' => $this->l('Import WordPress XML file'),
                         'desc' => $this->l('Import WordPress XML posts file'),
                         'hint' => $this->l('Will import posts from WordPress XML file'),
                         'name' => 'wordpress_xml',
-                        'required' => false
-                    ),
-                ),
-                'submit' => array(
+                        'required' => false,
+                    ],
+                ],
+                'submit' => [
                     'name' => 'submit',
                     'title' => $this->l('Save and import'),
-                ),
-            )
-        );
-        $form_fields[] = array(
-            'form' => array(
-                'legend' => array(
+                ],
+            ],
+        ];
+        $form_fields[] = [
+            'form' => [
+                'legend' => [
                     'title' => $this->l('Design settings'),
                     'icon' => 'icon-smile',
-                ),
-                'input' => array(
-                    array(
+                ],
+                'input' => [
+                    [
                         'type' => 'select',
                         'label' => $this->l('Custom CSS file'),
                         'desc' => $this->l('You can change here default CSS file'),
                         'hint' => $this->l('By changing CSS file, you will change blog colors'),
                         'required' => true,
                         'name' => 'EVERBLOG_CSS_FILE',
-                        'options' => array(
+                        'options' => [
                             'query' => $css_files,
                             'id' => 'id_file',
                             'name' => 'name',
-                        ),
+                        ],
                         'lang' => false,
-                    ),
-                    array(
+                    ],
+                    [
                         'type' => 'textarea',
                         'label' => $this->l('Custom CSS for blog'),
                         'desc' => $this->l('Add here your custom CSS rules'),
                         'hint' => $this->l('Webdesigners here can manage CSS rules for blog'),
                         'name' => 'EVERBLOG_CSS',
-                    ),
-                ),
-                'submit' => array(
+                    ],
+                ],
+                'submit' =>[
                     'name' => 'submit',
                     'title' => $this->l('Save'),
-                ),
-            )
-        );
+                ],
+            ],
+        ];
         return $form_fields;
     }
 
     public function hookActionAdminControllerSetMedia()
     {
-        $this->context->controller->addCss($this->_path.'views/css/ever.css');
+        $this->context->controller->addCss($this->_path . 'views/css/ever.css');
         if (Tools::getValue('configure') == $this->name) {
-            $this->context->controller->addJs($this->_path.'views/js/ever.js');
+            $this->context->controller->addJs($this->_path . 'views/js/ever.js');
         }
         if ((bool) Configuration::get('EVERBLOG_TINYMCE') === true) {
             $blogAdminControllers = [
@@ -1809,7 +1804,7 @@ class EverPsBlog extends Module
 
     public function hookDisplayAdminAfterHeader()
     {
-        if ($this->checkLatestEverModuleVersion($this->name, $this->version)) {
+        if ($this->checkLatestEverModuleVersion()) {
             return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/upgrade.tpl');
         }
     }
@@ -1820,43 +1815,43 @@ class EverPsBlog extends Module
         $module_name = Tools::getValue('module');
         if ($module_name == 'everpsblog') {
             $this->context->controller->addCSS(
-                $this->module_folder.'/views/css/everpsblog-all.css',
+                $this->module_folder . '/views/css/everpsblog-all.css',
                 'all'
             );
             $this->context->controller->addCSS(
-                $this->module_folder.'/views/css/everpsblog.css',
+                $this->module_folder . '/views/css/everpsblog.css',
                 'all'
             );
             $this->context->controller->addCSS(
-                $this->module_folder.'everpsblog/views/css/everpsblog.css',
+                $this->module_folder . 'everpsblog/views/css/everpsblog.css',
                 'all'
             );
             $this->context->controller->addJs(
-                $this->_path.'views/js/everpsblog.js'
+                $this->_path . 'views/js/everpsblog.js'
             );
             if ($controller_name == 'post') {
-                if ((int)Configuration::get('EVERBLOG_FANCYBOX')) {
+                if ((int) Configuration::get('EVERBLOG_FANCYBOX')) {
                     if ($controller_name != 'order') {
-                        $this->context->controller->addCSS(($this->_path).'views/css/jquery.fancybox.min.css', 'all');
-                        $this->context->controller->addJS(($this->_path).'views/js/jquery.fancybox.min.js', 'all');
+                        $this->context->controller->addCSS(($this->_path) . 'views/css/jquery.fancybox.min.css', 'all');
+                        $this->context->controller->addJS(($this->_path) . 'views/js/jquery.fancybox.min.js', 'all');
                     }
                 }
             }
         }
         $this->context->controller->addCSS(
-            $this->module_folder.'/views/css/everpsblog-columns.css',
+            $this->module_folder . '/views/css/everpsblog-columns.css',
             'all'
         );
         $css_file = Configuration::get('EVERBLOG_CSS_FILE');
         if ($css_file && $css_file != 'default') {
             $this->context->controller->addCSS(
-                $this->module_folder.'/views/css/'.$css_file.'.css',
+                $this->module_folder . '/views/css/'.$css_file.'.css',
                 'all'
             );
         }
-        if (file_exists($this->module_folder.'/views/css/custom.css')) {
+        if (file_exists($this->module_folder . '/views/css/custom.css')) {
             $this->context->controller->addCSS(
-                $this->module_folder.'/views/css/custom.css',
+                $this->module_folder . '/views/css/custom.css',
                 'all'
             );
         }
@@ -1864,8 +1859,8 @@ class EverPsBlog extends Module
 
     public function hookDisplayLeftColumn($params)
     {
-        if ((int)Configuration::get('EVERPSBLOG_HOME_NBR')) {
-            $post_number = (int)Configuration::get('EVERPSBLOG_HOME_NBR');
+        if ((int) Configuration::get('EVERPSBLOG_HOME_NBR')) {
+            $post_number = (int) Configuration::get('EVERPSBLOG_HOME_NBR');
         } else {
             $post_number = 4;
         }
@@ -1901,7 +1896,7 @@ class EverPsBlog extends Module
         $showTags = Configuration::get(
             'EVERBLOG_TAG_COLUMNS'
         );
-        $this->context->smarty->assign(array(
+        $this->context->smarty->assign([
             'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
             'everpsblog' => $latest_posts,
             'showArchives' => $showArchives,
@@ -1911,8 +1906,8 @@ class EverPsBlog extends Module
             'tags' => $tags,
             'categories' => $categories,
             'animate' => $animate,
-            'blogImg_dir' => $this->siteUrl.'/modules/everpsblog/views/img/',
-        ));
+            'blogImg_dir' => $this->siteUrl . '/modules/everpsblog/views/img/',
+        ]);
         return $this->display(__FILE__, 'views/templates/hook/columns.tpl');
     }
 
@@ -1938,8 +1933,8 @@ class EverPsBlog extends Module
 
     public function hookDisplayHome()
     {
-        if ((int)Configuration::get('EVERPSBLOG_HOME_NBR') > 0) {
-            $post_number = (int)Configuration::get('EVERPSBLOG_HOME_NBR');
+        if ((int) Configuration::get('EVERPSBLOG_HOME_NBR') > 0) {
+            $post_number = (int) Configuration::get('EVERPSBLOG_HOME_NBR');
         } else {
             $post_number = 4;
         }
@@ -1949,13 +1944,13 @@ class EverPsBlog extends Module
             [],
             true
         );
-        $latest_posts = EverPsBlogPost::getLatestPosts(
+        $starredPosts = EverPsBlogPost::getStarredPosts(
             (int) $this->context->language->id,
             (int) $this->context->shop->id,
             0,
             (int) $post_number
         );
-        if (!$latest_posts || !count($latest_posts)) {
+        if (!$starredPosts || !count($starredPosts)) {
             return;
         }
         $evercategories = EverPsBlogCategory::getAllCategories(
@@ -1965,24 +1960,22 @@ class EverPsBlog extends Module
         $animate = Configuration::get(
             'EVERBLOG_ANIMATE'
         );
-        $this->context->smarty->assign(
-            array(
-                'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
-                'blogUrl' => $blogUrl,
-                'everpsblog' => $latest_posts,
-                'evercategory' => $evercategories,
-                'default_lang' => (int) $this->context->language->id,
-                'id_lang' => (int) $this->context->language->id,
-                'blogImg_dir' => $this->siteUrl.'/modules/everpsblog/views/img/',
-                'animated' => $animate,
-            )
-        );
+        $this->context->smarty->assign([
+            'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
+            'blogUrl' => $blogUrl,
+            'everpsblog' => $starredPosts,
+            'evercategory' => $evercategories,
+            'default_lang' => (int) $this->context->language->id,
+            'id_lang' => (int) $this->context->language->id,
+            'blogImg_dir' => $this->siteUrl . '/modules/everpsblog/views/img/',
+            'animated' => $animate,
+        ]);
         return $this->display(__FILE__, 'views/templates/hook/home.tpl');
     }
 
     public function hookDisplayCustomerAccount()
     {
-        if ((bool)Configuration::get('EVERBLOG_ALLOW_COMMENTS') === true) {
+        if ((bool) Configuration::get('EVERBLOG_ALLOW_COMMENTS') === true) {
             return $this->display(__FILE__, 'views/templates/hook/my-account.tpl');
         }
     }
@@ -1994,11 +1987,11 @@ class EverPsBlog extends Module
 
     public function hookDisplayFooterProduct()
     {
-        if ((bool)Configuration::get('EVERBLOG_RELATED_POST') === false) {
+        if ((bool) Configuration::get('EVERBLOG_RELATED_POST') === false) {
             return;
         }
-        if ((int)Configuration::get('EVERPSBLOG_PRODUCT_NBR')) {
-            $post_number = (int)Configuration::get('EVERPSBLOG_PRODUCT_NBR');
+        if ((int) Configuration::get('EVERPSBLOG_PRODUCT_NBR')) {
+            $post_number = (int) Configuration::get('EVERPSBLOG_PRODUCT_NBR');
         } else {
             $post_number = 4;
         }
@@ -2011,7 +2004,7 @@ class EverPsBlog extends Module
         $posts = EverPsBlogPost::getPostsByProduct(
             (int) $this->context->language->id,
             (int) $this->context->shop->id,
-            (int)Tools::getValue('id_product'),
+            (int) Tools::getValue('id_product'),
             0,
             (int) $post_number
         );
@@ -2039,18 +2032,16 @@ class EverPsBlog extends Module
             );
             $everpsblog[] = $post;
         }
-        $this->context->smarty->assign(
-            array(
-                'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
-                'blogUrl' => $blogUrl,
-                'everpsblog' => $everpsblog,
-                'evercategory' => $evercategories,
-                'default_lang' => (int) $this->context->language->id,
-                'id_lang' => (int) $this->context->language->id,
-                'blogImg_dir' => $this->siteUrl.'/modules/everpsblog/views/img/',
-                'animated' => $animate,
-            )
-        );
+        $this->context->smarty->assign([
+            'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
+            'blogUrl' => $blogUrl,
+            'everpsblog' => $everpsblog,
+            'evercategory' => $evercategories,
+            'default_lang' => (int) $this->context->language->id,
+            'id_lang' => (int) $this->context->language->id,
+            'blogImg_dir' => $this->siteUrl.'/modules/everpsblog/views/img/',
+            'animated' => $animate,
+        ]);
         return $this->display(__FILE__, 'views/templates/hook/product.tpl');
     }
 
@@ -2063,14 +2054,11 @@ class EverPsBlog extends Module
     {
         $controller_name = Tools::getValue('controller');
         $module_name = Tools::getValue('module');
-
         if ($module_name == 'everpsblog') {
             if ($controller_name == 'post') {
-                $this->context->smarty->assign(
-                    array(
-                        'everfancybox' => (bool)Configuration::get('EVERBLOG_FANCYBOX'),
-                    )
-                );
+                $this->context->smarty->assign([
+                    'everfancybox' => (bool) Configuration::get('EVERBLOG_FANCYBOX'),
+                ]);
                 return $this->display(__FILE__, 'views/templates/hook/footer.tpl');
             }
         }
@@ -2078,27 +2066,19 @@ class EverPsBlog extends Module
 
     public function hookActionOutputHTMLBefore($params)
     {
-        $regex = '/<p>\[everpsblog\s+id=\s*[\'\"]?(\d+)[\'\"]?\s*\]<\/p>|\[everpsblog\s+id=\s*[\'\"]?(\d+)[\'\"]?\s*\]/Us';
-        if (preg_match_all($regex, $params['html'], $matches)) {
-            if ($html = preg_replace_callback($regex, array($this, 'displayPostsByCatId'), $params['html'])) {
-                $params['html'] = $html;
+        try {
+            $regex = '/<p>\[everpsblog\s+id=\s*[\'\"]?(\d+)[\'\"]?\s*\]<\/p>|\[everpsblog\s+id=\s*[\'\"]?(\d+)[\'\"]?\s*\]/Us';
+            if (preg_match_all($regex, $params['html'], $matches)) {
+                if ($html = preg_replace_callback($regex, [$this, 'displayPostsByCatId'], $params['html'])) {
+                    $params['html'] = $html;
+                }
             }
+            $params['html'] = EverPsBlogPost::changeShortcodes(
+                $params['html']
+            );
+        } catch (Exception $e) {
+            PrestaShopLogger::addLog($this->name . ' : ' . $e->getMessage());
         }
-        $regex_product_cat = '/<p>\[everpsblog\s+productcat=\s*[\'\"]?(\d+)[\'\"]?\s*\]<\/p>|\[everpsblog\s+productcat=\s*[\'\"]?(\d+)[\'\"]?\s*\]/Us';
-        if (preg_match_all($regex_product_cat, $params['html'], $matches)) {
-            if ($html = preg_replace_callback($regex_product_cat, array($this, 'displayProductsByCatId'), $params['html'])) {
-                $params['html'] = $html;
-            }
-        }
-        $regex_product = '/<p>\[everpsblog\s+productid=\s*[\'\"]?(\d+)[\'\"]?\s*\]<\/p>|\[everpsblog\s+productid=\s*[\'\"]?(\d+)[\'\"]?\s*\]/Us';
-        if (preg_match_all($regex_product, $params['html'], $matches)) {
-            if ($html = preg_replace_callback($regex_product, array($this, 'displayProductById'), $params['html'])) {
-                $params['html'] = $html;
-            }
-        }
-        $params['html'] = EverPsBlogPost::changeShortcodes(
-            $params['html']
-        );
     }
 
     public function hookActionFrontControllerAfterInit()
@@ -2115,12 +2095,12 @@ class EverPsBlog extends Module
 
     public function displayPostsByCatId($shortcode)
     {
-        if ((int)Configuration::get('EVERPSBLOG_PRODUCT_NBR') > 0) {
-            $post_number = (int)Configuration::get('EVERPSBLOG_PRODUCT_NBR');
+        if ((int) Configuration::get('EVERPSBLOG_PRODUCT_NBR') > 0) {
+            $post_number = (int) Configuration::get('EVERPSBLOG_PRODUCT_NBR');
         } else {
             $post_number = 4;
         }
-        $blogUrl = Context::getContext()->link->getModuleLink(
+        $blogUrl = $this->context->link->getModuleLink(
             $this->name,
             'blog',
             [],
@@ -2148,19 +2128,17 @@ class EverPsBlog extends Module
         $animate = Configuration::get(
             'EVERBLOG_ANIMATE'
         );
-        $this->context->smarty->assign(
-            array(
-                'post_category' => $post_category,
-                'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
-                'blogUrl' => $blogUrl,
-                'everpsblog' => $latest_posts,
-                'evercategory' => $evercategories,
-                'default_lang' => (int) $this->context->language->id,
-                'id_lang' => (int) $this->context->language->id,
-                'blogImg_dir' => $this->siteUrl.'/modules/everpsblog/views/img/',
-                'animated' => $animate,
-            )
-        );
+        $this->context->smarty->assign([
+            'post_category' => $post_category,
+            'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
+            'blogUrl' => $blogUrl,
+            'everpsblog' => $latest_posts,
+            'evercategory' => $evercategories,
+            'default_lang' => (int) $this->context->language->id,
+            'id_lang' => (int) $this->context->language->id,
+            'blogImg_dir' => $this->siteUrl . '/modules/everpsblog/views/img/',
+            'animated' => $animate,
+        ]);
         return $this->display(__FILE__, 'views/templates/hook/cat_shortcode.tpl');
     }
 
@@ -2174,7 +2152,7 @@ class EverPsBlog extends Module
         $featured_products = $featured_category->getProducts(
             (int) $this->context->language->id,
             1,
-            (int)Configuration::get('EVERPSBLOG_PRODUCT_NBR')
+            (int) Configuration::get('EVERPSBLOG_PRODUCT_NBR')
         );
         if (!empty($featured_products)) {
             $showPrice = true;
@@ -2190,87 +2168,36 @@ class EverPsBlog extends Module
                 new ProductColorsRetriever(),
                 $this->context->getTranslator()
             );
-
             $productsForTemplate = [];
-
             $presentationSettings->showPrices = $showPrice;
-
             if (is_array($featured_products)) {
                 foreach ($featured_products as $productId) {
                     $productsForTemplate[] = $presenter->present(
                         $presentationSettings,
-                        $assembler->assembleProduct(array('id_product' => $productId['id_product'])),
+                        $assembler->assembleProduct(['id_product' => $productId['id_product']]),
                         $this->context->language
                     );
                 }
             }
-            $this->context->smarty->assign(array(
+            $this->context->smarty->assign([
                 'everpsblog_category' => $featured_category,
                 'everpsblog_products' => $productsForTemplate,
-            ));
+            ]);
             return $this->display(__FILE__, 'views/templates/hook/products_shortcode.tpl');
-        }
-    }
-
-    public function displayProductById($shortcode)
-    {
-        $product = new Product(
-            (int) $shortcode[1],
-            false,
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
-        );
-        if (!Validate::isLoadedObject($product)) {
-            return;
-        }
-        $category = new Category(
-            (int) $product->id_category_default,
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
-        );
-        if (!$category->checkAccess((int) Context::getContext()->customer->id)) {
-            return;
-        }
-        if ((bool) $product->active === true) {
-            $showPrice = true;
-            $assembler = new ProductAssembler(Context::getContext());
-            $presenterFactory = new ProductPresenterFactory(Context::getContext());
-            $presentationSettings = $presenterFactory->getPresentationSettings();
-            $presenter = new ProductListingPresenter(
-                new ImageRetriever(
-                    $this->context->link
-                ),
-                $this->context->link,
-                new PriceFormatter(),
-                new ProductColorsRetriever(),
-                $this->context->getTranslator()
-            );
-
-            $presentationSettings->showPrices = $showPrice;
-
-            $productForTemplate = $presenter->present(
-                $presentationSettings,
-                $assembler->assembleProduct(array('id_product' => $product->id)),
-                $this->context->language
-            );
-            $this->context->smarty->assign(array(
-                'everpsblog_product' => $productForTemplate,
-            ));
-            return $this->display(__FILE__, 'views/templates/hook/product_shortcode.tpl');
         }
     }
 
     public function emptyTrash($id_shop)
     {
         $return = false;
-        $days = (int)Configuration::get('EVERBLOG_EMPTY_TRASH');
+        $days = (int) Configuration::get('EVERBLOG_EMPTY_TRASH');
         foreach (Language::getLanguages(false) as $language) {
             $posts = EverPsBlogPost::getPosts(
                 (int) $language['id_lang'],
                 (int) $id_shop,
                 0,
                 null,
-                (string) 'trash'
+                'trash'
             );
             if (!$posts) {
                 return true;
@@ -2292,7 +2219,7 @@ class EverPsBlog extends Module
     public function sendPendingNotification($id_shop)
     {
         $employee = new Employee(
-            (int)Configuration::get('EVERBLOG_ADMIN_EMAIL')
+            (int) Configuration::get('EVERBLOG_ADMIN_EMAIL')
         );
         $posts = EverPsBlogPost::getPosts(
             (int) $employee->id_lang,
@@ -2311,35 +2238,35 @@ class EverPsBlog extends Module
                 (int) $employee->id_lang,
                 (int) $id_shop
             );
-            $post_list .= '<br/><p>'.$post->title.'</p>';
+            $post_list .= '<br/><p>' . $post->title . '</p>';
         }
-        $mailDir = $this->module_folder.'/mails/';
+        $mailDir = $this->module_folder . '/mails/';
         $everShopEmail = Configuration::get('PS_SHOP_EMAIL');
         $sent = Mail::send(
             (int) $this->context->language->id,
             'pending',
             $this->l('Review on pending posts'),
-            array(
-                '{shop_name}'=>Configuration::get('PS_SHOP_NAME'),
-                '{shop_logo}'=>_PS_IMG_DIR_.Configuration::get(
+            [
+                '{shop_name}'=> Configuration::get('PS_SHOP_NAME'),
+                '{shop_logo}'=> _PS_IMG_DIR_ . Configuration::get(
                     'PS_LOGO',
                     null,
                     null,
                     (int) $this->context->shop->id
                 ),
-                '{posts}' => (string) $post_list
-            ),
-            (string) $employee->email,
+                '{posts}' => $post_list,
+            ],
+            $employee->email,
             null,
-            (string) $everShopEmail,
+            $everShopEmail,
             Configuration::get('PS_SHOP_NAME'),
             null,
             null,
             $mailDir,
             false,
             null,
-            (string) $everShopEmail,
-            (string) $everShopEmail,
+            $everShopEmail,
+            $everShopEmail,
             Configuration::get('PS_SHOP_NAME')
         );
         return $sent;
@@ -2374,7 +2301,7 @@ class EverPsBlog extends Module
 
     public function hookActionObjectShopAddAfter($params)
     {
-        $controllerTypes = array('admin', 'moduleadmin');
+        $controllerTypes = ['admin', 'moduleadmin'];
         if (!in_array(Context::getContext()->controller->controller_type, $controllerTypes)) {
             return;
         }
@@ -2393,7 +2320,7 @@ class EverPsBlog extends Module
 
     public function hookActionObjectEverPsBlogPostAddAfter($params)
     {
-        $controllerTypes = array('admin', 'moduleadmin');
+        $controllerTypes = ['admin', 'moduleadmin'];
         if (!in_array(Context::getContext()->controller->controller_type, $controllerTypes)) {
             return;
         }
@@ -2402,7 +2329,7 @@ class EverPsBlog extends Module
 
     public function hookActionObjectEverPsBlogPostUpdateAfter($params)
     {
-        $controllerTypes = array('admin', 'moduleadmin');
+        $controllerTypes = ['admin', 'moduleadmin'];
         if (!in_array(Context::getContext()->controller->controller_type, $controllerTypes)) {
             return;
         }
@@ -2456,9 +2383,9 @@ class EverPsBlog extends Module
         );
         // Drop temp img
         $tmp_file = _PS_IMG_DIR_
-        .'tmp/ever_blog_post_mini_'
-        .(int) $params['object']->id
-        .'_1.jpg';
+        . 'tmp/ever_blog_post_mini_'
+        . (int) $params['object']->id
+        . '_1.jpg';
         if (file_exists($tmp_file)) {
             unlink($tmp_file);
         }
@@ -2467,15 +2394,15 @@ class EverPsBlog extends Module
 
     public function hookActionObjectEverPsBlogCategoryUpdateAfter($params)
     {
-        $controllerTypes = array('admin', 'moduleadmin');
+        $controllerTypes = ['admin', 'moduleadmin'];
         if (!in_array(Context::getContext()->controller->controller_type, $controllerTypes)) {
             return;
         }
         // Drop temp img
         $tmp_file = _PS_IMG_DIR_
-        .'tmp/ever_blog_category_mini_'
-        .(int) $params['object']->id
-        .'_1.jpg';
+        . 'tmp/ever_blog_category_mini_'
+        . (int) $params['object']->id
+        . '_1.jpg';
         if (file_exists($tmp_file)) {
             unlink($tmp_file);
         }
@@ -2484,15 +2411,15 @@ class EverPsBlog extends Module
 
     public function hookActionObjectEverPsBlogTagUpdateAfter($params)
     {
-        $controllerTypes = array('admin', 'moduleadmin');
+        $controllerTypes = ['admin', 'moduleadmin'];
         if (!in_array(Context::getContext()->controller->controller_type, $controllerTypes)) {
             return;
         }
         // Drop temp img
         $tmp_file = _PS_IMG_DIR_
-        .'tmp/ever_blog_tag_mini_'
-        .(int) $params['object']->id
-        .'_1.jpg';
+        . 'tmp/ever_blog_tag_mini_'
+        . (int) $params['object']->id
+        . '_1.jpg';
         if (file_exists($tmp_file)) {
             unlink($tmp_file);
         }
@@ -2501,15 +2428,15 @@ class EverPsBlog extends Module
 
     public function hookActionObjectEverPsBlogAuthorUpdateAfter($params)
     {
-        $controllerTypes = array('admin', 'moduleadmin');
+        $controllerTypes = ['admin', 'moduleadmin'];
         if (!in_array(Context::getContext()->controller->controller_type, $controllerTypes)) {
             return;
         }
         // Drop temp img
         $tmp_file = _PS_IMG_DIR_
-        .'tmp/ever_blog_author_mini_'
-        .(int) $params['object']->id
-        .'_1.jpg';
+        . 'tmp/ever_blog_author_mini_'
+        . (int) $params['object']->id
+        . '_1.jpg';
         if (file_exists($tmp_file)) {
             unlink($tmp_file);
         }
@@ -2518,28 +2445,27 @@ class EverPsBlog extends Module
 
     public function hookActionObjectShopDeleteAfter($params)
     {
-        $controllerTypes = array('admin', 'moduleadmin');
+        $controllerTypes = ['admin', 'moduleadmin'];
         if (!in_array(Context::getContext()->controller->controller_type, $controllerTypes)) {
             return;
         }
         $shop = $params['object'];
-
         Db::getInstance()->delete(
             'ever_blog_category',
-            'id_shop = '.(int) $shop->id
+            'id_shop = ' . (int) $shop->id
         );
     }
 
     public function hookActionObjectEverPsBlogPostDeleteAfter($params)
     {
         $old_img = _PS_MODULE_DIR_
-        .'everpsblog/views/img/posts/post_image_'
-        .(int) $params['object']->id
-        .'.jpg';
+        . 'everpsblog/views/img/posts/post_image_'
+        . (int) $params['object']->id
+        . '.jpg';
         $old_ps_img = _PS_IMG_DIR_
-        .'posts/'
-        .(int) $params['object']->id
-        .'.jpg';
+        . 'posts/'
+        . (int) $params['object']->id
+        . '.jpg';
         if (file_exists($old_ps_img)) {
             unlink($old_ps_img);
         }
@@ -2572,14 +2498,29 @@ class EverPsBlog extends Module
 
     public function hookActionObjectEverPsBlogCategoryDeleteAfter($params)
     {
+        if ((int) $params['object']->id == (int) Configuration::get('EVERBLOG_UNCLASSED_ID')) {
+            // Unclassed
+            $unclassed_category = new EverPsBlogCategory();
+            $unclassed_category->id_parent_category = 0;
+            $unclassed_category->active = 1;
+            $unclassed_category->active = $root_category->id;
+            $unclassed_category->id_shop = (int) $shop['id_shop'];
+            foreach (Language::getLanguages(false) as $language) {
+                $unclassed_category->title[$language['id_lang']] = $this->l('Unclassed');
+                $unclassed_category->content[$language['id_lang']] = '';
+                $unclassed_category->link_rewrite[$language['id_lang']] = $this->l('Unclassed');
+            }
+            $unclassed_category->save();
+            Configuration::updateValue('EVERBLOG_UNCLASSED_ID', $unclassed_category->id);
+        }
         $old_img = _PS_MODULE_DIR_
-        .'everpsblog/views/img/categories/category_image_'
-        .(int) $params['object']->id
-        .'.jpg';
+        . 'everpsblog/views/img/categories/category_image_'
+        . (int) $params['object']->id
+        . '.jpg';
         $old_ps_img = _PS_IMG_DIR_
-        .'categories/'
-        .(int) $params['object']->id
-        .'.jpg';
+        . 'categories/'
+        . (int) $params['object']->id
+        . '.jpg';
         if (file_exists($old_ps_img)) {
             unlink($old_ps_img);
         }
@@ -2603,7 +2544,7 @@ class EverPsBlog extends Module
 
     public function hookActionObjectEverPsBlogTagDeleteAfter($params)
     {
-        $old_img = $this->module_folder.'/views/img/tags/tag_image_'.(int) $params['object']->id.'.jpg';
+        $old_img = $this->module_folder . '/views/img/tags/tag_image_' . (int) $params['object']->id . '.jpg';
         if (file_exists($old_img)) {
             unlink($old_img);
         }
@@ -2617,13 +2558,13 @@ class EverPsBlog extends Module
     public function hookActionObjectAuthorDeleteAfter($params)
     {
         $old_img = _PS_MODULE_DIR_
-        .'everpsblog/views/img/authors/author_image_'
-        .(int) $params['object']->id
-        .'.jpg';
+        . 'everpsblog/views/img/authors/author_image_'
+        . (int) $params['object']->id
+        . '.jpg';
         $old_ps_img = _PS_IMG_DIR_
-        .'authors/'
-        .(int) $params['object']->id
-        .'.jpg';
+        . 'authors/'
+        . (int) $params['object']->id
+        . '.jpg';
         if (file_exists($old_ps_img)) {
             unlink($old_ps_img);
         }
@@ -2668,7 +2609,6 @@ class EverPsBlog extends Module
             $result &= $this->processSitemapCategory((int) $id_shop, (int) $id_lang);
             $result &= $this->processSitemapPost((int) $id_shop, (int) $id_lang);
         }
-
         $this->postSuccess[] = $this->l('All XML sitemaps have been generated');
         if ((bool) $cron === true) {
             return $result;
@@ -2678,14 +2618,12 @@ class EverPsBlog extends Module
     private function processSitemapPost($id_shop, $id_lang)
     {
         $iso_lang = Language::getIsoById((int) $id_lang);
-
         $sitemap = new EverPsBlogSitemap(
             $this->siteUrl
         );
         $sitemap->setPath(_PS_ROOT_DIR_.'/');
-        $sitemap->setFilename('blogpost_' . (int) $id_shop . '_lang_' . (string) $iso_lang);
-        $sql =
-            'SELECT id_ever_post FROM ' . _DB_PREFIX_ . 'ever_blog_post
+        $sitemap->setFilename('blogpost_' . (int) $id_shop . '_lang_' . $iso_lang);
+        $sql = 'SELECT id_ever_post FROM ' . _DB_PREFIX_ . 'ever_blog_post
             WHERE sitemap = 1 AND post_status = "published"';
         if ($results = Db::getInstance()->executeS($sql)) {
             foreach ($results as $result) {
@@ -2695,14 +2633,20 @@ class EverPsBlog extends Module
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id
                 );
-
+                if (isset($post->allowed_groups) && $post->allowed_groups) {
+                    $allowedGroups = json_decode($post->allowed_groups);
+                    // Allow on sitemap only on visitor group
+                    if (is_array($allowedGroups) && !in_array('1', $allowedGroups)) {
+                        continue;
+                    }
+                }
                 $post_url = $link->getModuleLink(
                     'everpsblog',
                     'post',
-                    array(
+                    [
                         'id_ever_post' => $post->id,
-                        'link_rewrite' => $post->link_rewrite
-                    )
+                        'link_rewrite' => $post->link_rewrite,
+                    ],
                 );
                 $sitemap->addItem(
                     $post_url,
@@ -2725,10 +2669,9 @@ class EverPsBlog extends Module
         $sitemap = new EverPsBlogSitemap(
             $this->siteUrl
         );
-        $sitemap->setPath(_PS_ROOT_DIR_.'/');
-        $sitemap->setFilename('blogauthor_' . (int) $id_shop . '_lang_' . (string) $iso_lang);
-        $sql =
-            'SELECT id_ever_author FROM ' . _DB_PREFIX_ . 'ever_blog_author
+        $sitemap->setPath(_PS_ROOT_DIR_ . '/');
+        $sitemap->setFilename('blogauthor_' . (int) $id_shop . '_lang_' . $iso_lang);
+        $sql = 'SELECT id_ever_author FROM ' . _DB_PREFIX_ . 'ever_blog_author
             WHERE sitemap = 1 AND active = 1';
         if ($results = Db::getInstance()->executeS($sql)) {
             foreach ($results as $result) {
@@ -2738,14 +2681,20 @@ class EverPsBlog extends Module
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id
                 );
-
+                if (isset($author->allowed_groups) && $author->allowed_groups) {
+                    $allowedGroups = json_decode($author->allowed_groups);
+                    // Allow on sitemap only on visitor group
+                    if (is_array($allowedGroups) && !in_array('1', $allowedGroups)) {
+                        continue;
+                    }
+                }
                 $author_url = $link->getModuleLink(
                     'everpsblog',
                     'author',
-                    array(
+                    [
                         'id_ever_author' => $author->id,
-                        'link_rewrite' => $author->link_rewrite
-                    )
+                        'link_rewrite' => $author->link_rewrite,
+                    ],
                 );
                 if ((bool) $author->active === true) {
                     $sitemap->addItem(
@@ -2766,14 +2715,12 @@ class EverPsBlog extends Module
     private function processSitemapTag($id_shop, $id_lang)
     {
         $iso_lang = Language::getIsoById((int) $id_lang);
-
         $sitemap = new EverPsBlogSitemap(
             $this->siteUrl
         );
-        $sitemap->setPath(_PS_ROOT_DIR_.'/');
-        $sitemap->setFilename('blogtag_' . (int) $id_shop . '_lang_' . (string) $iso_lang);
-        $sql =
-            'SELECT id_ever_tag FROM ' . _DB_PREFIX_ . 'ever_blog_tag
+        $sitemap->setPath(_PS_ROOT_DIR_ . '/');
+        $sitemap->setFilename('blogtag_' . (int) $id_shop . '_lang_' . $iso_lang);
+        $sql = 'SELECT id_ever_tag FROM ' . _DB_PREFIX_ . 'ever_blog_tag
             WHERE sitemap = 1 AND active = 1';
         if ($results = Db::getInstance()->executeS($sql)) {
             foreach ($results as $result) {
@@ -2783,14 +2730,20 @@ class EverPsBlog extends Module
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id
                 );
-
+                if (isset($tag->allowed_groups) && $tag->allowed_groups) {
+                    $allowedGroups = json_decode($tag->allowed_groups);
+                    // Allow on sitemap only on visitor group
+                    if (is_array($allowedGroups) && !in_array('1', $allowedGroups)) {
+                        continue;
+                    }
+                }
                 $tag_url = $link->getModuleLink(
                     'everpsblog',
                     'tag',
-                    array(
+                    [
                         'id_ever_tag' => $tag->id,
-                        'link_rewrite' => $tag->link_rewrite
-                    )
+                        'link_rewrite' => $tag->link_rewrite,
+                    ],
                 );
                 if ((bool) $tag->active === true) {
                     $sitemap->addItem(
@@ -2811,14 +2764,12 @@ class EverPsBlog extends Module
     private function processSitemapCategory($id_shop, $id_lang)
     {
         $iso_lang = Language::getIsoById((int) $id_lang);
-
         $sitemap = new EverPsBlogSitemap(
             $this->siteUrl
         );
         $sitemap->setPath(_PS_ROOT_DIR_.'/');
-        $sitemap->setFilename('blogcategory_' . (int) $id_shop . '_lang_' . (string) $iso_lang);
-        $sql =
-            'SELECT id_ever_category FROM ' . _DB_PREFIX_ . 'ever_blog_category
+        $sitemap->setFilename('blogcategory_' . (int) $id_shop . '_lang_' . $iso_lang);
+        $sql = 'SELECT id_ever_category FROM ' . _DB_PREFIX_ . 'ever_blog_category
             WHERE sitemap = 1 AND active = 1';
         if ($results = Db::getInstance()->executeS($sql)) {
             foreach ($results as $result) {
@@ -2828,16 +2779,24 @@ class EverPsBlog extends Module
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id
                 );
-
+                if (isset($category->allowed_groups) && $category->allowed_groups) {
+                    $allowedGroups = json_decode($category->allowed_groups);
+                    // Allow on sitemap only on visitor group
+                    if (is_array($allowedGroups) && !in_array('1', $allowedGroups)) {
+                        continue;
+                    }
+                }
                 $category_url = $link->getModuleLink(
                     'everpsblog',
                     'category',
-                    array(
+                    [
                         'id_ever_category' => $category->id,
-                        'link_rewrite' => $category->link_rewrite
-                    )
+                        'link_rewrite' => $category->link_rewrite,
+                    ],
                 );
-                if ((bool) $category->active === true && (bool) $category->is_root_category === false) {
+                if ((bool) $category->active === true
+                    && (bool) $category->is_root_category === false
+                ) {
                     $sitemap->addItem(
                         $category_url,
                         1,
@@ -2865,20 +2824,20 @@ class EverPsBlog extends Module
                 $indexes[] = $this->siteUrl . basename($index);
             }
         }
-        return (array)$indexes;
+        return (array) $indexes;
     }
 
     public function hookActionAdminMetaAfterWriteRobotsFile($params)
     {
         $indexes = $this->getSitemapIndexes();
         // Panda theme uses random int on css file parameter
-        $allowSitemap = 'Disallow: /modules/stthemeeditor/views/css'."\r\n";
+        $allowSitemap = 'Disallow: /modules/stthemeeditor/views/css' . "\r\n";
         $allowSitemap .= "\n";
         if ($indexes) {
             foreach ($indexes as $index) {
                 $allowSitemap .= 'Sitemap: '
-                .$index
-                ."\r\n";
+                . $index
+                . "\r\n";
             }
         }
         fwrite($params['write_fd'], "#Rules from everpsblog\n");
@@ -2890,25 +2849,25 @@ class EverPsBlog extends Module
     */
     private function checkHooks()
     {
-        $this->registerHook('actionFrontControllerAfterInit');
-        $this->registerHook('header');
-        $this->registerHook('actionAdminControllerSetMedia');
-        $this->registerHook('displayHome');
-        $this->registerHook('displayLeftColumn');
-        $this->registerHook('displayRightColumn');
-        $this->registerHook('displayFooterProduct');
-        $this->registerHook('displayFooter');
-        $this->registerHook('displayCustomerAccount');
-        $this->registerHook('moduleRoutes');
-        $this->registerHook('displayBackOfficeHeader');
-        $this->registerHook('actionObjectProductDeleteAfter');
-        $this->registerHook('actionAdminMetaAfterWriteRobotsFile');
-        $this->registerHook('displayAdminAfterHeader');
-        $this->registerHook('actionAdminMetaAfterWriteRobotsFile');
-        $this->registerHook('actionObjectProductDeleteAfter');
-        $this->registerHook('actionObjectProductDeleteAfter');
-        $this->registerHook('actionOutputHTMLBefore');
-
+        try {
+            $this->registerHook('actionFrontControllerAfterInit');
+            $this->registerHook('header');
+            $this->registerHook('actionAdminControllerSetMedia');
+            $this->registerHook('displayHome');
+            $this->registerHook('displayLeftColumn');
+            $this->registerHook('displayRightColumn');
+            $this->registerHook('displayFooterProduct');
+            $this->registerHook('displayFooter');
+            $this->registerHook('displayCustomerAccount');
+            $this->registerHook('moduleRoutes');
+            $this->registerHook('displayBackOfficeHeader');
+            $this->registerHook('actionObjectProductDeleteAfter');
+            $this->registerHook('displayAdminAfterHeader');
+            $this->registerHook('actionAdminMetaAfterWriteRobotsFile');
+            $this->registerHook('actionOutputHTMLBefore');
+        } catch (Exception $e) {
+            PrestaShopLogger::addLog($this->name . ' : ' . $e->getMessage());
+        }
         return true;
     }
 
@@ -2917,61 +2876,28 @@ class EverPsBlog extends Module
     */
     private function checkObligatoryHooks()
     {
-        $this->registerHook('actionFrontControllerAfterInit');
-        $this->registerHook('moduleRoutes');
-        $this->registerHook('displayBackOfficeHeader');
-        $this->registerHook('actionObjectProductDeleteAfter');
-        $this->registerHook('actionAdminMetaAfterWriteRobotsFile');
-        $this->registerHook('displayAdminAfterHeader');
-        $this->registerHook('actionAdminMetaAfterWriteRobotsFile');
-        $this->registerHook('actionObjectProductDeleteAfter');
-        $this->registerHook('actionObjectProductDeleteAfter');
-        $this->registerHook('actionOutputHTMLBefore');
-        $this->registerHook('actionObjectEverPsBlogPostUpdateAfter');
-        $this->registerHook('actionObjectEverPsBlogPostAddAfter');
-        $this->registerHook('actionObjectEverPsBlogPostUpdateAfter');
-        $this->registerHook('actionObjectEverPsBlogCategoryUpdateAfter');
-        $this->registerHook('actionObjectEverPsBlogTagUpdateAfter');
-        $this->registerHook('actionObjectEverPsBlogAuthorUpdateAfter');
-        $this->registerHook('actionObjectShopDeleteAfter');
-        $this->registerHook('actionObjectEverPsBlogPostDeleteAfter');
-        $this->registerHook('actionObjectEverPsBlogCategoryDeleteAfter');
-        $this->registerHook('actionObjectEverPsBlogTagDeleteAfter');
-        $this->registerHook('actionObjectAuthorDeleteAfter');
-        $this->registerHook('actionObjectProductDeleteAfter');
-
-        return true;
-    }
-
-    private function exportWordPressFile()
-    {
-        $all_posts = EverPsBlogPost::getPosts(
-            (int) Context::getContext()->language->id,
-            (int) Context::getContext()->shop->id,
-            0,
-            99999
-        );
-        $dom->encoding = 'utf-8';
-        $dom->xmlVersion = '1.0';
-        $dom->formatOutput = true;
-        $xml_file_name = 'blog_' . Configuration::get('PS_SHOP_NAME') . '.xml';
-        // RSS node and his attributes
-        $root = $dom->createElement('rss');
-        $rss_version = new DOMAttr('version', '2.0');
-        $root->setAttributeNode($rss_version);
-        $xmlns_excerpt = new DOMAttr('xmlns:excerpt', 'http://wordpress.org/export/1.2/excerpt/');
-        $root->setAttributeNode($xmlns_excerpt);
-        $xmlns_content = new DOMAttr('xmlns:content', 'http://purl.org/rss/1.0/modules/content/');
-        $root->setAttributeNode($xmlns_content);
-        $xmlns_wfw = new DOMAttr('xmlns:wfw', 'http://wellformedweb.org/CommentAPI/');
-        $root->setAttributeNode($xmlns_wfw);
-        $xmlns_dc = new DOMAttr('xmlns:dc', 'http://purl.org/dc/elements/1.1/');
-        $root->setAttributeNode($xmlns_dc);
-        $xmlns_wp = new DOMAttr('xmlns:wp', 'http://wordpress.org/export/1.2/');
-        $root->setAttributeNode($xmlns_wp);
-        foreach ($all_posts as $post) {
-            # code...
+        try {
+            $this->registerHook('actionFrontControllerAfterInit');
+            $this->registerHook('moduleRoutes');
+            $this->registerHook('displayBackOfficeHeader');
+            $this->registerHook('displayAdminAfterHeader');
+            $this->registerHook('actionAdminMetaAfterWriteRobotsFile');
+            $this->registerHook('actionOutputHTMLBefore');
+            $this->registerHook('actionObjectEverPsBlogPostAddAfter');
+            $this->registerHook('actionObjectEverPsBlogPostUpdateAfter');
+            $this->registerHook('actionObjectEverPsBlogCategoryUpdateAfter');
+            $this->registerHook('actionObjectEverPsBlogTagUpdateAfter');
+            $this->registerHook('actionObjectEverPsBlogAuthorUpdateAfter');
+            $this->registerHook('actionObjectShopDeleteAfter');
+            $this->registerHook('actionObjectEverPsBlogPostDeleteAfter');
+            $this->registerHook('actionObjectEverPsBlogCategoryDeleteAfter');
+            $this->registerHook('actionObjectEverPsBlogTagDeleteAfter');
+            $this->registerHook('actionObjectAuthorDeleteAfter');
+            $this->registerHook('actionObjectProductDeleteAfter');
+        } catch (Exception $e) {
+            PrestaShopLogger::addLog($this->name . ' : ' . $e->getMessage());
         }
+        return true;
     }
 
     private function importWordPressFile($file)
@@ -3025,7 +2951,7 @@ class EverPsBlog extends Module
                         $category->id_parent_category = (int) $parent_category;
                         $category->id_shop = (int) Context::getContext()->shop->id;
                         $category->active = true;
-                        $category->index = true;
+                        $category->indexableable = true;
                         $category->follow = true;
                         $category->sitemap = true;
                         $category->active = (bool)Configuration::get('EVERBLOG_ENABLE_CATS');
@@ -3049,7 +2975,7 @@ class EverPsBlog extends Module
                         }
                         $tag->id_shop = (int) Context::getContext()->shop->id;
                         $tag->active = true;
-                        $tag->index = true;
+                        $tag->indexable = true;
                         $tag->follow = true;
                         $tag->sitemap = true;
                         $tag->active = (bool)Configuration::get('EVERBLOG_ENABLE_TAGS');
@@ -3062,25 +2988,25 @@ class EverPsBlog extends Module
             }
             // Post author
             $author = EverPsBlogAuthor::getAuthorByNickhandle(
-                (string) $el->creator
+                $el->creator
             );
             if (!Validate::isLoadedObject($author)
-                && (bool)Configuration::get('EVERBLOG_IMPORT_AUTHORS') === true
+                && (bool) Configuration::get('EVERBLOG_IMPORT_AUTHORS') === true
             ) {
                 $author = new EverPsBlogAuthor();
                 $author->nickhandle = (string) $el->creator;
                 foreach (Language::getLanguages(false) as $lang) {
                     $author->meta_title[$lang['id_lang']] = (string) $el->creator;
-                    $author->link_rewrite[$lang['id_lang']] = EverPsBlogCleaner::convertToUrlRewrite(
+                    $author->link_rewrite[$lang['id_lang']] = EverPsBlogCleaner::str2url(
                         (string) $el->creator
                     );
                 }
                 $author->id_shop = (int) Context::getContext()->shop->id;
                 $author->active = true;
-                $author->index = true;
+                $author->indexable = true;
                 $author->follow = true;
                 $author->sitemap = true;
-                $author->active = (bool)Configuration::get('EVERBLOG_ENABLE_AUTHORS');
+                $author->active = (bool) Configuration::get('EVERBLOG_ENABLE_AUTHORS');
                 $result &= $author->save();
             }
             // Post
@@ -3118,7 +3044,7 @@ class EverPsBlog extends Module
                     // Check img attributes
                     $item->setAttribute(
                         'src',
-                        $this->siteUrl.'cms/' . utf8_decode(basename($src))
+                        $this->siteUrl . 'cms/' . utf8_decode(basename($src))
                     );
                     $item->setAttribute(
                         'style',
@@ -3151,8 +3077,8 @@ class EverPsBlog extends Module
                 $post_content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $post_content);
                 // Multilingual fields
                 foreach (Language::getLanguages(false) as $lang) {
-                    $post->title[$lang['id_lang']] = (string) $el->title;
-                    $post->meta_title[$lang['id_lang']] = (string) $el->title;
+                    $post->title[$lang['id_lang']] = $el->title;
+                    $post->meta_title[$lang['id_lang']] = $el->title;
                     $post->meta_description[$lang['id_lang']] = Tools::substr(
                         strip_tags($post_content),
                         0,
@@ -3166,7 +3092,7 @@ class EverPsBlog extends Module
                 }
                 $post->id_shop = (int) Context::getContext()->shop->id;
                 $post->active = true;
-                $post->index = true;
+                $post->indexable = true;
                 $post->follow = true;
                 $post->sitemap = true;
                 $post->active = true;
@@ -3201,29 +3127,33 @@ class EverPsBlog extends Module
         }
     }
 
-    public function checkLatestEverModuleVersion($module, $version)
+    public function checkLatestEverModuleVersion()
     {
-        $upgrade_link = 'https://upgrade.team-ever.com/upgrade.php?module='
-        . $module
-        . '&version='
-        . $version;
-        $handle = curl_init($upgrade_link);
-        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
-        curl_exec($handle);
-        $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-        curl_close($handle);
-        if ($httpCode != 200) {
+        try {
+            $upgrade_link = 'https://upgrade.team-ever.com/upgrade.php?module='
+            . $this->name
+            . '&version='
+            . $this->version;
+            $handle = curl_init($upgrade_link);
+            curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
+            curl_exec($handle);
+            $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+            curl_close($handle);
+            if ($httpCode != 200) {
+                return false;
+            }
+            $module_version = Tools::file_get_contents(
+                $upgrade_link
+            );
+            if ($module_version && $module_version > $this->version) {
+                return true;
+            }
             return false;
+        } catch (Exception $e) {
+            PrestaShopLogger::addLog($this->name . ' : unable to check update. ' . $e->getMessage());
         }
-        $module_version = Tools::file_get_contents(
-            $upgrade_link
-        );
-        if ($module_version && $module_version > $version) {
-            return true;
-        }
-        return false;
     }
 
     public function checkAndFixDatabase()
@@ -3238,18 +3168,19 @@ class EverPsBlog extends Module
             'post_status' => 'varchar(255) NOT NULL',
             'date_add' => 'DATETIME DEFAULT NULL',
             'date_upd' => 'DATETIME DEFAULT NULL',
-            'index' => 'int(1) unsigned DEFAULT NULL',
+            'indexable' => 'int(1) unsigned DEFAULT NULL',
             'follow' => 'int(1) unsigned DEFAULT NULL',
             'sitemap' => 'int(1) unsigned DEFAULT 1',
             'active' => 'int(1) unsigned DEFAULT NULL',
+            'allowed_groups' => 'varchar(255) DEFAULT NULL',
             'post_categories' => 'varchar(255) DEFAULT NULL',
             'post_tags' => 'varchar(255) DEFAULT NULL',
             'post_products' => 'varchar(255) DEFAULT NULL',
             'psswd' => 'varchar(255) DEFAULT NULL',
+            'starred' => 'int(10) unsigned DEFAULT 0',
             'count' => 'int(10) unsigned DEFAULT 0',
             'groups' => 'text DEFAULT NULL',
         ];
-
         foreach ($columnsToAdd as $columnName => $columnDefinition) {
             $columnExists = $db->ExecuteS('DESCRIBE `' . _DB_PREFIX_ . 'ever_blog_post` `' . pSQL($columnName) . '`');
             if (!$columnExists) {
@@ -3261,7 +3192,6 @@ class EverPsBlog extends Module
                 }
             }
         }
-
         // Ajoute les colonnes manquantes à la table ps_ever_blog_post_lang
         $columnsToAdd = [
             'title' => 'varchar(255) NOT NULL',
@@ -3272,7 +3202,6 @@ class EverPsBlog extends Module
             'excerpt' => 'varchar(255) DEFAULT NULL',
             'id_lang' => 'int(10) unsigned NOT NULL',
         ];
-
         foreach ($columnsToAdd as $columnName => $columnDefinition) {
             $columnExists = $db->ExecuteS('DESCRIBE `' . _DB_PREFIX_ . 'ever_blog_post_lang` `' . pSQL($columnName) . '`');
             if (!$columnExists) {
@@ -3284,5 +3213,161 @@ class EverPsBlog extends Module
                 }
             }
         }
+        // Ajoute les colonnes manquantes à la table ever_blog_category
+        $columnsToAdd = [
+            'id_ever_category' => 'int(10) unsigned NOT NULL auto_increment',
+            'id_parent_category' => 'int(10) DEFAULT NULL',
+            'id_shop' => 'int(10) unsigned NOT NULL',
+            'date_add' => 'DATETIME DEFAULT NULL',
+            'date_upd' => 'DATETIME DEFAULT NULL',
+            'indexable' => 'int(1) unsigned DEFAULT NULL',
+            'follow' => 'int(1) unsigned DEFAULT NULL',
+            'sitemap' => 'int(1) unsigned DEFAULT 1',
+            'active' => 'int(1) unsigned DEFAULT NULL',
+            'category_products' => 'varchar(255) DEFAULT NULL',
+            'allowed_groups' => 'varchar(255) DEFAULT NULL',
+            'is_root_category' => 'int(1) unsigned DEFAULT NULL',
+            'count' => 'int(10) unsigned DEFAULT 0',
+        ];
+        foreach ($columnsToAdd as $columnName => $columnDefinition) {
+            $columnExists = $db->ExecuteS('DESCRIBE `' . _DB_PREFIX_ . 'ever_blog_category` `' . pSQL($columnName) . '`');
+            if (!$columnExists) {
+                try {
+                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_category` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
+                    $db->execute($query);
+                } catch (Exception $e) {
+                    PrestaShopLogger::addLog('Unable to update Ever blog category table');
+                }
+            }
+        }
+        // Ajoute les colonnes manquantes à la table ps_ever_blog_category_lang
+        $columnsToAdd = [
+            'id_ever_category' => 'int(10) unsigned NOT NULL',
+            'title' => 'varchar(255) NOT NULL',
+            'meta_title' => 'varchar(255) DEFAULT NULL',
+            'meta_description' => 'varchar(255) DEFAULT NULL',
+            'link_rewrite' => 'varchar(255) DEFAULT NULL',
+            'content' => 'text NOT NULL',
+            'bottom_content' => 'text DEFAULT NULL',
+            'id_lang' => 'int(10) unsigned NOT NULL',
+        ];
+        foreach ($columnsToAdd as $columnName => $columnDefinition) {
+            $columnExists = $db->ExecuteS('DESCRIBE `' . _DB_PREFIX_ . 'ever_blog_category_lang` `' . pSQL($columnName) . '`');
+            if (!$columnExists) {
+                try {
+                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_category_lang` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
+                    $db->execute($query);
+                } catch (Exception $e) {
+                    PrestaShopLogger::addLog('Unable to update Ever blog category lang table');
+                }
+            }
+        }
+        // Ajoute les colonnes manquantes à la table ever_blog_tag
+        $columnsToAdd = [
+            'id_ever_tag' => 'int(10) unsigned NOT NULL auto_increment',
+            'id_shop' => 'int(10) unsigned NOT NULL',
+            'date_add' => 'DATETIME DEFAULT NULL',
+            'date_upd' => 'DATETIME DEFAULT NULL',
+            'indexable' => 'int(10) unsigned DEFAULT NULL',
+            'follow' => 'int(10) unsigned DEFAULT NULL',
+            'sitemap' => 'int(1) unsigned DEFAULT 1',
+            'active' => 'int(1) unsigned DEFAULT NULL',
+            'allowed_groups' => 'varchar(255) DEFAULT NULL',
+            'tag_products' => 'varchar(255) DEFAULT NULL',
+            'count' => 'int(10) unsigned DEFAULT 0',
+        ];
+        foreach ($columnsToAdd as $columnName => $columnDefinition) {
+            $columnExists = $db->ExecuteS('DESCRIBE `' . _DB_PREFIX_ . 'ever_blog_tag` `' . pSQL($columnName) . '`');
+            if (!$columnExists) {
+                try {
+                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_category_lang` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
+                    $db->execute($query);
+                } catch (Exception $e) {
+                    PrestaShopLogger::addLog('Unable to update Ever blog category lang table');
+                }
+            }
+        }
+        // Ajoute les colonnes manquantes à la table ps_ever_blog_tag_lang
+        $columnsToAdd = [
+            'id_ever_tag' => 'int(10) unsigned NOT NULL',
+            'title' => 'varchar(255) NOT NULL',
+            'meta_title' => 'varchar(255) DEFAULT NULL',
+            'meta_description' => 'varchar(255) DEFAULT NULL',
+            'link_rewrite' => 'varchar(255) DEFAULT NULL',
+            'content' => 'text NOT NULL',
+            'bottom_content' => 'text DEFAULT NULL',
+            'id_lang' => 'int(10) unsigned NOT NULL',
+        ];
+        foreach ($columnsToAdd as $columnName => $columnDefinition) {
+            $columnExists = $db->ExecuteS('DESCRIBE `' . _DB_PREFIX_ . 'ever_blog_tag_lang` `' . pSQL($columnName) . '`');
+            if (!$columnExists) {
+                try {
+                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_category_lang` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
+                    $db->execute($query);
+                } catch (Exception $e) {
+                    PrestaShopLogger::addLog('Unable to update Ever blog category lang table');
+                }
+            }
+        }
+        // Ajoute les colonnes manquantes à la table ever_blog_author
+        $columnsToAdd = [
+            'id_ever_author' => 'int(10) unsigned NOT NULL auto_increment',
+            'id_employee' => 'int(10) unsigned NOT NULL',
+            'id_shop' => 'int(10) unsigned NOT NULL',
+            'nickhandle' => 'varchar(255) NOT NULL',
+            'twitter' => 'varchar(255) DEFAULT NULL',
+            'facebook' => 'varchar(255) DEFAULT NULL',
+            'linkedin' => 'varchar(255) DEFAULT NULL',
+            'date_add' => 'DATETIME DEFAULT NULL',
+            'date_upd' => 'DATETIME DEFAULT NULL',
+            'indexable' => 'int(10) unsigned DEFAULT NULL',
+            'follow' => 'int(10) unsigned DEFAULT NULL',
+            'sitemap' => 'int(1) unsigned DEFAULT 1',
+            'allowed_groups' => 'varchar(255) DEFAULT NULL',
+            'author_products' => 'varchar(255) DEFAULT NULL',
+            'active' => 'int(10) unsigned DEFAULT NULL',
+            'count' => 'int(10) unsigned DEFAULT 0',
+        ];
+        foreach ($columnsToAdd as $columnName => $columnDefinition) {
+            $columnExists = $db->ExecuteS('DESCRIBE `' . _DB_PREFIX_ . 'ever_blog_author` `' . pSQL($columnName) . '`');
+            if (!$columnExists) {
+                try {
+                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_author` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
+                    $db->execute($query);
+                } catch (Exception $e) {
+                    PrestaShopLogger::addLog('Unable to update Ever blog category lang table');
+                }
+            }
+        }
+        // Ajoute les colonnes manquantes à la table ps_ever_blog_author_lang
+        $columnsToAdd = [
+            'id_ever_author' => 'int(10) unsigned NOT NULL',
+            'meta_title' => 'varchar(255) DEFAULT NULL',
+            'meta_description' => 'varchar(255) DEFAULT NULL',
+            'link_rewrite' => 'varchar(255) DEFAULT NULL',
+            'content' => 'text NOT NULL',
+            'bottom_content' => 'text DEFAULT NULL',
+            'id_lang' => 'int(10) unsigned NOT NULL',
+        ];
+        foreach ($columnsToAdd as $columnName => $columnDefinition) {
+            $columnExists = $db->ExecuteS('DESCRIBE `' . _DB_PREFIX_ . 'ever_blog_author_lang` `' . pSQL($columnName) . '`');
+            if (!$columnExists) {
+                try {
+                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_category_lang` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
+                    $db->execute($query);
+                } catch (Exception $e) {
+                    PrestaShopLogger::addLog('Unable to update Ever blog category lang table');
+                }
+            }
+        }
+    }
+
+    public static function getConfigInMultipleLangs($key, $idShopGroup = null, $idShop = null)
+    {
+        $resultsArray = [];
+        foreach (Language::getIDs() as $idLang) {
+            $resultsArray[$idLang] = Configuration::get($key, $idLang, $idShopGroup, $idShop);
+        }
+        return $resultsArray;
     }
 }

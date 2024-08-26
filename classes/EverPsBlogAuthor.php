@@ -38,112 +38,118 @@ class EverPsBlogAuthor extends ObjectModel
     public $id_author;
     public $date_add;
     public $date_upd;
-    public $index;
+    public $indexable;
     public $follow;
     public $sitemap;
+    public $allowed_groups;
     public $author_products;
     public $active;
     public $count;
 
-    public static $definition = array(
+    public static $definition = [
         'table' => 'ever_blog_author',
         'primary' => 'id_ever_author',
         'multilang' => true,
-        'fields' => array(
-            'nickhandle' => array(
+        'fields' => [
+            'nickhandle' => [
                 'type' => self::TYPE_HTML,
                 'lang' => false,
-                'validate' => 'isCleanHtml'
-            ),
-            'meta_title' => array(
+                'validate' => 'isCleanHtml',
+            ],
+            'meta_title' => [
                 'type' => self::TYPE_HTML,
                 'lang' => true,
-                'validate' => 'isCleanHtml'
-            ),
-            'meta_description' => array(
+                'validate' => 'isCleanHtml',
+            ],
+            'meta_description' => [
                 'type' => self::TYPE_HTML,
                 'lang' => true,
-                'validate' => 'isCleanHtml'
-            ),
-            'link_rewrite' => array(
+                'validate' => 'isCleanHtml',
+            ],
+            'link_rewrite' => [
                 'type' => self::TYPE_STRING,
                 'lang' => true,
-                'validate' => 'isLinkRewrite'
-            ),
-            'twitter' => array(
+                'validate' => 'isLinkRewrite',
+            ],
+            'twitter' => [
                 'type' => self::TYPE_HTML,
                 'lang' => false,
-                'validate' => 'isCleanHtml'
-            ),
-            'facebook' => array(
+                'validate' => 'isCleanHtml',
+            ],
+            'facebook' => [
                 'type' => self::TYPE_HTML,
                 'lang' => false,
-                'validate' => 'isCleanHtml'
-            ),
-            'linkedin' => array(
+                'validate' => 'isCleanHtml',
+            ],
+            'linkedin' => [
                 'type' => self::TYPE_HTML,
                 'lang' => false,
-                'validate' => 'isCleanHtml'
-            ),
-            'content' => array(
+                'validate' => 'isCleanHtml',
+            ],
+            'content' => [
                 'type' => self::TYPE_HTML,
                 'lang' => true,
-                'validate' => 'isCleanHtml'
-            ),
-            'bottom_content' => array(
+                'validate' => 'isCleanHtml',
+            ],
+            'bottom_content' => [
                 'type' => self::TYPE_HTML,
                 'lang' => true,
-                'validate' => 'isCleanHtml'
-            ),
-            'date_add' => array(
+                'validate' => 'isCleanHtml',
+            ],
+            'date_add' => [
                 'type' => self::TYPE_DATE,
                 'lang' => false,
                 'validate' => 'isDate',
-                'required' => false
-            ),
-            'date_upd' => array(
+                'required' => false,
+            ],
+            'date_upd' => [
                 'type' => self::TYPE_DATE,
                 'lang' => false,
                 'validate' => 'isDate',
-                'required' => false
-            ),
-            'id_shop' => array(
+                'required' => false,
+            ],
+            'id_shop' => [
                 'type' => self::TYPE_INT,
-                'validate' => 'isunsignedInt',
-                'required' => false
-            ),
-            'index' => array(
+                'validate' => 'isUnsignedInt',
+                'required' => false,
+            ],
+            'indexable' => [
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
-                'required' => true
-            ),
-            'follow' => array(
+                'required' => true,
+            ],
+            'follow' => [
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
-                'required' => true
-            ),
-            'sitemap' => array(
+                'required' => true,
+            ],
+            'sitemap' => [
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
-                'required' => false
-            ),
-            'author_products' => array(
+                'required' => false,
+            ],
+            'allowed_groups' => [
                 'type' => self::TYPE_STRING,
                 'validate' => 'isJson',
-                'required' => false
-            ),
-            'active' => array(
+                'required' => false,
+            ],
+            'author_products' => [
+                'type' => self::TYPE_STRING,
+                'validate' => 'isJson',
+                'required' => false,
+            ],
+            'active' => [
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
-                'required' => true
-            ),
-            'count' => array(
+                'required' => true,
+            ],
+            'count' => [
                 'type' => self::TYPE_INT,
-                'validate' => 'isunsignedInt',
-                'required' => false
-            ),
-        )
-    );
+                'validate' => 'isUnsignedInt',
+                'required' => false,
+            ],
+        ],
+    ];
 
     /**
      * Get all available authors
@@ -153,25 +159,25 @@ class EverPsBlogAuthor extends ObjectModel
     public static function getAllAuthors($id_lang, $id_shop, $active = 1)
     {
         $cache_id = 'EverPsBlogAuthor::getAllAuthors_'
-        .(int) $id_lang
-        .'_'
-        .(int) $id_shop
-        .'_'
-        .(int) $active;
+        . (int) $id_lang
+        . '_'
+        . (int) $id_shop
+        . '_'
+        . (int) $active;
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
             $sql->select('*');
-            $sql->from('ever_blog_author', 'eba');
+            $sql->from(self::$definition['table'], 'eba');
             $sql->leftJoin(
-                'ever_blog_author_lang',
+                self::$definition['table'] . '_lang',
                 'ebl',
-                'ebl.id_ever_author = eba.id_ever_author'
+                'ebl.' . self::$definition['primary'] . ' = eba.' . self::$definition['primary'] . ''
             );
-            $sql->where('eba.active = '.(int) $active);
-            $sql->where('eba.id_shop = '.(int) $id_shop);
-            $sql->where('ebl.id_lang = '.(int) $id_lang);
+            $sql->where('eba.active = ' . (int) $active);
+            $sql->where('eba.id_shop = ' . (int) $id_shop);
+            $sql->where('ebl.id_lang = ' . (int) $id_lang);
             $sql->orderBy('eba.date_add DESC');
-            $authors = Db::getInstance()->executeS($sql);
+            $authors = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
             if (count($authors)) {
                 Cache::store($cache_id, $authors);
                 return $authors;
@@ -188,10 +194,10 @@ class EverPsBlogAuthor extends ObjectModel
     public static function getAuthorByNickhandle($nickhandle)
     {
         $sql = new DbQuery;
-        $sql->select('id_ever_author');
-        $sql->from('ever_blog_author');
-        $sql->where('nickhandle = "'.pSQL($nickhandle).'"');
-        $id_author = Db::getInstance()->getValue($sql);
+        $sql->select(self::$definition['primary']);
+        $sql->from(self::$definition['table']);
+        $sql->where('nickhandle = "' . pSQL($nickhandle) . '"');
+        $id_author = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
         if ($id_author) {
             $return = new self($id_author);
             return $return;

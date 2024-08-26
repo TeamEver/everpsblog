@@ -35,95 +35,100 @@ class EverPsBlogTag extends ObjectModel
     public $active;
     public $date_add;
     public $date_upd;
-    public $index;
+    public $indexable;
     public $follow;
     public $sitemap;
+    public $allowed_groups;
     public $tag_products;
     public $count;
 
-    public static $definition = array(
+    public static $definition = [
         'table' => 'ever_blog_tag',
         'primary' => 'id_ever_tag',
         'multilang' => true,
-        'fields' => array(
-            'title' => array(
+        'fields' => [
+            'title' => [
                 'type' => self::TYPE_HTML,
                 'lang' => true,
-                'validate' => 'isCleanHtml'
-            ),
-            'meta_title' => array(
+                'validate' => 'isCleanHtml',
+            ],
+            'meta_title' => [
                 'type' => self::TYPE_HTML,
                 'lang' => true,
-                'validate' => 'isCleanHtml'
-            ),
-            'meta_description' => array(
+                'validate' => 'isCleanHtml',
+            ],
+            'meta_description' => [
                 'type' => self::TYPE_HTML,
                 'lang' => true,
-                'validate' =>
-                'isCleanHtml'
-            ),
-            'link_rewrite' => array(
+                'validate' => 'isCleanHtml',
+            ],
+            'link_rewrite' => [
                 'type' => self::TYPE_STRING,
                 'lang' => true,
-                'validate' => 'isString'
-            ),
-            'content' => array(
+                'validate' => 'isString',
+            ],
+            'content' => [
                 'type' => self::TYPE_HTML,
                 'lang' => true,
-                'validate' => 'isCleanHtml'
-            ),
-            'bottom_content' => array(
+                'validate' => 'isCleanHtml',
+            ],
+            'bottom_content' => [
                 'type' => self::TYPE_HTML,
                 'lang' => true,
-                'validate' => 'isCleanHtml'
-            ),
-            'date_add' => array(
+                'validate' => 'isCleanHtml',
+            ],
+            'date_add' => [
                 'type' => self::TYPE_DATE,
                 'validate' => 'isDate',
-                'required' => false
-            ),
-            'date_upd' => array(
+                'required' => false,
+            ],
+            'date_upd' => [
                 'type' => self::TYPE_DATE,
                 'validate' => 'isDate',
-                'required' => false
-            ),
-            'id_shop' => array(
+                'required' => false,
+            ],
+            'id_shop' => [
                 'type' => self::TYPE_INT,
-                'validate' => 'isunsignedInt',
-                'required' => false
-            ),
-            'index' => array(
+                'validate' => 'isUnsignedInt',
+                'required' => false,
+            ],
+            'indexable' => [
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
-                'required' => true
-            ),
-            'follow' => array(
+                'required' => true,
+            ],
+            'follow' => [
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
-                'required' => true
-            ),
-            'sitemap' => array(
+                'required' => true,
+            ],
+            'sitemap' => [
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
-                'required' => false
-            ),
-            'tag_products' => array(
+                'required' => false,
+            ],
+            'tag_products' => [
                 'type' => self::TYPE_STRING,
                 'validate' => 'isJson',
-                'required' => false
-            ),
-            'active' => array(
+                'required' => false,
+            ],
+            'allowed_groups' => [
+                'type' => self::TYPE_STRING,
+                'validate' => 'isJson',
+                'required' => false,
+            ],
+            'active' => [
                 'type' => self::TYPE_BOOL,
                 'validate' => 'isBool',
-                'required' => true
-            ),
-            'count' => array(
+                'required' => true,
+            ],
+            'count' => [
                 'type' => self::TYPE_INT,
-                'validate' => 'isunsignedInt',
-                'required' => false
-            ),
-        )
-    );
+                'validate' => 'isUnsignedInt',
+                'required' => false,
+            ],
+        ],
+    ];
 
     /**
      * Get all available tags
@@ -133,20 +138,43 @@ class EverPsBlogTag extends ObjectModel
     public static function getAllTags($id_lang, $id_shop, $active = 1)
     {
         $cache_id = 'EverPsBlogTag::getAllTags_'
-        .(int) $id_lang
-        .'_'
-        .(int) $id_shop
-        .'_'
-        .(int) $active;
+        . (int) $id_lang
+        . '_'
+        . (int) $id_shop
+        . '_'
+        . (int) $active;
         if (!Cache::isStored($cache_id)) {
-            $return = Db::getInstance()->executeS(
-                'SELECT * FROM `' . _DB_PREFIX_ . 'ever_blog_tag_lang` btl
-                INNER JOIN `' . _DB_PREFIX_ . 'ever_blog_tag` bt
-                ON bt.id_ever_tag = btl.id_ever_tag
-                WHERE bt.active = "'.(bool) $active.'"
-                AND bt.id_shop = '.(int) $id_shop.'
-                AND btl.id_lang = '.(int) $id_lang.''
+            $context = Context::getContext();
+            $tags = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+                'SELECT * FROM `' . _DB_PREFIX_ . self::$definition['table'] . '_lang` btl
+                INNER JOIN `' . _DB_PREFIX_ . self::$definition['table'] . '` bt
+                ON bt.' . self::$definition['primary'] . ' = btl.' . self::$definition['primary'] . '
+                WHERE bt.active = "' . (bool) $active . '"
+                AND bt.id_shop = ' . (int) $id_shop . '
+                AND btl.id_lang = ' . (int) $id_lang . ''
             );
+            $return = [];
+            foreach ($tags as $tag) {
+                if ($context->controller->controller_type == 'front'
+                    || $context->controller->controller_type == 'modulefront'
+                ) {
+                    if (isset($tag['allowed_groups'])
+                        && $tag['allowed_groups']
+                    ) {
+                        $allowedGroups = json_decode($tag['allowed_groups']);
+                        $customerGroups = Customer::getGroupsStatic(
+                            (int) $context->customer->id
+                        );
+                        if (isset($customerGroups)
+                            && !empty($allowedGroups)
+                            && !array_intersect($allowedGroups, $customerGroups)
+                        ) {
+                            continue;
+                        }
+                    }
+                }
+                $return[] = $tag;
+            }
             Cache::store($cache_id, $return);
             return $return;
         }
@@ -161,9 +189,9 @@ class EverPsBlogTag extends ObjectModel
     public static function getTagByLinkRewrite($link_rewrite)
     {
         $sql = new DbQuery;
-        $sql->select('id_ever_tag');
-        $sql->from('ever_blog_tag_lang');
-        $sql->where('link_rewrite = "'.pSQL($link_rewrite).'"');
+        $sql->select(self::$definition['primary']);
+        $sql->from(self::$definition['table'] . '_lang');
+        $sql->where('link_rewrite = "' . pSQL($link_rewrite) . '"');
         $id_tag = Db::getInstance()->getValue($sql);
         if ($id_tag) {
             $return = new self($id_tag);

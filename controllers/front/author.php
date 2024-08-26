@@ -35,17 +35,32 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
 
     public function init()
     {
-        $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
         $this->module_name = 'everpsblog';
         $this->errors = [];
         $this->author = new EverPsBlogAuthor(
-            (int)Tools::getValue('id_ever_author'),
+            (int) Tools::getValue('id_ever_author'),
             (int) $this->context->language->id,
             (int) $this->context->shop->id
         );
+        $customerGroups = Customer::getGroupsStatic(
+            (int) $this->context->customer->id
+        );
+        if (isset($this->author->allowed_groups) && $this->author->allowed_groups) {
+            if (is_array($this->author->allowed_groups)) {
+                $allowedGroups = [];
+            } else {
+                $allowedGroups = json_decode($this->author->allowed_groups);
+            }
+            if (isset($customerGroups)
+                && !empty($allowedGroups)
+                && !array_intersect($allowedGroups, $customerGroups)
+            ) {
+                Tools::redirect('index.php?controller=404');
+            }
+        }
         parent::init();
         // if inactive post or unexists, redirect
-        if (!(int)Tools::getValue('id_ever_author')
+        if (!(int) Tools::getValue('id_ever_author')
             || (bool) $this->author->active === false
         ) {
             Tools::redirect('index.php?controller=404');
@@ -56,15 +71,11 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
 
     public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
     {
-        if ($this->isSeven) {
-            return Context::getContext()->getTranslator()->trans(
-                $string,
-                [],
-                'Modules.Everpsblog.author'
-            );
-        }
-
-        return parent::l($string, $specific, $class, $addslashes, $htmlentities);
+        return $this->context->getTranslator()->trans(
+            $string,
+            [],
+            'Modules.Everpsblog.author'
+        );
     }
 
     public function initContent()
@@ -72,7 +83,7 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
         parent::initContent();
         if (Tools::getValue('id_ever_author')) {
             $this->post_number = EverPsBlogPost::countPostsByAuthor(
-                (int)Tools::getValue('id_ever_author'),
+                (int) Tools::getValue('id_ever_author'),
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id
             );
@@ -83,7 +94,7 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
             $animate = Configuration::get(
                 'EVERBLOG_ANIMATE'
             );
-            if ($this->author->index) {
+            if ($this->author->indexable) {
                 $seo_index = 'index';
             } else {
                 $seo_index = 'noindex';
@@ -96,8 +107,8 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
             $page = $this->context->controller->getTemplateVarPage();
             $page['meta']['robots'] = $seo_index . ', ' . $seo_follow;
             if (Tools::getValue('page')) {
-                $meta_title = $this->l('Page : ').Tools::getValue('page').' | '.$this->author->meta_title;
-                $meta_description = $this->l('Page : ').Tools::getValue('page').' | '.$this->author->meta_description;
+                $meta_title = $this->l('Page : ') . Tools::getValue('page') . ' | ' . $this->author->meta_title;
+                $meta_description = $this->l('Page : ') . Tools::getValue('page') . ' | ' . $this->author->meta_description;
             } else {
                 $meta_title = $this->author->meta_title;
                 $meta_description = $this->author->meta_description;
@@ -108,16 +119,16 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
             // Now prepare template and show it
             // Prepare shortcodes
             $this->author->content = EverPsBlogPost::changeShortcodes(
-                (string) $this->author->content,
-                (int) Context::getContext()->customer->id
+                $this->author->content,
+                (int) $this->context->customer->id
             );
             $this->author->bottom_content = EverPsBlogPost::changeShortcodes(
-                (string) $this->author->bottom_content,
-                (int) Context::getContext()->customer->id
+                $this->author->bottom_content,
+                (int) $this->context->customer->id
             );
             $this->author->nickhandle = EverPsBlogPost::changeShortcodes(
-                (string) $this->author->nickhandle,
-                (int) Context::getContext()->customer->id
+                $this->author->nickhandle,
+                (int) $this->context->customer->id
             );
             $posts = EverPsBlogPost::getPostsByAuthor(
                 (int) $this->context->language->id,
@@ -125,19 +136,19 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
                 (int) $this->author->id,
                 (int) $pagination['items_shown_from'] - 1
             );
-            Hook::exec('actionBeforeEverAuthorInitContent', array(
-                'blog_author' => $this->author
-            ));
+            Hook::exec('actionBeforeEverAuthorInitContent', [
+                'blog_author' => $this->author,
+            ]);
             $social_share_links = [];
             $social_share_links['facebook'] = [
                 'label' => $this->trans('Share', [], 'Modules.Everpsblog.Shop'),
                 'class' => 'facebook',
-                'url' => 'https://www.facebook.com/sharer.php?u='.$page['canonical'],
+                'url' => 'https://www.facebook.com/sharer.php?u=' . $page['canonical'],
             ];
             $social_share_links['twitter'] = [
                 'label' => $this->trans('Tweet', [], 'Modules.Everpsblog.Shop'),
                 'class' => 'twitter',
-                'url' => 'https://twitter.com/intent/tweet?text='.$this->author->nickhandle.' '.$page['canonical'],
+                'url' => 'https://twitter.com/intent/tweet?text=' . $this->author->nickhandle . ' ' . $page['canonical'],
             ];
             $file_url = EverPsBlogImage::getBlogImageUrl(
                 (int) $this->author->id,
@@ -147,34 +158,32 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
             $feed_url = $this->context->link->getModuleLink(
                 $this->module_name,
                 'feed',
-                array(
+                [
                     'feed' => 'author',
-                    'id_obj' => $this->author->id
-                ),
+                    'id_obj' => $this->author->id,
+                ],
                 true,
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id
             );
-            $this->context->smarty->assign(
-                array(
-                    'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
-                    'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
-                    'allow_feed' => (bool)Configuration::get('EVERBLOG_RSS'),
-                    'feed_url' => $feed_url,
-                    'featured_image' => $file_url,
-                    'posts' => $posts,
-                    'paginated' => Tools::getValue('page'),
-                    'post_number' => (int) $this->post_number,
-                    'pagination' => $pagination,
-                    'social_share_links' => $social_share_links,
-                    'author' => $this->author,
-                    'default_lang' => (int) $this->context->language->id,
-                    'id_lang' => (int) $this->context->language->id,
-                    'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'modules/everpsblog/views/img/',
-                    'animated' => (bool) $animate,
-                    'logged' => (bool) $this->context->customer->isLogged(),
-                )
-            );
+            $this->context->smarty->assign([
+                'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
+                'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
+                'allow_feed' => (bool) Configuration::get('EVERBLOG_RSS'),
+                'feed_url' => $feed_url,
+                'featured_image' => $file_url,
+                'posts' => $posts,
+                'paginated' => Tools::getValue('page'),
+                'post_number' => (int) $this->post_number,
+                'pagination' => $pagination,
+                'social_share_links' => $social_share_links,
+                'author' => $this->author,
+                'default_lang' => (int) $this->context->language->id,
+                'id_lang' => (int) $this->context->language->id,
+                'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__ . 'modules/everpsblog/views/img/',
+                'animated' => (bool) $animate,
+                'logged' => (bool) $this->context->customer->isLogged(),
+            ]);
             $this->setTemplate('module:everpsblog/views/templates/front/author.tpl');
         }
     }
@@ -187,32 +196,32 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
     public function getBreadcrumbLinks()
     {
         $this->author = new EverPsBlogAuthor(
-            (int)Tools::getValue('id_ever_author'),
+            (int) Tools::getValue('id_ever_author'),
             (int) $this->context->language->id,
             (int) $this->context->shop->id
         );
         $breadcrumb = parent::getBreadcrumbLinks();
-        $breadcrumb['links'][] = array(
+        $breadcrumb['links'][] = [
             'title' => $this->l('Blog'),
             'url' => $this->context->link->getModuleLink(
                 'everpsblog',
                 'blog'
             ),
-        );
-        $breadcrumb['links'][] = array(
+        ];
+        $breadcrumb['links'][] = [
             'title' => EverPsBlogPost::changeShortcodes(
                 $this->author->nickhandle,
-                Context::getContext()->customer->id
+                $this->context->customer->id
             ),
             'url' => $this->context->link->getModuleLink(
-                'everpsblog',
+                $this->module->name,
                 'author',
-                array(
+                [
                     'id_ever_author' => $this->author->id,
-                    'link_rewrite' => $this->author->link_rewrite
-                )
+                    'link_rewrite' => $this->author->link_rewrite,
+                ]
             ),
-        );
+        ];
         return $breadcrumb;
     }
 
@@ -224,10 +233,10 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
         return $this->context->link->getModuleLink(
             'everpsblog',
             'author',
-            array(
+            [
                 'id_ever_author' => $this->author->id,
-                'link_rewrite' => $this->author->link_rewrite
-            )
+                'link_rewrite' => $this->author->link_rewrite,
+            ]
         );
     }
 
@@ -236,11 +245,11 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
         $page = parent::getTemplateVarPage();
         $page['body_classes']['page-everblog'] = true;
         $page['body_classes']['page-everblog-author'] = true;
-        $page['body_classes']['page-everblog-author-id-'.(int) $this->author->id] = true;
-        if ((bool)Context::getContext()->customer->isLogged()) {
+        $page['body_classes']['page-everblog-author-id-' . (int) $this->author->id] = true;
+        if ((bool) $this->context->customer->isLogged()) {
             $page['body_classes']['page-everblog-logged-in'] = true;
         }
-        $page['body_classes']['page-everblog-'.Configuration::get('EVERPSBLOG_AUTHOR_LAYOUT')] = true;
+        $page['body_classes']['page-everblog-' . Configuration::get('EVERPSBLOG_AUTHOR_LAYOUT')] = true;
         return $page;
     }
 }

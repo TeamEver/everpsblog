@@ -89,15 +89,15 @@ class EverPsBlogsitemapsModuleFrontController extends ModuleFrontController
         }
 
         $id_shop = (Tools::getIsset('id_shop') && in_array(Tools::getValue('id_shop'), $list_id_shop))
-            ? (int)Tools::getValue('id_shop') : (int)Configuration::get('PS_SHOP_DEFAULT');
+            ? (int) Tools::getValue('id_shop') : (int) Configuration::get('PS_SHOP_DEFAULT');
 
         $everpsblog->cron = true;
         $sitemaps_generated = $everpsblog->generateBlogSitemap((int) $id_shop, true);
         if (Validate::isUnsignedInt($sitemaps_generated)) {
             die(
                 $this->smileys[$this->randSmiley]
-                .' All sitemaps have been regenerated '
-                .$this->smileys[$this->randSmiley]
+                . ' All sitemaps have been regenerated '
+                . $this->smileys[$this->randSmiley]
             );
         }
         Tools::redirect('index.php');

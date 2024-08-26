@@ -35,9 +35,8 @@ class EverPsBlogcustomercommentsModuleFrontController extends EverPsBlogModuleFr
     public function init()
     {
         parent::init();
-        $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
-        if ((bool)Context::getContext()->customer->isLogged() === false
-            || (bool)Configuration::get('EVERBLOG_ALLOW_COMMENTS') === false
+        if ((bool) $this->context->customer->isLogged() === false
+            || (bool) Configuration::get('EVERBLOG_ALLOW_COMMENTS') === false
         ) {
             Tools::redirect('index.php');
         }
@@ -45,37 +44,28 @@ class EverPsBlogcustomercommentsModuleFrontController extends EverPsBlogModuleFr
 
     public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
     {
-        if ($this->isSeven) {
-            return Context::getContext()->getTranslator()->trans(
-                $string,
-                [],
-                'Modules.Everpsblog.customercomments'
-            );
-        }
-
-        return parent::l($string, $specific, $class, $addslashes, $htmlentities);
+        return $this->context->getTranslator()->trans(
+            $string,
+            [],
+            'Modules.Everpsblog.customercomments'
+        );
     }
 
     public function initContent()
     {
-        if ((bool)Context::getContext()->customer->isLogged() === false) {
+        if ((bool) $this->context->customer->isLogged() === false) {
             Tools::redirect('index.php');
         }
         parent::initContent();
-        if ($this->isSeven) {
-            $page = $this->context->controller->getTemplateVarPage();
-            $page['meta']['title'] = $this->l('Your comments');
-            $page['meta']['description'] = $this->l('Find all your comments on our blog');
-            $this->context->smarty->assign('page', $page);
-        } else {
-            $this->context->smarty->assign($this->l('Your comments'), true);
-            $this->context->smarty->assign($this->l('Find all your comments on our blog'), true);
-        }
+        $page = $this->context->controller->getTemplateVarPage();
+        $page['meta']['title'] = $this->l('Your comments');
+        $page['meta']['description'] = $this->l('Find all your comments on our blog');
+        $this->context->smarty->assign('page', $page);
         $animate = Configuration::get(
             'EVERBLOG_ANIMATE'
         );
         $comments = EverPsBlogComment::getCommentsByEmail(
-            (string) $this->context->customer->email,
+            $this->context->customer->email,
             (int) $this->context->language->id
         );
         $cust_comments = [];
@@ -95,15 +85,14 @@ class EverPsBlogcustomercommentsModuleFrontController extends EverPsBlogModuleFr
                 'comment' => $comment
             );
         }
-        $blogUrl = Context::getContext()->link->getModuleLink(
+        $blogUrl = $this->context->link->getModuleLink(
             'everpsblog',
             'blog',
             [],
             true
         );
 
-        $this->context->smarty->assign(
-            array(
+        $this->context->smarty->assign([
                 'blogUrl' => $blogUrl,
                 'comments' => $comments,
                 'cust_comments' => $cust_comments,
@@ -111,26 +100,21 @@ class EverPsBlogcustomercommentsModuleFrontController extends EverPsBlogModuleFr
                 'id_lang' => (int) $this->context->language->id,
                 'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'/modules/everpsblog/views/img/',
                 'animated' => $animate,
-            )
-        );
-        if ($this->isSeven) {
-            $this->setTemplate('module:everpsblog/views/templates/front/customercomments.tpl');
-        } else {
-            $this->setTemplate('customercomments.tpl');
-        }
+        ]);
+        $this->setTemplate('module:everpsblog/views/templates/front/customercomments.tpl');
     }
 
     public function getBreadcrumbLinks()
     {
         $breadcrumb = parent::getBreadcrumbLinks();
         $breadcrumb['links'][] = $this->addMyAccountToBreadcrumb();
-        $breadcrumb['links'][] = array(
+        $breadcrumb['links'][] = [
             'title' => $this->l('My blog comments'),
             'url' => $this->context->link->getModuleLink(
                 'everpsblog',
                 'customercomments'
             ),
-        );
+        ];
         return $breadcrumb;
     }
 
@@ -138,8 +122,8 @@ class EverPsBlogcustomercommentsModuleFrontController extends EverPsBlogModuleFr
     {
         $page = parent::getTemplateVarPage();
         $page['body_classes']['page-everblog-customercomments'] = true;
-        $page['body_classes']['page-everblog-customer-id-'.(int) $this->context->customer->id] = true;
-        if ((bool)Context::getContext()->customer->isLogged()) {
+        $page['body_classes']['page-everblog-customer-id-' . (int) $this->context->customer->id] = true;
+        if ((bool) $this->context->customer->isLogged()) {
             $page['body_classes']['page-everblog-logged-in'] = true;
         }
         return $page;

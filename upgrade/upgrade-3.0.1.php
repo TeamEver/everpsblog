@@ -85,7 +85,7 @@ function upgrade_module_3_0_1()
             `linkedin` varchar(255) DEFAULT NULL,
             `date_add` DATETIME DEFAULT NULL,
             `date_upd` DATETIME DEFAULT NULL,
-            `index` int(10) unsigned DEFAULT NULL,
+            `indexable` int(10) unsigned DEFAULT NULL,
             `follow` int(10) unsigned DEFAULT NULL,
             `active` int(10) unsigned DEFAULT NULL,
             PRIMARY KEY (`id_ever_author`)

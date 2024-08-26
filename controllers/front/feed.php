@@ -35,13 +35,11 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
 
     public function init()
     {
-        $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
-        $this->module_name = 'everpsblog';
         $this->errors = [];
-        if ((bool)Configuration::get('EVERBLOG_RSS') === false) {
+        if ((bool) Configuration::get('EVERBLOG_RSS') === false) {
             Tools::redirect('index.php');
         }
-        $this->allowed_feeds = array('category', 'tag', 'author', 'blog');
+        $this->allowed_feeds = ['category', 'tag', 'author', 'blog'];
         if (!Tools::getValue('feed')
             || !in_array(Tools::getValue('feed'), $this->allowed_feeds)
         ) {
@@ -53,15 +51,11 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
 
     public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
     {
-        if ($this->isSeven) {
-            return Context::getContext()->getTranslator()->trans(
-                $string,
-                [],
-                'Modules.Everpsblog.feed'
-            );
-        }
-
-        return parent::l($string, $specific, $class, $addslashes, $htmlentities);
+        return $this->context->getTranslator()->trans(
+            $string,
+            [],
+            'Modules.Everpsblog.feed'
+        );
     }
 
     public function initContent()
@@ -70,7 +64,7 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
         switch (Tools::getValue('feed')) {
             case 'category':
                 $feed_obj = new EverPsBlogCategory(
-                    (int)Tools::getValue('id_obj'),
+                    (int) Tools::getValue('id_obj'),
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id
                 );
@@ -87,7 +81,7 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
 
             case 'tag':
                 $feed_obj = new EverPsBlogTag(
-                    (int)Tools::getValue('id_obj'),
+                    (int) Tools::getValue('id_obj'),
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id
                 );
@@ -104,7 +98,7 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
 
             case 'author':
                 $feed_obj = new EverPsBlogAuthor(
-                    (int)Tools::getValue('id_obj'),
+                    (int) Tools::getValue('id_obj'),
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id
                 );
@@ -123,19 +117,19 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
             default:
                 $feed_obj = new stdClass();
                 // SEO title and meta desc
-                $everblog_title = Configuration::getConfigInMultipleLangs('EVERBLOG_TITLE');
-                $meta_title = $everblog_title[(int) Context::getContext()->language->id];
+                $everblog_title = $this->module::getConfigInMultipleLangs('EVERBLOG_TITLE');
+                $meta_title = $everblog_title[(int) $this->context->language->id];
                 // Default blog text
-                $everblog_top_text = Configuration::getConfigInMultipleLangs('EVERBLOG_TOP_TEXT');
-                $default_blog_top_text = $everblog_top_text[(int) Context::getContext()->language->id];
+                $everblog_top_text = $this->module::getConfigInMultipleLangs('EVERBLOG_TOP_TEXT');
+                $default_blog_top_text = $everblog_top_text[(int) $this->context->language->id];
                 $default_blog_top_text = EverPsBlogPost::changeShortcodes(
                     $default_blog_top_text,
-                    (int) Context::getContext()->customer->id
+                    (int) $this->context->customer->id
                 );
                 $feed_obj->title = $meta_title;
                 $feed_obj->content = $default_blog_top_text;
                 $feed_obj->link_rewrite = $this->context->link->getModuleLink(
-                    $this->module_name,
+                    $this->module->name,
                     'blog',
                     [],
                     true,
@@ -163,28 +157,22 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
                 break;
         }
         $feed_url = $this->context->link->getModuleLink(
-            $this->module_name,
+            $this->module->name,
             'feed',
-            array(
+            [
                 'feed' => Tools::getValue('feed'),
-                'id_obj' => Tools::getValue('id_obj')
-            ),
+                'id_obj' => Tools::getValue('id_obj'),
+            ],
             true,
             (int) $this->context->language->id,
             (int) $this->context->shop->id
         );
-        $this->context->smarty->assign(
-            array(
-                'feed_url' => $feed_url,
-                'feed_obj' => $feed_obj,
-                'posts' => $posts,
-                'locale' => Context::getContext()->language->locale
-            )
-        );
-        if ($this->isSeven) {
-            $this->setTemplate('module:everpsblog/views/templates/front/feed.tpl');
-        } else {
-            $this->setTemplate('feed.tpl');
-        }
+        $this->context->smarty->assign([
+            'feed_url' => $feed_url,
+            'feed_obj' => $feed_obj,
+            'posts' => $posts,
+            'locale' => $this->context->language->locale,
+        ]);
+        $this->setTemplate('module:everpsblog/views/templates/front/feed.tpl');
     }
 }

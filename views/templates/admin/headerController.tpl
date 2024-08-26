@@ -26,9 +26,6 @@
             </a>
             <strong>{l s='Welcome to Ever Blog !' mod='everpsblog'}</strong>
             <p>
-                <a href="https://addons.prestashop.com/contact-form.php?id_product=44064" target="_blank" class="btn btn-danger">{l s='Ask for Elementor compatibility' mod='everpsblog'}</a> 
-            </p>
-            <p>
                 <strong>
                     {l s='Click on our logo to go direct to bottom' mod='everpsblog'}
                 </strong>
