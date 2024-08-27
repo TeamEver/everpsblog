@@ -56,7 +56,7 @@ class EverPsBlogSortOrders
         return $sortOrders;
     }
 
-    private function buildSortLink(string $orderBy, string $orderWay): string
+    private static function buildSortLink(string $orderBy, string $orderWay): string
     {
         // Récupération de l'URL courante
         $url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
