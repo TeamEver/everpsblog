@@ -1736,4 +1736,130 @@ class EverPsBlogPost extends ObjectModel
         $sql->where('`post_status` = "published"');
         return (bool) Db::getInstance()->getValue($sql);
     }
+
+    public function convertToPrettyBlock()
+    {
+        if (!Module::isInstalled('prettyblocks')
+            || Module::isEnabled('prettyblocks')
+        ) {
+            return;
+        }
+        // Récupérer toutes les langues disponibles pour le shop
+        $languages = Language::getLanguages(true, $this->id_shop);
+
+        foreach ($languages as $language) {
+            // Récupérer le post de blog pour la langue spécifique
+            $blogPost = Db::getInstance()->getRow('
+                SELECT p.id_ever_post, pl.id_lang, pl.content, pl.title 
+                FROM ' . _DB_PREFIX_ . 'ever_blog_post p
+                INNER JOIN ' . _DB_PREFIX_ . 'ever_blog_post_lang pl ON p.id_ever_post = pl.id_ever_post
+                WHERE p.id_ever_post = ' . (int)$this->id_ever_post . ' 
+                AND pl.id_lang = ' . (int)$language['id_lang'] . ' 
+                AND p.id_shop = ' . (int)$this->id_shop
+            );
+
+            // Si le post n'existe pas pour cette langue, on passe à la langue suivante
+            if (!$blogPost) {
+                continue;
+            }
+
+            // Récupérer les informations du post pour cette langue
+            $id_lang = (int) $blogPost['id_lang'];
+            $content = $blogPost['content'];
+            $metaTitle = $blogPost['title'];
+            $defaultTemplate = 'module:prettyblocks/views/templates/blocks/custom_text/default.tpl';
+
+            // Créer une zone spécifique pour le post et la langue
+            $zoneName = 'displayPost' . $this->id_ever_post;
+
+            // Créer un nouveau bloc PrettyBlocks pour ce post et langue
+            $prettyBlock = new PrettyBlocksModel();
+            $prettyBlock->id_shop = $this->id_shop;
+            $prettyBlock->id_lang = $id_lang;
+            $prettyBlock->code = 'prettyblocks_custom_text';
+            $prettyBlock->name = $metaTitle;
+            $prettyBlock->zone_name = $zoneName;
+            $prettyBlock->template = $defaultTemplate;
+
+            // Configuration du bloc avec le contenu pour cette langue
+            $prettyBlock->config = json_encode([
+                'content' => [
+                    'type' => 'editor',
+                    'label' => 'Content',
+                    'default' => '<p> lorem ipsum </p>',
+                    'force_default_value' => true,
+                    'value' => $content,
+                ],
+            ]);
+            $prettyBlock->default_params = json_encode([
+                'container' => true,
+                'force_full_width' => false,
+                'load_ajax' => false,
+                'is_cached' => false,
+                'bg_color' => '',
+                'paddings' => [
+                    'desktop' => [
+                        'auto' => 0,
+                        'top' => '',
+                        'right' => '',
+                        'bottom' => '',
+                        'left' => '',
+                        'use_custom_data' => false,
+                    ],
+                    'tablet' => [
+                        'auto' => 0,
+                        'top' => '',
+                        'right' => '',
+                        'bottom' => '',
+                        'left' => '',
+                        'use_custom_data' => false,
+                    ],
+                    'mobile' => [
+                        'auto' => 0,
+                        'top' => null,
+                        'right' => null,
+                        'bottom' => null,
+                        'left' => null,
+                        'use_custom_data' => false,
+                    ],
+                ],
+                'margins' => [
+                    'desktop' => [
+                        'auto' => 0,
+                        'top' => '',
+                        'right' => '',
+                        'bottom' => '',
+                        'left' => '',
+                        'use_custom_data' => false,
+                    ],
+                    'tablet' => [
+                        'auto' => 0,
+                        'top' => '',
+                        'right' => '',
+                        'bottom' => '',
+                        'left' => '',
+                        'use_custom_data' => false,
+                    ],
+                    'mobile' => [
+                        'auto' => 0,
+                        'top' => null,
+                        'right' => null,
+                        'bottom' => null,
+                        'left' => null,
+                        'use_custom_data' => false,
+                    ],
+                ],
+            ]);
+
+            // Sauvegarder le bloc PrettyBlock
+            $prettyBlock->add();
+
+            // Facultatif : Vider le contenu du post pour cette langue
+            Db::getInstance()->execute('
+                UPDATE ' . _DB_PREFIX_ . 'ever_blog_post_lang
+                SET content = ""
+                WHERE id_ever_post = ' . (int)$this->id_ever_post . ' AND id_lang = ' . (int) $id_lang
+            );
+        }
+    }
 }

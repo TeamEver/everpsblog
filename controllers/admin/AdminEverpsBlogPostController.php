@@ -247,6 +247,11 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         $this->addRowAction('deletePost');
         $this->addRowAction('ViewPost');
         $this->addRowAction('UnprotectPost');
+        if (Module::isInstalled('prettyblocks')
+            && Module::isEnabled('prettyblocks')
+        ) {
+            $this->addRowAction('ConvertToPrettyBlocks');
+        }
         $this->bulk_actions = [
             'delete' => [
                 'text' => $this->l('Delete selected items'),
@@ -937,6 +942,15 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             $everObj->psswd = null;
             $everObj->save();
         }
+        if (Module::isInstalled('prettyblocks')
+            && Module::isEnabled('prettyblocks')
+            && Tools::getIsset('convert_to_prettyblocks')
+        ) {
+            $everObj = new $this->className(
+                (int) Tools::getValue($this->identifier)
+            );
+            $everObj->convertToPrettyBlock();
+        }
         if (Tools::getIsset('duplicateever_blog_post')) {
             return $this->duplicatePost(
                 (int) Tools::getValue($this->identifier)
@@ -1254,6 +1268,27 @@ class AdminEverPsBlogPostController extends ModuleAdminController
 
         return $this->context->smarty->fetch(
             _PS_MODULE_DIR_ . $this->module->name . '/views/templates/admin/helpers/lists/list_action_unprotect_obj.tpl'
+        );
+    }
+
+    public function displayConvertToPrettyBlocksLink($token, $postId)
+    {
+        if (!$token) {
+            return;
+        }
+        $convertToPrettyBlocksUrl  = 'index.php?controller=AdminEverPsBlogPost&token=';
+        $convertToPrettyBlocksUrl .= Tools::getAdminTokenLite('AdminEverPsBlogPost');
+        $convertToPrettyBlocksUrl .= '&id_ever_post=' . (int) $postId;
+        $convertToPrettyBlocksUrl .= '&convert_to_prettyblocks';
+
+        $this->context->smarty->assign([
+            'href' => $convertToPrettyBlocksUrl,
+            'confirm' => null,
+            'action' => $this->l('Convert to Prettyblocks'),
+        ]);
+
+        return $this->context->smarty->fetch(
+            _PS_MODULE_DIR_ . $this->module->name . '/views/templates/admin/helpers/lists/convert_to_prettyblocks.tpl'
         );
     }
 

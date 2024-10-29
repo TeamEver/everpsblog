@@ -46,11 +46,10 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '5.6.2';
+        $this->version = '5.6.3';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
-        $this->siteUrl = Tools::getHttpHost(true) . __PS_BASE_URI__;
         $this->module_folder = _PS_MODULE_DIR_ . 'everpsblog';
         parent::__construct();
         $this->displayName = $this->l('Ever Blog');
@@ -277,8 +276,209 @@ class EverPsBlog extends Module
         ];
     }
 
+    public function clearEverblogContent()
+    {
+        // Suppression des anciens posts, catégories, et tags
+        Db::getInstance()->execute('DELETE FROM ' . _DB_PREFIX_ . 'ever_blog_post');
+        Db::getInstance()->execute('DELETE FROM ' . _DB_PREFIX_ . 'ever_blog_post_lang');
+        Db::getInstance()->execute('DELETE FROM ' . _DB_PREFIX_ . 'ever_blog_category');
+        Db::getInstance()->execute('DELETE FROM ' . _DB_PREFIX_ . 'ever_blog_category_lang');
+        Db::getInstance()->execute('DELETE FROM ' . _DB_PREFIX_ . 'ever_blog_tag');
+        Db::getInstance()->execute('DELETE FROM ' . _DB_PREFIX_ . 'ever_blog_post_category');
+        Db::getInstance()->execute('DELETE FROM ' . _DB_PREFIX_ . 'ever_blog_post_tag');
+    }
+
+    public function migrateMagentoToEverblog()
+    {
+        // Supprimer le contenu actuel d'Everblog
+        $this->clearEverblogContent();
+
+        // Récupérer les catégories, tags et posts de Magento
+        $categories = Db::getInstance()->executeS('SELECT * FROM aw_blog_cat');
+        $tags = Db::getInstance()->executeS('SELECT * FROM aw_blog_tags');
+        $posts = Db::getInstance()->executeS('SELECT * FROM aw_blog');
+
+        // Récupérer tous les IDs de groupes dans PrestaShop
+        $groups = Db::getInstance()->executeS('SELECT id_group FROM ' . _DB_PREFIX_ . 'group');
+        $groupIds = array_column($groups, 'id_group');
+        $allowedGroupsJson = json_encode($groupIds); // Convertir en JSON
+
+        // Créer une catégorie par défaut "Non classé"
+        $defaultCategory = new EverPsBlogCategory();
+        $defaultCategory->title = [1 => 'Non classé']; // Assuming language ID = 1
+        $defaultCategory->meta_title = [1 => 'Non classé'];
+        $defaultCategory->meta_description = [1 => ''];
+        $defaultCategory->link_rewrite = [1 => Tools::link_rewrite('non-classe')];
+        $defaultCategory->date_add = date('Y-m-d H:i:s');
+        $defaultCategory->date_upd = date('Y-m-d H:i:s');
+        $defaultCategory->id_parent_category = 1;
+        $defaultCategory->allowed_groups = $allowedGroupsJson;
+        $defaultCategory->indexable = true;
+        $defaultCategory->follow = true;
+        $defaultCategory->active = true;
+        $defaultCategory->id_shop = 1;
+        $defaultCategory->save();
+        // Récupérer l'ID de la catégorie par défaut
+        $defaultCategoryId = Configuration::get('EVERBLOG_UNCLASSED_ID');
+
+        // Insérer les catégories dans Everblog
+        foreach ($categories as $category) {
+            $newCategory = new EverPsBlogCategory();
+            $newCategory->title = [1 => $category['title']]; // Assuming language ID = 1
+            $newCategory->meta_title = [1 => $category['meta_keywords']];
+            $newCategory->meta_description = [1 => $category['meta_description']];
+            $newCategory->link_rewrite = [1 => Tools::link_rewrite($category['title'])];
+            $newCategory->date_add = date('Y-m-d H:i:s');
+            $newCategory->date_upd = date('Y-m-d H:i:s');
+            $newCategory->allowed_groups = $allowedGroupsJson;
+            $newCategory->active = true;
+            $newCategory->id_shop = 1;
+            $newCategory->save();
+        }
+
+        // Insérer les tags dans Everblog
+        foreach ($tags as $tag) {
+            $newTag = new EverPsBlogTag();
+            $newTag->title = [1 => $tag['tag']];
+            $newTag->meta_title = [1 => $tag['tag']];
+            $newTag->meta_description = [1 => ''];
+            $newTag->link_rewrite = [1 => Tools::link_rewrite($tag['tag'])];
+            $newTag->allowed_groups = $allowedGroupsJson;
+            $newTag->date_add = date('Y-m-d H:i:s');
+            $newTag->date_upd = date('Y-m-d H:i:s');
+            $newTag->indexable = true;
+            $newTag->follow = true;
+            $newTag->active = true;
+            $newTag->id_shop = 1;
+            $newTag->save();
+        }
+
+        // Insérer les posts dans Everblog
+        foreach ($posts as $post) {
+            $post['post_content'] = str_replace('\r\n', '<p></p>', $post['post_content']);
+            // Nettoyage et remplacement des images dans le contenu
+            $cleanedContent = $this->replaceAndDownloadImages($post['post_content']);
+            $cleanedContent = Tools::purifyHTML($cleanedContent);
+            $cleanedExcerpt = $this->replaceAndDownloadImages($post['short_content']);
+            // Création du post
+            $newPost = new EverPsBlogPost();
+            $newPost->title = [1 => $post['title']];
+            $newPost->meta_title = [1 => $post['meta_keywords']];
+            $newPost->meta_description = [1 => $post['meta_description']];
+            $newPost->link_rewrite = [1 => Tools::link_rewrite($post['title'])];
+            $newPost->date_add = $post['created_time'] ? $post['created_time'] : date('Y-m-d H:i:s');
+            $newPost->date_upd = $post['update_time'] ? $post['update_time'] : date('Y-m-d H:i:s');
+            $newPost->active = ($post['status'] == 1) ? true : false;
+            $newPost->indexable = ($post['status'] == 1) ? true : false;
+            $newPost->follow = ($post['status'] == 1) ? true : false;
+            $newPost->content = [1 => $cleanedContent];
+            $newPost->post_status = 'published';
+            $newPost->id_shop = 1;
+            $newPost->id_default_category = $defaultCategoryId;
+            $newPost->allowed_groups = $allowedGroupsJson; // Ajouter les groupes autorisés
+            $newPost->save();
+            // dump($post['post_content']);
+            // die();
+            // Récupérer l'ID du post enregistré
+            $postId = $newPost->id;
+            // dump(pSQL($post['post_content'], true));
+            // die();
+            // dump($cleanedContent);
+            // die();
+            // Mise à jour directe du contenu dans la base de données
+            // Db::getInstance()->execute('
+            //     UPDATE ' . _DB_PREFIX_ . 'ever_blog_post_lang
+            //     SET content = "' . pSQL($post['post_content'], true) . '", excerpt = "' . pSQL($cleanedExcerpt) . '"
+            //     WHERE id_ever_post = ' . (int)$postId
+            // );
+            EverPsBlogTaxonomy::insertTaxonomy($defaultCategoryId, $postId, 'category');
+            $newPost->save();
+            // Insérer la catégorie par défaut "Non classé" pour chaque post
+
+            // Insérer les autres catégories associées au post
+            $postCategories = Db::getInstance()->executeS('SELECT * FROM aw_blog_post_cat WHERE post_id = ' . (int)$post['post_id']);
+            foreach ($postCategories as $postCategory) {
+                EverPsBlogTaxonomy::insertTaxonomy($postCategory['cat_id'], $postId, 'category');
+            }
+
+            // Insérer les tags associés au post
+            $postTags = explode(',', $post['tags']);
+            foreach ($postTags as $tag) {
+                $existingTag = Db::getInstance()->getRow('SELECT id_ever_tag FROM ' . _DB_PREFIX_ . 'ever_blog_tag_lang WHERE title = "' . pSQL($tag) . '"');
+                if ($existingTag) {
+                    EverPsBlogTaxonomy::insertTaxonomy($existingTag['id_ever_tag'], $postId, 'tag');
+                }
+            }
+            $newPost->save();
+        }
+    }
+
+    public function replaceAndDownloadImages($content)
+    {
+        // Remplacer {{media url="..."}}
+        $pattern = '/\{\{media url="wysiwyg\/([^"]+)"\}\}/';
+        $content = preg_replace_callback($pattern, function($matches) {
+            $fullUrl = 'https://www.comptoir-de-vie.com/media/wysiwyg/' . $matches[1];
+            $localPath = $this->downloadImage($fullUrl);
+            if ($localPath) {
+                return $localPath; // Replace the {{media url="..."}} with the local path
+            }
+            return $fullUrl; // If download fails, return the original full URL
+        }, $content);
+
+        // Remplacer les URLs d'images dans les balises <img>
+        $dom = new DOMDocument;
+        if (!empty($content)) {
+            @$dom->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        }
+        $xpath = new DOMXPath($dom);
+        $images = $xpath->query("//img");
+
+        foreach ($images as $img) {
+            $src = $img->getAttribute('src');
+            if (!empty($src)) {
+                // Identifier et traiter toutes les URLs valides
+                if (strpos($src, 'http://www.comptoir-de-vie.com/') !== false) {
+                    // Cible tous les domaines nécessaires
+                    $localPath = $this->downloadImage($src);
+                    if ($localPath) {
+                        $img->setAttribute('src', $localPath);
+                    }
+                } elseif (strpos($src, 'http://www.comptoir-de-vie.com/') === false && strpos($src, '/comptoir/') !== false) {
+                    // Cible tous les domaines nécessaires
+                    $localPath = $this->downloadImage('http://www.comptoir-de-vie.com/'.$src);
+                    if ($localPath) {
+                        $img->setAttribute('src', $localPath);
+                    }
+                }
+            }
+        }
+
+        return $dom->saveHTML();
+    }
+
+    public function downloadImage($url)
+    {
+        $imageContent = @file_get_contents($url);
+        if ($imageContent !== false) {
+            $imageName = basename(parse_url($url, PHP_URL_PATH));
+            $localPath = _PS_IMG_DIR_ . 'cms/' . $imageName;
+
+            if (!is_dir(_PS_IMG_DIR_ . 'cms/')) {
+                mkdir(_PS_IMG_DIR_ . 'cms/', 0755, true);
+            }
+
+            file_put_contents($localPath, $imageContent);
+
+            return _PS_IMG_ . 'cms/' . $imageName;
+        }
+
+        return false;
+    }
+
     public function getContent()
     {
+        $this->checkObligatoryHooks();
         $this->checkAndFixDatabase();
         $this->html = '';
         // Process internal linking
@@ -1809,7 +2009,7 @@ class EverPsBlog extends Module
         }
     }
 
-    public function hookHeader()
+    public function hookDisplayHeader()
     {
         $controller_name = Tools::getValue('controller');
         $module_name = Tools::getValue('module');
@@ -1896,6 +2096,7 @@ class EverPsBlog extends Module
         $showTags = Configuration::get(
             'EVERBLOG_TAG_COLUMNS'
         );
+        $siteUrl = Tools::getHttpHost(true) . __PS_BASE_URI__;
         $this->context->smarty->assign([
             'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
             'everpsblog' => $latest_posts,
@@ -1906,7 +2107,7 @@ class EverPsBlog extends Module
             'tags' => $tags,
             'categories' => $categories,
             'animate' => $animate,
-            'blogImg_dir' => $this->siteUrl . '/modules/everpsblog/views/img/',
+            'blogImg_dir' => $siteUrl . '/modules/everpsblog/views/img/',
         ]);
         return $this->display(__FILE__, 'views/templates/hook/columns.tpl');
     }
@@ -1933,44 +2134,50 @@ class EverPsBlog extends Module
 
     public function hookDisplayHome()
     {
-        if ((int) Configuration::get('EVERPSBLOG_HOME_NBR') > 0) {
-            $post_number = (int) Configuration::get('EVERPSBLOG_HOME_NBR');
-        } else {
-            $post_number = 4;
+        $idLang = $this->context->language->id;
+        $idShop = $this->context->shop->id;
+        $cacheId = $this->name . '-hookDisplayBanner-' . $idLang . '-' . $idShop;
+        if (!$this->isCached('home.tpl', $cacheId)) {
+            if ((int) Configuration::get('EVERPSBLOG_HOME_NBR') > 0) {
+                $post_number = (int) Configuration::get('EVERPSBLOG_HOME_NBR');
+            } else {
+                $post_number = 4;
+            }
+            $blogUrl = Context::getContext()->link->getModuleLink(
+                $this->name,
+                'blog',
+                [],
+                true
+            );
+            $starredPosts = EverPsBlogPost::getStarredPosts(
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id,
+                0,
+                (int) $post_number
+            );
+            if (!$starredPosts || !count($starredPosts)) {
+                return;
+            }
+            $evercategories = EverPsBlogCategory::getAllCategories(
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id
+            );
+            $animate = Configuration::get(
+                'EVERBLOG_ANIMATE'
+            );
+            $siteUrl = Tools::getHttpHost(true) . __PS_BASE_URI__;
+            $this->context->smarty->assign([
+                'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
+                'blogUrl' => $blogUrl,
+                'everpsblog' => $starredPosts,
+                'evercategory' => $evercategories,
+                'default_lang' => (int) $this->context->language->id,
+                'id_lang' => (int) $this->context->language->id,
+                'blogImg_dir' => $siteUrl . '/modules/everpsblog/views/img/',
+                'animated' => $animate,
+            ]);
         }
-        $blogUrl = Context::getContext()->link->getModuleLink(
-            $this->name,
-            'blog',
-            [],
-            true
-        );
-        $starredPosts = EverPsBlogPost::getStarredPosts(
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id,
-            0,
-            (int) $post_number
-        );
-        if (!$starredPosts || !count($starredPosts)) {
-            return;
-        }
-        $evercategories = EverPsBlogCategory::getAllCategories(
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
-        );
-        $animate = Configuration::get(
-            'EVERBLOG_ANIMATE'
-        );
-        $this->context->smarty->assign([
-            'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
-            'blogUrl' => $blogUrl,
-            'everpsblog' => $starredPosts,
-            'evercategory' => $evercategories,
-            'default_lang' => (int) $this->context->language->id,
-            'id_lang' => (int) $this->context->language->id,
-            'blogImg_dir' => $this->siteUrl . '/modules/everpsblog/views/img/',
-            'animated' => $animate,
-        ]);
-        return $this->display(__FILE__, 'views/templates/hook/home.tpl');
+        return $this->display(__FILE__, 'views/templates/hook/home.tpl', $cacheId);
     }
 
     public function hookDisplayCustomerAccount()
@@ -2032,6 +2239,7 @@ class EverPsBlog extends Module
             );
             $everpsblog[] = $post;
         }
+        $siteUrl = Tools::getHttpHost(true) . __PS_BASE_URI__;
         $this->context->smarty->assign([
             'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
             'blogUrl' => $blogUrl,
@@ -2039,7 +2247,7 @@ class EverPsBlog extends Module
             'evercategory' => $evercategories,
             'default_lang' => (int) $this->context->language->id,
             'id_lang' => (int) $this->context->language->id,
-            'blogImg_dir' => $this->siteUrl.'/modules/everpsblog/views/img/',
+            'blogImg_dir' => $siteUrl.'/modules/everpsblog/views/img/',
             'animated' => $animate,
         ]);
         return $this->display(__FILE__, 'views/templates/hook/product.tpl');
@@ -2067,6 +2275,14 @@ class EverPsBlog extends Module
     public function hookActionOutputHTMLBefore($params)
     {
         try {
+            foreach (Shop::getShops() as $shop) {
+                $this->publishPlannedPosts(
+                    (int) $shop['id_shop']
+                );
+                $this->emptyTrash(
+                    (int) $shop['id_shop']
+                );
+            }
             $regex = '/<p>\[everpsblog\s+id=\s*[\'\"]?(\d+)[\'\"]?\s*\]<\/p>|\[everpsblog\s+id=\s*[\'\"]?(\d+)[\'\"]?\s*\]/Us';
             if (preg_match_all($regex, $params['html'], $matches)) {
                 if ($html = preg_replace_callback($regex, [$this, 'displayPostsByCatId'], $params['html'])) {
@@ -2078,18 +2294,6 @@ class EverPsBlog extends Module
             );
         } catch (Exception $e) {
             PrestaShopLogger::addLog($this->name . ' : ' . $e->getMessage());
-        }
-    }
-
-    public function hookActionFrontControllerAfterInit()
-    {
-        foreach (Shop::getShops() as $shop) {
-            $this->publishPlannedPosts(
-                (int) $shop['id_shop']
-            );
-            $this->emptyTrash(
-                (int) $shop['id_shop']
-            );
         }
     }
 
@@ -2128,6 +2332,7 @@ class EverPsBlog extends Module
         $animate = Configuration::get(
             'EVERBLOG_ANIMATE'
         );
+        $siteUrl = Tools::getHttpHost(true) . __PS_BASE_URI__;
         $this->context->smarty->assign([
             'post_category' => $post_category,
             'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
@@ -2136,7 +2341,7 @@ class EverPsBlog extends Module
             'evercategory' => $evercategories,
             'default_lang' => (int) $this->context->language->id,
             'id_lang' => (int) $this->context->language->id,
-            'blogImg_dir' => $this->siteUrl . '/modules/everpsblog/views/img/',
+            'blogImg_dir' => $siteUrl . '/modules/everpsblog/views/img/',
             'animated' => $animate,
         ]);
         return $this->display(__FILE__, 'views/templates/hook/cat_shortcode.tpl');
@@ -2619,7 +2824,7 @@ class EverPsBlog extends Module
     {
         $iso_lang = Language::getIsoById((int) $id_lang);
         $sitemap = new EverPsBlogSitemap(
-            $this->siteUrl
+            Tools::getHttpHost(true) . __PS_BASE_URI__
         );
         $sitemap->setPath(_PS_ROOT_DIR_.'/');
         $sitemap->setFilename('blogpost_' . (int) $id_shop . '_lang_' . $iso_lang);
@@ -2656,7 +2861,7 @@ class EverPsBlog extends Module
                 );
             }
             return $sitemap->createSitemapIndex(
-                $this->siteUrl,
+                Tools::getHttpHost(true) . __PS_BASE_URI__,
                 'Today'
             );
         }
@@ -2667,7 +2872,7 @@ class EverPsBlog extends Module
         $iso_lang = Language::getIsoById((int) $id_lang);
 
         $sitemap = new EverPsBlogSitemap(
-            $this->siteUrl
+            Tools::getHttpHost(true) . __PS_BASE_URI__
         );
         $sitemap->setPath(_PS_ROOT_DIR_ . '/');
         $sitemap->setFilename('blogauthor_' . (int) $id_shop . '_lang_' . $iso_lang);
@@ -2706,7 +2911,7 @@ class EverPsBlog extends Module
                 }
             }
             return $sitemap->createSitemapIndex(
-                $this->siteUrl,
+                Tools::getHttpHost(true) . __PS_BASE_URI__,
                 'Today'
             );
         }
@@ -2716,7 +2921,7 @@ class EverPsBlog extends Module
     {
         $iso_lang = Language::getIsoById((int) $id_lang);
         $sitemap = new EverPsBlogSitemap(
-            $this->siteUrl
+            Tools::getHttpHost(true) . __PS_BASE_URI__
         );
         $sitemap->setPath(_PS_ROOT_DIR_ . '/');
         $sitemap->setFilename('blogtag_' . (int) $id_shop . '_lang_' . $iso_lang);
@@ -2755,7 +2960,7 @@ class EverPsBlog extends Module
                 }
             }
             return $sitemap->createSitemapIndex(
-                $this->siteUrl,
+                Tools::getHttpHost(true) . __PS_BASE_URI__,
                 'Today'
             );
         }
@@ -2765,7 +2970,7 @@ class EverPsBlog extends Module
     {
         $iso_lang = Language::getIsoById((int) $id_lang);
         $sitemap = new EverPsBlogSitemap(
-            $this->siteUrl
+            Tools::getHttpHost(true) . __PS_BASE_URI__
         );
         $sitemap->setPath(_PS_ROOT_DIR_.'/');
         $sitemap->setFilename('blogcategory_' . (int) $id_shop . '_lang_' . $iso_lang);
@@ -2806,7 +3011,7 @@ class EverPsBlog extends Module
                 }
             }
             return $sitemap->createSitemapIndex(
-                $this->siteUrl,
+                Tools::getHttpHost(true) . __PS_BASE_URI__,
                 'Today'
             );
         }
@@ -2821,7 +3026,7 @@ class EverPsBlog extends Module
                 && pathinfo($index, PATHINFO_EXTENSION) == 'xml'
                 && strpos(basename($index), 'index')
             ) {
-                $indexes[] = $this->siteUrl . basename($index);
+                $indexes[] = Tools::getHttpHost(true) . __PS_BASE_URI__ . basename($index);
             }
         }
         return (array) $indexes;
@@ -2850,8 +3055,7 @@ class EverPsBlog extends Module
     private function checkHooks()
     {
         try {
-            $this->registerHook('actionFrontControllerAfterInit');
-            $this->registerHook('header');
+            $this->registerHook('displayHeader');
             $this->registerHook('actionAdminControllerSetMedia');
             $this->registerHook('displayHome');
             $this->registerHook('displayLeftColumn');
@@ -2877,7 +3081,6 @@ class EverPsBlog extends Module
     private function checkObligatoryHooks()
     {
         try {
-            $this->registerHook('actionFrontControllerAfterInit');
             $this->registerHook('moduleRoutes');
             $this->registerHook('displayBackOfficeHeader');
             $this->registerHook('displayAdminAfterHeader');
@@ -3044,7 +3247,7 @@ class EverPsBlog extends Module
                     // Check img attributes
                     $item->setAttribute(
                         'src',
-                        $this->siteUrl . 'cms/' . utf8_decode(basename($src))
+                        Tools::getHttpHost(true) . __PS_BASE_URI__ . 'cms/' . utf8_decode(basename($src))
                     );
                     $item->setAttribute(
                         'style',
@@ -3066,7 +3269,7 @@ class EverPsBlog extends Module
                         $host = $href_array['host'];
                         $item->setAttribute(
                             'src',
-                            str_replace($host, $this->siteUrl, $href)
+                            str_replace($host, Tools::getHttpHost(true) . __PS_BASE_URI__, $href)
                         );
                     }
                 }
