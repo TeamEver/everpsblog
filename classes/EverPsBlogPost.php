@@ -66,6 +66,7 @@ class EverPsBlogPost extends ObjectModel
         'table' => 'ever_blog_post',
         'primary' => 'id_ever_post',
         'multilang' => true,
+        'multishop' => true,
         'fields' => [
             'title' => [
                 'type' => self::TYPE_HTML,
@@ -228,10 +229,15 @@ class EverPsBlogPost extends ObjectModel
             $sql->leftJoin(
                 self::$definition['table'],
                 'bp',
-                'bp.' . self::$definition['primary'] . ' = bpl.' . self::$definition['primary'] . ''
+                'bp.' . self::$definition['primary'] . ' = bpl.' . self::$definition['primary']
+            );
+            $sql->leftJoin(
+                self::$definition['table'] . '_shop',
+                'bps',
+                'bp.' . self::$definition['primary'] . ' = bps.' . self::$definition['primary']
+                . ' AND bps.id_shop = ' . (int) $id_shop
             );
             $sql->where('bp.post_status = "' . pSQL($post_status) . '"');
-            $sql->where('bp.id_shop = ' . (int) $id_shop);
             $sql->where('bpl.id_lang = ' . (int) $id_lang);
             if ((bool) $starred === true) {
                 $sql->where('bp.starred = 1');
@@ -350,10 +356,15 @@ class EverPsBlogPost extends ObjectModel
             $sql->leftJoin(
                 self::$definition['table'],
                 'bp',
-                'bp.' . self::$definition['primary'] . ' = bpl.' . self::$definition['primary'] . ''
+                'bp.' . self::$definition['primary'] . ' = bpl.' . self::$definition['primary']
+            );
+            $sql->leftJoin(
+                self::$definition['table'] . '_shop',
+                'bps',
+                'bp.' . self::$definition['primary'] . ' = bps.' . self::$definition['primary']
+                . ' AND bps.id_shop = ' . (int) $id_shop
             );
             $sql->where('bp.post_status = "' . pSQL($post_status) . '"');
-            $sql->where('bp.id_shop = ' . (int) $id_shop);
             $sql->where('bp.starred = 1');
             $sql->where('bpl.id_lang = ' . (int) $id_lang);
             $sql->limit((int) $limit, (int) $start);

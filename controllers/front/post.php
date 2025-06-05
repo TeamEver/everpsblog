@@ -96,7 +96,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 if (isset($this->author->allowed_groups)
                     && $this->author->allowed_groups
                 ) {
-                if (is_array($this->author->allowed_groupss)) {
+                if (is_array($this->author->allowed_groups)) {
                     $allowedGroups = [];
                 } else {
                     $allowedGroups = json_decode($this->author->allowed_groups);

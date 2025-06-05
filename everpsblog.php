@@ -462,11 +462,12 @@ class EverPsBlog extends Module
         $imageContent = @file_get_contents($url);
         if ($imageContent !== false) {
             $imageName = basename(parse_url($url, PHP_URL_PATH));
-            $localPath = _PS_IMG_DIR_ . 'cms/' . $imageName;
-
-            if (!is_dir(_PS_IMG_DIR_ . 'cms/')) {
-                mkdir(_PS_IMG_DIR_ . 'cms/', 0755, true);
+            $imageName = preg_replace('/[^\w.-]/', '', $imageName);
+            $targetDir = _PS_IMG_DIR_ . 'cms/';
+            if (!is_dir($targetDir)) {
+                mkdir($targetDir, 0755, true);
             }
+            $localPath = $targetDir . $imageName;
 
             file_put_contents($localPath, $imageContent);
 
@@ -665,11 +666,11 @@ class EverPsBlog extends Module
             ) {
                 $this->postErrors[] = $this->l('Error : The field "Only logged can comment" is not valid');
             }
-            if (!Tools::getValue('EVERBLOG_EMPTY_TRASH')
-                && !Validate::isUnsignedInt(Tools::getValue('EVERBLOG_FANCYBOX'))
+            if (Tools::getValue('EVERBLOG_EMPTY_TRASH')
+                && !Validate::isUnsignedInt(Tools::getValue('EVERBLOG_EMPTY_TRASH'))
             ) {
                 $this->postErrors[] = $this->l(
-                    'Error : The field "Fancybox" is not valid'
+                    'Error : The field "Empty trash" is not valid'
                 );
             }
             if (!Tools::getValue('EVERPSBLOG_TYPE')
@@ -3339,8 +3340,8 @@ class EverPsBlog extends Module
             . $this->version;
             $handle = curl_init($upgrade_link);
             curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, 2);
+            curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, true);
             curl_exec($handle);
             $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
             curl_close($handle);
@@ -3458,7 +3459,7 @@ class EverPsBlog extends Module
             $columnExists = $db->ExecuteS('DESCRIBE `' . _DB_PREFIX_ . 'ever_blog_category_lang` `' . pSQL($columnName) . '`');
             if (!$columnExists) {
                 try {
-                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_category_lang` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
+                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_tag` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
                     $db->execute($query);
                 } catch (Exception $e) {
                     PrestaShopLogger::addLog('Unable to update Ever blog category lang table');
@@ -3483,7 +3484,7 @@ class EverPsBlog extends Module
             $columnExists = $db->ExecuteS('DESCRIBE `' . _DB_PREFIX_ . 'ever_blog_tag` `' . pSQL($columnName) . '`');
             if (!$columnExists) {
                 try {
-                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_category_lang` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
+                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_tag` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
                     $db->execute($query);
                 } catch (Exception $e) {
                     PrestaShopLogger::addLog('Unable to update Ever blog category lang table');
@@ -3505,7 +3506,7 @@ class EverPsBlog extends Module
             $columnExists = $db->ExecuteS('DESCRIBE `' . _DB_PREFIX_ . 'ever_blog_tag_lang` `' . pSQL($columnName) . '`');
             if (!$columnExists) {
                 try {
-                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_category_lang` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
+                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_tag_lang` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
                     $db->execute($query);
                 } catch (Exception $e) {
                     PrestaShopLogger::addLog('Unable to update Ever blog category lang table');
@@ -3556,7 +3557,7 @@ class EverPsBlog extends Module
             $columnExists = $db->ExecuteS('DESCRIBE `' . _DB_PREFIX_ . 'ever_blog_author_lang` `' . pSQL($columnName) . '`');
             if (!$columnExists) {
                 try {
-                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_category_lang` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
+                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_author_lang` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
                     $db->execute($query);
                 } catch (Exception $e) {
                     PrestaShopLogger::addLog('Unable to update Ever blog category lang table');

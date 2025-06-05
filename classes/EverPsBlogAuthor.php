@@ -50,6 +50,7 @@ class EverPsBlogAuthor extends ObjectModel
         'table' => 'ever_blog_author',
         'primary' => 'id_ever_author',
         'multilang' => true,
+        'multishop' => true,
         'fields' => [
             'nickhandle' => [
                 'type' => self::TYPE_HTML,
@@ -169,12 +170,17 @@ class EverPsBlogAuthor extends ObjectModel
             $sql->select('*');
             $sql->from(self::$definition['table'], 'eba');
             $sql->leftJoin(
+                self::$definition['table'] . '_shop',
+                'ebas',
+                'eba.' . self::$definition['primary'] . ' = ebas.' . self::$definition['primary']
+                . ' AND ebas.id_shop = ' . (int) $id_shop
+            );
+            $sql->leftJoin(
                 self::$definition['table'] . '_lang',
                 'ebl',
-                'ebl.' . self::$definition['primary'] . ' = eba.' . self::$definition['primary'] . ''
+                'ebl.' . self::$definition['primary'] . ' = eba.' . self::$definition['primary']
             );
             $sql->where('eba.active = ' . (int) $active);
-            $sql->where('eba.id_shop = ' . (int) $id_shop);
             $sql->where('ebl.id_lang = ' . (int) $id_lang);
             $sql->orderBy('eba.date_add DESC');
             $authors = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);

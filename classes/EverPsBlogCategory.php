@@ -48,6 +48,7 @@ class EverPsBlogCategory extends ObjectModel
         'table' => 'ever_blog_category',
         'primary' => 'id_ever_category',
         'multilang' => true,
+        'multishop' => true,
         'fields' => [
             'title' => [
                 'type' => self::TYPE_STRING,
@@ -151,10 +152,15 @@ class EverPsBlogCategory extends ObjectModel
         $cache_id = 'EverPsBlogCategory::getRootCategory';
         if (!Cache::isStored($cache_id)) {
             $sql = new DbQuery;
-            $sql->select(self::$definition['primary']);
-            $sql->from(self::$definition['table']);
+            $sql->select('bc.' . self::$definition['primary']);
+            $sql->from(self::$definition['table'], 'bc');
+            $sql->leftJoin(
+                self::$definition['table'] . '_shop',
+                'bcs',
+                'bc.' . self::$definition['primary'] . ' = bcs.' . self::$definition['primary']
+            );
             $sql->where('is_root_category = 1');
-            $sql->where('id_shop = ' . (int) Context::getContext()->shop->id);
+            $sql->where('bcs.id_shop = ' . (int) Context::getContext()->shop->id);
             $return = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
             $return = new self($return);
             if (!Validate::isLoadedObject($return)) {
@@ -244,10 +250,15 @@ class EverPsBlogCategory extends ObjectModel
             $sql->leftJoin(
                 self::$definition['table'],
                 'bc',
-                'bc.' . self::$definition['primary'] . ' = bcl.' . self::$definition['primary'] . ''
+                'bc.' . self::$definition['primary'] . ' = bcl.' . self::$definition['primary']
+            );
+            $sql->leftJoin(
+                self::$definition['table'] . '_shop',
+                'bcs',
+                'bc.' . self::$definition['primary'] . ' = bcs.' . self::$definition['primary']
+                . ' AND bcs.id_shop = ' . (int) $id_shop
             );
             $sql->where('bc.active = ' . (int) $active);
-            $sql->where('bc.id_shop = ' . (int) $id_shop);
             $sql->where('bcl.id_lang = ' . (int) $id_lang);
             if ((int) $only_parent > 0) {
                 $sql->where('bc.id_parent_category = 1');
@@ -321,10 +332,15 @@ class EverPsBlogCategory extends ObjectModel
             $sql->leftJoin(
                 self::$definition['table'],
                 'bc',
-                'bc.' . self::$definition['primary'] . ' = bcl.' . self::$definition['primary'] . ''
+                'bc.' . self::$definition['primary'] . ' = bcl.' . self::$definition['primary']
+            );
+            $sql->leftJoin(
+                self::$definition['table'] . '_shop',
+                'bcs',
+                'bc.' . self::$definition['primary'] . ' = bcs.' . self::$definition['primary']
+                . ' AND bcs.id_shop = ' . (int) $id_shop
             );
             $sql->where('bc.active = ' . (int) $active);
-            $sql->where('bc.id_shop = ' . (int) $id_shop);
             $sql->where('bcl.id_lang = ' . (int) $id_lang);
             $sql->where('bc.id_parent_category = ' . (int) $category->id_parent_category);
             $return = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
@@ -369,10 +385,15 @@ class EverPsBlogCategory extends ObjectModel
             $sql->leftJoin(
                 self::$definition['table'],
                 'bc',
-                'bc.' . self::$definition['primary'] . ' = bcl.' . self::$definition['primary'] . ''
+                'bc.' . self::$definition['primary'] . ' = bcl.' . self::$definition['primary']
+            );
+            $sql->leftJoin(
+                self::$definition['table'] . '_shop',
+                'bcs',
+                'bc.' . self::$definition['primary'] . ' = bcs.' . self::$definition['primary']
+                . ' AND bcs.id_shop = ' . (int) $id_shop
             );
             $sql->where('bc.active = ' . (int) $active);
-            $sql->where('bc.id_shop = ' . (int) $id_shop);
             $sql->where('bcl.id_lang = ' . (int) $id_lang);
             $sql->where('bc.id_parent_category = ' . (int) $id_ever_category);
             $return = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);

@@ -33,6 +33,7 @@ class EverPsBlogImage extends ObjectModel
         'table' => 'ever_blog_image',
         'primary' => 'id_ever_image',
         'multilang' => false,
+        'multishop' => true,
         'fields' => [
             'id_element' => [
                 'type' => self::TYPE_INT,
