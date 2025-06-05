@@ -374,10 +374,8 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                             $cookieName,
                             true
                         );
-                        $this->post->content = EverPsBlogPost::changeShortcodes(
-                            $this->post->content,
-                            (int)$this->context->customer->id
-                        );
+                        $this->post->content = 
+                            $this->post->content;
                     }
                 } else {
                     $this->post->password_protected = true;
@@ -385,15 +383,11 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 }
             } else {
                 // Prepare shortcodes
-                $this->post->content = EverPsBlogPost::changeShortcodes(
-                    $this->post->content,
-                    (int) $this->context->customer->id
-                );
+                $this->post->content = 
+                    $this->post->content;
             }
-            $this->post->title = EverPsBlogPost::changeShortcodes(
-                $this->post->title,
-                (int) $this->context->customer->id
-            );
+            $this->post->title = 
+                $this->post->title;
             $this->post->date_add = date('d-m-Y', strtotime($this->post->date_add));
             Hook::exec('actionBeforeEverPostInitContent', [
                 'blog_post' => $this->post,
@@ -519,10 +513,8 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
             }
         }
         $breadcrumb['links'][] = [
-            'title' => EverPsBlogPost::changeShortcodes(
+            'title' => 
                 $this->post->title,
-                $this->context->customer->id
-            ),
             'url' => $this->context->link->getModuleLink(
                 'everpsblog',
                 'post',

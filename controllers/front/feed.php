@@ -122,10 +122,8 @@ class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontControlle
                 // Default blog text
                 $everblog_top_text = $this->module::getConfigInMultipleLangs('EVERBLOG_TOP_TEXT');
                 $default_blog_top_text = $everblog_top_text[(int) $this->context->language->id];
-                $default_blog_top_text = EverPsBlogPost::changeShortcodes(
-                    $default_blog_top_text,
-                    (int) $this->context->customer->id
-                );
+                $default_blog_top_text = 
+                    $default_blog_top_text;
                 $feed_obj->title = $meta_title;
                 $feed_obj->content = $default_blog_top_text;
                 $feed_obj->link_rewrite = $this->context->link->getModuleLink(

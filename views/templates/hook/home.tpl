@@ -27,11 +27,11 @@
         {if $counter is div by 4}
         <div class="row">
         {/if}
-            <div class="col-12 col-xs-12 col-md-3 article everpsblog" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
-                    <div class="col-12 col-xs-12 article-img {$blogcolor|escape:'htmlall':'UTF-8'}">
-                        <img src="{$item->featured_image|escape:'htmlall':'UTF-8'}" class="img-fluid col-12 col-xs-12 {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item->title|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}" />
+            <div class="col-12 col-md-3 article everpsblog" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
+                    <div class="col-12 article-img {$blogcolor|escape:'htmlall':'UTF-8'}">
+                        <img src="{$item->featured_image|escape:'htmlall':'UTF-8'}" class="img-fluid col-12 {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item->title|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}" />
                     </div>
-                    <div class="col-12 col-xs-12">
+                    <div class="col-12 col-12">
                         <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
                             <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'}">
                                 {$item->title|escape:'htmlall':'UTF-8'}

@@ -246,7 +246,6 @@ class AdminEverPsBlogTagController extends ModuleAdminController
             _PS_MODULE_DIR_
             . '/'
             . $this->module_name
-            . '/views/templates/admin/shortcodes.tpl'
         );
         $this->html .= $this->context->smarty->fetch(
             _PS_MODULE_DIR_

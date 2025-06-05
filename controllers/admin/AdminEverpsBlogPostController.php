@@ -321,7 +321,6 @@ class AdminEverPsBlogPostController extends ModuleAdminController
         $this->html .= $lists;
         $this->html .= $this->context->smarty->fetch(
             _PS_MODULE_DIR_
-            .'/' . $this->module->name . '/views/templates/admin/shortcodes.tpl'
         );
         $this->html .= $this->context->smarty->fetch(
             _PS_MODULE_DIR_

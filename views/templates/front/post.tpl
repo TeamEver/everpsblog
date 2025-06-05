@@ -68,14 +68,14 @@
 <div class="content">
     <div class="container">
         {if isset($errors) && $errors}
-        <div class="col-12 col-xs-12 col-md-12 alert alert-danger" role="alert">
+        <div class="col-12 col-md-12 alert alert-danger" role="alert">
         {foreach from=$errors item=error}
           <p>{$error|escape:'htmlall':'UTF-8'}</p>
         {/foreach}
         </div>
         {/if}
         {if isset($successes) && $successes}
-        <div class="col-12 col-xs-12 col-md-12 alert alert-success" role="alert">
+        <div class="col-12 col-md-12 alert alert-success" role="alert">
         {foreach from=$successes item=success}
           <p>{$success|escape:'htmlall':'UTF-8'}</p>
         {/foreach}
@@ -105,7 +105,7 @@
                 {$post->content nofilter}
             </div>
             <form method="POST">
-                <div class="form-group">
+                <div class="mb-3">
                     <input type="password" class="form-control" id="post_psswd" name="post_psswd" placeholder="{l s='Password' mod='everpsblog'}" required>
                 </div>
                 <button type="submit" class="btn btn-primary">{l s='Validate' mod='everpsblog'}</button>
@@ -122,7 +122,7 @@
 {if !isset($post->password_protected)}
 <div class="container">
     <div class="row mt-2">
-        <div class="col-xs-12 col-12 col-md-6">
+        <div class="col-12 col-md-6">
             <span class="postpublished">{l s='Published on' mod='everpsblog'} {$post->date_add|escape:'htmlall':'UTF-8'}</span>
             {if isset($allow_views_count) && $allow_views_count > 0}
             <span class="postviews"> | {$post->count|escape:'htmlall':'UTF-8'} {l s='Views' mod='everpsblog'}</span>
@@ -135,7 +135,7 @@
             </p>
             {/if}
         </div>
-            <div class="col-xs-12 col-12 col-md-6">
+            <div class="col-12 col-md-6">
           {if $social_share_links}
             <div class="social-sharing">
               <span>{l s='Share' d='Shop.Theme.Actions'}</span>
@@ -158,15 +158,15 @@
     <form action="{$link->getPageLink('authentication', true)|escape:'htmlall':'UTF-8'}?back={$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $post->id_ever_post , 'link_rewrite' => $post->link_rewrite])|escape:'htmlall':'UTF-8'}" method="post" id="login-form" class="box">
         <h3 class="page-subheading">{l s='Log in to comment' mod='everpsblog'}</h3>
         <div class="form_content clearfix">
-            <div class="form-group">
+            <div class="mb-3">
                 <label>{l s='Email address' mod='everpsblog'}</label> 
                 <input class="is_required validate account_input form-control" id="email" name="email" value="" type="text" />
             </div>
-        <div class="form-group">
+        <div class="mb-3">
             <label>{l s='Password' mod='everpsblog'}</label>
             <input class="form-control js-child-focus js-visible-password" type="password" id="password" name="password" value="" />
         </div>
-        <p class="lost_password form-group">
+        <p class="lost_password mb-3">
             <a href="{$link->getPageLink('password', true)|escape:'htmlall':'UTF-8'}" title="{l s='Recover your forgotten password' mod='everpsblog'}">{l s='Forgot your password ?' mod='everpsblog'}</a>
         </p>
         <p class="submit">
@@ -187,17 +187,17 @@
             {if isset($logged) && $logged}
             <input type="hidden" name="customerEmail" id="customerEmail" value="{$customer.email|escape:'htmlall':'UTF-8'}">
             {else}
-            <div class="form-group">
+            <div class="mb-3">
                 <label for="customerEmail">{l s='Email address' mod='everpsblog'}</label>
                 <input type="email" class="form-control" id="customerEmail" name="customerEmail" aria-describedby="emailHelp" placeholder="Enter email">
                 <small id="emailHelp" class="form-text text-muted">{l s='We\'ll never share your email with anyone else.' mod='everpsblog'}</small>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label for="name">{l s='Name' mod='everpsblog'}</label>
                 <input type="text" class="form-control" id="name" name="name" aria-describedby="nameHelp" placeholder="Enter your name">
             </div>
             {/if}
-            <div class="form-group">
+            <div class="mb-3">
             <label for="evercomment">{l s='Your comment' mod='everpsblog'}</label>
             <textarea class="form-control" id="evercomment" name="evercomment" rows="3"></textarea>
             </div>
@@ -221,13 +221,13 @@
         {foreach from=$comments item=comment}
             <div class="container commentblock" id="{$comment->id|escape:'htmlall':'UTF-8'}">
                 <div class="row">
-                    <div class="col-12 col-xs-12 col-md-8 commentname">
+                    <div class="col-12 col-md-8 commentname">
                         {$comment->name|escape:'htmlall':'UTF-8'}
                     </div>
-                    <div class="col-12 col-xs-12 col-md-4 commentdate">
+                    <div class="col-12 col-md-4 commentdate">
                         {$comment->date_upd|escape:'htmlall':'UTF-8'}
                     </div>
-                    <div class="col-12 col-xs-12 col-md-12 comment">
+                    <div class="col-12 col-md-12 comment">
                         <div class="rte">
                             {$comment->comment nofilter}
                         </div>

@@ -20,7 +20,7 @@
         <i class="icon icon-smile"></i> {l s='Ever Blog' mod='everpsblog'}
     </div>
     <div class="panel-body">
-        <div class="col-xs-12 col-lg-6">
+        <div class="col-lg-6">
             <p>
                 <a href="#everbottom" id="evertop">
                    <img id="everlogo" src="{$image_dir|escape:'htmlall':'UTF-8'}/ever.png" style="max-width: 120px;">
@@ -71,7 +71,7 @@
                 </div>
             </p>
         </div>
-        <div class="col-xs-12 col-lg-6">
+        <div class="col-lg-6">
             <p class="alert alert-warning">
                 {l s='This module is free and will always be ! You can support our free modules by making a donation by clicking the button below' mod='everpsblog'}
             </p>

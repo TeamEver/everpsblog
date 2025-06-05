@@ -2228,18 +2228,7 @@ class EverPsBlog extends Module
         $animate = Configuration::get(
             'EVERBLOG_ANIMATE'
         );
-        $everpsblog = [];
-        foreach ($posts as $post) {
-            $post->title = EverPsBlogPost::changeShortcodes(
-                $post->title,
-                (int) Context::getContext()->customer->id
-            );
-            $post->content = EverPsBlogPost::changeShortcodes(
-                $post->content,
-                (int) Context::getContext()->customer->id
-            );
-            $everpsblog[] = $post;
-        }
+        $everpsblog = $posts;
         $siteUrl = Tools::getHttpHost(true) . __PS_BASE_URI__;
         $this->context->smarty->assign([
             'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
@@ -2284,114 +2273,12 @@ class EverPsBlog extends Module
                     (int) $shop['id_shop']
                 );
             }
-            $regex = '/<p>\[everpsblog\s+id=\s*[\'\"]?(\d+)[\'\"]?\s*\]<\/p>|\[everpsblog\s+id=\s*[\'\"]?(\d+)[\'\"]?\s*\]/Us';
-            if (preg_match_all($regex, $params['html'], $matches)) {
-                if ($html = preg_replace_callback($regex, [$this, 'displayPostsByCatId'], $params['html'])) {
-                    $params['html'] = $html;
-                }
-            }
-            $params['html'] = EverPsBlogPost::changeShortcodes(
-                $params['html']
-            );
+            // Remove obsolete shortcode handling
         } catch (Exception $e) {
             PrestaShopLogger::addLog($this->name . ' : ' . $e->getMessage());
         }
     }
 
-    public function displayPostsByCatId($shortcode)
-    {
-        if ((int) Configuration::get('EVERPSBLOG_PRODUCT_NBR') > 0) {
-            $post_number = (int) Configuration::get('EVERPSBLOG_PRODUCT_NBR');
-        } else {
-            $post_number = 4;
-        }
-        $blogUrl = $this->context->link->getModuleLink(
-            $this->name,
-            'blog',
-            [],
-            true
-        );
-        $post_category = new EverPsBlogCategory(
-            (int) $shortcode[1],
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
-        );
-        $latest_posts = EverPsBlogPost::getPostsByCategory(
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id,
-            (int) $shortcode[1],
-            0,
-            (int) $post_number
-        );
-        if (!$latest_posts || !count($latest_posts)) {
-            return;
-        }
-        $evercategories = EverPsBlogCategory::getAllCategories(
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
-        );
-        $animate = Configuration::get(
-            'EVERBLOG_ANIMATE'
-        );
-        $siteUrl = Tools::getHttpHost(true) . __PS_BASE_URI__;
-        $this->context->smarty->assign([
-            'post_category' => $post_category,
-            'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
-            'blogUrl' => $blogUrl,
-            'everpsblog' => $latest_posts,
-            'evercategory' => $evercategories,
-            'default_lang' => (int) $this->context->language->id,
-            'id_lang' => (int) $this->context->language->id,
-            'blogImg_dir' => $siteUrl . '/modules/everpsblog/views/img/',
-            'animated' => $animate,
-        ]);
-        return $this->display(__FILE__, 'views/templates/hook/cat_shortcode.tpl');
-    }
-
-    public function displayProductsByCatId($shortcode)
-    {
-        $featured_category = new Category(
-            (int) $shortcode[1],
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
-        );
-        $featured_products = $featured_category->getProducts(
-            (int) $this->context->language->id,
-            1,
-            (int) Configuration::get('EVERPSBLOG_PRODUCT_NBR')
-        );
-        if (!empty($featured_products)) {
-            $showPrice = true;
-            $assembler = new ProductAssembler(Context::getContext());
-            $presenterFactory = new ProductPresenterFactory(Context::getContext());
-            $presentationSettings = $presenterFactory->getPresentationSettings();
-            $presenter = new ProductListingPresenter(
-                new ImageRetriever(
-                    $this->context->link
-                ),
-                $this->context->link,
-                new PriceFormatter(),
-                new ProductColorsRetriever(),
-                $this->context->getTranslator()
-            );
-            $productsForTemplate = [];
-            $presentationSettings->showPrices = $showPrice;
-            if (is_array($featured_products)) {
-                foreach ($featured_products as $productId) {
-                    $productsForTemplate[] = $presenter->present(
-                        $presentationSettings,
-                        $assembler->assembleProduct(['id_product' => $productId['id_product']]),
-                        $this->context->language
-                    );
-                }
-            }
-            $this->context->smarty->assign([
-                'everpsblog_category' => $featured_category,
-                'everpsblog_products' => $productsForTemplate,
-            ]);
-            return $this->display(__FILE__, 'views/templates/hook/products_shortcode.tpl');
-        }
-    }
 
     public function emptyTrash($id_shop)
     {
