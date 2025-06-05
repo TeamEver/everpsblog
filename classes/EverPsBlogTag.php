@@ -46,6 +46,7 @@ class EverPsBlogTag extends ObjectModel
         'table' => 'ever_blog_tag',
         'primary' => 'id_ever_tag',
         'multilang' => true,
+        'multishop' => true,
         'fields' => [
             'title' => [
                 'type' => self::TYPE_HTML,
@@ -148,10 +149,12 @@ class EverPsBlogTag extends ObjectModel
             $tags = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
                 'SELECT * FROM `' . _DB_PREFIX_ . self::$definition['table'] . '_lang` btl
                 INNER JOIN `' . _DB_PREFIX_ . self::$definition['table'] . '` bt
-                ON bt.' . self::$definition['primary'] . ' = btl.' . self::$definition['primary'] . '
+                    ON bt.' . self::$definition['primary'] . ' = btl.' . self::$definition['primary'] . '
+                INNER JOIN `' . _DB_PREFIX_ . self::$definition['table'] . '_shop` bts
+                    ON bts.' . self::$definition['primary'] . ' = bt.' . self::$definition['primary'] . '
+                    AND bts.id_shop = ' . (int) $id_shop . '
                 WHERE bt.active = "' . (bool) $active . '"
-                AND bt.id_shop = ' . (int) $id_shop . '
-                AND btl.id_lang = ' . (int) $id_lang . ''
+                AND btl.id_lang = ' . (int) $id_lang
             );
             $return = [];
             foreach ($tags as $tag) {

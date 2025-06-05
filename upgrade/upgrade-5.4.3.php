@@ -21,7 +21,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-function upgrade_module_5_2_5()
+function upgrade_module_5_4_3()
 {
     $result = true;
     $sql = [];

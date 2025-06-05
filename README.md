@@ -38,3 +38,9 @@ In order to use these hooks, [you can use free HTML blocks module Ever Block, av
 
 ## Documentation (French only)
 Available at https://www.team-ever.com/prestashop-1-7-un-module-de-blog-gratuit/
+
+## Upgrade from 5.x
+When updating to version 6.0.0, run the module upgrade from the back office.
+The `upgrade_module_6_0_0` script creates the new multishop association tables
+and migrates existing `id_shop` values so your posts, categories, authors,
+tags and images remain linked to the proper shops.

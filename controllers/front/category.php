@@ -144,14 +144,10 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
             } else {
                 $children_categories = false;
             }
-            $this->category->content = EverPsBlogPost::changeShortcodes(
-                $this->category->content,
-                (int) $this->context->customer->id
-            );
-            $this->category->bottom_content = EverPsBlogPost::changeShortcodes(
-                $this->category->bottom_content,
-                (int) $this->context->customer->id
-            );
+            $this->category->content = 
+                $this->category->content;
+            $this->category->bottom_content = 
+                $this->category->bottom_content;
             Hook::exec('actionBeforeEverCategoryInitContent', [
                 'blog_category' => $this->category,
                 'blog_posts' => $posts,

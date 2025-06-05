@@ -61,6 +61,13 @@ $sql[] =
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_post_shop` (
+        `id_ever_post` int(10) unsigned NOT NULL,
+        `id_shop` int(10) unsigned NOT NULL,
+        PRIMARY KEY (`id_ever_post`, `id_shop`)
+    ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
+
+$sql[] =
     'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_category` (
         `id_ever_category` int(10) unsigned NOT NULL auto_increment,
         `id_parent_category` int(10) DEFAULT NULL,
@@ -93,6 +100,13 @@ $sql[] =
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_category_shop` (
+        `id_ever_category` int(10) unsigned NOT NULL,
+        `id_shop` int(10) unsigned NOT NULL,
+        PRIMARY KEY (`id_ever_category`, `id_shop`)
+    ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
+
+$sql[] =
     'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_tag` (
         `id_ever_tag` int(10) unsigned NOT NULL auto_increment,
         `id_shop` int(10) unsigned NOT NULL,
@@ -119,6 +133,13 @@ $sql[] =
         `bottom_content` text DEFAULT NULL,
         `id_lang` int(10) unsigned NOT NULL,
         PRIMARY KEY (`id_ever_tag`, `id_lang`)
+    ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
+
+$sql[] =
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_tag_shop` (
+        `id_ever_tag` int(10) unsigned NOT NULL,
+        `id_shop` int(10) unsigned NOT NULL,
+        PRIMARY KEY (`id_ever_tag`, `id_shop`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
@@ -169,6 +190,13 @@ $sql[] =
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_author_shop` (
+        `id_ever_author` int(10) unsigned NOT NULL,
+        `id_shop` int(10) unsigned NOT NULL,
+        PRIMARY KEY (`id_ever_author`, `id_shop`)
+    ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
+
+$sql[] =
     'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_image` (
         `id_ever_image` int(10) unsigned NOT NULL auto_increment,
         `image_type` varchar(255) DEFAULT NULL,
@@ -176,6 +204,13 @@ $sql[] =
         `id_element` int(10) unsigned NOT NULL,
         `id_shop` int(10) unsigned NOT NULL,
         PRIMARY KEY (`id_ever_image`)
+    ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
+
+$sql[] =
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_image_shop` (
+        `id_ever_image` int(10) unsigned NOT NULL,
+        `id_shop` int(10) unsigned NOT NULL,
+        PRIMARY KEY (`id_ever_image`, `id_shop`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =

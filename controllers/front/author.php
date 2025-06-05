@@ -118,18 +118,12 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
             $this->context->smarty->assign('page', $page);
             // Now prepare template and show it
             // Prepare shortcodes
-            $this->author->content = EverPsBlogPost::changeShortcodes(
-                $this->author->content,
-                (int) $this->context->customer->id
-            );
-            $this->author->bottom_content = EverPsBlogPost::changeShortcodes(
-                $this->author->bottom_content,
-                (int) $this->context->customer->id
-            );
-            $this->author->nickhandle = EverPsBlogPost::changeShortcodes(
-                $this->author->nickhandle,
-                (int) $this->context->customer->id
-            );
+            $this->author->content = 
+                $this->author->content;
+            $this->author->bottom_content = 
+                $this->author->bottom_content;
+            $this->author->nickhandle = 
+                $this->author->nickhandle;
             $posts = EverPsBlogPost::getPostsByAuthor(
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id,
@@ -209,10 +203,8 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
             ),
         ];
         $breadcrumb['links'][] = [
-            'title' => EverPsBlogPost::changeShortcodes(
+            'title' => 
                 $this->author->nickhandle,
-                $this->context->customer->id
-            ),
             'url' => $this->context->link->getModuleLink(
                 $this->module->name,
                 'author',

@@ -26,10 +26,6 @@
 		<p>{l s='At the bottom of this page are some blog design settings. A web designer can add custom CSS directly in the field provided for this purpose, you can also put the CSS code in your child theme or in your theme\'s custom.css file.' mod='everpsblog'}</p>
 		<p>{l s='For the correct functioning of the module, configure the cron jobs specified in the header of this page.' mod='everpsblog'}</p>
 		<p>{l s='Don\'t forget to fill in the title, rewritten URL and meta description fields for each article, category, tag and author.' mod='everpsblog'}</p>
-		<p>{l s='You can use a shortcode to display a list of blog posts anywhere in your content.' mod='everpsblog'}</p>
-		<p>{l s='For example, to show the latest articles in category number 2, type [everpsblog id = "2"] in your content.' mod='everpsblog'}</p>
-		<p>{l s='The free Ever Block module will allow you to put HTML content on all the locations of your store.' mod='everpsblog'}</p>
-		<p><a href="https://www.team-ever.com/prestashop-module-bloc-editeur-html-illimite-shortcode/" target="_blank"> {l s='See the free module Ever Block' mod='everpsblog'}</a></p>
 		<p><a href="https://www.team-ever.com/prestashop-1-7-un-module-de-blog-gratuit/" target="_blank"> {l s='Find our tutorial by clicking here' mod='everpsblog'}</a></p>
 	</div>
 </div>

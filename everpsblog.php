@@ -462,11 +462,12 @@ class EverPsBlog extends Module
         $imageContent = @file_get_contents($url);
         if ($imageContent !== false) {
             $imageName = basename(parse_url($url, PHP_URL_PATH));
-            $localPath = _PS_IMG_DIR_ . 'cms/' . $imageName;
-
-            if (!is_dir(_PS_IMG_DIR_ . 'cms/')) {
-                mkdir(_PS_IMG_DIR_ . 'cms/', 0755, true);
+            $imageName = preg_replace('/[^\w.-]/', '', $imageName);
+            $targetDir = _PS_IMG_DIR_ . 'cms/';
+            if (!is_dir($targetDir)) {
+                mkdir($targetDir, 0755, true);
             }
+            $localPath = $targetDir . $imageName;
 
             file_put_contents($localPath, $imageContent);
 
@@ -665,11 +666,11 @@ class EverPsBlog extends Module
             ) {
                 $this->postErrors[] = $this->l('Error : The field "Only logged can comment" is not valid');
             }
-            if (!Tools::getValue('EVERBLOG_EMPTY_TRASH')
-                && !Validate::isUnsignedInt(Tools::getValue('EVERBLOG_FANCYBOX'))
+            if (Tools::getValue('EVERBLOG_EMPTY_TRASH')
+                && !Validate::isUnsignedInt(Tools::getValue('EVERBLOG_EMPTY_TRASH'))
             ) {
                 $this->postErrors[] = $this->l(
-                    'Error : The field "Fancybox" is not valid'
+                    'Error : The field "Empty trash" is not valid'
                 );
             }
             if (!Tools::getValue('EVERPSBLOG_TYPE')
@@ -2227,18 +2228,7 @@ class EverPsBlog extends Module
         $animate = Configuration::get(
             'EVERBLOG_ANIMATE'
         );
-        $everpsblog = [];
-        foreach ($posts as $post) {
-            $post->title = EverPsBlogPost::changeShortcodes(
-                $post->title,
-                (int) Context::getContext()->customer->id
-            );
-            $post->content = EverPsBlogPost::changeShortcodes(
-                $post->content,
-                (int) Context::getContext()->customer->id
-            );
-            $everpsblog[] = $post;
-        }
+        $everpsblog = $posts;
         $siteUrl = Tools::getHttpHost(true) . __PS_BASE_URI__;
         $this->context->smarty->assign([
             'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
@@ -2283,114 +2273,12 @@ class EverPsBlog extends Module
                     (int) $shop['id_shop']
                 );
             }
-            $regex = '/<p>\[everpsblog\s+id=\s*[\'\"]?(\d+)[\'\"]?\s*\]<\/p>|\[everpsblog\s+id=\s*[\'\"]?(\d+)[\'\"]?\s*\]/Us';
-            if (preg_match_all($regex, $params['html'], $matches)) {
-                if ($html = preg_replace_callback($regex, [$this, 'displayPostsByCatId'], $params['html'])) {
-                    $params['html'] = $html;
-                }
-            }
-            $params['html'] = EverPsBlogPost::changeShortcodes(
-                $params['html']
-            );
+            // Remove obsolete shortcode handling
         } catch (Exception $e) {
             PrestaShopLogger::addLog($this->name . ' : ' . $e->getMessage());
         }
     }
 
-    public function displayPostsByCatId($shortcode)
-    {
-        if ((int) Configuration::get('EVERPSBLOG_PRODUCT_NBR') > 0) {
-            $post_number = (int) Configuration::get('EVERPSBLOG_PRODUCT_NBR');
-        } else {
-            $post_number = 4;
-        }
-        $blogUrl = $this->context->link->getModuleLink(
-            $this->name,
-            'blog',
-            [],
-            true
-        );
-        $post_category = new EverPsBlogCategory(
-            (int) $shortcode[1],
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
-        );
-        $latest_posts = EverPsBlogPost::getPostsByCategory(
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id,
-            (int) $shortcode[1],
-            0,
-            (int) $post_number
-        );
-        if (!$latest_posts || !count($latest_posts)) {
-            return;
-        }
-        $evercategories = EverPsBlogCategory::getAllCategories(
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
-        );
-        $animate = Configuration::get(
-            'EVERBLOG_ANIMATE'
-        );
-        $siteUrl = Tools::getHttpHost(true) . __PS_BASE_URI__;
-        $this->context->smarty->assign([
-            'post_category' => $post_category,
-            'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
-            'blogUrl' => $blogUrl,
-            'everpsblog' => $latest_posts,
-            'evercategory' => $evercategories,
-            'default_lang' => (int) $this->context->language->id,
-            'id_lang' => (int) $this->context->language->id,
-            'blogImg_dir' => $siteUrl . '/modules/everpsblog/views/img/',
-            'animated' => $animate,
-        ]);
-        return $this->display(__FILE__, 'views/templates/hook/cat_shortcode.tpl');
-    }
-
-    public function displayProductsByCatId($shortcode)
-    {
-        $featured_category = new Category(
-            (int) $shortcode[1],
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
-        );
-        $featured_products = $featured_category->getProducts(
-            (int) $this->context->language->id,
-            1,
-            (int) Configuration::get('EVERPSBLOG_PRODUCT_NBR')
-        );
-        if (!empty($featured_products)) {
-            $showPrice = true;
-            $assembler = new ProductAssembler(Context::getContext());
-            $presenterFactory = new ProductPresenterFactory(Context::getContext());
-            $presentationSettings = $presenterFactory->getPresentationSettings();
-            $presenter = new ProductListingPresenter(
-                new ImageRetriever(
-                    $this->context->link
-                ),
-                $this->context->link,
-                new PriceFormatter(),
-                new ProductColorsRetriever(),
-                $this->context->getTranslator()
-            );
-            $productsForTemplate = [];
-            $presentationSettings->showPrices = $showPrice;
-            if (is_array($featured_products)) {
-                foreach ($featured_products as $productId) {
-                    $productsForTemplate[] = $presenter->present(
-                        $presentationSettings,
-                        $assembler->assembleProduct(['id_product' => $productId['id_product']]),
-                        $this->context->language
-                    );
-                }
-            }
-            $this->context->smarty->assign([
-                'everpsblog_category' => $featured_category,
-                'everpsblog_products' => $productsForTemplate,
-            ]);
-            return $this->display(__FILE__, 'views/templates/hook/products_shortcode.tpl');
-        }
-    }
 
     public function emptyTrash($id_shop)
     {
@@ -3154,7 +3042,7 @@ class EverPsBlog extends Module
                         $category->id_parent_category = (int) $parent_category;
                         $category->id_shop = (int) Context::getContext()->shop->id;
                         $category->active = true;
-                        $category->indexableable = true;
+                        $category->indexable = true;
                         $category->follow = true;
                         $category->sitemap = true;
                         $category->active = (bool)Configuration::get('EVERBLOG_ENABLE_CATS');
@@ -3200,7 +3088,7 @@ class EverPsBlog extends Module
                 $author->nickhandle = (string) $el->creator;
                 foreach (Language::getLanguages(false) as $lang) {
                     $author->meta_title[$lang['id_lang']] = (string) $el->creator;
-                    $author->link_rewrite[$lang['id_lang']] = EverPsBlogCleaner::str2url(
+                    $author->link_rewrite[$lang['id_lang']] = Tools::str2url(
                         (string) $el->creator
                     );
                 }
@@ -3213,9 +3101,9 @@ class EverPsBlog extends Module
                 $result &= $author->save();
             }
             // Post
-            $post_link_rewrite = parse_url($el->link);
-            $host = $post_link_rewrite['host'];
-            $post_link_rewrite = str_replace('/', '', $post_link_rewrite['path']);
+            $parsed_url = parse_url((string) $el->link);
+            $host = $parsed_url['host'];
+            $post_link_rewrite = Tools::str2url(basename($parsed_url['path']));
             $post = EverPsBlogPost::getPostByLinkRewrite(
                 $post_link_rewrite
             );
@@ -3237,18 +3125,11 @@ class EverPsBlog extends Module
                         continue;
                     }
                     curl_close($handle);
-                    // Copy img that are found and does not already exist
-                    if (!file_exists(_PS_IMG_DIR_ . 'cms/' . utf8_decode(basename($src)))) {
-                        copy(
-                            $src,
-                            _PS_IMG_DIR_ . 'cms/' . utf8_decode(basename($src))
-                        );
+                    // Download remote image
+                    $local = $this->downloadImage($src);
+                    if ($local) {
+                        $item->setAttribute('src', $local);
                     }
-                    // Check img attributes
-                    $item->setAttribute(
-                        'src',
-                        Tools::getHttpHost(true) . __PS_BASE_URI__ . 'cms/' . utf8_decode(basename($src))
-                    );
                     $item->setAttribute(
                         'style',
                         'max-width:100%;'
@@ -3268,16 +3149,18 @@ class EverPsBlog extends Module
                     if (isset($href_array['host'])) {
                         $host = $href_array['host'];
                         $item->setAttribute(
-                            'src',
+                            'href',
                             str_replace($host, Tools::getHttpHost(true) . __PS_BASE_URI__, $href)
                         );
                     }
                 }
-                $dom->saveHTML();
-                $post = new EverPsBlogPost();
-                $post_content = preg_replace('/<!--(.|\s)*?-->/', '', $el->content);
+                libxml_clear_errors();
+                libxml_use_internal_errors(false);
+                $post_content = $dom->saveHTML();
+                $post_content = preg_replace('/<!--(.|\s)*?-->/', '', $post_content);
                 $post_content = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $post_content);
                 $post_content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $post_content);
+                $post = new EverPsBlogPost();
                 // Multilingual fields
                 foreach (Language::getLanguages(false) as $lang) {
                     $post->title[$lang['id_lang']] = $el->title;
@@ -3339,8 +3222,8 @@ class EverPsBlog extends Module
             . $this->version;
             $handle = curl_init($upgrade_link);
             curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, 2);
+            curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, true);
             curl_exec($handle);
             $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
             curl_close($handle);
@@ -3458,7 +3341,7 @@ class EverPsBlog extends Module
             $columnExists = $db->ExecuteS('DESCRIBE `' . _DB_PREFIX_ . 'ever_blog_category_lang` `' . pSQL($columnName) . '`');
             if (!$columnExists) {
                 try {
-                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_category_lang` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
+                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_tag` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
                     $db->execute($query);
                 } catch (Exception $e) {
                     PrestaShopLogger::addLog('Unable to update Ever blog category lang table');
@@ -3483,7 +3366,7 @@ class EverPsBlog extends Module
             $columnExists = $db->ExecuteS('DESCRIBE `' . _DB_PREFIX_ . 'ever_blog_tag` `' . pSQL($columnName) . '`');
             if (!$columnExists) {
                 try {
-                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_category_lang` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
+                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_tag` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
                     $db->execute($query);
                 } catch (Exception $e) {
                     PrestaShopLogger::addLog('Unable to update Ever blog category lang table');
@@ -3505,7 +3388,7 @@ class EverPsBlog extends Module
             $columnExists = $db->ExecuteS('DESCRIBE `' . _DB_PREFIX_ . 'ever_blog_tag_lang` `' . pSQL($columnName) . '`');
             if (!$columnExists) {
                 try {
-                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_category_lang` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
+                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_tag_lang` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
                     $db->execute($query);
                 } catch (Exception $e) {
                     PrestaShopLogger::addLog('Unable to update Ever blog category lang table');
@@ -3556,7 +3439,7 @@ class EverPsBlog extends Module
             $columnExists = $db->ExecuteS('DESCRIBE `' . _DB_PREFIX_ . 'ever_blog_author_lang` `' . pSQL($columnName) . '`');
             if (!$columnExists) {
                 try {
-                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_category_lang` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
+                    $query = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_author_lang` ADD `' . pSQL($columnName) . '` ' . $columnDefinition;
                     $db->execute($query);
                 } catch (Exception $e) {
                     PrestaShopLogger::addLog('Unable to update Ever blog category lang table');

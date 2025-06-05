@@ -18,7 +18,7 @@
 
 <section class="card my-2 py-1">
     <div class="row blogproducttitle">
-        <div class="col-12 col-xs-12">
+        <div class="col-12 col-12">
             <a href="{$blogUrl|escape:'htmlall':'UTF-8'}">
                 <h2 class="h2 products-section-title text-uppercase text-center {$blogcolor|escape:'htmlall':'UTF-8'}">{l s='Associated posts' mod='everpsblog'}</h2>
             </a>

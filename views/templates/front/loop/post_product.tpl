@@ -15,11 +15,11 @@
  *  @copyright 2019-2021 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-        <div class="col-12 col-xs-12 col-md-3 article everpsblog mb-3" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
-                <div class="col-12 col-xs-12 article-img">
+        <div class="col-12 col-md-3 article everpsblog mb-3" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
+                <div class="col-12 article-img">
                     <img src="{$item->featured_image|escape:'htmlall':'UTF-8'}" class="img img-fluid {if $animated}animated flipSideBySide zoomed{/if}" title="{$item->title|escape:'htmlall':'UTF-8'}" alt="{$item->title|escape:'htmlall':'UTF-8'}"/>
                 </div>
-                <div class="col-12 col-xs-12">
+                <div class="col-12 col-12">
                     <h3 class="everpsblog article-content h3 product-title" id="everpsblog-post-title-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
                         <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'}">
                             {$item->title|escape:'htmlall':'UTF-8'}
