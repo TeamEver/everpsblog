@@ -154,7 +154,7 @@
 {if isset($allow_comments) && $allow_comments && !isset($post->password_protected)}
 
 {if isset($logged) && $logged ==  false && isset($only_logged_comment) && $only_logged_comment == true}
-<div class="card card-block mt-2">
+<div class="card card-body mt-2">
     <form action="{$link->getPageLink('authentication', true)|escape:'htmlall':'UTF-8'}?back={$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $post->id_ever_post , 'link_rewrite' => $post->link_rewrite])|escape:'htmlall':'UTF-8'}" method="post" id="login-form" class="box">
         <h3 class="page-subheading">{l s='Log in to comment' mod='everpsblog'}</h3>
         <div class="form_content clearfix">
@@ -202,7 +202,7 @@
             <textarea class="form-control" id="evercomment" name="evercomment" rows="3"></textarea>
             </div>
             <div class="form-check">
-            <input class="checkbox" type="checkbox" value="1" id="RgpdCompliance" name="RgpdCompliance">
+            <input class="form-check-input" type="checkbox" value="1" id="RgpdCompliance" name="RgpdCompliance">
             <label class="form-check-label" for="RgpdCompliance">
                 {l s='RGPD compliance' mod='everpsblog'}
             </label>
@@ -217,7 +217,7 @@
 {hook h="displayBeforeEverComment"}
 <section class="comments container clearfix mt-2">
     <span id="commentsTitle">{$commentsCount|escape:'htmlall':'UTF-8'} {l s='comment(s)' mod='everpsblog'}</span>
-    <div class="commentcontainer row">
+    <div class="commentcontainer row g-3">
         {foreach from=$comments item=comment}
             <div class="container commentblock" id="{$comment->id|escape:'htmlall':'UTF-8'}">
                 <div class="row">
