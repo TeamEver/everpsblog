@@ -3042,7 +3042,7 @@ class EverPsBlog extends Module
                         $category->id_parent_category = (int) $parent_category;
                         $category->id_shop = (int) Context::getContext()->shop->id;
                         $category->active = true;
-                        $category->indexableable = true;
+                        $category->indexable = true;
                         $category->follow = true;
                         $category->sitemap = true;
                         $category->active = (bool)Configuration::get('EVERBLOG_ENABLE_CATS');
@@ -3088,7 +3088,7 @@ class EverPsBlog extends Module
                 $author->nickhandle = (string) $el->creator;
                 foreach (Language::getLanguages(false) as $lang) {
                     $author->meta_title[$lang['id_lang']] = (string) $el->creator;
-                    $author->link_rewrite[$lang['id_lang']] = EverPsBlogCleaner::str2url(
+                    $author->link_rewrite[$lang['id_lang']] = Tools::str2url(
                         (string) $el->creator
                     );
                 }
@@ -3101,9 +3101,9 @@ class EverPsBlog extends Module
                 $result &= $author->save();
             }
             // Post
-            $post_link_rewrite = parse_url($el->link);
-            $host = $post_link_rewrite['host'];
-            $post_link_rewrite = str_replace('/', '', $post_link_rewrite['path']);
+            $parsed_url = parse_url((string) $el->link);
+            $host = $parsed_url['host'];
+            $post_link_rewrite = Tools::str2url(basename($parsed_url['path']));
             $post = EverPsBlogPost::getPostByLinkRewrite(
                 $post_link_rewrite
             );
@@ -3125,18 +3125,11 @@ class EverPsBlog extends Module
                         continue;
                     }
                     curl_close($handle);
-                    // Copy img that are found and does not already exist
-                    if (!file_exists(_PS_IMG_DIR_ . 'cms/' . utf8_decode(basename($src)))) {
-                        copy(
-                            $src,
-                            _PS_IMG_DIR_ . 'cms/' . utf8_decode(basename($src))
-                        );
+                    // Download remote image
+                    $local = $this->downloadImage($src);
+                    if ($local) {
+                        $item->setAttribute('src', $local);
                     }
-                    // Check img attributes
-                    $item->setAttribute(
-                        'src',
-                        Tools::getHttpHost(true) . __PS_BASE_URI__ . 'cms/' . utf8_decode(basename($src))
-                    );
                     $item->setAttribute(
                         'style',
                         'max-width:100%;'
@@ -3156,16 +3149,18 @@ class EverPsBlog extends Module
                     if (isset($href_array['host'])) {
                         $host = $href_array['host'];
                         $item->setAttribute(
-                            'src',
+                            'href',
                             str_replace($host, Tools::getHttpHost(true) . __PS_BASE_URI__, $href)
                         );
                     }
                 }
-                $dom->saveHTML();
-                $post = new EverPsBlogPost();
-                $post_content = preg_replace('/<!--(.|\s)*?-->/', '', $el->content);
+                libxml_clear_errors();
+                libxml_use_internal_errors(false);
+                $post_content = $dom->saveHTML();
+                $post_content = preg_replace('/<!--(.|\s)*?-->/', '', $post_content);
                 $post_content = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $post_content);
                 $post_content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $post_content);
+                $post = new EverPsBlogPost();
                 // Multilingual fields
                 foreach (Language::getLanguages(false) as $lang) {
                     $post->title[$lang['id_lang']] = $el->title;
