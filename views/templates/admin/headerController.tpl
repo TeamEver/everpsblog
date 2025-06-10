@@ -13,8 +13,9 @@
  *
  *  @author    Team Ever <https://www.team-ever.com/>
  *  @copyright 2019-2025 Team Ever
- *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
+{*
 <div class="panel everheader">
     <div class="panel-heading">
         <i class="icon icon-smile"></i> {l s='Ever Blog' mod='everpsblog'}
@@ -54,3 +55,4 @@
         </div>
     </div>
 </div>
+*}
