@@ -2273,7 +2273,9 @@ class EverPsBlog extends Module
                     (int) $shop['id_shop']
                 );
             }
-            // Remove obsolete shortcode handling
+            if (isset($params['html'])) {
+                $params['html'] = $this->parseShortcodes($params['html']);
+            }
         } catch (Exception $e) {
             PrestaShopLogger::addLog($this->name . ' : ' . $e->getMessage());
         }
@@ -3455,5 +3457,47 @@ class EverPsBlog extends Module
             $resultsArray[$idLang] = Configuration::get($key, $idLang, $idShopGroup, $idShop);
         }
         return $resultsArray;
+    }
+
+    private function parseShortcodes($html)
+    {
+        return preg_replace_callback('/\[everpsblog([^\]]*)\]/i', function ($m) {
+            $attrs = [];
+            if (preg_match_all('/(\w+)="?([^\s"]+)"?/', trim($m[1]), $attrMatches, PREG_SET_ORDER)) {
+                foreach ($attrMatches as $attr) {
+                    $attrs[strtolower($attr[1])] = $attr[2];
+                }
+            }
+            if (empty($attrs['category'])) {
+                return '';
+            }
+            $order = isset($attrs['order']) ? strtolower($attrs['order']) : 'desc';
+            $limit = isset($attrs['limit']) ? (int) $attrs['limit'] : null;
+            return $this->renderPostsShortcode((int) $attrs['category'], $order, $limit);
+        }, $html);
+    }
+
+    private function renderPostsShortcode($category, $order, $limit)
+    {
+        $orderWay = strtolower($order) === 'asc' ? 'ASC' : 'DESC';
+        $posts = EverPsBlogPost::getPostsByCategory(
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id,
+            (int) $category,
+            0,
+            $limit,
+            'published',
+            false,
+            false,
+            $orderWay
+        );
+        if (!$posts) {
+            return '';
+        }
+        $this->context->smarty->assign([
+            'posts' => $posts,
+            'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
+        ]);
+        return $this->display(__FILE__, 'views/templates/hook/shortcode.tpl');
     }
 }
