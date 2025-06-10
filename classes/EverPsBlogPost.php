@@ -701,9 +701,10 @@ class EverPsBlogPost extends ObjectModel
         $limit = null,
         $post_status = 'published',
         $is_feed = false,
-        $starred = false
+        $starred = false,
+        $orderWay = 'DESC'
     ) {
-        $cache_id = 'EverPsBlogPost::getPostsByTag_'
+        $cache_id = 'EverPsBlogPost::getPostsByCategory_'
         . (int) $id_lang
         . '_'
         . (int) $id_shop
@@ -718,7 +719,9 @@ class EverPsBlogPost extends ObjectModel
         . '_'
         . $is_feed
         . '_'
-        . $starred;
+        . $starred
+        . '_'
+        . $orderWay;
         if (!Cache::isStored($cache_id)) {
             $context = Context::getContext();
             if (!(int) $limit <= 0) {
@@ -746,7 +749,7 @@ class EverPsBlogPost extends ObjectModel
             if ((bool) $starred === true) {
                 $sql->where('bp.starred = 1');
             }
-            $sql->orderBy('bp.date_add DESC');
+            $sql->orderBy('bp.date_add ' . pSQL($orderWay));
             $sql->limit((int) $limit, (int) $start);
             $posts = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
             $return = [];
