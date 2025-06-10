@@ -3076,6 +3076,14 @@ class EverPsBlog extends Module
             $xml_str
         );
         $obj = new SimpleXMLElement($xml_str, LIBXML_NOCDATA);
+        $redirects = [
+            'posts' => [],
+            'categories' => [],
+            'tags' => [],
+            'authors' => [],
+        ];
+        $link = new Link();
+        $default_lang = (int) Context::getContext()->language->id;
         foreach ($obj->channel->item as $el) {
             // Post categories and post tags
             $post_categories = [];
@@ -3107,6 +3115,17 @@ class EverPsBlog extends Module
                     } else {
                         $post_categories[] = $category->id;
                     }
+                    $old_path = '/category/' . (string) $wp_taxonomy['nicename'];
+                    if (!isset($redirects['categories'][$old_path])) {
+                        $redirects['categories'][$old_path] = $link->getModuleLink(
+                            'everpsblog',
+                            'category',
+                            [
+                                'id_ever_category' => $category->id,
+                                'link_rewrite' => $category->link_rewrite[$default_lang],
+                            ]
+                        );
+                    }
                 } elseif ($wp_taxonomy->attributes()['domain'] == 'post_tag'
                     && (bool)Configuration::get('EVERBLOG_IMPORT_TAGS') === true
                 ) {
@@ -3130,6 +3149,17 @@ class EverPsBlog extends Module
                         $post_tags[] = $tag->id;
                     } else {
                         $post_tags[] = $tag->id;
+                    }
+                    $old_path = '/tag/' . (string) $wp_taxonomy['nicename'];
+                    if (!isset($redirects['tags'][$old_path])) {
+                        $redirects['tags'][$old_path] = $link->getModuleLink(
+                            'everpsblog',
+                            'tag',
+                            [
+                                'id_ever_tag' => $tag->id,
+                                'link_rewrite' => $tag->link_rewrite[$default_lang],
+                            ]
+                        );
                     }
                 }
             }
@@ -3155,6 +3185,18 @@ class EverPsBlog extends Module
                 $author->sitemap = true;
                 $author->active = (bool) Configuration::get('EVERBLOG_ENABLE_AUTHORS');
                 $result &= $author->save();
+            }
+            $author_slug = Tools::str2url((string) $el->creator);
+            $old_path = '/author/' . $author_slug;
+            if (!isset($redirects['authors'][$old_path])) {
+                $redirects['authors'][$old_path] = $link->getModuleLink(
+                    'everpsblog',
+                    'author',
+                    [
+                        'id_ever_author' => $author->id,
+                        'link_rewrite' => $author->link_rewrite[$default_lang],
+                    ]
+                );
             }
             // Post
             $parsed_url = parse_url((string) $el->link);
@@ -3225,6 +3267,7 @@ class EverPsBlog extends Module
                 $post_content = preg_replace('/<!--(.|\s)*?-->/', '', $post_content);
                 $post_content = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $post_content);
                 $post_content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $post_content);
+                $post_content = $this->cleanWpShortcodes($post_content);
                 $post = new EverPsBlogPost();
                 // Multilingual fields
                 foreach (Language::getLanguages(false) as $lang) {
@@ -3283,7 +3326,30 @@ class EverPsBlog extends Module
                         $result &= $image->save();
                     }
                 }
+                $old_path = isset($parsed_url['path']) ? $parsed_url['path'] : '';
+                if (!isset($redirects['posts'][$old_path])) {
+                    $redirects['posts'][$old_path] = $link->getModuleLink(
+                        'everpsblog',
+                        'post',
+                        [
+                            'id_ever_post' => $post->id,
+                            'link_rewrite' => $post_link_rewrite,
+                        ]
+                    );
+                }
             }
+        }
+        $redirect_lines = [];
+        foreach ($redirects as $datas) {
+            foreach ($datas as $from => $to) {
+                $redirect_lines[] = 'Redirect 301 ' . rtrim($from, '/') . ' ' . $to;
+            }
+        }
+        if (!empty($redirect_lines)) {
+            file_put_contents(
+                dirname(__FILE__) . '/wordpress_redirects.txt',
+                implode(PHP_EOL, $redirect_lines)
+            );
         }
         // Reset iframes
         if ((bool) $allow_iframes === false) {
@@ -3662,6 +3728,11 @@ class EverPsBlog extends Module
         }
 
         return $resultsArray;
+    }
+
+    private function cleanWpShortcodes($html)
+    {
+        return preg_replace('/\[(?!everpsblog)(?:\/)?[\w\-]+(?:\s[^\]]*)?\]/i', '', $html);
     }
 
     private function parseShortcodes($html)
