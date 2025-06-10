@@ -415,6 +415,34 @@ class EverPsBlog extends Module
 
     public function replaceAndDownloadImages($content)
     {
+        // Convert WordPress [caption] shortcodes to Bootstrap 5 figure markup
+        $content = preg_replace_callback(
+            '/\[caption[^\]]*\](<img[^>]+>)(.*?)\[\/caption\]/si',
+            function ($matches) {
+                $imgTag = $matches[1];
+                $caption = trim($matches[2]);
+                $imgDom = new DOMDocument();
+                @$imgDom->loadHTML($imgTag, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+                $img = $imgDom->getElementsByTagName('img')->item(0);
+                if ($img) {
+                    $classes = $img->getAttribute('class');
+                    $img->setAttribute('class', trim($classes . ' img-fluid figure-img'));
+                    $imgTag = $imgDom->saveHTML($img);
+                }
+                return '<figure class="figure text-center">' . $imgTag
+                    . '<figcaption class="figure-caption">' . $caption . '</figcaption></figure>';
+            },
+            $content
+        );
+
+        // Replace common WordPress alignment classes with Bootstrap 5 ones
+        $replace = [
+            'aligncenter' => 'mx-auto d-block',
+            'alignright'  => 'float-end',
+            'alignleft'   => 'float-start',
+        ];
+        $content = str_replace(array_keys($replace), array_values($replace), $content);
+
         // Remplacer {{media url="..."}}
         $pattern = '/\{\{media url="wysiwyg\/([^"]+)"\}\}/';
         $content = preg_replace_callback($pattern, function($matches) {
@@ -452,6 +480,9 @@ class EverPsBlog extends Module
                     }
                 }
             }
+            // Apply Bootstrap 5 responsive class to images
+            $currentClass = $img->getAttribute('class');
+            $img->setAttribute('class', trim($currentClass . ' img-fluid'));
         }
 
         return $dom->saveHTML();
