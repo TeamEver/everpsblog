@@ -1,0 +1,20 @@
+name: PHP Syntax Check
+
+on:
+  push:
+    paths:
+      - '**.php'
+  pull_request:
+    paths:
+      - '**.php'
+
+jobs:
+  phplint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+      - name: PHP syntax check
+        run: find . -name '*.php' -print0 | xargs -0 -n 1 php -l
