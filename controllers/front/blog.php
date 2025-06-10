@@ -152,13 +152,15 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         // Default blog text
         $everblog_top_text = $this->module::getConfigInMultipleLangs('EVERBLOG_TOP_TEXT');
         $default_blog_top_text = $everblog_top_text[(int) Context::getContext()->language->id];
-        $default_blog_top_text = 
-            $default_blog_top_text->customer->id
+        $default_blog_top_text = EverPsBlogPost::changeShortcodes(
+            $default_blog_top_text,
+            (int) Context::getContext()->customer->id
         );
         $everblog_bottom_text = $this->module::getConfigInMultipleLangs('EVERBLOG_BOTTOM_TEXT');
         $default_blog_bottom_text = $everblog_bottom_text[(int) Context::getContext()->language->id];
-        $default_blog_bottom_text = 
-            $default_blog_bottom_text->customer->id
+        $default_blog_bottom_text = EverPsBlogPost::changeShortcodes(
+            $default_blog_bottom_text,
+            (int) Context::getContext()->customer->id
         );
         Hook::exec('actionBeforeEverBlogInitContent', [
             'blog_post_number' => &$this->post_number,
