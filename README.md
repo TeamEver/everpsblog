@@ -37,6 +37,9 @@ A detailed guide in French is available at <https://www.team-ever.com/prestashop
 ### Upgrade from 5.x
 When updating to version 6.0.0, run the module upgrade from the back office. The `upgrade_module_6_0_0` script creates the new multishop association tables and migrates existing `id_shop` values so your posts, categories, authors, tags and images remain linked to the proper shops.
 
+### WooCommerce REST Import
+You can now fetch posts from a WooCommerce store using its REST API. Configure the API URL and credentials in the module settings and click **Import WooCommerce posts**. Tags and linked product IDs detected in the API data are also imported.
+
 ---
 
 ## Français
