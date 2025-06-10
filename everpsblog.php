@@ -3452,10 +3452,15 @@ class EverPsBlog extends Module
 
     public static function getConfigInMultipleLangs($key, $idShopGroup = null, $idShop = null)
     {
+        if (is_callable(['Configuration', 'getConfigInMultipleLangs'])) {
+            return Configuration::getConfigInMultipleLangs($key, $idShopGroup, $idShop);
+        }
+
         $resultsArray = [];
         foreach (Language::getIDs() as $idLang) {
             $resultsArray[$idLang] = Configuration::get($key, $idLang, $idShopGroup, $idShop);
         }
+
         return $resultsArray;
     }
 
