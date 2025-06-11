@@ -66,10 +66,12 @@
 
 {if isset($post_number) && $post_number > 0}
 <div class="container">
-{hook h="displayBeforeEverLoop"}
-{foreach from=$posts item=item}
-{include file='module:everpsblog/views/templates/front/loop/post_object.tpl'}
-{/foreach}
+    <div class="row">
+        {hook h="displayBeforeEverLoop"}
+        {foreach from=$posts item=item}
+        {include file='module:everpsblog/views/templates/front/loop/post_object.tpl'}
+        {/foreach}
+    </div>
 </div>
 {if isset($post_number) && $post_number > 0}
 <div class="row">
