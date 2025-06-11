@@ -2,7 +2,7 @@
 #module-everpsblog-blog .article, #module-everpsblog-blog .evercategory,
 #module-everpsblog-category .article, #module-everpsblog-author .article, #module-everpsblog-category .evercategory,
 #module-everpsblog-tag .article, #module-everpsblog-tag .evercategory{
-    border: 1px solid #D3D3D3;
+    border: none;
     margin-top: 1%;
     margin-bottom: 1%;
 }
