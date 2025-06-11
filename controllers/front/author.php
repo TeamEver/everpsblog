@@ -166,7 +166,7 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
                 'allow_feed' => (bool) Configuration::get('EVERBLOG_RSS'),
                 'feed_url' => $feed_url,
                 'featured_image' => $file_url,
-                'show_featured_post' => (bool) Configuration::get('EVERBLOG_SHOW_FEAT_POST'),
+                'show_featured_post' => true,
                 'posts' => $posts,
                 'paginated' => Tools::getValue('page'),
                 'post_number' => (int) $this->post_number,
