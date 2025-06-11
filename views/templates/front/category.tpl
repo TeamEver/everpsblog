@@ -103,7 +103,7 @@
 <div class="container">
 {hook h="displayBeforeEverLoop"}
 {foreach from=$posts item=item}
-{include file='module:everpsblog/views/templates/front/loop/post_object.tpl'}
+{include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
 {/foreach}
 </div>
 {if isset($post_number) && $post_number > 0}
