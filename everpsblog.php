@@ -156,6 +156,7 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERPSBLOG_EXCERPT', '150')
             && Configuration::updateValue('EVERPSBLOG_TITLE_LENGTH', '150')
             && Configuration::updateValue('EVERBLOG_PRODUCT_COLUMNS', 1)
+            && Configuration::updateValue('EVERBLOG_CATEG_COLUMNS', 1)
             && Configuration::updateValue('EVERPSBLOG_BLOG_LAYOUT', 'layouts/layout-right-column.tpl')
             && Configuration::updateValue('EVERPSBLOG_POST_LAYOUT', 'layouts/layout-right-column.tpl')
             && Configuration::updateValue('EVERPSBLOG_CAT_LAYOUT', 'layouts/layout-right-column.tpl')
@@ -175,6 +176,7 @@ class EverPsBlog extends Module
             'hook_module',
             'id_module = ' . (int) $this->id
         );
+        Configuration::deleteByName('EVERBLOG_CATEG_COLUMNS');
         return parent::uninstall()
             && $this->uninstallModuleTab('AdminEverPsBlog')
             && $this->uninstallModuleTab('AdminEverPsBlogPost')
