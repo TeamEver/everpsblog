@@ -527,7 +527,8 @@ class EverPsBlog extends Module
             if (!count($this->postErrors)) {
                 $this->postProcess();
             }
-        } elseif (Tools::isSubmit('submitWooImport')) {
+        }
+        if (Tools::isSubmit('submitWooImport')) {
             $this->postValidation();
             if (!count($this->postErrors)) {
                 $this->importWooCommercePosts(
@@ -536,7 +537,8 @@ class EverPsBlog extends Module
                     Tools::getValue('EVER_WOO_CS')
                 );
             }
-        } elseif (Tools::isSubmit('submitWpImport')) {
+        }
+        if (Tools::isSubmit('submitWpImport')) {
             $this->postValidation();
             if (!count($this->postErrors)) {
                 $this->importWordPressPosts(
