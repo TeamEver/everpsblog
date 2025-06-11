@@ -233,9 +233,6 @@ class AdminEverPsBlogAuthorController extends ModuleAdminController
         $this->html .= $lists;
         $this->html .= $this->context->smarty->fetch(
             _PS_MODULE_DIR_
-        );
-        $this->html .= $this->context->smarty->fetch(
-            _PS_MODULE_DIR_
             . '/' . $this->module->name . '/views/templates/admin/footer.tpl'
         );
 
