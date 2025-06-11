@@ -41,7 +41,7 @@ When updating to version 6.0.0, run the module upgrade from the back office. The
 You can now fetch posts from a WooCommerce store using its REST API. Configure the API URL and credentials in the module settings and click **Import WooCommerce posts**. Tags and linked product IDs detected in the API data are also imported.
 
 ### WordPress REST Import
-If WooCommerce is not installed, you can still import posts using the standard WordPress REST API. Provide the API URL in the module settings and click **Import WordPress posts** to fetch all blog content.
+If WooCommerce is not installed, you can still import posts using the standard WordPress REST API. Provide the API URL in the module settings and click **Import WordPress posts** to fetch all blog content. Featured images, categories, authors and excerpts are imported and WordPress shortcodes are converted to Bootstrap compatible HTML.
 
 ---
 

@@ -3434,6 +3434,7 @@ class EverPsBlog extends Module
     {
         $result = true;
         $page = 1;
+        $root = EverPsBlogCategory::getRootCategory();
         do {
             $endpoint = rtrim($apiUrl, '/') . '/wp-json/wp/v2/posts?per_page=100&page=' . (int) $page;
             $posts = $this->wooRequest($endpoint, $consumerKey, $consumerSecret);
@@ -3448,11 +3449,18 @@ class EverPsBlog extends Module
                 }
                 $post = new EverPsBlogPost();
                 foreach (Language::getLanguages(false) as $language) {
+                    $content = $this->replaceAndDownloadImages(
+                        $this->cleanWpShortcodes($data->content->rendered)
+                    );
+                    $excerpt = $this->replaceAndDownloadImages(
+                        $this->cleanWpShortcodes($data->excerpt->rendered)
+                    );
                     $post->title[$language['id_lang']] = html_entity_decode($data->title->rendered, ENT_QUOTES, 'UTF-8');
                     $post->meta_title[$language['id_lang']] = html_entity_decode($data->title->rendered, ENT_QUOTES, 'UTF-8');
-                    $post->meta_description[$language['id_lang']] = Tools::substr(strip_tags($data->content->rendered), 0, 160);
+                    $post->meta_description[$language['id_lang']] = Tools::substr(strip_tags($content), 0, 160);
                     $post->link_rewrite[$language['id_lang']] = $post_link_rewrite;
-                    $post->content = $data->content->rendered;
+                    $post->content[$language['id_lang']] = $content;
+                    $post->excerpt[$language['id_lang']] = Tools::substr(strip_tags($excerpt), 0, 255);
                 }
                 $post->id_shop = (int) Context::getContext()->shop->id;
                 $post->active = true;
@@ -3462,6 +3470,54 @@ class EverPsBlog extends Module
                 $post->date_add = $data->date;
                 $post->date_upd = $data->modified;
                 $post->post_status = 'publish';
+
+                $post_categories = [];
+                if (!empty($data->categories)) {
+                    foreach ($data->categories as $cat_id) {
+                        $catData = $this->wpRequest(rtrim($apiUrl, '/') . '/wp-json/wp/v2/categories/' . (int) $cat_id);
+                        if ($catData && isset($catData->slug)) {
+                            $category = EverPsBlogCategory::getCategoryByLinkRewrite($catData->slug);
+                            if (!Validate::isLoadedObject($category)) {
+                                $category = new EverPsBlogCategory();
+                                foreach (Language::getLanguages(false) as $langCat) {
+                                    $category->title[$langCat['id_lang']] = html_entity_decode($catData->name, ENT_QUOTES, 'UTF-8');
+                                    $category->meta_title[$langCat['id_lang']] = html_entity_decode($catData->name, ENT_QUOTES, 'UTF-8');
+                                    $category->link_rewrite[$langCat['id_lang']] = Tools::str2url($catData->slug);
+                                }
+                                $category->id_parent_category = (int) $root->id;
+                                $category->id_shop = (int) Context::getContext()->shop->id;
+                                $category->active = (bool) Configuration::get('EVERBLOG_ENABLE_CATS');
+                                $category->indexable = true;
+                                $category->follow = true;
+                                $category->sitemap = true;
+                                $category->save();
+                            }
+                            $post_categories[] = $category->id;
+                        }
+                    }
+                }
+
+                if (!empty($data->author)) {
+                    $authorData = $this->wpRequest(rtrim($apiUrl, '/') . '/wp-json/wp/v2/users/' . (int) $data->author);
+                    if ($authorData && isset($authorData->slug)) {
+                        $author = EverPsBlogAuthor::getAuthorByNickhandle($authorData->slug);
+                        if (!Validate::isLoadedObject($author)) {
+                            $author = new EverPsBlogAuthor();
+                            $author->nickhandle = $authorData->slug;
+                            foreach (Language::getLanguages(false) as $langAuthor) {
+                                $author->meta_title[$langAuthor['id_lang']] = html_entity_decode($authorData->name, ENT_QUOTES, 'UTF-8');
+                                $author->link_rewrite[$langAuthor['id_lang']] = Tools::str2url($authorData->slug);
+                            }
+                            $author->id_shop = (int) Context::getContext()->shop->id;
+                            $author->active = (bool) Configuration::get('EVERBLOG_ENABLE_AUTHORS');
+                            $author->indexable = true;
+                            $author->follow = true;
+                            $author->sitemap = true;
+                            $author->save();
+                        }
+                        $post->id_author = $author->id;
+                    }
+                }
                 // Prepare tags
                 $post_tags = [];
                 if (!empty($data->tags)) {
@@ -3538,6 +3594,7 @@ class EverPsBlog extends Module
     {
         $result = true;
         $page = 1;
+        $root = EverPsBlogCategory::getRootCategory();
         do {
             $endpoint = rtrim($apiUrl, '/') . '/wp-json/wp/v2/posts?per_page=100&page=' . (int) $page;
             $posts = $this->wpRequest($endpoint);
@@ -3552,11 +3609,18 @@ class EverPsBlog extends Module
                 }
                 $post = new EverPsBlogPost();
                 foreach (Language::getLanguages(false) as $language) {
+                    $content = $this->replaceAndDownloadImages(
+                        $this->cleanWpShortcodes($data->content->rendered)
+                    );
+                    $excerpt = $this->replaceAndDownloadImages(
+                        $this->cleanWpShortcodes($data->excerpt->rendered)
+                    );
                     $post->title[$language['id_lang']] = html_entity_decode($data->title->rendered, ENT_QUOTES, 'UTF-8');
                     $post->meta_title[$language['id_lang']] = html_entity_decode($data->title->rendered, ENT_QUOTES, 'UTF-8');
-                    $post->meta_description[$language['id_lang']] = Tools::substr(strip_tags($data->content->rendered), 0, 160);
+                    $post->meta_description[$language['id_lang']] = Tools::substr(strip_tags($content), 0, 160);
                     $post->link_rewrite[$language['id_lang']] = $post_link_rewrite;
-                    $post->content = $data->content->rendered;
+                    $post->content[$language['id_lang']] = $content;
+                    $post->excerpt[$language['id_lang']] = Tools::substr(strip_tags($excerpt), 0, 255);
                 }
                 $post->id_shop = (int) Context::getContext()->shop->id;
                 $post->active = true;
@@ -3566,6 +3630,54 @@ class EverPsBlog extends Module
                 $post->date_add = $data->date;
                 $post->date_upd = $data->modified;
                 $post->post_status = 'publish';
+
+                $post_categories = [];
+                if (!empty($data->categories)) {
+                    foreach ($data->categories as $cat_id) {
+                        $catData = $this->wpRequest(rtrim($apiUrl, '/') . '/wp-json/wp/v2/categories/' . (int) $cat_id);
+                        if ($catData && isset($catData->slug)) {
+                            $category = EverPsBlogCategory::getCategoryByLinkRewrite($catData->slug);
+                            if (!Validate::isLoadedObject($category)) {
+                                $category = new EverPsBlogCategory();
+                                foreach (Language::getLanguages(false) as $langCat) {
+                                    $category->title[$langCat['id_lang']] = html_entity_decode($catData->name, ENT_QUOTES, 'UTF-8');
+                                    $category->meta_title[$langCat['id_lang']] = html_entity_decode($catData->name, ENT_QUOTES, 'UTF-8');
+                                    $category->link_rewrite[$langCat['id_lang']] = Tools::str2url($catData->slug);
+                                }
+                                $category->id_parent_category = (int) $root->id;
+                                $category->id_shop = (int) Context::getContext()->shop->id;
+                                $category->active = (bool) Configuration::get('EVERBLOG_ENABLE_CATS');
+                                $category->indexable = true;
+                                $category->follow = true;
+                                $category->sitemap = true;
+                                $category->save();
+                            }
+                            $post_categories[] = $category->id;
+                        }
+                    }
+                }
+
+                if (!empty($data->author)) {
+                    $authorData = $this->wpRequest(rtrim($apiUrl, '/') . '/wp-json/wp/v2/users/' . (int) $data->author);
+                    if ($authorData && isset($authorData->slug)) {
+                        $author = EverPsBlogAuthor::getAuthorByNickhandle($authorData->slug);
+                        if (!Validate::isLoadedObject($author)) {
+                            $author = new EverPsBlogAuthor();
+                            $author->nickhandle = $authorData->slug;
+                            foreach (Language::getLanguages(false) as $langAuthor) {
+                                $author->meta_title[$langAuthor['id_lang']] = html_entity_decode($authorData->name, ENT_QUOTES, 'UTF-8');
+                                $author->link_rewrite[$langAuthor['id_lang']] = Tools::str2url($authorData->slug);
+                            }
+                            $author->id_shop = (int) Context::getContext()->shop->id;
+                            $author->active = (bool) Configuration::get('EVERBLOG_ENABLE_AUTHORS');
+                            $author->indexable = true;
+                            $author->follow = true;
+                            $author->sitemap = true;
+                            $author->save();
+                        }
+                        $post->id_author = $author->id;
+                    }
+                }
 
                 $post_tags = [];
                 if (!empty($data->tags)) {
@@ -3592,6 +3704,10 @@ class EverPsBlog extends Module
                     }
                 }
 
+                if (!empty($post_categories)) {
+                    $post->id_default_category = $post_categories[0];
+                    $post->post_categories = json_encode($post_categories);
+                }
                 if (!empty($post_tags)) {
                     $post->post_tags = json_encode(array_unique($post_tags));
                 }
