@@ -74,6 +74,12 @@
         {if isset($allow_feed) && $allow_feed}
         <a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' mod='everpsblog'} {$author->nickhandle|escape:'htmlall':'UTF-8'}</a>
         {/if}
+<form method="get" action="{$link->getModuleLink('everpsblog','search')|escape:'htmlall':'UTF-8'}" class="everpsblog-search mb-3">
+    <div class="input-group">
+        <input class="form-control" type="search" name="s" placeholder="{l s='Search the blog...' mod='everpsblog'}" required />
+        <button class="btn btn-secondary" type="submit">{l s='Search' mod='everpsblog'}</button>
+    </div>
+</form>
         {if isset($paginated) && !$paginated}
         <div class="row author-header">
             <img class="img img-fluid author-featured-image featured-image" src="{$featured_image|escape:'htmlall':'UTF-8'}" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
