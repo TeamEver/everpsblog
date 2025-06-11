@@ -38,10 +38,10 @@ A detailed guide in French is available at <https://www.team-ever.com/prestashop
 When updating to version 6.0.0, run the module upgrade from the back office. The `upgrade_module_6_0_0` script creates the new multishop association tables and migrates existing `id_shop` values so your posts, categories, authors, tags and images remain linked to the proper shops.
 
 ### WooCommerce REST Import
-You can now fetch posts from a WooCommerce store using its REST API. Configure the API URL and credentials in the module settings and click **Import WooCommerce posts**. Tags and linked product IDs detected in the API data are also imported.
+You can now fetch posts from a WooCommerce store using its REST API. Configure the API URL and credentials in the module settings and click **Import WooCommerce posts**. Tags and linked product IDs detected in the API data are also imported. Imported posts are linked with their categories and tags and a `wordpress_redirects.txt` file is generated to help you create 301 redirects.
 
 ### WordPress REST Import
-If WooCommerce is not installed, you can still import posts using the standard WordPress REST API. Provide the API URL in the module settings and click **Import WordPress posts** to fetch all blog content. Featured images, categories, authors and excerpts are imported and WordPress shortcodes are converted to Bootstrap compatible HTML.
+If WooCommerce is not installed, you can still import posts using the standard WordPress REST API. Provide the API URL in the module settings and click **Import WordPress posts** to fetch all blog content. Featured images, categories, authors, tags and excerpts are imported, WordPress shortcodes are converted to Bootstrap compatible HTML and a `wordpress_redirects.txt` file lists old WordPress URLs so you can add 301 redirects in your `.htaccess`.
 
 ---
 
