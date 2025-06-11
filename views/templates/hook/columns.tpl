@@ -21,17 +21,13 @@
 {if isset($showCategories) && $showCategories && isset($categories) && !empty($categories)}
 <div class="columns_everblog_wrapper category_wrapper">
     <p class="text-uppercase h6 hidden-sm-down">{l s='Categories from the blog' mod='everpsblog'}</p>
-    <ul>
-{foreach from=$categories item=category}
-{if $category.is_root_category == 0}
-    <li>
-        <a href="{$link->getModuleLink('everpsblog', 'category',['id_ever_category'=>$category.id_ever_category, 'link_rewrite'=>$category.link_rewrite])|escape:'htmlall':'UTF-8'}" class="category" title="{$category.title|escape:'htmlall':'UTF-8'}">
+    {foreach from=$categories item=category}
+    {if $category.is_root_category == 0}
+        <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category' => $category.id_ever_category, 'link_rewrite' => $category.link_rewrite])|escape:'htmlall':'UTF-8'}" class="category d-block" title="{$category.title|escape:'htmlall':'UTF-8'}">
             {$category.title|escape:'htmlall':'UTF-8'}
         </a>
-    </li>
-{/if}
-{/foreach}
-    </ul>
+    {/if}
+    {/foreach}
 </div>
 {/if}
 
