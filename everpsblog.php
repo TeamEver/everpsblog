@@ -3751,6 +3751,7 @@ class EverPsBlog extends Module
                     $content = $this->replaceAndDownloadImages(
                         $this->cleanWpShortcodes($data->content->rendered)
                     );
+                    $content = $this->removeJavascript($content);
                     $excerpt = $this->replaceAndDownloadImages(
                         $this->cleanWpShortcodes($data->excerpt->rendered)
                     );
@@ -4227,6 +4228,14 @@ class EverPsBlog extends Module
     private function cleanWpShortcodes($html)
     {
         return preg_replace('/\[(?!everpsblog)(?:\/)?[\w\-]+(?:\s[^\]]*)?\]/i', '', $html);
+    }
+
+    private function removeJavascript($html)
+    {
+        $html = preg_replace("#<script(.*?)>(.*?)</script>#is", '', $html);
+        $html = preg_replace("/on\\w+=(\\"[^\\"]*\\"|'[^']*'|[^\\s>]+)/i", '', $html);
+        $html = preg_replace('/javascript:/i', '', $html);
+        return $html;
     }
 
     private function parseShortcodes($html)
