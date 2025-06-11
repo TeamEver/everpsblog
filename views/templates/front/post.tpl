@@ -85,6 +85,9 @@
             <img class="img img-fluid post-featured-image featured-image" src="{$featured_image|escape:'htmlall':'UTF-8'}" alt="{$post->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$post->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
         </div>
         <h1 class="text-center">{$post->title|escape:'htmlall':'UTF-8'}</h1>
+        <p class="postpublished text-start">
+            {$post->date_add|date_format:'%d %B %Y'|escape:'htmlall':'UTF-8'}
+        </p>
         {if isset($show_author) && $show_author}
         <p class="text-center author_cover_container">
             <a href="{$author->url|escape:'htmlall':'UTF-8'}" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
@@ -123,12 +126,11 @@
 <div class="container">
     <div class="row mt-2">
         <div class="col-12 col-md-6">
-            <span class="postpublished">{l s='Published on' mod='everpsblog'} {$post->date_add|escape:'htmlall':'UTF-8'}</span>
             {if isset($allow_views_count) && $allow_views_count > 0}
             <span class="postviews"> | {$post->count|escape:'htmlall':'UTF-8'} {l s='Views' mod='everpsblog'}</span>
             {/if}
             {if isset($tags) && $tags}
-            <p class="taggedIn">{l s='Tagged in' mod='everpsblog'}
+            <p class="taggedIn d-none">{l s='Tagged in' mod='everpsblog'}
             {foreach from=$tags item=tag}
                 <a href="{$link->getModuleLink('everpsblog', 'tag', ['id_ever_tag'=>$tag->id, 'link_rewrite'=>$tag->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$tag->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{$tag->title|escape:'htmlall':'UTF-8'}</a>&nbsp;
             {/foreach}
@@ -137,7 +139,7 @@
         </div>
             <div class="col-12 col-md-6">
           {if $social_share_links}
-            <div class="social-sharing">
+            <div class="social-sharing d-none">
               <span>{l s='Share' d='Shop.Theme.Actions'}</span>
               <ul>
                 {foreach from=$social_share_links item='social_share_link'}
