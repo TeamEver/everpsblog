@@ -535,6 +535,13 @@ class EverPsBlog extends Module
                     Tools::getValue('EVER_WOO_CS')
                 );
             }
+        } elseif (Tools::isSubmit('submitWpImport')) {
+            $this->postValidation();
+            if (!count($this->postErrors)) {
+                $this->importWordPressPosts(
+                    Tools::getValue('EVER_WP_API_URL')
+                );
+            }
         }
         if (count($this->postErrors)) {
             foreach ($this->postErrors as $error) {
@@ -916,6 +923,10 @@ class EverPsBlog extends Module
                 if (Tools::getValue('EVER_WOO_API_URL') && !Validate::isUrl(Tools::getValue('EVER_WOO_API_URL'))) {
                     $this->postErrors[] = $this->l('Error : The field "API URL" is not valid');
                 }
+            } elseif (Tools::isSubmit('submitWpImport')) {
+                if (Tools::getValue('EVER_WP_API_URL') && !Validate::isUrl(Tools::getValue('EVER_WP_API_URL'))) {
+                    $this->postErrors[] = $this->l('Error : The field "API URL" is not valid');
+                }
             }
         }
     }
@@ -1090,6 +1101,7 @@ class EverPsBlog extends Module
             'EVERBLOG_ENABLE_CATS' => Configuration::get('EVERBLOG_ENABLE_CATS'),
             'EVERBLOG_ENABLE_TAGS' => Configuration::get('EVERBLOG_ENABLE_TAGS'),
             'EVERBLOG_IMPORT_POST_STATE' => Configuration::get('EVERBLOG_IMPORT_POST_STATE'),
+            'EVER_WP_API_URL' => Configuration::get('EVER_WP_API_URL'),
             'EVER_WOO_API_URL' => Configuration::get('EVER_WOO_API_URL'),
             'EVER_WOO_CK' => Configuration::get('EVER_WOO_CK'),
             'EVER_WOO_CS' => Configuration::get('EVER_WOO_CS'),
@@ -1984,6 +1996,30 @@ class EverPsBlog extends Module
                 'submit' => [
                     'name' => 'submit',
                     'title' => $this->l('Save and import'),
+                ],
+            ],
+        ];
+        $form_fields[] = [
+            'form' => [
+                'legend' => [
+                    'title' => $this->l('WordPress REST import settings'),
+                    'icon' => 'icon-cloud-download',
+                ],
+                'input' => [
+                    [
+                        'type' => 'text',
+                        'label' => $this->l('API URL'),
+                        'name' => 'EVER_WP_API_URL',
+                        'required' => false,
+                    ],
+                ],
+                'buttons' => [
+                    'importWp' => [
+                        'name' => 'submitWpImport',
+                        'type' => 'submit',
+                        'class' => 'btn btn-default pull-right',
+                        'title' => $this->l('Import WordPress posts'),
+                    ],
                 ],
             ],
         ];
@@ -3496,6 +3532,109 @@ class EverPsBlog extends Module
         } else {
             $this->postErrors[] = $this->l('An error occured while importing WooCommerce posts');
         }
+    }
+
+    private function importWordPressPosts($apiUrl)
+    {
+        $result = true;
+        $page = 1;
+        do {
+            $endpoint = rtrim($apiUrl, '/') . '/wp-json/wp/v2/posts?per_page=100&page=' . (int) $page;
+            $posts = $this->wpRequest($endpoint);
+            if (!$posts) {
+                break;
+            }
+            foreach ($posts as $data) {
+                $post_link_rewrite = Tools::str2url($data->slug);
+                $post = EverPsBlogPost::getPostByLinkRewrite($post_link_rewrite);
+                if (Validate::isLoadedObject($post)) {
+                    continue;
+                }
+                $post = new EverPsBlogPost();
+                foreach (Language::getLanguages(false) as $language) {
+                    $post->title[$language['id_lang']] = html_entity_decode($data->title->rendered, ENT_QUOTES, 'UTF-8');
+                    $post->meta_title[$language['id_lang']] = html_entity_decode($data->title->rendered, ENT_QUOTES, 'UTF-8');
+                    $post->meta_description[$language['id_lang']] = Tools::substr(strip_tags($data->content->rendered), 0, 160);
+                    $post->link_rewrite[$language['id_lang']] = $post_link_rewrite;
+                    $post->content = $data->content->rendered;
+                }
+                $post->id_shop = (int) Context::getContext()->shop->id;
+                $post->active = true;
+                $post->indexable = true;
+                $post->follow = true;
+                $post->sitemap = true;
+                $post->date_add = $data->date;
+                $post->date_upd = $data->modified;
+                $post->post_status = 'publish';
+
+                $post_tags = [];
+                if (!empty($data->tags)) {
+                    foreach ($data->tags as $tag_id) {
+                        $tagData = $this->wpRequest(rtrim($apiUrl, '/') . '/wp-json/wp/v2/tags/' . (int) $tag_id);
+                        if ($tagData && isset($tagData->name)) {
+                            $tag = EverPsBlogTag::getTagByLinkRewrite(Tools::str2url($tagData->slug));
+                            if (!Validate::isLoadedObject($tag)) {
+                                $tag = new EverPsBlogTag();
+                                foreach (Language::getLanguages(false) as $languageTag) {
+                                    $tag->title[$languageTag['id_lang']] = html_entity_decode($tagData->name, ENT_QUOTES, 'UTF-8');
+                                    $tag->meta_title[$languageTag['id_lang']] = html_entity_decode($tagData->name, ENT_QUOTES, 'UTF-8');
+                                    $tag->link_rewrite[$languageTag['id_lang']] = Tools::str2url($tagData->slug);
+                                }
+                                $tag->id_shop = (int) Context::getContext()->shop->id;
+                                $tag->active = (bool) Configuration::get('EVERBLOG_ENABLE_TAGS');
+                                $tag->indexable = true;
+                                $tag->follow = true;
+                                $tag->sitemap = true;
+                                $tag->save();
+                            }
+                            $post_tags[] = $tag->id;
+                        }
+                    }
+                }
+
+                if (!empty($post_tags)) {
+                    $post->post_tags = json_encode(array_unique($post_tags));
+                }
+
+                $result &= $post->save();
+
+                if (!empty($data->featured_media)) {
+                    $media = $this->wpRequest(rtrim($apiUrl, '/') . '/wp-json/wp/v2/media/' . (int) $data->featured_media);
+                    if ($media && isset($media->source_url)) {
+                        $local = $this->downloadImage($media->source_url);
+                        if ($local) {
+                            $image = new EverPsBlogImage();
+                            $image->id_element = (int) $post->id;
+                            $image->image_type = 'post';
+                            $image->image_link = ltrim(str_replace(Tools::getHttpHost(true) . __PS_BASE_URI__, '', $local), '/');
+                            $image->id_shop = (int) Context::getContext()->shop->id;
+                            $result &= $image->save();
+                        }
+                    }
+                }
+            }
+            $page++;
+        } while (!empty($posts));
+
+        if ($result) {
+            $this->generateBlogSitemap();
+            $this->postSuccess[] = $this->l('WordPress posts have been imported');
+        } else {
+            $this->postErrors[] = $this->l('An error occured while importing WordPress posts');
+        }
+    }
+
+    private function wpRequest($url)
+    {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $data = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if ($httpCode != 200) {
+            return false;
+        }
+        return json_decode($data);
     }
 
     private function wooRequest($url, $ck, $cs)
