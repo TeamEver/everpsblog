@@ -189,7 +189,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             'id_lang' => (int) $this->context->language->id,
             'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__ . 'modules/everpsblog/views/img/',
             'animated' => $animate,
-            'show_featured_post' => (bool) Configuration::get('EVERBLOG_SHOW_FEAT_POST'),
+            'show_featured_post' => true,
             'pagination' => $pagination,
             'show_featured_cat' => (bool) Configuration::get('EVERBLOG_SHOW_FEAT_CAT'),
             'sort_orders' => $sortOrders,
