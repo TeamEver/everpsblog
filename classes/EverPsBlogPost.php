@@ -219,7 +219,7 @@ class EverPsBlogPost extends ObjectModel
         . '_'
         . $starred;
         if (!Cache::isStored($cache_id)) {
-            if (!(int) $limit <= 0) {
+            if ((int) $limit <= 0) {
                 $limit = (int) Configuration::get('EVERPSBLOG_PAGINATION');
             }
             $context = Context::getContext();
@@ -599,7 +599,7 @@ class EverPsBlogPost extends ObjectModel
         . (bool) $starred;
         if (!Cache::isStored($cache_id)) {
             $context = Context::getContext();
-            if (!(int) $limit <= 0) {
+            if ((int) $limit <= 0) {
                 $limit = (int) Configuration::get('EVERPSBLOG_PAGINATION');
             }
             $sql = new DbQuery;
@@ -724,7 +724,7 @@ class EverPsBlogPost extends ObjectModel
         . $orderWay;
         if (!Cache::isStored($cache_id)) {
             $context = Context::getContext();
-            if (!(int) $limit <= 0) {
+            if ((int) $limit <= 0) {
                 $limit = (int) Configuration::get('EVERPSBLOG_PAGINATION');
             }
             $sql = new DbQuery;
@@ -848,7 +848,7 @@ class EverPsBlogPost extends ObjectModel
         . (bool) $starred;
         if (!Cache::isStored($cache_id)) {
             $context = Context::getContext();
-            if (!(int) $limit <= 0) {
+            if ((int) $limit <= 0) {
                 $limit = (int) Configuration::get('EVERPSBLOG_PAGINATION');
             }
             $sql = new DbQuery;
@@ -958,7 +958,7 @@ class EverPsBlogPost extends ObjectModel
         . $post_status;
         if (!Cache::isStored($cache_id)) {
             $context = Context::getContext();
-            if (!(int) $limit <= 0) {
+            if ((int) $limit <= 0) {
                 $limit = (int) Configuration::get('EVERPSBLOG_PAGINATION');
             }
             $sql = new DbQuery;
