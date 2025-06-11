@@ -1,1 +1,7 @@
 /* just to avoid error in console log */
+.everpsblog-search input[type="search"] {
+    background-image: url(../img/microphone.svg);
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    padding-right: 2rem;
+}
