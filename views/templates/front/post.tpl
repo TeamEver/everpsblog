@@ -81,9 +81,11 @@
         {/foreach}
         </div>
         {/if}
+        {if isset($show_featured_post) && $show_featured_post}
         <div class="row post-header">
             <img class="img img-fluid post-featured-image featured-image" src="{$featured_image|escape:'htmlall':'UTF-8'}" alt="{$post->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$post->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
         </div>
+        {/if}
         <h1 class="text-center">{$post->title|escape:'htmlall':'UTF-8'}</h1>
         <p class="postpublished text-start">
             {$post->date_add|date_format:'%d %B %Y'|escape:'htmlall':'UTF-8'}

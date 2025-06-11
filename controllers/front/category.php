@@ -184,6 +184,7 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                 'id_lang' => $this->context->language->id,
                 'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'modules/' . $this->module->name . '/views/img/',
                 'animated' => $animate,
+                'show_featured_post' => (bool) Configuration::get('EVERBLOG_SHOW_FEAT_POST'),
                 'show_featured_cat' => (bool)Configuration::get('EVERBLOG_SHOW_FEAT_CAT'),
                 'sort_orders' => $sortOrders,
                 'sort_selected' => $sortSelected ? $sortSelected['label'] : null,

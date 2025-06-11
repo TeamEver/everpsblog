@@ -2,7 +2,9 @@
     {foreach from=$posts item=item}
     <div class="col-12 col-md-4 article everpsblog mb-3" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
         <div class="col-12 article-img">
+            {if isset($show_featured_post) && $show_featured_post}
             <img src="{$item->featured_image|escape:'htmlall':'UTF-8'}" class="img img-fluid" alt="{$item->title|escape:'htmlall':'UTF-8'}" />
+            {/if}
         </div>
         <div class="col-12">
             <h3 class="everpsblog article-content h3" id="everpsblog-post-title-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
