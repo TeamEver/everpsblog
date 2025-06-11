@@ -228,6 +228,16 @@ class EverPsBlog extends Module
                     'controller' => 'blog',
                 ],
             ],
+            'module-everpsblog-search' => [
+                'controller' => 'search',
+                'rule' => $base_route . '/search',
+                'keywords' => [
+                ],
+                'params' => [
+                    'fc' => 'module',
+                    'module' => 'everpsblog',
+                ],
+            ],
             'module-everpsblog-category' => [
                 'controller' => 'category',
                 'rule' => $base_route . '/category{/:id_ever_category}-{:link_rewrite}',
@@ -950,6 +960,7 @@ class EverPsBlog extends Module
         Configuration::deleteByName('PS_ROUTE_module-everpsblog-blog');
         Configuration::deleteByName('PS_ROUTE_module-everpsblog-category');
         Configuration::deleteByName('PS_ROUTE_module-everpsblog-post');
+        Configuration::deleteByName('PS_ROUTE_module-everpsblog-search');
         Configuration::deleteByName('PS_ROUTE_module-everpsblog-tag');
         Configuration::deleteByName('PS_ROUTE_module-everpsblog-author');
         Hook::exec('hookModuleRoutes');

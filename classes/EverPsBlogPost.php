@@ -1517,6 +1517,54 @@ class EverPsBlogPost extends ObjectModel
         }
         return Cache::retrieve($cache_id);
     }
+    public static function countPostsBySearch($query, $id_lang, $id_shop)
+    {
+        $cached_string = Tools::str2url($query);
+        $cache_id = 'EverPsBlogPost::countPostsBySearch_'
+        . $cached_string
+        . '_' . (int) $id_lang
+        . '_' . (int) $id_shop;
+        if (!Cache::isStored($cache_id)) {
+            $context = Context::getContext();
+            $sql = new DbQuery();
+            $sql->select('*');
+            $sql->from(self::$definition['table'] . '_lang', 'bpl');
+            $sql->leftJoin(
+                self::$definition['table'],
+                'bp',
+                'bp.' . self::$definition['primary'] . ' = bpl.' . self::$definition['primary']
+            );
+            $sql->where('bp.id_shop = ' . (int) $id_shop);
+            $sql->where('bpl.id_lang = ' . (int) $id_lang);
+            $sql->where('INSTR(title, "' . pSQL($query) . '") OR INSTR(content, "' . pSQL($query) . '")');
+            $posts = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+            $count = 0;
+            foreach ($posts as $post) {
+                $customerGroups = Customer::getGroupsStatic((int) $context->customer->id);
+                if (isset($post['allowed_groups']) && $post['allowed_groups']) {
+                    $allowedGroups = json_decode($post['allowed_groups']);
+                    if (isset($customerGroups) && !empty($allowedGroups) && !array_intersect($allowedGroups, $customerGroups)) {
+                        continue;
+                    }
+                }
+                $post_category = new EverPsBlogCategory(
+                    (int) $post['id_default_category'],
+                    (int) $context->language->id,
+                    (int) $context->shop->id
+                );
+                if (isset($post_category->allowed_groups) && $post_category->allowed_groups) {
+                    $allowedGroups = json_decode($post_category->allowed_groups);
+                    if (isset($customerGroups) && !empty($allowedGroups) && !array_intersect($allowedGroups, $customerGroups)) {
+                        continue;
+                    }
+                }
+                $count++;
+            }
+            Cache::store($cache_id, $count);
+            return $count;
+        }
+        return Cache::retrieve($cache_id);
+    }
 
     public static function updatePostViewCount($id_ever_post, $id_shop)
     {
