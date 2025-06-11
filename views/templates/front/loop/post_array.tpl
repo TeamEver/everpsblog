@@ -15,21 +15,17 @@
  *  @copyright 2019-2025 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-    <article class="col-12 article everpsblog" id="everpsblog-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
-        <div class="row">
-            <div class="col-12 col-md-4 article-img">
-                <img src="{$item.featured_image|escape:'htmlall':'UTF-8'}" class="img-fluid {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" />
-            </div>
-            <div class="col-12 col-md-8">
-                <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
-                    <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'}">
-                        {$item.title|escape:'htmlall':'UTF-8'}
-                    </a>
-                </h3>
-                <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
-                    {if isset($item.excerpt) && !empty($item.excerpt)}{$item.excerpt|escape:'htmlall':'UTF-8'}{else}{$item.content|escape:'htmlall':'UTF-8'}{/if}
-                    <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary btn-blog-primary {$blogcolor|escape:'htmlall':'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}">{l s='Read more' mod='everpsblog'}</a>
-                </div>
-            </div>
+    <article class="col-6 col-md-4 mb-4 article everpsblog" id="everpsblog-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
+        <div class="article-img text-center mb-2">
+            <img src="{$item.featured_image|escape:'htmlall':'UTF-8'}" class="img-fluid w-100 {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" />
         </div>
+        <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
+            <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'}">
+                {$item.title|escape:'htmlall':'UTF-8'}
+            </a>
+        </h3>
+        <div class="everpsblogcontent rte mb-2" id="everpsblog-post-content-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
+            {if isset($item.excerpt) && !empty($item.excerpt)}{$item.excerpt|escape:'htmlall':'UTF-8'}{else}{$item.content|escape:'htmlall':'UTF-8'}{/if}
+        </div>
+        <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary btn-blog-primary {$blogcolor|escape:'htmlall':'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}">{l s='Lire la suite' mod='everpsblog'}</a>
     </article>
