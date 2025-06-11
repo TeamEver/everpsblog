@@ -39,9 +39,11 @@ When updating to version 6.0.0, run the module upgrade from the back office. The
 
 ### WooCommerce REST Import
 You can now fetch posts from a WooCommerce store using its REST API. Configure the API URL and credentials in the module settings and click **Import WooCommerce posts**. Tags and linked product IDs detected in the API data are also imported. Imported posts are linked with their categories and tags and a `wordpress_redirects.txt` file is generated to help you create 301 redirects.
+The importer detects the language code from the remote data (when available) and assigns post content to the matching PrestaShop language.
 
 ### WordPress REST Import
 If WooCommerce is not installed, you can still import posts using the standard WordPress REST API. Provide the API URL in the module settings and click **Import WordPress posts** to fetch all blog content. Featured images, categories, authors, tags and excerpts are imported, WordPress shortcodes are converted to Bootstrap compatible HTML and a `wordpress_redirects.txt` file lists old WordPress URLs so you can add 301 redirects in your `.htaccess`.
+When posts include a language code (e.g. from Polylang), the module assigns the content only to the corresponding PrestaShop language.
 
 ---
 
