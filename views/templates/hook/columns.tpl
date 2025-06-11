@@ -73,7 +73,9 @@
             <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}">
                 <div class="d-block w-100">
                     <div class="col-12 article-img">
+                        {if isset($show_featured_post) && $show_featured_post}
                         <img src="{$item->featured_image|escape:'htmlall':'UTF-8'}" class="col-12 {if $animate}animate flipSideBySide zoomed{/if}" alt="{$item->title|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}" />
+                        {/if}
                     </div>
                     <div class="col-12 col-12">
                         <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">

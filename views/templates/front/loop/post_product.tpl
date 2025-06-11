@@ -17,7 +17,9 @@
 *}
         <div class="col-12 col-md-3 article everpsblog mb-3" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
                 <div class="col-12 article-img">
+                    {if isset($show_featured_post) && $show_featured_post}
                     <img src="{$item->featured_image|escape:'htmlall':'UTF-8'}" class="img img-fluid {if $animated}animated flipSideBySide zoomed{/if}" title="{$item->title|escape:'htmlall':'UTF-8'}" alt="{$item->title|escape:'htmlall':'UTF-8'}"/>
+                    {/if}
                 </div>
                 <div class="col-12 col-12">
                     <h3 class="everpsblog article-content h3 product-title" id="everpsblog-post-title-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">

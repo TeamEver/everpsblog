@@ -80,6 +80,7 @@ class EverPsBlogsearchModuleFrontController extends EverPsBlogModuleFrontControl
             'id_lang' => $this->context->language->id,
             'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__ . 'modules/everpsblog/views/img/',
             'animated' => Configuration::get('EVERBLOG_ANIMATE'),
+            'show_featured_post' => (bool) Configuration::get('EVERBLOG_SHOW_FEAT_POST'),
         ]);
         $this->setTemplate('module:everpsblog/views/templates/front/search.tpl');
     }

@@ -416,6 +416,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
                 'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
                 'featured_image' => $file_url,
+                'show_featured_post' => (bool) Configuration::get('EVERBLOG_SHOW_FEAT_POST'),
                 'author_cover' => $this->author_cover,
                 'author' => $this->author,
                 'social_share_links' => $social_share_links,
