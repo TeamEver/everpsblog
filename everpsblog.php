@@ -3252,11 +3252,13 @@ class EverPsBlog extends Module
                     );
                     if (!Validate::isLoadedObject($category)) {
                         $category = new EverPsBlogCategory();
-                        foreach (Language::getLanguages(false) as $lang) {
-                            $category->title[$lang['id_lang']] = (string) $wp_taxonomy;
-                            $category->meta_title[$lang['id_lang']] = (string) $wp_taxonomy;
-                            $category->link_rewrite[$lang['id_lang']] = (string) $wp_taxonomy['nicename'];
-                        }
+                $id_lang = $this->getIdLangFromWpData($wp_taxonomy);
+                $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
+                foreach ($langs as $lang) {
+                    $category->title[$lang['id_lang']] = (string) $wp_taxonomy;
+                    $category->meta_title[$lang['id_lang']] = (string) $wp_taxonomy;
+                    $category->link_rewrite[$lang['id_lang']] = (string) $wp_taxonomy['nicename'];
+                }
                         $category->id_parent_category = (int) $parent_category;
                         $category->id_shop = (int) Context::getContext()->shop->id;
                         $category->active = true;
@@ -3288,7 +3290,9 @@ class EverPsBlog extends Module
                     );
                     if (!Validate::isLoadedObject($tag)) {
                         $tag = new EverPsBlogTag();
-                        foreach (Language::getLanguages(false) as $lang) {
+                        $id_lang = $this->getIdLangFromWpData($wp_taxonomy);
+                        $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
+                        foreach ($langs as $lang) {
                             $tag->title[$lang['id_lang']] = (string) $wp_taxonomy;
                             $tag->meta_title[$lang['id_lang']] = (string) $wp_taxonomy;
                             $tag->link_rewrite[$lang['id_lang']] = (string) $wp_taxonomy['nicename'];
@@ -3326,7 +3330,9 @@ class EverPsBlog extends Module
             ) {
                 $author = new EverPsBlogAuthor();
                 $author->nickhandle = (string) $el->creator;
-                foreach (Language::getLanguages(false) as $lang) {
+                $id_lang = $this->getIdLangFromWpData($el);
+                $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
+                foreach ($langs as $lang) {
                     $author->meta_title[$lang['id_lang']] = (string) $el->creator;
                     $author->link_rewrite[$lang['id_lang']] = Tools::str2url(
                         (string) $el->creator
@@ -3424,7 +3430,9 @@ class EverPsBlog extends Module
                 $post_content = $this->cleanWpShortcodes($post_content);
                 $post = new EverPsBlogPost();
                 // Multilingual fields
-                foreach (Language::getLanguages(false) as $lang) {
+                $id_lang = $this->getIdLangFromWpData($el);
+                $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
+                foreach ($langs as $lang) {
                     $post->title[$lang['id_lang']] = html_entity_decode((string) $el->title, ENT_QUOTES, 'UTF-8');
                     $post->meta_title[$lang['id_lang']] = html_entity_decode((string) $el->title, ENT_QUOTES, 'UTF-8');
                     $post->meta_description[$lang['id_lang']] = Tools::substr(
@@ -3433,10 +3441,10 @@ class EverPsBlog extends Module
                         160
                     );
                     $post->link_rewrite[$lang['id_lang']] = $post_link_rewrite;
-                    $post->content = $post_content;
-                    if (!Validate::isCleanHtml($post_content, true)) {
-                        continue 2;
-                    }
+                    $post->content[$lang['id_lang']] = $post_content;
+                }
+                if (!Validate::isCleanHtml($post_content, true)) {
+                    continue;
                 }
                 $post->id_shop = (int) Context::getContext()->shop->id;
                 $post->active = true;
@@ -3533,7 +3541,9 @@ class EverPsBlog extends Module
                     continue;
                 }
                 $post = new EverPsBlogPost();
-                foreach (Language::getLanguages(false) as $language) {
+                $id_lang = $this->getIdLangFromWpData($data);
+                $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
+                foreach ($langs as $language) {
                     $content = $this->replaceAndDownloadImages(
                         $this->cleanWpShortcodes($data->content->rendered)
                     );
@@ -3566,7 +3576,9 @@ class EverPsBlog extends Module
                             $category = EverPsBlogCategory::getCategoryByLinkRewrite($catData->slug);
                             if (!Validate::isLoadedObject($category)) {
                                 $category = new EverPsBlogCategory();
-                                foreach (Language::getLanguages(false) as $langCat) {
+                                $id_lang = $this->getIdLangFromWpData($catData);
+                                $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
+                                foreach ($langs as $langCat) {
                                     $category->title[$langCat['id_lang']] = html_entity_decode($catData->name, ENT_QUOTES, 'UTF-8');
                                     $category->meta_title[$langCat['id_lang']] = html_entity_decode($catData->name, ENT_QUOTES, 'UTF-8');
                                     $category->link_rewrite[$langCat['id_lang']] = Tools::str2url($catData->slug);
@@ -3605,7 +3617,9 @@ class EverPsBlog extends Module
                         if (!Validate::isLoadedObject($author)) {
                             $author = new EverPsBlogAuthor();
                             $author->nickhandle = $authorData->slug;
-                            foreach (Language::getLanguages(false) as $langAuthor) {
+                            $id_lang = $this->getIdLangFromWpData($authorData);
+                            $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
+                            foreach ($langs as $langAuthor) {
                                 $author->meta_title[$langAuthor['id_lang']] = html_entity_decode($authorData->name, ENT_QUOTES, 'UTF-8');
                                 $author->link_rewrite[$langAuthor['id_lang']] = Tools::str2url($authorData->slug);
                             }
@@ -3642,7 +3656,9 @@ class EverPsBlog extends Module
                             $tag = EverPsBlogTag::getTagByLinkRewrite(Tools::str2url($tagData->slug));
                             if (!Validate::isLoadedObject($tag)) {
                             $tag = new EverPsBlogTag();
-                                foreach (Language::getLanguages(false) as $languageTag) {
+                                $id_lang = $this->getIdLangFromWpData($tagData);
+                                $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
+                                foreach ($langs as $languageTag) {
                                     $tag->title[$languageTag['id_lang']] = html_entity_decode($tagData->name, ENT_QUOTES, 'UTF-8');
                                     $tag->meta_title[$languageTag['id_lang']] = html_entity_decode($tagData->name, ENT_QUOTES, 'UTF-8');
                                     $tag->link_rewrite[$languageTag['id_lang']] = Tools::str2url($tagData->slug);
@@ -3758,7 +3774,9 @@ class EverPsBlog extends Module
                     continue;
                 }
                 $post = new EverPsBlogPost();
-                foreach (Language::getLanguages(false) as $language) {
+                $id_lang = $this->getIdLangFromWpData($data);
+                $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
+                foreach ($langs as $language) {
                     $content = $this->replaceAndDownloadImages(
                         $this->cleanWpShortcodes($data->content->rendered)
                     );
@@ -3790,7 +3808,9 @@ class EverPsBlog extends Module
                             $category = EverPsBlogCategory::getCategoryByLinkRewrite($catData->slug);
                             if (!Validate::isLoadedObject($category)) {
                                 $category = new EverPsBlogCategory();
-                                foreach (Language::getLanguages(false) as $langCat) {
+                                $id_lang = $this->getIdLangFromWpData($catData);
+                                $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
+                                foreach ($langs as $langCat) {
                                     $category->title[$langCat['id_lang']] = html_entity_decode($catData->name, ENT_QUOTES, 'UTF-8');
                                     $category->meta_title[$langCat['id_lang']] = html_entity_decode($catData->name, ENT_QUOTES, 'UTF-8');
                                     $category->link_rewrite[$langCat['id_lang']] = Tools::str2url($catData->slug);
@@ -3829,7 +3849,9 @@ class EverPsBlog extends Module
                         if (!Validate::isLoadedObject($author)) {
                             $author = new EverPsBlogAuthor();
                             $author->nickhandle = $authorData->slug;
-                            foreach (Language::getLanguages(false) as $langAuthor) {
+                            $id_lang = $this->getIdLangFromWpData($authorData);
+                            $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
+                            foreach ($langs as $langAuthor) {
                                 $author->meta_title[$langAuthor['id_lang']] = html_entity_decode($authorData->name, ENT_QUOTES, 'UTF-8');
                                 $author->link_rewrite[$langAuthor['id_lang']] = Tools::str2url($authorData->slug);
                             }
@@ -3866,7 +3888,9 @@ class EverPsBlog extends Module
                             $tag = EverPsBlogTag::getTagByLinkRewrite(Tools::str2url($tagData->slug));
                             if (!Validate::isLoadedObject($tag)) {
                                 $tag = new EverPsBlogTag();
-                                foreach (Language::getLanguages(false) as $languageTag) {
+                                $id_lang = $this->getIdLangFromWpData($tagData);
+                                $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
+                                foreach ($langs as $languageTag) {
                                     $tag->title[$languageTag['id_lang']] = html_entity_decode($tagData->name, ENT_QUOTES, 'UTF-8');
                                     $tag->meta_title[$languageTag['id_lang']] = html_entity_decode($tagData->name, ENT_QUOTES, 'UTF-8');
                                     $tag->link_rewrite[$languageTag['id_lang']] = Tools::str2url($tagData->slug);
@@ -3985,6 +4009,26 @@ class EverPsBlog extends Module
                 implode(PHP_EOL, $redirect_lines)
             );
         }
+    }
+
+    private function getIdLangFromWpData($data)
+    {
+        $iso = '';
+        if (isset($data->lang)) {
+            $iso = (string) $data->lang;
+        } elseif (isset($data->language)) {
+            $iso = (string) $data->language;
+        } elseif (isset($data->locale)) {
+            $iso = (string) $data->locale;
+        }
+        if ($iso === '') {
+            return false;
+        }
+        if (strpos($iso, '_') !== false) {
+            $iso = substr($iso, 0, 2);
+        }
+        $id_lang = (int) Language::getIdByIso($iso);
+        return $id_lang ? $id_lang : false;
     }
 
     public function checkLatestEverModuleVersion()
