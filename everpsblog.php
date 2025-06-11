@@ -155,6 +155,7 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERPSBLOG_PRODUCT_NBR', '4')
             && Configuration::updateValue('EVERPSBLOG_EXCERPT', '150')
             && Configuration::updateValue('EVERPSBLOG_TITLE_LENGTH', '150')
+            && Configuration::updateValue('EVERBLOG_PRODUCT_COLUMNS', 1)
             && Configuration::updateValue('EVERPSBLOG_BLOG_LAYOUT', 'layouts/layout-right-column.tpl')
             && Configuration::updateValue('EVERPSBLOG_POST_LAYOUT', 'layouts/layout-right-column.tpl')
             && Configuration::updateValue('EVERPSBLOG_CAT_LAYOUT', 'layouts/layout-right-column.tpl')
@@ -756,6 +757,13 @@ class EverPsBlog extends Module
                     'Error : The field "Show archives on columns" is not valid'
                 );
             }
+            if (Tools::getValue('EVERBLOG_PRODUCT_COLUMNS')
+                && !Validate::isBool(Tools::getValue('EVERBLOG_PRODUCT_COLUMNS'))
+            ) {
+                $this->postErrors[] = $this->l(
+                    'Error : The field "Show products on columns" is not valid'
+                );
+            }
             if (Tools::getValue('EVERBLOG_TAG_COLUMNS')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_TAG_COLUMNS'))
             ) {
@@ -1061,6 +1069,7 @@ class EverPsBlog extends Module
             'EVERBLOG_SHOW_FEAT_TAG' => Configuration::get('EVERBLOG_SHOW_FEAT_TAG'),
             'EVERBLOG_ARCHIVE_COLUMNS' => Configuration::get('EVERBLOG_ARCHIVE_COLUMNS'),
             'EVERBLOG_TAG_COLUMNS' => Configuration::get('EVERBLOG_TAG_COLUMNS'),
+            'EVERBLOG_PRODUCT_COLUMNS' => Configuration::get('EVERBLOG_PRODUCT_COLUMNS'),
             'EVERBLOG_CATEG_COLUMNS' => Configuration::get('EVERBLOG_CATEG_COLUMNS'),
             'EVERBLOG_FANCYBOX' => Configuration::get('EVERBLOG_FANCYBOX'),
             'EVERBLOG_CAT_FEATURED' => Configuration::get('EVERBLOG_CAT_FEATURED'),
@@ -1623,6 +1632,27 @@ class EverPsBlog extends Module
                     ],
                     [
                         'type' => 'switch',
+                        'label' => $this->l('Show related products on columns ?'),
+                        'desc' => $this->l('Set yes to show products linked to the post'),
+                        'hint' => $this->l('Will display related products in left or right columns'),
+                        'required' => false,
+                        'name' => 'EVERBLOG_PRODUCT_COLUMNS',
+                        'is_bool' => true,
+                        'values' => [
+                            [
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'switch',
                         'label' => $this->l('Show related posts on products pages ?'),
                         'desc' => $this->l('Set yes show related posts on product pages footer'),
                         'hint' => $this->l('Will show related posts on product page footer'),
@@ -2145,6 +2175,47 @@ class EverPsBlog extends Module
 
     public function hookDisplayLeftColumn($params)
     {
+        $controller = Tools::getValue('controller');
+        $module = Tools::getValue('module');
+        $ps_products = [];
+        if ($module == $this->name
+            && $controller == 'post'
+            && Configuration::get('EVERBLOG_PRODUCT_COLUMNS')
+        ) {
+            $id_post = (int) Tools::getValue('id_ever_post');
+            if ($id_post) {
+                $post_products = EverPsBlogTaxonomy::getPostProductsTaxonomies($id_post);
+                if ($post_products) {
+                    $assembler = new ProductAssembler($this->context);
+                    $presenterFactory = new ProductPresenterFactory($this->context);
+                    $presentationSettings = $presenterFactory->getPresentationSettings();
+                    $presenter = new ProductListingPresenter(
+                        new ImageRetriever($this->context->link),
+                        $this->context->link,
+                        new PriceFormatter(),
+                        new ProductColorsRetriever(),
+                        $this->context->getTranslator()
+                    );
+                    foreach ($post_products as $productId) {
+                        $product = new Product(
+                            (int) $productId,
+                            true,
+                            (int) $this->context->language->id,
+                            (int) $this->context->shop->id
+                        );
+                        if (Product::checkAccessStatic((int) $product->id, false)) {
+                            $cover = Product::getCover((int) $product->id);
+                            $product->cover = (int) $cover['id_image'];
+                            $ps_products[] = $presenter->present(
+                                $presentationSettings,
+                                $assembler->assembleProduct(['id_product' => $product->id]),
+                                $this->context->language
+                            );
+                        }
+                    }
+                }
+            }
+        }
         if ((int) Configuration::get('EVERPSBLOG_HOME_NBR')) {
             $post_number = (int) Configuration::get('EVERPSBLOG_HOME_NBR');
         } else {
@@ -2194,6 +2265,7 @@ class EverPsBlog extends Module
             'categories' => $categories,
             'animate' => $animate,
             'blogImg_dir' => $siteUrl . '/modules/everpsblog/views/img/',
+            'ps_products' => $ps_products,
         ]);
         return $this->display(__FILE__, 'views/templates/hook/columns.tpl');
     }
