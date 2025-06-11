@@ -34,6 +34,17 @@
     </ul>
 </div>
 {/if}
+
+{if isset($ps_products) && $ps_products}
+<div class="columns_everblog_wrapper products_wrapper">
+    <p class="text-uppercase h6 hidden-sm-down">{l s='Linked products' mod='everpsblog'}</p>
+    <div class="products">
+        {foreach from=$ps_products item="product"}
+            {include file="catalog/_partials/miniatures/product.tpl" product=$product}
+        {/foreach}
+    </div>
+</div>
+{/if}
 {if isset($showTags) && $showTags && isset($tags) && !empty($tags)}
 <div class="columns_everblog_wrapper tag_wrapper">
     <p class="text-uppercase h6 hidden-sm-down">{l s='Tags from the blog' mod='everpsblog'}</p>
