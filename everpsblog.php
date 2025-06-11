@@ -3526,9 +3526,11 @@ class EverPsBlog extends Module
                     $content = $this->replaceAndDownloadImages(
                         $this->cleanWpShortcodes($data->content->rendered)
                     );
+                    $content = Tools::purifyHTML($content);
                     $excerpt = $this->replaceAndDownloadImages(
                         $this->cleanWpShortcodes($data->excerpt->rendered)
                     );
+                    $excerpt = Tools::purifyHTML($excerpt);
                     $post->title[$language['id_lang']] = html_entity_decode($data->title->rendered, ENT_QUOTES, 'UTF-8');
                     $post->meta_title[$language['id_lang']] = html_entity_decode($data->title->rendered, ENT_QUOTES, 'UTF-8');
                     $post->meta_description[$language['id_lang']] = Tools::substr(strip_tags($content), 0, 160);
