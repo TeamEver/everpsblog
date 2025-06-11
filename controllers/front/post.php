@@ -482,7 +482,8 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                     ]
                 ),
             ];
-            if ((bool) $parent_category->hasChildren() === true) {
+            if ((bool) Configuration::get('EVERBLOG_SHOW_SUBCATS') === true
+                && (bool) $parent_category->hasChildren() === true) {
                 $children_categories = EverPsBlogCategory::getChildrenCategories(
                     (int) $this->post->id_default_category,
                     (int) $this->context->language->id,

@@ -185,6 +185,7 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                 'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'modules/' . $this->module->name . '/views/img/',
                 'animated' => $animate,
                 'show_featured_cat' => (bool)Configuration::get('EVERBLOG_SHOW_FEAT_CAT'),
+                'show_subcats' => (bool)Configuration::get('EVERBLOG_SHOW_SUBCATS'),
                 'sort_orders' => $sortOrders,
                 'sort_selected' => $sortSelected ? $sortSelected['label'] : null,
             ]);

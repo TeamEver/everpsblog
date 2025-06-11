@@ -46,7 +46,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '6.0.1';
+        $this->version = '6.0.2';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -85,6 +85,7 @@ class EverPsBlog extends Module
             mkdir(_PS_IMG_DIR_ . 'author', 0755, true);
         }
         Configuration::updateValue('EVERBLOG_SHOW_HOME', true);
+        Configuration::updateValue('EVERBLOG_SHOW_SUBCATS', true);
         // Creating root category
         $shops = Shop::getShops();
         foreach ($shops as $shop) {
@@ -157,6 +158,7 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERPSBLOG_TITLE_LENGTH', '150')
             && Configuration::updateValue('EVERBLOG_PRODUCT_COLUMNS', 1)
             && Configuration::updateValue('EVERBLOG_CATEG_COLUMNS', 1)
+            && Configuration::updateValue('EVERBLOG_SHOW_SUBCATS', true)
             && Configuration::updateValue('EVERPSBLOG_BLOG_LAYOUT', 'layouts/layout-right-column.tpl')
             && Configuration::updateValue('EVERPSBLOG_POST_LAYOUT', 'layouts/layout-right-column.tpl')
             && Configuration::updateValue('EVERPSBLOG_CAT_LAYOUT', 'layouts/layout-right-column.tpl')
@@ -771,6 +773,13 @@ class EverPsBlog extends Module
                     'Error : The field "Show featured tag image" is not valid'
                 );
             }
+            if (Tools::getValue('EVERBLOG_SHOW_SUBCATS')
+                && !Validate::isBool(Tools::getValue('EVERBLOG_SHOW_SUBCATS'))
+            ) {
+                $this->postErrors[] = $this->l(
+                    'Error : The field "Show subcategories list" is not valid'
+                );
+            }
             if (Tools::getValue('EVERBLOG_ARCHIVE_COLUMNS')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_ARCHIVE_COLUMNS'))
             ) {
@@ -1093,6 +1102,7 @@ class EverPsBlog extends Module
             'EVERBLOG_RELATED_POST' => Configuration::get('EVERBLOG_RELATED_POST'),
             'EVERBLOG_SHOW_FEAT_CAT' => Configuration::get('EVERBLOG_SHOW_FEAT_CAT'),
             'EVERBLOG_SHOW_FEAT_TAG' => Configuration::get('EVERBLOG_SHOW_FEAT_TAG'),
+            'EVERBLOG_SHOW_SUBCATS' => Configuration::get('EVERBLOG_SHOW_SUBCATS'),
             'EVERBLOG_ARCHIVE_COLUMNS' => Configuration::get('EVERBLOG_ARCHIVE_COLUMNS'),
             'EVERBLOG_TAG_COLUMNS' => Configuration::get('EVERBLOG_TAG_COLUMNS'),
             'EVERBLOG_PRODUCT_COLUMNS' => Configuration::get('EVERBLOG_PRODUCT_COLUMNS'),
@@ -1725,6 +1735,26 @@ class EverPsBlog extends Module
                         'desc' => $this->l('Set yes to show each tag featured image'),
                         'hint' => $this->l('Else tag featured image won\'t be shown'),
                         'name' => 'EVERBLOG_SHOW_FEAT_TAG',
+                        'is_bool' => true,
+                        'values' => [
+                            [
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'switch',
+                        'label' => $this->l('Show subcategories list ?'),
+                        'desc' => $this->l('Set yes to display subcategories on category pages'),
+                        'hint' => $this->l('Else subcategories will be hidden'),
+                        'name' => 'EVERBLOG_SHOW_SUBCATS',
                         'is_bool' => true,
                         'values' => [
                             [

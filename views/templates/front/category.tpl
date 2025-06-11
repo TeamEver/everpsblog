@@ -96,7 +96,7 @@
     </div>
 </div>
 {/if}
-{if isset($children_categories) && $children_categories && !empty($children_categories)}
+{if isset($show_subcats) && $show_subcats && isset($children_categories) && $children_categories && !empty($children_categories)}
 <div class="row mt-2">
 {foreach from=$children_categories item=item}
     {if !$item->is_root_category}
