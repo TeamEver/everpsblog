@@ -179,7 +179,7 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                 'post_number' => (int) $this->post_number,
                 'pagination' => $pagination,
                 'category' => $this->category,
-                'posts' => array_map(function ($post) { return (array) $post; }, $posts ?: []),
+                'posts' => $posts,
                 'default_lang' => (int) $this->context->language->id,
                 'id_lang' => $this->context->language->id,
                 'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'modules/' . $this->module->name . '/views/img/',
