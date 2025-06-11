@@ -4232,11 +4232,12 @@ class EverPsBlog extends Module
 
     private function removeJavascript($html)
     {
-        $html = preg_replace("#<script(.*?)>(.*?)</script>#is", '', $html);
-        $html = preg_replace("/on\\w+=(\\"[^\\"]*\\"|'[^']*'|[^\\s>]+)/i", '', $html);
+        $html = preg_replace('#<script[^>]*>.*?</script>#is', '', $html);
+        $html = preg_replace("/on\w+=(\"[^\"]*\"|'[^']*'|[^\s>]+)/i", '', $html);
         $html = preg_replace('/javascript:/i', '', $html);
         return $html;
     }
+
 
     private function parseShortcodes($html)
     {
