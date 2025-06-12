@@ -164,6 +164,13 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERPSBLOG_TAG_LAYOUT', 'layouts/layout-right-column.tpl')
             && Configuration::updateValue('EVERBLOG_SHOW_FEAT_POST', 1)
             && Configuration::updateValue('EVERBLOG_SITEMAP_NUMBER', 5000)
+            && Configuration::updateValue('EVERBLOG_MAIN_TITLE', (function () {
+                $title = [];
+                foreach (Language::getLanguages(false) as $language) {
+                    $title[$language['id_lang']] = 'Our blog';
+                }
+                return $title;
+            })())
             && $this->checkHooks()
             && $this->checkObligatoryHooks();
     }
@@ -851,6 +858,13 @@ class EverPsBlog extends Module
                         'Error : Blog bottom text is invalid'
                     );
                 }
+                if (Tools::getValue('EVERBLOG_MAIN_TITLE_'.$lang['id_lang'])
+                    && !Validate::isString(Tools::getValue('EVERBLOG_MAIN_TITLE_'.$lang['id_lang']))
+                ) {
+                    $this->postErrors[] = $this->l(
+                        'Error : Blog page title is invalid'
+                    );
+                }
             }
             // Layouts
             if (Tools::getValue('EVERPSBLOG_BLOG_LAYOUT')
@@ -977,6 +991,7 @@ class EverPsBlog extends Module
         $everblog_meta_desc = [];
         $everblog_top_text = [];
         $everblog_bottom_text = [];
+        $everblog_main_title = [];
         foreach (Language::getLanguages(false) as $lang) {
             $everblog_title[$lang['id_lang']] = (Tools::getValue(
                 'EVERBLOG_TITLE_'.$lang['id_lang']
@@ -997,6 +1012,11 @@ class EverPsBlog extends Module
                 'EVERBLOG_BOTTOM_TEXT_'.$lang['id_lang']
             )) ? Tools::getValue(
                 'EVERBLOG_BOTTOM_TEXT_'.$lang['id_lang']
+            ) : '';
+            $everblog_main_title[$lang['id_lang']] = (Tools::getValue(
+                'EVERBLOG_MAIN_TITLE_'.$lang['id_lang']
+            )) ? Tools::getValue(
+                'EVERBLOG_MAIN_TITLE_'.$lang['id_lang']
             ) : '';
         }
         // Save all datas
@@ -1021,6 +1041,12 @@ class EverPsBlog extends Module
                 Configuration::updateValue(
                     $key,
                     $everblog_bottom_text,
+                    true
+                );
+            } elseif ($key == 'EVERBLOG_MAIN_TITLE') {
+                Configuration::updateValue(
+                    $key,
+                    $everblog_main_title,
                     true
                 );
             } else {
@@ -1055,6 +1081,7 @@ class EverPsBlog extends Module
         $everblog_meta_desc = [];
         $everblog_top_text = [];
         $everblog_bottom_text = [];
+        $everblog_main_title = [];
         foreach (Language::getLanguages(false) as $lang) {
             $everblog_title[$lang['id_lang']] = (Tools::getValue(
                 'EVERBLOG_TITLE_'.$lang['id_lang']
@@ -1075,6 +1102,11 @@ class EverPsBlog extends Module
                 'EVERBLOG_BOTTOM_TEXT_'.$lang['id_lang']
             )) ? Tools::getValue(
                 'EVERBLOG_BOTTOM_TEXT_'.$lang['id_lang']
+            ) : '';
+            $everblog_main_title[$lang['id_lang']] = (Tools::getValue(
+                'EVERBLOG_MAIN_TITLE_'.$lang['id_lang']
+            )) ? Tools::getValue(
+                'EVERBLOG_MAIN_TITLE_'.$lang['id_lang']
             ) : '';
         }
         $formValues[] = [
@@ -1119,6 +1151,9 @@ class EverPsBlog extends Module
             ),
             'EVERBLOG_BOTTOM_TEXT' => static::getConfigInMultipleLangs(
                 'EVERBLOG_BOTTOM_TEXT'
+            ),
+            'EVERBLOG_MAIN_TITLE' => static::getConfigInMultipleLangs(
+                'EVERBLOG_MAIN_TITLE'
             ),
             'EVERPSBLOG_BLOG_LAYOUT' => Configuration::get('EVERPSBLOG_BLOG_LAYOUT'),
             'EVERPSBLOG_POST_LAYOUT' => Configuration::get('EVERPSBLOG_POST_LAYOUT'),
@@ -1543,6 +1578,14 @@ class EverPsBlog extends Module
                         'rows' => 4,
                         'lang' => true,
                         'autoload_rte' => true,
+                    ],
+                    [
+                        'type' => 'text',
+                        'label' => $this->l('Blog page title'),
+                        'name' => 'EVERBLOG_MAIN_TITLE',
+                        'desc' => $this->l('Main H1 title displayed on blog page'),
+                        'hint' => $this->l('Leave empty to use default translation'),
+                        'lang' => true,
                     ],
                     [
                         'type' => 'switch',

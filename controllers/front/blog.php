@@ -156,6 +156,8 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
         $everblog_bottom_text = $this->module::getConfigInMultipleLangs('EVERBLOG_BOTTOM_TEXT');
         $default_blog_bottom_text = $everblog_bottom_text[(int) Context::getContext()->language->id];
         // Bottom text is retrieved directly without shortcode parsing
+        $everblog_main_title = $this->module::getConfigInMultipleLangs('EVERBLOG_MAIN_TITLE');
+        $blog_page_title = $everblog_main_title[(int) Context::getContext()->language->id];
         Hook::exec('actionBeforeEverBlogInitContent', [
             'blog_post_number' => &$this->post_number,
             'starred' => &$starredPosts,
@@ -179,6 +181,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             'feed_url' => $feed_url,
             'default_blog_top_text' => $default_blog_top_text,
             'default_blog_bottom_text' => $default_blog_bottom_text,
+            'blog_page_title' => $blog_page_title,
             'paginated' => Tools::getValue('page'),
             'post_number' => (int) $this->post_number,
             'pagination' => $pagination,
