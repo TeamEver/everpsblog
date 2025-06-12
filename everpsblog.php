@@ -3241,6 +3241,15 @@ class EverPsBlog extends Module
         }
         $result = true;
         $xml_str = Tools::file_get_contents($file['tmp_name']);
+        // Force UTF-8 encoding for proper special character handling
+        $encoding = mb_detect_encoding(
+            $xml_str,
+            ['UTF-8', 'ISO-8859-1', 'WINDOWS-1252'],
+            true
+        );
+        if ($encoding && $encoding !== 'UTF-8') {
+            $xml_str = iconv($encoding, 'UTF-8', $xml_str);
+        }
         $xml_str = str_replace(
             'content:encoded',
             'content',
