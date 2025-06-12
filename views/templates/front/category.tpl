@@ -77,7 +77,7 @@
     <h1 class="text-center flex-grow-1 m-0">{$category->title|escape:'htmlall':'UTF-8'}</h1>
     <form method="get" action="{$link->getModuleLink('everpsblog','search')|escape:'htmlall':'UTF-8'}" class="everpsblog-search ms-3" data-doofinder-ignore="true">
         <div class="input-group">
-            <input class="form-control" type="search" name="s" data-doofinder-ignore="true" placeholder="{l s='Search the blog...' mod='everpsblog'}" required />
+            <input class="form-control" type="search" name="s" data-doofinder-ignore="true" placeholder="{l s='Search by keywords' mod='everpsblog'}" required />
             <button class="btn btn-danger" type="submit">{l s='Search' mod='everpsblog'}</button>
         </div>
     </form>
