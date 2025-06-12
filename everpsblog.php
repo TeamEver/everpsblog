@@ -2478,7 +2478,7 @@ class EverPsBlog extends Module
             'id_lang' => (int) $this->context->language->id,
             'blogImg_dir' => $siteUrl.'/modules/everpsblog/views/img/',
             'animated' => $animate,
-            'show_featured_post' => true,
+            'show_featured_post' => (bool) Configuration::get('EVERBLOG_SHOW_FEAT_POST'),
         ]);
         return $this->display(__FILE__, 'views/templates/hook/product.tpl');
     }
