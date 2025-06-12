@@ -88,7 +88,7 @@
         {/if}
         <h1 class="text-start">{$post->title|escape:'htmlall':'UTF-8'}</h1>
         <p class="postpublished text-start">
-            {$post->date_add|date_format:'%d %B %Y'|escape:'htmlall':'UTF-8'}
+            <strong>{$post->date_add|date_format:'%d %B %Y'|escape:'htmlall':'UTF-8'}</strong>
         </p>
         {if isset($show_author) && $show_author}
         <p class="text-center author_cover_container">
