@@ -358,6 +358,21 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 (int) $this->post->id,
                 (int) $this->context->language->id
             );
+            $related_posts = EverPsBlogPost::getPostsByCategory(
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id,
+                (int) $this->post->id_default_category,
+                0,
+                5
+            );
+            foreach ($related_posts as $key => $related) {
+                if ((int) $related->id === (int) $this->post->id) {
+                    unset($related_posts[$key]);
+                }
+            }
+            if (count($related_posts) > 4) {
+                $related_posts = array_slice($related_posts, 0, 4);
+            }
             // Password protected
             $cookieName = $this->context->shop->id . $this->post->id . Tools::encrypt('everpsblog/post-' . $this->post->id);
             if ($this->post->psswd
@@ -425,6 +440,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 'post' => $this->post,
                 'tags' => $tags,
                 'ps_products' => $ps_products,
+                'related_posts' => $related_posts,
                 'default_lang' => (int) $this->context->language->id,
                 'id_lang' => (int) $this->context->language->id,
                 'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__ . 'modules/everpsblog/views/img/',
