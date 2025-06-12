@@ -31,7 +31,8 @@
 </div>
 {/if}
 
-{if isset($ps_products) && $ps_products}
+{if isset($page.page_name) && $page.page_name == 'module-everpsblog-post'
+    && isset($ps_products) && $ps_products}
 <div class="columns_everblog_wrapper products_wrapper">
     <p class="text-uppercase h6 hidden-sm-down">{l s='Linked products' mod='everpsblog'}</p>
     <div class="products">

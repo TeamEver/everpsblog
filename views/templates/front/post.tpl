@@ -244,16 +244,6 @@
 {hook h="displayAfterEverComment"}
 {/if}
 {/if}
-{if isset($count_products) && $count_products > 0}
-<section id="products" class="mt-2">
-  <h2 class="text-center">{l s='Linked products' mod='everpsblog'}</h2>
-  <div class="products row">
-    {foreach from=$ps_products item="product"}
-      {include file="catalog/_partials/miniatures/product.tpl" product=$product}
-    {/foreach}
-  </div>
-</section>
-{/if}
 {if isset($related_posts) && $related_posts}
 <section id="related-posts" class="mt-2">
   <h2 class="text-center">{l s='Related posts' mod='everpsblog'}</h2>
