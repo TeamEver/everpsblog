@@ -67,16 +67,18 @@
 {/block}
 
 {block name="page_content"}
-<h1 class="text-center">{l s='Our blog' mod='everpsblog'}</h1>
+<div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+    <h1 class="text-center flex-grow-1 m-0">{l s='Our blog' mod='everpsblog'}</h1>
+    <form method="get" action="{$link->getModuleLink('everpsblog','search')|escape:'htmlall':'UTF-8'}" class="everpsblog-search ms-3" data-doofinder-ignore="true">
+        <div class="input-group">
+            <input class="form-control" type="search" name="blog_search" placeholder="{l s='Search the blog...' mod='everpsblog'}" required />
+            <button class="btn btn-secondary" type="submit">{l s='Search' mod='everpsblog'}</button>
+        </div>
+    </form>
+</div>
 {if isset($allow_feed) && $allow_feed}
 <a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' mod='everpsblog'} {$page.meta.title|escape:'htmlall':'UTF-8'}</a>
 {/if}
-<form method="get" action="{$link->getModuleLink('everpsblog','search')|escape:'htmlall':'UTF-8'}" class="everpsblog-search mb-3" data-doofinder-ignore="true">
-    <div class="input-group">
-        <input class="form-control" type="search" name="blog_search" placeholder="{l s='Search the blog...' mod='everpsblog'}" required />
-        <button class="btn btn-secondary" type="submit">{l s='Search' mod='everpsblog'}</button>
-    </div>
-</form>
 <span class="paginated float-end d-none">{if isset($pagination) && $pagination.current_page > 0}{l s='(page' mod='everpsblog'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' mod='everpsblog'}{/if}</span>
 {if isset($paginated) && !$paginated}
 {if isset($default_blog_top_text) && $default_blog_top_text}

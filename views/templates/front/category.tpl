@@ -73,16 +73,18 @@
   <img src="{$featured_image|escape:'htmlall':'UTF-8'}" class="img img-fluid category-featured-image featured-image" alt="{$category->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$category->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
 </div>
 {/if}
-<h1 class="text-center">{$category->title|escape:'htmlall':'UTF-8'}</h1>
+<div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
+    <h1 class="text-center flex-grow-1 m-0">{$category->title|escape:'htmlall':'UTF-8'}</h1>
+    <form method="get" action="{$link->getModuleLink('everpsblog','search')|escape:'htmlall':'UTF-8'}" class="everpsblog-search ms-3" data-doofinder-ignore="true">
+        <div class="input-group">
+            <input class="form-control" type="search" name="blog_search" placeholder="{l s='Search the blog...' mod='everpsblog'}" required />
+            <button class="btn btn-secondary" type="submit">{l s='Search' mod='everpsblog'}</button>
+        </div>
+    </form>
+</div>
 {if isset($allow_feed) && $allow_feed}
 <a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' mod='everpsblog'} {$category->title|escape:'htmlall':'UTF-8'}</a>
 {/if}
-<form method="get" action="{$link->getModuleLink('everpsblog','search')|escape:'htmlall':'UTF-8'}" class="everpsblog-search mb-3" data-doofinder-ignore="true">
-    <div class="input-group">
-        <input class="form-control" type="search" name="blog_search" placeholder="{l s='Search the blog...' mod='everpsblog'}" required />
-        <button class="btn btn-secondary" type="submit">{l s='Search' mod='everpsblog'}</button>
-    </div>
-</form>
 {if isset($paginated) && !$paginated}
 <div class="container">
     <div class="row categoryinfos d-none">
