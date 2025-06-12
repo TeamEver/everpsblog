@@ -98,7 +98,8 @@
     </div>
 </div>
 {/if}
-{if isset($children_categories) && $children_categories && !empty($children_categories)}
+{* Hide children categories *}
+{*{if isset($children_categories) && $children_categories && !empty($children_categories)}
 <div class="row mt-2">
 {foreach from=$children_categories item=item}
     {if !$item->is_root_category}
@@ -106,7 +107,7 @@
     {/if}
 {/foreach}
 </div>
-{/if}
+{/if}*}
 {if isset($post_number) && $post_number > 0}
 <div class="container">
     <div class="row">
