@@ -1,0 +1,6 @@
+Ein neuer Kommentar wurde von {email} veröffentlicht
+Kommentar:
+
+Bitte besuchen Sie {shop_name}, um ihn zu genehmigen oder zu löschen
+
+{shop_name}

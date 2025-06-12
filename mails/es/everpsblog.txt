@@ -1,0 +1,6 @@
+Se ha publicado un nuevo comentario de {email}
+Comentario:
+
+Por favor vaya a {shop_name} para aprobarlo o eliminarlo
+
+{shop_name}

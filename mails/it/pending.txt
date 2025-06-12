@@ -1,0 +1,6 @@
+Articoli in attesa di revisione
+{posts}
+
+Vai su {shop_name} per approvarli o eliminarli
+
+{shop_name}

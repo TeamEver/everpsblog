@@ -1,0 +1,6 @@
+Un nuovo commento è stato inviato da {email}
+Commento:
+
+Vai su {shop_name} per approvarlo o eliminarlo
+
+{shop_name}
