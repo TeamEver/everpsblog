@@ -1,5 +1,5 @@
 /* just to avoid error in console log */
 .everpsblog-search input[type="search"] {
     border-radius: 0.25rem;
-    min-width: 350px;
+    max-width: 350px;
 }
