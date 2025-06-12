@@ -1,7 +1,8 @@
 /* just to avoid error in console log */
 .everpsblog-search input[type="search"] {
-    background-image: url(../img/microphone.svg);
+    background-image: url(../img/search.svg);
     background-repeat: no-repeat;
-    background-position: right 0.5rem center;
-    padding-right: 2rem;
+    background-position: left 0.5rem center;
+    padding-left: 2rem;
+    border-radius: 0.25rem;
 }
