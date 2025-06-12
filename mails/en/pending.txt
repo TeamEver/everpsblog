@@ -1,0 +1,6 @@
+Posts are pending review
+{posts}
+
+Please go to {shop_name} to approve or delete them
+
+{shop_name}

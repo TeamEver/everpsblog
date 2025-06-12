@@ -1,0 +1,6 @@
+Publicaciones pendientes de revisión
+{posts}
+
+Por favor vaya a {shop_name} para aprobarlas o eliminarlas
+
+{shop_name}

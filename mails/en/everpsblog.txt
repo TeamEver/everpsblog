@@ -1,0 +1,7 @@
+
+A new comment has been posted by {email}
+Comment:
+
+Please go to {shop_name} to approve or delete it
+
+{shop_name}

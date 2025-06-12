@@ -1,0 +1,6 @@
+Beiträge warten auf Prüfung
+{posts}
+
+Bitte besuchen Sie {shop_name}, um sie zu genehmigen oder zu löschen
+
+{shop_name}
