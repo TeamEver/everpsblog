@@ -714,3 +714,4 @@ $_MODULE['<{everpsblog}prestashop>home_43340e6cc4e88197d57f8d6d5ea50a46'] = 'En 
 $_MODULE['<{everpsblog}prestashop>home_52f7b53572fe9db69047ccbb3626833a'] = 'Voir tous les articles du blog';
 $_MODULE['<{everpsblog}prestashop>my-account_435e5e6d4790eba0f8d185ba05fcde74'] = 'Mes commentaires';
 $_MODULE['<{everpsblog}prestashop>product_fb3510c4e6419c8fbf7e4460438ac62f'] = 'Articles du blog associés';
+$_MODULE['<{everpsblog}prestashop>post_394efb42d8bf427587bc4333d7f461f1'] = 'Articles liés';

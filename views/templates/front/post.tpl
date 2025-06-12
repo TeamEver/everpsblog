@@ -254,5 +254,15 @@
   </div>
 </section>
 {/if}
+{if isset($related_posts) && $related_posts}
+<section id="related-posts" class="mt-2">
+  <h2 class="text-center">{l s='Related posts' mod='everpsblog'}</h2>
+  <div class="row blogrelated mt-2">
+    {foreach from=$related_posts item=item}
+      {include file='module:everpsblog/views/templates/front/loop/post_product.tpl'}
+    {/foreach}
+  </div>
+</section>
+{/if}
 {hook h="displayAfterEverPost" everblogpost=$post}
 {/block}
