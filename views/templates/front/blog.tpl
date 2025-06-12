@@ -89,13 +89,14 @@
 {if isset($prettyblocks_enabled) && $prettyblocks_enabled}
 {widget name="prettyblocks" zone_name="displayBeforeBlog"}
 {/if}
-<div class="row mt-2">
+{* Hide categories list on blog pages *}
+{*<div class="row mt-2">
 {foreach from=$evercategory item=item}
     {if !$item.is_root_category}
     {include file='module:everpsblog/views/templates/front/loop/category_array.tpl'}
     {/if}
 {/foreach}
-</div>
+</div>*}
 {/if}
 
 {if isset($post_number) && $post_number > 0}
