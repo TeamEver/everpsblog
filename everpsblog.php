@@ -436,27 +436,43 @@ class EverPsBlog extends Module
 
     public function replaceAndDownloadImages($content)
     {
-        // Convert WordPress [caption] shortcodes to Bootstrap 5 figure markup
+        // 1. Convertir les shortcodes [caption] en <figure>
         $content = preg_replace_callback(
             '/\[caption[^\]]*\](<img[^>]+>)(.*?)\[\/caption\]/si',
             function ($matches) {
                 $imgTag = $matches[1];
-                $caption = trim($matches[2]);
-                $imgDom = new DOMDocument();
-                @$imgDom->loadHTML($imgTag, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-                $img = $imgDom->getElementsByTagName('img')->item(0);
-                if ($img) {
-                    $classes = $img->getAttribute('class');
-                    $img->setAttribute('class', trim($classes . ' img-fluid figure-img'));
-                    $imgTag = $imgDom->saveHTML($img);
-                }
-                return '<figure class="figure text-center">' . $imgTag
-                    . '<figcaption class="figure-caption">' . $caption . '</figcaption></figure>';
+                $caption = trim(strip_tags($matches[2]));
+                // Ajouter class img-fluid et figure-img à l'image
+                $imgTag = preg_replace(
+                    '/<img(.*?)class=["\']?([^"\']*)["\']?/i',
+                    '<img$1class="$2 img-fluid figure-img"',
+                    $imgTag
+                );
+                return '<figure class="figure text-center">' . $imgTag . '<figcaption class="figure-caption">' . $caption . '</figcaption></figure>';
             },
             $content
         );
 
-        // Replace common WordPress alignment classes with Bootstrap 5 ones
+        // 2. Ajouter les classes Bootstrap aux <img> classiques
+        $content = preg_replace_callback(
+            '/<img([^>]+)>/i',
+            function ($matches) {
+                $tag = $matches[0];
+                if (strpos($tag, 'class=') !== false) {
+                    $tag = preg_replace(
+                        '/class=["\']([^"\']*)["\']/i',
+                        'class="$1 img-fluid"',
+                        $tag
+                    );
+                } else {
+                    $tag = str_replace('<img', '<img class="img-fluid"', $tag);
+                }
+                return $tag;
+            },
+            $content
+        );
+
+        // 3. Remplacer les classes d’alignement WordPress
         $replace = [
             'aligncenter' => 'mx-auto d-block',
             'alignright'  => 'float-end',
@@ -464,50 +480,36 @@ class EverPsBlog extends Module
         ];
         $content = str_replace(array_keys($replace), array_values($replace), $content);
 
-        // Remplacer {{media url="..."}}
-        $pattern = '/\{\{media url="wysiwyg\/([^"]+)"\}\}/';
-        $content = preg_replace_callback($pattern, function($matches) {
-            $fullUrl = 'https://www.comptoir-de-vie.com/media/wysiwyg/' . $matches[1];
-            $localPath = $this->downloadImage($fullUrl);
-            if ($localPath) {
-                return $localPath; // Replace the {{media url="..."}} with the local path
-            }
-            return $fullUrl; // If download fails, return the original full URL
+        // 4. Remplacer les URLs {{media url="..."}}
+        $content = preg_replace_callback('/\{\{media url="wysiwyg\/([^"]+)"\}\}/', function ($matches) {
+            $url = 'https://www.comptoir-de-vie.com/media/wysiwyg/' . $matches[1];
+            $localPath = $this->downloadImage($url);
+            return $localPath ?: $url;
         }, $content);
 
-        // Remplacer les URLs d'images dans les balises <img>
-        $dom = new DOMDocument;
-        if (!empty($content)) {
-            @$dom->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-        }
-        $xpath = new DOMXPath($dom);
-        $images = $xpath->query("//img");
+        // 5. Remplacer les src des balises <img>
+        $content = preg_replace_callback('/<img[^>]*src=["\']([^"\']+)["\'][^>]*>/i', function ($matches) {
+            $src = $matches[1];
+            $newSrc = $src;
 
-        foreach ($images as $img) {
-            $src = $img->getAttribute('src');
-            if (!empty($src)) {
-                // Identifier et traiter toutes les URLs valides
-                if (strpos($src, 'http://www.comptoir-de-vie.com/') !== false) {
-                    // Cible tous les domaines nécessaires
-                    $localPath = $this->downloadImage($src);
-                    if ($localPath) {
-                        $img->setAttribute('src', $localPath);
-                    }
-                } elseif (strpos($src, 'http://www.comptoir-de-vie.com/') === false && strpos($src, '/comptoir/') !== false) {
-                    // Cible tous les domaines nécessaires
-                    $localPath = $this->downloadImage('http://www.comptoir-de-vie.com/'.$src);
-                    if ($localPath) {
-                        $img->setAttribute('src', $localPath);
-                    }
+            if (strpos($src, 'http://www.comptoir-de-vie.com/') !== false) {
+                $localPath = $this->downloadImage($src);
+                if ($localPath) {
+                    $newSrc = $localPath;
+                }
+            } elseif (strpos($src, '/comptoir/') !== false) {
+                $localPath = $this->downloadImage('http://www.comptoir-de-vie.com/' . ltrim($src, '/'));
+                if ($localPath) {
+                    $newSrc = $localPath;
                 }
             }
-            // Apply Bootstrap 5 responsive class to images
-            $currentClass = $img->getAttribute('class');
-            $img->setAttribute('class', trim($currentClass . ' img-fluid'));
-        }
 
-        return $dom->saveHTML();
+            return str_replace($src, $newSrc, $matches[0]);
+        }, $content);
+
+        return $content;
     }
+
 
     public function downloadImage($url)
     {
@@ -3343,15 +3345,15 @@ class EverPsBlog extends Module
                     $category->meta_title[$lang['id_lang']] = (string) $wp_taxonomy;
                     $category->link_rewrite[$lang['id_lang']] = (string) $wp_taxonomy['nicename'];
                 }
-                        $category->id_parent_category = (int) $parent_category;
-                        $category->id_shop = (int) Context::getContext()->shop->id;
-                        $category->active = true;
-                        $category->indexable = true;
-                        $category->follow = true;
-                        $category->sitemap = true;
-                        $category->active = (bool)Configuration::get('EVERBLOG_ENABLE_CATS');
-                        $result &= $category->save();
-                        $post_categories[] = $category->id;
+                    $category->id_parent_category = (int) $parent_category;
+                    $category->id_shop = (int) Context::getContext()->shop->id;
+                    $category->active = true;
+                    $category->indexable = true;
+                    $category->follow = true;
+                    $category->sitemap = true;
+                    $category->active = (bool)Configuration::get('EVERBLOG_ENABLE_CATS');
+                    $result &= $category->save();
+                    $post_categories[] = $category->id;
                     } else {
                         $post_categories[] = $category->id;
                     }
@@ -3453,7 +3455,11 @@ class EverPsBlog extends Module
                 // Copy images
                 $dom = new DOMDocument();
                 libxml_use_internal_errors(true);
-                $dom->loadHTML($el->content);
+                // Injecte une déclaration UTF-8 pour que DOMDocument n'interprète pas comme Latin1
+                $content = '<?xml encoding="UTF-8">' . $el->content;
+
+                $dom->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+
                 $images = $dom->getElementsByTagName('img');
                 foreach ($images as $item) {
                     $src = $item->getAttribute('src');
@@ -3508,6 +3514,10 @@ class EverPsBlog extends Module
                         $featured_url = (string) $wp->attachment_url;
                     }
                 }
+                // Et ensuite : corriger les entités HTML et les encodages tordus
+                $post_content = html_entity_decode($post_content, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                $post_content = mb_convert_encoding($post_content, 'UTF-8', 'UTF-8');
+                $post_content = str_replace('<?xml encoding="UTF-8">', '', $post_content);
                 $post_content = preg_replace('/<!--(.|\s)*?-->/', '', $post_content);
                 $post_content = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $post_content);
                 $post_content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $post_content);
@@ -3650,7 +3660,7 @@ class EverPsBlog extends Module
                 $post->sitemap = true;
                 $post->date_add = $data->date;
                 $post->date_upd = $data->modified;
-                $post->post_status = 'publish';
+                $post->post_status = 'published';
 
                 $post_categories = [];
                 if (!empty($data->categories)) {
@@ -3854,17 +3864,20 @@ class EverPsBlog extends Module
                 $parsed_url = parse_url($data->link);
                 $post_link_rewrite = Tools::str2url($data->slug);
                 $post = EverPsBlogPost::getPostByLinkRewrite($post_link_rewrite);
-                if (Validate::isLoadedObject($post)) {
-                    continue;
+                if (!Validate::isLoadedObject($post)) {
+                    $post = new EverPsBlogPost();
                 }
-                $post = new EverPsBlogPost();
                 $id_lang = $this->getIdLangFromWpData($data);
                 $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
                 foreach ($langs as $language) {
-                    $content = $this->replaceAndDownloadImages(
-                        $this->cleanWpShortcodes($data->content->rendered)
-                    );
+                    $content = $this->cleanWpShortcodes($data->content->rendered);
+                    $content = $this->replaceAndDownloadImages($content);
                     $content = $this->removeJavascript($content);
+
+                    // Décodage double si nécessaire
+                    $content = html_entity_decode($content, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                    $content = html_entity_decode($content, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
                     $excerpt = $this->replaceAndDownloadImages(
                         $this->cleanWpShortcodes($data->excerpt->rendered)
                     );
@@ -3880,9 +3893,9 @@ class EverPsBlog extends Module
                 $post->indexable = true;
                 $post->follow = true;
                 $post->sitemap = true;
-                $post->date_add = $data->date;
-                $post->date_upd = $data->modified;
-                $post->post_status = 'publish';
+                $post->date_add = date('Y-m-d H:i:s', strtotime($data->date));
+                $post->date_upd = date('Y-m-d H:i:s', strtotime($data->modified));
+                $post->post_status = 'published';
 
                 $post_categories = [];
                 if (!empty($data->categories)) {
@@ -4004,7 +4017,14 @@ class EverPsBlog extends Module
                         }
                     }
                 }
-
+                $post_products = [];
+                if (isset($data->acf) && isset($data->acf->pages_products_choice) && is_array($data->acf->pages_products_choice)) {
+                    foreach ($data->acf->pages_products_choice as $choice) {
+                        if (isset($choice->{'pages_products-id'})) {
+                            $post_products[] = (int) $choice->{'pages_products-id'};
+                        }
+                    }
+                }
                 if (!empty($post_categories)) {
                     $post->id_default_category = $post_categories[0];
                     $post->post_categories = json_encode($post_categories);
@@ -4012,9 +4032,10 @@ class EverPsBlog extends Module
                 if (!empty($post_tags)) {
                     $post->post_tags = json_encode(array_unique($post_tags));
                 }
-
+                if (!empty($post_products)) {
+                    $post->post_products = json_encode(array_unique($post_products));
+                }
                 $result &= $post->save();
-
                 if (!empty($data->featured_media)) {
                     $media = $this->wpRequest(rtrim($apiUrl, '/') . '/wp-json/wp/v2/media/' . (int) $data->featured_media);
                     if ($media && isset($media->source_url)) {

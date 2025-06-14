@@ -370,7 +370,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                     unset($related_posts[$key]);
                 }
             }
-            if (count($related_posts) > 4) {
+            if ($related_posts && count($related_posts) > 4) {
                 $related_posts = array_slice($related_posts, 0, 4);
             }
             // Password protected
