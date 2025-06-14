@@ -4408,12 +4408,22 @@ class EverPsBlog extends Module
                     $attrs[strtolower($attr[1])] = $attr[2];
                 }
             }
-            if (empty($attrs['category'])) {
-                return '';
+
+            if (isset($attrs['category'])) {
+                $order = isset($attrs['order']) ? strtolower($attrs['order']) : 'desc';
+                $limit = isset($attrs['limit']) ? (int) $attrs['limit'] : null;
+                return $this->renderPostsShortcode((int) $attrs['category'], $order, $limit);
             }
-            $order = isset($attrs['order']) ? strtolower($attrs['order']) : 'desc';
-            $limit = isset($attrs['limit']) ? (int) $attrs['limit'] : null;
-            return $this->renderPostsShortcode((int) $attrs['category'], $order, $limit);
+
+            if (isset($attrs['latest'])) {
+                $limit = isset($attrs['limit']) ? (int) $attrs['limit'] : (int) $attrs['latest'];
+                if ($limit <= 0) {
+                    $limit = null;
+                }
+                return $this->renderLatestPostsShortcode($limit);
+            }
+
+            return '';
         }, $html);
     }
 
@@ -4430,6 +4440,24 @@ class EverPsBlog extends Module
             false,
             false,
             $orderWay
+        );
+        if (!$posts) {
+            return '';
+        }
+        $this->context->smarty->assign([
+            'posts' => $posts,
+            'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
+        ]);
+        return $this->display(__FILE__, 'views/templates/hook/shortcode.tpl');
+    }
+
+    private function renderLatestPostsShortcode($limit)
+    {
+        $posts = EverPsBlogPost::getLatestPosts(
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id,
+            0,
+            $limit
         );
         if (!$posts) {
             return '';

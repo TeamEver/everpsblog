@@ -31,6 +31,10 @@ Ever PS Blog is a free and multilingual module that adds a complete blog to your
 
 You can use a module like **Ever Block** to insert content on these hooks.
 
+### Shortcodes
+- `[everpsblog category="ID" limit="X" order="asc|desc"]` displays posts from a specific category.
+- `[everpsblog latest="X"]` shows the latest blog posts.
+
 ### Documentation
 A detailed guide in French is available at <https://www.team-ever.com/prestashop-1-7-un-module-de-blog-gratuit/>. You can also [support the project with a donation](https://www.paypal.com/donate?hosted_button_id=3CM3XREMKTMSE).
 
@@ -78,6 +82,10 @@ Ever PS Blog est un module gratuit et multilingue qui ajoute un blog complet à 
 
 Le module **Ever Block** peut être utilisé pour ajouter du contenu sur ces hooks.
 
+### Shortcodes
+- `[everpsblog category="ID" limit="X" order="asc|desc"]` affiche les articles d'une catégorie.
+- `[everpsblog latest="X"]` affiche les derniers articles du blog.
+
 ### Documentation
 Un guide complet est disponible en français à l’adresse suivante : <https://www.team-ever.com/prestashop-1-7-un-module-de-blog-gratuit/>. Vous pouvez aussi [soutenir le projet par un don](https://www.paypal.com/donate?hosted_button_id=3CM3XREMKTMSE).
 
@@ -117,6 +125,10 @@ Ever PS Blog es un módulo gratuito y multilingüe que añade un blog completo a
 
 Puedes usar un módulo como **Ever Block** para insertar contenido en estos hooks.
 
+### Shortcodes
+- `[everpsblog category="ID" limit="X" order="asc|desc"]` muestra las entradas de una categoría.
+- `[everpsblog latest="X"]` muestra las últimas entradas del blog.
+
 ### Documentación
 Hay una guía detallada en francés disponible en <https://www.team-ever.com/prestashop-1-7-un-module-de-blog-gratuit/>. También puedes [apoyar el proyecto con una donación](https://www.paypal.com/donate?hosted_button_id=3CM3XREMKTMSE).
 
@@ -155,6 +167,10 @@ Ever PS Blog è un modulo gratuito e multilingue che aggiunge un blog completo a
 - `displayAfterEverComment`
 
 È possibile utilizzare un modulo come **Ever Block** per inserire contenuti in questi hook.
+
+### Shortcodes
+- `[everpsblog category="ID" limit="X" order="asc|desc"]` mostra gli articoli di una categoria.
+- `[everpsblog latest="X"]` mostra gli ultimi articoli del blog.
 
 ### Documentazione
 È disponibile una guida dettagliata in francese su <https://www.team-ever.com/prestashop-1-7-un-module-de-blog-gratuit/>. Puoi anche [sostenere il progetto con una donazione](https://www.paypal.com/donate?hosted_button_id=3CM3XREMKTMSE).
