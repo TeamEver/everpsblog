@@ -223,24 +223,43 @@ class EverPsBlogImage extends ObjectModel
         . '_' . (int) $width
         . 'x' . (int) $height;
         if (!Cache::isStored($cache_id)) {
-            $original = _PS_IMG_DIR_ . $image_type . '/' . (int) $id_element . '.jpg';
+            $extension = 'jpg';
+            $original = _PS_IMG_DIR_ . $image_type . '/' . (int) $id_element . '.' . $extension;
+
+            if (!file_exists($original)) {
+                $image = self::getBlogImage((int) $id_element, (int) $id_shop, $image_type);
+                if (Validate::isLoadedObject($image)) {
+                    $source = _PS_ROOT_DIR_ . '/' . ltrim($image->image_link, '/');
+                    if (file_exists($source)) {
+                        $extension = pathinfo($source, PATHINFO_EXTENSION);
+                        $original = _PS_IMG_DIR_ . $image_type . '/' . (int) $id_element . '.' . $extension;
+                        if (!file_exists($original)) {
+                            Tools::copy($source, $original);
+                        }
+                    }
+                }
+            }
+
             if (!file_exists($original)) {
                 $return = self::getBlogImageUrl($id_element, $id_shop, $image_type);
                 Cache::store($cache_id, $return);
                 return $return;
             }
+
             $thumbDir = _PS_IMG_DIR_ . $image_type . '/thumbs/';
             if (!file_exists($thumbDir)) {
                 @mkdir($thumbDir, 0755, true);
             }
-            $thumbFile = $thumbDir . (int) $id_element . '-' . (int) $width . 'x' . (int) $height . '.jpg';
+
+            $thumbFile = $thumbDir . (int) $id_element . '-' . (int) $width . 'x' . (int) $height . '.' . $extension;
             if (!file_exists($thumbFile)) {
                 ImageManager::resize($original, $thumbFile, (int) $width, (int) $height);
             }
+
             $return = Tools::getHttpHost(true)
             . __PS_BASE_URI__
             . 'img/' . $image_type . '/thumbs/'
-            . (int) $id_element . '-' . (int) $width . 'x' . (int) $height . '.jpg';
+            . (int) $id_element . '-' . (int) $width . 'x' . (int) $height . '.' . $extension;
             Cache::store($cache_id, $return);
             return $return;
         }
