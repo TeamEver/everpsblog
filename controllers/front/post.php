@@ -35,6 +35,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
     protected $post;
     protected $blog;
     protected $author;
+    protected $default_category;
     public $controller_name = 'post';
 
     public function init()
@@ -72,6 +73,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 Tools::redirect('index.php?controller=404');
             }
         }
+        $this->default_category = $defaultCategory;
         if (isset($this->post->allowed_groups) && $this->post->allowed_groups) {
             if (is_array($this->post->allowed_groups)) {
                 $allowedGroups = [];
@@ -435,6 +437,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 'show_featured_post' => false,
                 'author_cover' => $this->author_cover,
                 'author' => $this->author,
+                'default_category' => $this->default_category,
                 'social_share_links' => $social_share_links,
                 'count_products' => $count_products,
                 'post' => $this->post,

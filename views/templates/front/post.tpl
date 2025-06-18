@@ -89,6 +89,9 @@
         <h1 class="text-start">{$post->title|escape:'htmlall':'UTF-8'}</h1>
         <p class="postpublished text-start">
             <strong>{$post->date_add|date_format:'%d %B %Y'|escape:'htmlall':'UTF-8'}</strong>
+            {if isset($default_category) && $default_category && !$default_category->is_root_category}
+                - <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category'=>$default_category->id_ever_category, 'link_rewrite'=>$default_category->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$default_category->title|escape:'htmlall':'UTF-8'}">{$default_category->title|escape:'htmlall':'UTF-8'}</a>
+            {/if}
         </p>
         {if isset($show_author) && $show_author}
         <p class="text-center author_cover_container">
