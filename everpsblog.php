@@ -163,6 +163,7 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERPSBLOG_AUTHOR_LAYOUT', 'layouts/layout-right-column.tpl')
             && Configuration::updateValue('EVERPSBLOG_TAG_LAYOUT', 'layouts/layout-right-column.tpl')
             && Configuration::updateValue('EVERBLOG_SHOW_FEAT_POST', 1)
+            && Configuration::updateValue('EVERBLOG_SHOW_POST_TAGS', 1)
             && Configuration::updateValue('EVERBLOG_SITEMAP_NUMBER', 5000)
             && Configuration::updateValue('EVERBLOG_MAIN_TITLE', (function () {
                 $title = [];
@@ -185,6 +186,7 @@ class EverPsBlog extends Module
             'id_module = ' . (int) $this->id
         );
         Configuration::deleteByName('EVERBLOG_CATEG_COLUMNS');
+        Configuration::deleteByName('EVERBLOG_SHOW_POST_TAGS');
         return parent::uninstall()
             && $this->uninstallModuleTab('AdminEverPsBlog')
             && $this->uninstallModuleTab('AdminEverPsBlogPost')
@@ -788,6 +790,13 @@ class EverPsBlog extends Module
                     'Error : The field "Show featured post image" is not valid'
                 );
             }
+            if (Tools::getValue('EVERBLOG_SHOW_POST_TAGS')
+                && !Validate::isBool(Tools::getValue('EVERBLOG_SHOW_POST_TAGS'))
+            ) {
+                $this->postErrors[] = $this->l(
+                    'Error : The field "Show tags on posts" is not valid'
+                );
+            }
             if (Tools::getValue('EVERBLOG_ARCHIVE_COLUMNS')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_ARCHIVE_COLUMNS'))
             ) {
@@ -1136,6 +1145,7 @@ class EverPsBlog extends Module
             'EVERBLOG_SHOW_FEAT_CAT' => Configuration::get('EVERBLOG_SHOW_FEAT_CAT'),
             'EVERBLOG_SHOW_FEAT_TAG' => Configuration::get('EVERBLOG_SHOW_FEAT_TAG'),
             'EVERBLOG_SHOW_FEAT_POST' => Configuration::get('EVERBLOG_SHOW_FEAT_POST'),
+            'EVERBLOG_SHOW_POST_TAGS' => Configuration::get('EVERBLOG_SHOW_POST_TAGS'),
             'EVERBLOG_ARCHIVE_COLUMNS' => Configuration::get('EVERBLOG_ARCHIVE_COLUMNS'),
             'EVERBLOG_TAG_COLUMNS' => Configuration::get('EVERBLOG_TAG_COLUMNS'),
             'EVERBLOG_PRODUCT_COLUMNS' => Configuration::get('EVERBLOG_PRODUCT_COLUMNS'),
@@ -1377,6 +1387,27 @@ class EverPsBlog extends Module
                         'hint' => $this->l('Else will only be shown on admin'),
                         'required' => false,
                         'name' => 'EVERBLOG_SHOW_POST_COUNT',
+                        'is_bool' => true,
+                        'values' => [
+                            [
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'switch',
+                        'label' => $this->l('Show tags on posts ?'),
+                        'desc' => $this->l('Display tags on post pages'),
+                        'hint' => $this->l('Set no to hide tags on posts'),
+                        'required' => false,
+                        'name' => 'EVERBLOG_SHOW_POST_TAGS',
                         'is_bool' => true,
                         'values' => [
                             [
