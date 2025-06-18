@@ -84,6 +84,40 @@
         </div>
     </form>
 </div>
+{if ((isset($evercategory) && $evercategory|count > 0) || (isset($evertags) && $evertags|count > 0))}
+<form id="everpsblog-filter" class="row mb-3" onsubmit="return false;">
+    {if isset($evercategory) && $evercategory|count > 0}
+    <div class="col">
+        <select id="everpsblog-category" class="form-select" name="category">
+            <option value="0">{l s='Category' mod='everpsblog'}</option>
+            {foreach from=$evercategory item=item}
+                {if !$item.is_root_category}
+                <option value="{$item.id_ever_category}">{$item.title|escape:'htmlall':'UTF-8'}</option>
+                {/if}
+            {/foreach}
+        </select>
+    </div>
+    {/if}
+    {if isset($evertags) && $evertags|count > 0}
+    <div class="col">
+        <select id="everpsblog-tag" class="form-select" name="tag">
+            <option value="0">{l s='Tag' mod='everpsblog'}</option>
+            {foreach from=$evertags item=tag}
+                <option value="{$tag.id_ever_tag}">{$tag.title|escape:'htmlall':'UTF-8'}</option>
+            {/foreach}
+        </select>
+    </div>
+    {/if}
+    <div class="col-auto">
+        <button id="everpsblog-filter-submit" class="btn btn-primary">{l s='Filter' mod='everpsblog'}</button>
+    </div>
+</form>
+{/if}
+{if isset($facet_url)}
+<script type="text/javascript">
+    var facetUrl = '{$facet_url|escape:'javascript'}';
+</script>
+{/if}
 {if isset($allow_feed) && $allow_feed}
 <a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' mod='everpsblog'} {$page.meta.title|escape:'htmlall':'UTF-8'}</a>
 {/if}
@@ -108,7 +142,7 @@
 {/if}
 
 {if isset($post_number) && $post_number > 0}
-<div class="row mt-2">
+<div class="row mt-2" id="everpsblog-posts">
 {hook h="displayBeforeEverLoop"}
 {foreach from=$everpsblog item=item}
 {include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}

@@ -36,4 +36,29 @@ $(document).ready(function(){
             $this.wrap(a).parent().addClass('fancybox').attr('rel', 'gallery').fancybox();
         });
     }
+
+    if ($('#everpsblog-filter').length) {
+        $('#everpsblog-filter-submit').on('click', function() {
+            var cat = $('#everpsblog-category').val();
+            var tag = $('#everpsblog-tag').val();
+            if ((!cat || cat === '0') && (!tag || tag === '0')) {
+                return;
+            }
+            $.ajax({
+                url: typeof facetUrl !== 'undefined' ? facetUrl : '',
+                method: 'GET',
+                data: {
+                    category: cat,
+                    tag: tag,
+                    ajax: 1
+                },
+                dataType: 'json'
+            }).done(function(resp){
+                if (resp.html !== undefined) {
+                    $('#everpsblog-posts').html(resp.html);
+                    $(document).trigger('everpsblogAjaxLoaded');
+                }
+            });
+        });
+    }
 });
