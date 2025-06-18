@@ -4454,6 +4454,13 @@ class EverPsBlog extends Module
                 return $this->renderLatestPostsShortcode($limit);
             }
 
+            if (isset($attrs['product'])) {
+                $limit = isset($attrs['limit']) ? (int) $attrs['limit'] : null;
+                $orderBy = isset($attrs['orderby']) ? $attrs['orderby'] : 'date_add';
+                $orderWay = isset($attrs['orderway']) ? strtoupper($attrs['orderway']) : 'DESC';
+                return $this->renderProductPostsShortcode((int) $attrs['product'], $orderBy, $orderWay, $limit);
+            }
+
             return '';
         }, $html);
     }
@@ -4489,6 +4496,39 @@ class EverPsBlog extends Module
             (int) $this->context->shop->id,
             0,
             $limit
+        );
+        if (!$posts) {
+            return '';
+        }
+        $this->context->smarty->assign([
+            'posts' => $posts,
+            'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
+        ]);
+        return $this->display(__FILE__, 'views/templates/hook/shortcode.tpl');
+    }
+
+    /**
+     * Render posts associated with a product
+     *
+     * @param int $product  Product ID
+     * @param string $orderBy Field used for ordering
+     * @param string $orderWay Order direction ASC|DESC
+     * @param int|null $limit Maximum number of posts
+     *
+     * @return string
+     */
+    private function renderProductPostsShortcode($product, $orderBy, $orderWay, $limit = null)
+    {
+        $orderWay = strtoupper($orderWay) === 'ASC' ? 'ASC' : 'DESC';
+        $posts = EverPsBlogPost::getPostsByProduct(
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id,
+            (int) $product,
+            0,
+            $limit,
+            'published',
+            $orderBy,
+            $orderWay
         );
         if (!$posts) {
             return '';

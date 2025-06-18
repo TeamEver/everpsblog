@@ -34,6 +34,7 @@ You can use a module like **Ever Block** to insert content on these hooks.
 ### Shortcodes
 - `[everpsblog category="ID" limit="X" order="asc|desc"]` displays posts from a specific category.
 - `[everpsblog latest="X"]` shows the latest blog posts.
+- `[everpsblog product="ID" orderby="FIELD" orderway="asc|desc" limit="X"]` lists posts linked to a product.
 
 ### Documentation
 A detailed guide in French is available at <https://www.team-ever.com/prestashop-1-7-un-module-de-blog-gratuit/>. You can also [support the project with a donation](https://www.paypal.com/donate?hosted_button_id=3CM3XREMKTMSE).
@@ -85,6 +86,7 @@ Le module **Ever Block** peut être utilisé pour ajouter du contenu sur ces hoo
 ### Shortcodes
 - `[everpsblog category="ID" limit="X" order="asc|desc"]` affiche les articles d'une catégorie.
 - `[everpsblog latest="X"]` affiche les derniers articles du blog.
+- `[everpsblog product="ID" orderby="CHAMP" orderway="asc|desc" limit="X"]` liste les articles liés à un produit.
 
 ### Documentation
 Un guide complet est disponible en français à l’adresse suivante : <https://www.team-ever.com/prestashop-1-7-un-module-de-blog-gratuit/>. Vous pouvez aussi [soutenir le projet par un don](https://www.paypal.com/donate?hosted_button_id=3CM3XREMKTMSE).
@@ -128,6 +130,7 @@ Puedes usar un módulo como **Ever Block** para insertar contenido en estos hook
 ### Shortcodes
 - `[everpsblog category="ID" limit="X" order="asc|desc"]` muestra las entradas de una categoría.
 - `[everpsblog latest="X"]` muestra las últimas entradas del blog.
+- `[everpsblog product="ID" orderby="CAMPO" orderway="asc|desc" limit="X"]` lista las entradas vinculadas a un producto.
 
 ### Documentación
 Hay una guía detallada en francés disponible en <https://www.team-ever.com/prestashop-1-7-un-module-de-blog-gratuit/>. También puedes [apoyar el proyecto con una donación](https://www.paypal.com/donate?hosted_button_id=3CM3XREMKTMSE).
@@ -171,6 +174,7 @@ Ever PS Blog è un modulo gratuito e multilingue che aggiunge un blog completo a
 ### Shortcodes
 - `[everpsblog category="ID" limit="X" order="asc|desc"]` mostra gli articoli di una categoria.
 - `[everpsblog latest="X"]` mostra gli ultimi articoli del blog.
+- `[everpsblog product="ID" orderby="CAMPO" orderway="asc|desc" limit="X"]` elenca gli articoli collegati a un prodotto.
 
 ### Documentazione
 È disponibile una guida dettagliata in francese su <https://www.team-ever.com/prestashop-1-7-un-module-de-blog-gratuit/>. Puoi anche [sostenere il progetto con una donazione](https://www.paypal.com/donate?hosted_button_id=3CM3XREMKTMSE).
