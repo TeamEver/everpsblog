@@ -37,7 +37,7 @@
     <p class="text-uppercase h6 hidden-sm-down">{l s='Linked products' mod='everpsblog'}</p>
     <div class="products">
         {foreach from=$ps_products item="product"}
-            {include file="catalog/_partials/miniatures/product.tpl" product=$product}
+            {include file="catalog/_partials/miniatures/product.tpl" product=$product productClasses="col-12"}
         {/foreach}
     </div>
 </div>
