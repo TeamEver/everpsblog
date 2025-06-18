@@ -206,6 +206,48 @@ class EverPsBlogImage extends ObjectModel
     }
 
     /**
+     * Get resized blog image link
+     * @param int $id_element
+     * @param int $id_shop
+     * @param string $image_type
+     * @param int $width
+     * @param int $height
+     * @return string image link
+     */
+    public static function getBlogThumbUrl($id_element, $id_shop, $image_type, $width = 320, $height = 180)
+    {
+        $cache_id = 'EverPsBlogImage::getBlogThumbUrl_'
+        . (int) $id_element
+        . '_' . (int) $id_shop
+        . '_' . $image_type
+        . '_' . (int) $width
+        . 'x' . (int) $height;
+        if (!Cache::isStored($cache_id)) {
+            $original = _PS_IMG_DIR_ . $image_type . '/' . (int) $id_element . '.jpg';
+            if (!file_exists($original)) {
+                $return = self::getBlogImageUrl($id_element, $id_shop, $image_type);
+                Cache::store($cache_id, $return);
+                return $return;
+            }
+            $thumbDir = _PS_IMG_DIR_ . $image_type . '/thumbs/';
+            if (!file_exists($thumbDir)) {
+                @mkdir($thumbDir, 0755, true);
+            }
+            $thumbFile = $thumbDir . (int) $id_element . '-' . (int) $width . 'x' . (int) $height . '.jpg';
+            if (!file_exists($thumbFile)) {
+                ImageManager::resize($original, $thumbFile, (int) $width, (int) $height);
+            }
+            $return = Tools::getHttpHost(true)
+            . __PS_BASE_URI__
+            . 'img/' . $image_type . '/thumbs/'
+            . (int) $id_element . '-' . (int) $width . 'x' . (int) $height . '.jpg';
+            Cache::store($cache_id, $return);
+            return $return;
+        }
+        return Cache::retrieve($cache_id);
+    }
+
+    /**
      * Check if image exists on PS folder
      * @param int id_element, string image_type
      * @return bool file exists or not

@@ -18,7 +18,7 @@
     <article class="col-6 col-md-4 mb-4 article everpsblog" id="everpsblog-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
         <div class="article-img text-center mb-2">
             {if isset($show_featured_post) && $show_featured_post}
-            <img src="{$item.featured_image|escape:'htmlall':'UTF-8'}" class="img-fluid w-100 {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" />
+            <img src="{$item.featured_thumb|escape:'htmlall':'UTF-8'}" width="320" height="180" class="img-fluid w-100 {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" />
             {/if}
         </div>
         <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
