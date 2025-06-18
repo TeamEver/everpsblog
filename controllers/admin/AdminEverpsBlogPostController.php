@@ -1057,11 +1057,14 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 $post->id_author = Tools::getValue('id_author');
             }
             // Categories, products and tags
-            // Default category is fully required
+            // Default category is fully required and cannot be root
+            $rootCategory = EverPsBlogCategory::getRootCategory();
             if (!Tools::getValue('id_default_category')
                 || !Validate::isInt(Tools::getValue('id_default_category'))
             ) {
-                $post->id_parent_category = $this->unclassedCategory;
+                $this->errors[] = $this->l('Default category is required');
+            } elseif ((int) Tools::getValue('id_default_category') == (int) $rootCategory->id) {
+                $this->errors[] = $this->l('Default category cannot be the root category');
             } else {
                 $post->id_default_category = Tools::getValue('id_default_category');
             }
