@@ -942,7 +942,9 @@ class EverPsBlogPost extends ObjectModel
         $id_product,
         $start = 0,
         $limit = null,
-        $post_status = 'published'
+        $post_status = 'published',
+        $orderBy = 'date_add',
+        $orderWay = 'DESC'
     ) {
         $cache_id = 'EverPsBlogPost::getPostsByProduct_'
         . (int) $id_lang
@@ -955,7 +957,11 @@ class EverPsBlogPost extends ObjectModel
         . '_'
         . (int) $limit
         . '_'
-        . $post_status;
+        . $post_status
+        . '_'
+        . pSQL($orderBy)
+        . '_'
+        . pSQL($orderWay);
         if (!Cache::isStored($cache_id)) {
             $context = Context::getContext();
             if ((int) $limit <= 0) {
@@ -978,7 +984,7 @@ class EverPsBlogPost extends ObjectModel
             $sql->where('bp.id_shop = ' . (int) $id_shop);
             $sql->where('bpl.id_lang = ' . (int) $id_lang);
             $sql->where('bpp.' . self::$definition['primary'] . '_product = ' . (int) $id_product);
-            $sql->orderBy('bp.date_add DESC');
+            $sql->orderBy('bp.' . pSQL($orderBy) . ' ' . pSQL($orderWay));
             $sql->limit((int) $limit, (int) $start);
             $posts = Db::getInstance()->executeS($sql);
             $return = [];
