@@ -139,7 +139,7 @@
   <h2 class="text-center">{l s='Our best products' mod='everpsblog'}</h2>
   <div class="products row">
     {foreach from=$everhome_products item="product"}
-      {include file="catalog/_partials/miniatures/product.tpl" product=$product}
+      {include file="catalog/_partials/miniatures/product.tpl" product=$product productClasses="col-12"}
     {/foreach}
   </div>
 </section>
