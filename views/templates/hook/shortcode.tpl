@@ -3,7 +3,7 @@
     <div class="col-12 col-md-4 article everpsblog mb-3" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
         <div class="col-12 article-img">
             {if isset($show_featured_post) && $show_featured_post}
-            <img src="{$item->featured_image|escape:'htmlall':'UTF-8'}" class="img img-fluid" alt="{$item->title|escape:'htmlall':'UTF-8'}" />
+            <img src="{$item->featured_thumb|escape:'htmlall':'UTF-8'}" width="320" height="180" class="img img-fluid" alt="{$item->title|escape:'htmlall':'UTF-8'}" />
             {/if}
         </div>
         <div class="col-12">

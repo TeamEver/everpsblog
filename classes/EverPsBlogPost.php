@@ -305,6 +305,11 @@ class EverPsBlogPost extends ObjectModel
                         (int) $id_shop,
                         'post'
                     );
+                    $post['featured_thumb'] = EverPsBlogImage::getBlogThumbUrl(
+                        (int) $post[self::$definition['primary']],
+                        (int) $id_shop,
+                        'post'
+                    );
                     $return[] = $post;
                 }
             } else {
@@ -424,6 +429,11 @@ class EverPsBlogPost extends ObjectModel
                     (int) Configuration::get('EVERPSBLOG_EXCERPT')
                 );
                 $post->featured_image = EverPsBlogImage::getBlogImageUrl(
+                    (int) $post->id,
+                    (int) $id_shop,
+                    'post'
+                );
+                $post->featured_thumb = EverPsBlogImage::getBlogThumbUrl(
                     (int) $post->id,
                     (int) $id_shop,
                     'post'
@@ -677,6 +687,11 @@ class EverPsBlogPost extends ObjectModel
                     (int) $id_shop,
                     'post'
                 );
+                $post->featured_thumb = EverPsBlogImage::getBlogThumbUrl(
+                    (int) $post->id,
+                    (int) $id_shop,
+                    'post'
+                );
                 $return[] = $post;
             }
             if ($return) {
@@ -804,6 +819,11 @@ class EverPsBlogPost extends ObjectModel
                     (int) $id_shop,
                     'post'
                 );
+                $post->featured_thumb = EverPsBlogImage::getBlogThumbUrl(
+                    (int) $post->id,
+                    (int) $id_shop,
+                    'post'
+                );
                 $return[] = $post;
             }
             if ($return) {
@@ -921,6 +941,11 @@ class EverPsBlogPost extends ObjectModel
                     (int) $id_shop,
                     'post'
                 );
+                $post->featured_thumb = EverPsBlogImage::getBlogThumbUrl(
+                    (int) $post->id,
+                    (int) $id_shop,
+                    'post'
+                );
                 $return[] = $post;
             }
             if ($return) {
@@ -1033,6 +1058,11 @@ class EverPsBlogPost extends ObjectModel
                     (int) Configuration::get('EVERPSBLOG_EXCERPT')
                 );
                 $post->featured_image = EverPsBlogImage::getBlogImageUrl(
+                    (int) $post->id,
+                    (int) $id_shop,
+                    'post'
+                );
+                $post->featured_thumb = EverPsBlogImage::getBlogThumbUrl(
                     (int) $post->id,
                     (int) $id_shop,
                     'post'
