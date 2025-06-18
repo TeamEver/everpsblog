@@ -450,6 +450,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 'comments' => (array) $comments,
                 'commentsCount' => (int) $commentsCount,
                 'allow_views_count' => (bool) Configuration::get('EVERBLOG_SHOW_POST_COUNT'),
+                'show_post_tags' => (bool) Configuration::get('EVERBLOG_SHOW_POST_TAGS'),
                 'only_logged_comment' => (bool) Configuration::get('EVERBLOG_ONLY_LOGGED_COMMENT'),
             ]);
             if (Module::isInstalled('prettyblocks')

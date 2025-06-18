@@ -131,12 +131,12 @@
             {if isset($allow_views_count) && $allow_views_count > 0}
             <span class="postviews"> | {$post->count|escape:'htmlall':'UTF-8'} {l s='Views' mod='everpsblog'}</span>
             {/if}
-            {if isset($tags) && $tags}
-            <p class="taggedIn d-none">{l s='Tagged in' mod='everpsblog'}
+            {if isset($show_post_tags) && $show_post_tags && isset($tags) && $tags}
+            <div class="post-tags">
             {foreach from=$tags item=tag}
-                <a href="{$link->getModuleLink('everpsblog', 'tag', ['id_ever_tag'=>$tag->id, 'link_rewrite'=>$tag->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$tag->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{$tag->title|escape:'htmlall':'UTF-8'}</a>&nbsp;
+                <a href="{$link->getModuleLink('everpsblog', 'tag', ['id_ever_tag'=>$tag->id, 'link_rewrite'=>$tag->link_rewrite])|escape:'htmlall':'UTF-8'}" class="badge badge-info m-1" title="{$tag->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{$tag->title|escape:'htmlall':'UTF-8'}</a>
             {/foreach}
-            </p>
+            </div>
             {/if}
         </div>
             <div class="col-12 col-md-6">

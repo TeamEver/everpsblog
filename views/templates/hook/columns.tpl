@@ -46,7 +46,7 @@
 <div class="columns_everblog_wrapper tag_wrapper">
     <p class="text-uppercase h6 hidden-sm-down">{l s='Tags from the blog' mod='everpsblog'}</p>
 {foreach from=$tags item=tag}
-    <a href="{$link->getModuleLink('everpsblog', 'tag', ['id_ever_tag'=>$tag.id_ever_tag, 'link_rewrite' => $tag.link_rewrite])|escape:'htmlall':'UTF-8'}" class="tag" title="{$tag.title|escape:'htmlall':'UTF-8'}">
+    <a href="{$link->getModuleLink('everpsblog', 'tag', ['id_ever_tag'=>$tag.id_ever_tag, 'link_rewrite' => $tag.link_rewrite])|escape:'htmlall':'UTF-8'}" class="badge badge-info m-1 tag" title="{$tag.title|escape:'htmlall':'UTF-8'}">
         {$tag.title|escape:'htmlall':'UTF-8'}
     </a>
 {/foreach}
