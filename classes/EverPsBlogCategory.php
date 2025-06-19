@@ -252,7 +252,7 @@ class EverPsBlogCategory extends ObjectModel
                 'bc',
                 'bc.' . self::$definition['primary'] . ' = bcl.' . self::$definition['primary']
             );
-            $sql->leftJoin(
+            $sql->innerJoin(
                 self::$definition['table'] . '_shop',
                 'bcs',
                 'bc.' . self::$definition['primary'] . ' = bcs.' . self::$definition['primary']
@@ -334,7 +334,7 @@ class EverPsBlogCategory extends ObjectModel
                 'bc',
                 'bc.' . self::$definition['primary'] . ' = bcl.' . self::$definition['primary']
             );
-            $sql->leftJoin(
+            $sql->innerJoin(
                 self::$definition['table'] . '_shop',
                 'bcs',
                 'bc.' . self::$definition['primary'] . ' = bcs.' . self::$definition['primary']
@@ -387,7 +387,7 @@ class EverPsBlogCategory extends ObjectModel
                 'bc',
                 'bc.' . self::$definition['primary'] . ' = bcl.' . self::$definition['primary']
             );
-            $sql->leftJoin(
+            $sql->innerJoin(
                 self::$definition['table'] . '_shop',
                 'bcs',
                 'bc.' . self::$definition['primary'] . ' = bcs.' . self::$definition['primary']
