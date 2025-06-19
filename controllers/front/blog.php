@@ -146,6 +146,10 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             true,
             1
         );
+        $evertags = EverPsBlogTag::getAllTags(
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
+        );
         $animate = Configuration::get(
             'EVERBLOG_ANIMATE'
         );
@@ -173,6 +177,10 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             (int) $this->context->language->id,
             (int) $this->context->shop->id
         );
+        $facet_url = $this->context->link->getModuleLink(
+            $this->module->name,
+            'filter'
+        );
         $this->context->smarty->assign([
             'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
             'blog_path' => $this->blog_path,
@@ -188,6 +196,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             'everpsblog' => $everpsblogposts,
             'starredPosts' => $starredPosts,
             'evercategory' => $evercategories,
+            'evertags' => $evertags,
             'default_lang' => (int) $this->context->language->id,
             'id_lang' => (int) $this->context->language->id,
             'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__ . 'modules/everpsblog/views/img/',
@@ -195,6 +204,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             'show_featured_post' => true,
             'pagination' => $pagination,
             'show_featured_cat' => (bool) Configuration::get('EVERBLOG_SHOW_FEAT_CAT'),
+            'facet_url' => $facet_url,
             'sort_orders' => $sortOrders,
             'sort_selected' => $sortSelected ? $sortSelected['label'] : null,
         ]);
