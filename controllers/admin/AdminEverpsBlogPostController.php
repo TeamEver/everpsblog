@@ -1060,7 +1060,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
             // Default category is fully required and cannot be root
             $rootCategory = EverPsBlogCategory::getRootCategory();
             if (!Tools::getValue('id_default_category')
-                || !Validate::isInt(Tools::getValue('id_default_category'))
+                || !Validate::isUnsignedInt(Tools::getValue('id_default_category'))
             ) {
                 $this->errors[] = $this->l('Default category is required');
             } elseif ((int) Tools::getValue('id_default_category') == (int) $rootCategory->id) {
@@ -1073,7 +1073,7 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 $post_categories = [$post_categories];
             }
             if (!in_array(Tools::getValue('id_default_category'), $post_categories)) {
-                $post_categories[] = $this->unclassedCategory;
+                $post_categories[] = (int) Tools::getValue('id_default_category');
             }
             $post->post_categories = json_encode($post_categories);
             $post->allowed_groups = json_encode(Tools::getValue('allowed_groups'));
