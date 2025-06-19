@@ -92,6 +92,7 @@ class EverPsBlog extends Module
             $root_category->is_root_category = 1;
             $root_category->active = 1;
             $root_category->id_shop = (int) $shop['id_shop'];
+            $root_category->id_shop_list = [(int) $shop['id_shop']];
             foreach (Language::getLanguages(false) as $language) {
                 $root_category->title[$language['id_lang']] = 'Root';
                 $root_category->content[$language['id_lang']] = 'Root';
@@ -103,6 +104,7 @@ class EverPsBlog extends Module
             $unclassed_category->id_parent_category = 0;
             $unclassed_category->active = 1;
             $unclassed_category->id_shop = (int) $shop['id_shop'];
+            $unclassed_category->id_shop_list = [(int) $shop['id_shop']];
             foreach (Language::getLanguages(false) as $language) {
                 $unclassed_category->title[$language['id_lang']] = $this->l('Unclassed');
                 $unclassed_category->content[$language['id_lang']] = '';
@@ -2721,6 +2723,7 @@ class EverPsBlog extends Module
         $root_category->is_root_category = 1;
         $root_category->active = 1;
         $root_category->id_shop = (int) $shop->id;
+        $root_category->id_shop_list = [(int) $shop->id];
         foreach (Language::getLanguages(false) as $language) {
             $root_category->title[$language['id_lang']] = 'Root';
             $root_category->content[$language['id_lang']] = 'Root';
@@ -2916,6 +2919,7 @@ class EverPsBlog extends Module
             $unclassed_category->active = 1;
             $unclassed_category->active = $root_category->id;
             $unclassed_category->id_shop = (int) $shop['id_shop'];
+            $unclassed_category->id_shop_list = [(int) $shop['id_shop']];
             foreach (Language::getLanguages(false) as $language) {
                 $unclassed_category->title[$language['id_lang']] = $this->l('Unclassed');
                 $unclassed_category->content[$language['id_lang']] = '';
