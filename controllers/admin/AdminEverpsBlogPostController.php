@@ -1134,6 +1134,29 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                     );
                 }
             }
+            // Copy default language values to empty translations
+            $defaultLang = (int) Configuration::get('PS_LANG_DEFAULT');
+            foreach (Language::getLanguages(false) as $lang) {
+                $idLang = (int) $lang['id_lang'];
+                if (empty($post->title[$idLang])) {
+                    $post->title[$idLang] = $post->title[$defaultLang] ?? '';
+                }
+                if (empty($post->content[$idLang])) {
+                    $post->content[$idLang] = $post->content[$defaultLang] ?? '';
+                }
+                if (empty($post->excerpt[$idLang])) {
+                    $post->excerpt[$idLang] = $post->excerpt[$defaultLang] ?? '';
+                }
+                if (empty($post->meta_title[$idLang])) {
+                    $post->meta_title[$idLang] = $post->meta_title[$defaultLang] ?? '';
+                }
+                if (empty($post->meta_description[$idLang])) {
+                    $post->meta_description[$idLang] = $post->meta_description[$defaultLang] ?? '';
+                }
+                if (empty($post->link_rewrite[$idLang])) {
+                    $post->link_rewrite[$idLang] = $post->link_rewrite[$defaultLang] ?? '';
+                }
+            }
             if (!count($this->errors)) {
                 try {
                     $post->save();
