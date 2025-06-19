@@ -1057,23 +1057,22 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 $post->id_author = Tools::getValue('id_author');
             }
             // Categories, products and tags
-            // Default category is fully required and cannot be root
+            // Default category cannot be root and defaults to unclassed
             $rootCategory = EverPsBlogCategory::getRootCategory();
-            if (!Tools::getValue('id_default_category')
-                || !Validate::isUnsignedInt(Tools::getValue('id_default_category'))
-            ) {
-                $this->errors[] = $this->l('Default category is required');
-            } elseif ((int) Tools::getValue('id_default_category') == (int) $rootCategory->id) {
+            $idDefaultCategory = (int) Tools::getValue('id_default_category');
+            if (!$idDefaultCategory || !Validate::isUnsignedInt($idDefaultCategory)) {
+                $post->id_default_category = (int) $this->unclassedCategory;
+            } elseif ($idDefaultCategory == (int) $rootCategory->id) {
                 $this->errors[] = $this->l('Default category cannot be the root category');
             } else {
-                $post->id_default_category = Tools::getValue('id_default_category');
+                $post->id_default_category = $idDefaultCategory;
             }
             $post_categories = Tools::getValue('post_categories');
             if (!is_array($post_categories)) {
                 $post_categories = [$post_categories];
             }
-            if (!in_array(Tools::getValue('id_default_category'), $post_categories)) {
-                $post_categories[] = (int) Tools::getValue('id_default_category');
+            if (!in_array($post->id_default_category, $post_categories)) {
+                $post_categories[] = (int) $post->id_default_category;
             }
             $post->post_categories = json_encode($post_categories);
             $post->allowed_groups = json_encode(Tools::getValue('allowed_groups'));
