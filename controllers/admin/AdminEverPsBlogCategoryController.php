@@ -28,21 +28,16 @@ require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogComment.php';
 require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogCleaner.php';
 require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogImage.php';
 
-class AdminEverPsBlogCategoryController extends ModuleAdminController
+class AdminEverPsBlogCategoryController extends EverPsBlogAdminController
 {
     private $html;
 
     public function __construct()
     {
         $this->name = 'AdminEverPsBlogCategoryController';
-        $this->bootstrap = true;
         $this->display = $this->l('Ever Blog Categories');
         $this->table = 'ever_blog_category';
         $this->className = 'EverPsBlogCategory';
-        $this->module_name = 'everpsblog';
-        $this->shop_url = Tools::getHttpHost(true) . __PS_BASE_URI__;
-        $this->img_url = $this->shop_url . 'modules/' . $this->module_name . '/views/img/';
-        $this->context = Context::getContext();
         $this->identifier = 'id_ever_category';
         $this->_orderBy = $this->identifier;
         $this->_orderWay = 'DESC';
@@ -64,6 +59,12 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
             'title' => [
                 'title' => $this->l('Category title'),
                 'align' => 'left',
+            ],
+            'posts_count' => [
+                'title' => $this->l('Posts'),
+                'align' => 'center',
+                'orderby' => false,
+                'filter' => false,
             ],
             'active' => [
                 'title' => $this->l('Active'),
@@ -109,6 +110,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
         $this->colorOnBackground = true;
         $this->unclassedCategory = (int) Configuration::get('EVERBLOG_UNCLASSED_ID');
         $this->_select = 'l.title,
+        (SELECT COUNT(*) FROM `'._DB_PREFIX_.'ever_blog_post_category` pc WHERE pc.id_ever_post_category = a.id_ever_category) AS posts_count,
         CONCAT("' . $this->img_url . '",ai.image_link) AS featured_img';
 
         $this->_join =
@@ -125,71 +127,6 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
         .' AND a.is_root_category != 1'
         .' AND a.id_ever_category != ' . $this->unclassedCategory
         .' AND l.id_lang = ' . (int) $this->context->language->id;
-        $moduleConfUrl  = 'index.php?controller=AdminModules&configure=everpsblog&token=';
-        $moduleConfUrl .= Tools::getAdminTokenLite('AdminModules');
-        $postUrl  = 'index.php?controller=AdminEverPsBlogPost&token=';
-        $postUrl .= Tools::getAdminTokenLite('AdminEverPsBlogPost');
-        $authorUrl  = 'index.php?controller=AdminEverPsBlogAuthor&token=';
-        $authorUrl .= Tools::getAdminTokenLite('AdminEverPsBlogAuthor');
-        $categoryUrl  = 'index.php?controller=AdminEverPsBlogCategory&token=';
-        $categoryUrl .= Tools::getAdminTokenLite('AdminEverPsBlogCategory');
-        $tagUrl  = 'index.php?controller=AdminEverPsBlogTag&token=';
-        $tagUrl .= Tools::getAdminTokenLite('AdminEverPsBlogTag');
-        $commentUrl  = 'index.php?controller=AdminEverPsBlogComment&token=';
-        $commentUrl .= Tools::getAdminTokenLite('AdminEverPsBlogComment');
-        $blogUrl = Context::getContext()->link->getModuleLink(
-            'everpsblog',
-            'blog',
-            [],
-            true
-        );
-        $ever_blog_token = Tools::encrypt('everpsblog/cron');
-        $emptytrash = $this->context->link->getModuleLink(
-            $this->module_name,
-            'emptytrash',
-            [
-                'token' => $ever_blog_token,
-                'id_shop' => (int) $this->context->shop->id,
-            ],
-            true,
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
-        );
-        $pending = $this->context->link->getModuleLink(
-            $this->module_name,
-            'pending',
-            [
-                'token' => $ever_blog_token,
-                'id_shop' => (int) $this->context->shop->id,
-            ],
-            true,
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
-        );
-        $planned = $this->context->link->getModuleLink(
-            $this->module_name,
-            'planned',
-            [
-                'token' => $ever_blog_token,
-                'id_shop' => (int) $this->context->shop->id,
-            ],
-            true,
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
-        );
-        $this->context->smarty->assign([
-            'image_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'/modules/everpsblog/views/img/',
-            'everpsblogcron' => $emptytrash,
-            'everpsblogcronpending' => $pending,
-            'everpsblogcronplanned' => $planned,
-            'moduleConfUrl' => $moduleConfUrl,
-            'authorUrl' => $authorUrl,
-            'postUrl' => $postUrl,
-            'categoryUrl' => $categoryUrl,
-            'tagUrl' => $tagUrl,
-            'commentUrl' => $commentUrl,
-            'blogUrl' => $blogUrl,
-        ]);
         parent::__construct();
     }
 
@@ -233,27 +170,7 @@ class AdminEverPsBlogCategoryController extends ModuleAdminController
         if (Tools::isSubmit('submitBulkenableSelection' . $this->table)) {
             $this->processBulkEnable();
         }
-        $lists = parent::renderList();
-        $this->html .= $this->context->smarty->fetch(
-            _PS_MODULE_DIR_
-            . '/' . $this->module->name . '/views/templates/admin/headerController.tpl'
-        );
-        $blog_instance = Module::getInstanceByName($this->module_name);
-        if ($blog_instance->checkLatestEverModuleVersion()) {
-            $this->html .= $this->context->smarty->fetch(
-                _PS_MODULE_DIR_
-                . '/'
-                . $this->module_name
-                . '/views/templates/admin/upgrade.tpl'
-            );
-        }
-        $this->html .= $lists;
-        $this->html .= $this->context->smarty->fetch(
-            _PS_MODULE_DIR_
-            . '/' . $this->module->name . '/views/templates/admin/footer.tpl'
-        );
-
-        return $this->html;
+        return parent::renderList();
     }
 
     public function renderForm()

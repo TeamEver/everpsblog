@@ -30,7 +30,7 @@ require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogTaxonomy.php';
 require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogImage.php';
 require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogCleaner.php';
 
-class AdminEverPsBlogPostController extends ModuleAdminController
+class AdminEverPsBlogPostController extends EverPsBlogAdminController
 {
     private $html;
     public $name;
@@ -38,13 +38,9 @@ class AdminEverPsBlogPostController extends ModuleAdminController
     public function __construct()
     {
         $this->name = 'AdminEverPsBlogPostController';
-        $this->bootstrap = true;
         $this->display = $this->l('Ever Blog Posts');
         $this->table = 'ever_blog_post';
         $this->className = 'EverPsBlogPost';
-        $this->shop_url = Tools::getHttpHost(true) . __PS_BASE_URI__;
-        $this->img_url = $this->shop_url . 'modules/everpsblog/views/img/';
-        $this->context = Context::getContext();
         $this->identifier = 'id_ever_post';
         $this->_orderBy = $this->identifier;
         $this->_orderWay = 'DESC';
@@ -153,71 +149,6 @@ class AdminEverPsBlogPostController extends ModuleAdminController
                 )';
         $this->_where = 'AND a.id_shop = ' . (int) $this->context->shop->id;
         $this->_where = 'AND l.id_lang = ' . (int) $this->context->language->id;
-        $moduleConfUrl  = 'index.php?controller=AdminModules&configure=everpsblog&token=';
-        $moduleConfUrl .= Tools::getAdminTokenLite('AdminModules');
-        $postUrl  = 'index.php?controller=AdminEverPsBlogPost&token=';
-        $postUrl .= Tools::getAdminTokenLite('AdminEverPsBlogPost');
-        $authorUrl  = 'index.php?controller=AdminEverPsBlogAuthor&token=';
-        $authorUrl .= Tools::getAdminTokenLite('AdminEverPsBlogAuthor');
-        $categoryUrl  = 'index.php?controller=AdminEverPsBlogCategory&token=';
-        $categoryUrl .= Tools::getAdminTokenLite('AdminEverPsBlogCategory');
-        $tagUrl  = 'index.php?controller=AdminEverPsBlogTag&token=';
-        $tagUrl .= Tools::getAdminTokenLite('AdminEverPsBlogTag');
-        $commentUrl  = 'index.php?controller=AdminEverPsBlogComment&token=';
-        $commentUrl .= Tools::getAdminTokenLite('AdminEverPsBlogComment');
-        $blogUrl = $this->context->link->getModuleLink(
-            'everpsblog',
-            'blog',
-            [],
-            true
-        );
-        $ever_blog_token = Tools::encrypt('everpsblog/cron');
-        $emptytrash = $this->context->link->getModuleLink(
-            'everpsblog',
-            'emptytrash',
-            [
-                'token' => $ever_blog_token,
-                'id_shop' => (int) $this->context->shop->id,
-            ],
-            true,
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
-        );
-        $pending = $this->context->link->getModuleLink(
-            'everpsblog',
-            'pending',
-            [
-                'token' => $ever_blog_token,
-                'id_shop' => (int) $this->context->shop->id,
-            ],
-            true,
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
-        );
-        $planned = $this->context->link->getModuleLink(
-            'everpsblog',
-            'planned',
-            [
-                'token' => $ever_blog_token,
-                'id_shop' => (int) $this->context->shop->id,
-            ],
-            true,
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
-        );
-        $this->context->smarty->assign([
-            'image_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__ . '/modules/everpsblog/views/img/',
-            'everpsblogcron' => $emptytrash,
-            'everpsblogcronpending' => $pending,
-            'everpsblogcronplanned' => $planned,
-            'moduleConfUrl' => $moduleConfUrl,
-            'authorUrl' => $authorUrl,
-            'postUrl' => $postUrl,
-            'categoryUrl' => $categoryUrl,
-            'tagUrl' => $tagUrl,
-            'commentUrl' => $commentUrl,
-            'blogUrl' => $blogUrl,
-        ]);
         parent::__construct();
     }
 
