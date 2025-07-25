@@ -27,19 +27,16 @@ require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogTag.php';
 require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogComment.php';
 require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogImage.php';
 
-class AdminEverPsBlogCommentController extends ModuleAdminController
+class AdminEverPsBlogCommentController extends EverPsBlogAdminController
 {
     private $html;
 
     public function __construct()
     {
         $this->isSeven = Tools::version_compare(_PS_VERSION_, '1.7', '>=') ? true : false;
-        $this->bootstrap = true;
         $this->display = $this->l('Ever Blog Comments');
         $this->table = 'ever_blog_comments';
         $this->className = 'EverPsBlogComment';
-        $this->module_name = 'everpsblog';
-        $this->context = Context::getContext();
         $this->identifier = "id_ever_comment";
         $this->_orderBy = 'id_ever_comment';
         $this->_orderWay = 'DESC';
@@ -84,72 +81,6 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
         );
 
         $this->colorOnBackground = true;
-        $moduleConfUrl  = 'index.php?controller=AdminModules&configure=everpsblog&token=';
-        $moduleConfUrl .= Tools::getAdminTokenLite('AdminModules');
-        $postUrl  = 'index.php?controller=AdminEverPsBlogPost&token=';
-        $postUrl .= Tools::getAdminTokenLite('AdminEverPsBlogPost');
-        $authorUrl  = 'index.php?controller=AdminEverPsBlogAuthor&token=';
-        $authorUrl .= Tools::getAdminTokenLite('AdminEverPsBlogAuthor');
-        $categoryUrl  = 'index.php?controller=AdminEverPsBlogCategory&token=';
-        $categoryUrl .= Tools::getAdminTokenLite('AdminEverPsBlogCategory');
-        $tagUrl  = 'index.php?controller=AdminEverPsBlogTag&token=';
-        $tagUrl .= Tools::getAdminTokenLite('AdminEverPsBlogTag');
-        $commentUrl  = 'index.php?controller=AdminEverPsBlogComment&token=';
-        $commentUrl .= Tools::getAdminTokenLite('AdminEverPsBlogComment');
-        $blogUrl = Context::getContext()->link->getModuleLink(
-            'everpsblog',
-            'blog',
-            [],
-            true
-        );
-        $ever_blog_token = Tools::encrypt('everpsblog/cron');
-        $emptytrash = $this->context->link->getModuleLink(
-            $this->module_name,
-            'emptytrash',
-            array(
-                'token' => $ever_blog_token,
-                'id_shop' => (int) $this->context->shop->id
-            ),
-            true,
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
-        );
-        $pending = $this->context->link->getModuleLink(
-            $this->module_name,
-            'pending',
-            array(
-                'token' => $ever_blog_token,
-                'id_shop' => (int) $this->context->shop->id
-            ),
-            true,
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
-        );
-        $planned = $this->context->link->getModuleLink(
-            $this->module_name,
-            'planned',
-            array(
-                'token' => $ever_blog_token,
-                'id_shop' => (int) $this->context->shop->id
-            ),
-            true,
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
-        );
-        $this->context->smarty->assign(array(
-            'image_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'/modules/everpsblog/views/img/',
-            'everpsblogcron' => $emptytrash,
-            'everpsblogcronpending' => $pending,
-            'everpsblogcronplanned' => $planned,
-            'moduleConfUrl' => $moduleConfUrl,
-            'authorUrl' => $authorUrl,
-            'postUrl' => $postUrl,
-            'categoryUrl' => $categoryUrl,
-            'tagUrl' => $tagUrl,
-            'commentUrl' => $commentUrl,
-            'blogUrl' => $blogUrl,
-        ));
-
         parent::__construct();
     }
 
@@ -179,12 +110,12 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
         $this->addRowAction('deleteComment');
         $this->addRowAction('ViewPost');
         $this->toolbar_title = $this->l('Comment settings');
-        $this->bulk_actions = array(
-            'delete' => array(
+        $this->bulk_actions = [
+            'delete' => [
                 'text' => $this->l('Delete selected items'),
-                'confirm' => $this->l('Delete selected items ?')
-            ),
-        );
+                'confirm' => $this->l('Delete selected items ?'),
+            ],
+        ];
 
         if (Tools::getIsset('deleteComment'.$this->table)) {
             $everObj = new EverPsBlogComment(
@@ -205,28 +136,7 @@ class AdminEverPsBlogCommentController extends ModuleAdminController
             $this->processBulkEnable();
         }
 
-        $lists = parent::renderList();
-
-        $this->html .= $this->context->smarty->fetch(
-            _PS_MODULE_DIR_
-            .'/everpsblog/views/templates/admin/headerController.tpl'
-        );
-        $blog_instance = Module::getInstanceByName($this->module_name);
-        if ($blog_instance->checkLatestEverModuleVersion()) {
-            $this->html .= $this->context->smarty->fetch(
-                _PS_MODULE_DIR_
-                .'/'
-                .$this->module_name
-                .'/views/templates/admin/upgrade.tpl'
-            );
-        }
-        $this->html .= $lists;
-        $this->html .= $this->context->smarty->fetch(
-            _PS_MODULE_DIR_
-            .'/everpsblog/views/templates/admin/footer.tpl'
-        );
-
-        return $this->html;
+        return parent::renderList();
     }
 
     public function renderForm()
