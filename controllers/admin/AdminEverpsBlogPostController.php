@@ -928,40 +928,32 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
             // Validate functions
             $post->id_shop = (int) $this->context->shop->id;
             // SEO
-            if (Tools::getValue('indexable')
-                && !Validate::isBool(Tools::getValue('indexable'))
-            ) {
-                 $this->errors[] = $this->l('Index is not valid');
+            $indexable = (int) Tools::getValue('indexable', 0);
+            if (!Validate::isBool($indexable)) {
+                $this->errors[] = $this->l('Index is not valid');
             } else {
-                $post->indexable = Tools::getValue('indexable');
+                $post->indexable = $indexable;
             }
-            if (Tools::getValue('follow')
-                && !Validate::isBool(Tools::getValue('follow'))
-            ) {
-                 $this->errors[] = $this->l('Follow is not valid');
+
+            $follow = (int) Tools::getValue('follow', 0);
+            if (!Validate::isBool($follow)) {
+                $this->errors[] = $this->l('Follow is not valid');
             } else {
-                $post->follow = Tools::getValue('follow');
+                $post->follow = $follow;
             }
-            if (Tools::getValue('sitemap')
-                && !Validate::isBool(Tools::getValue('sitemap'))
-            ) {
-                 $this->errors[] = $this->l('Follow is not valid');
+
+            $sitemap = (int) Tools::getValue('sitemap', 0);
+            if (!Validate::isBool($sitemap)) {
+                $this->errors[] = $this->l('Sitemap is not valid');
             } else {
-                $post->sitemap = Tools::getValue('sitemap');
+                $post->sitemap = $sitemap;
             }
-            if (Tools::getValue('sitemap')
-                && !Validate::isBool(Tools::getValue('sitemap'))
-            ) {
-                 $this->errors[] = $this->l('Sitemap is not valid');
+
+            $starred = (int) Tools::getValue('starred', 0);
+            if (!Validate::isBool($starred)) {
+                $this->errors[] = $this->l('Starred is not valid');
             } else {
-                $post->sitemap = Tools::getValue('sitemap');
-            }
-            if (Tools::getValue('starred')
-                && !Validate::isBool(Tools::getValue('starred'))
-            ) {
-                 $this->errors[] = $this->l('Starred is not valid');
-            } else {
-                $post->starred = Tools::getValue('starred');
+                $post->starred = $starred;
             }
             // Date add
             if (!Tools::getValue('date_add')) {
