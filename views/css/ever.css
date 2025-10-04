@@ -59,3 +59,93 @@
     padding-bottom: 2%;
     margin-bottom: 2%;
 }
+.everpsblog-quick-links {
+    margin-bottom: 25px;
+}
+.everpsblog-quick-link {
+    margin-bottom: 15px;
+}
+.everpsblog-quick-link-card {
+    display: block;
+    padding: 18px 20px;
+    border: 1px solid rgba(235, 110, 31, 0.4);
+    border-radius: 6px;
+    background: #fff;
+    height: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all .2s ease-in-out;
+    text-align: center;
+}
+.everpsblog-quick-link-card:hover,
+.everpsblog-quick-link-card:focus {
+    text-decoration: none;
+    border-color: #eb6e1f;
+    box-shadow: 0 6px 12px rgba(235, 110, 31, 0.2);
+}
+.everpsblog-quick-link-icon {
+    display: block;
+    font-size: 28px;
+    color: #eb6e1f;
+    margin-bottom: 10px;
+}
+.everpsblog-quick-link-label {
+    display: block;
+    font-weight: 600;
+    color: #363a41;
+}
+.everpsblog-quick-link-desc {
+    display: block;
+    color: #6c868e;
+    margin-top: 6px;
+}
+.everpsblog-quick-link-card .icon {
+    margin-right: 0;
+}
+.everpsblog-cron {
+    margin-top: 20px;
+}
+.everpsblog-cron-list li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+.everpsblog-cron-list .icon {
+    margin-right: 6px;
+    color: #eb6e1f;
+}
+.everpsblog-support-links {
+    margin: 10px 0 0;
+}
+.everpsblog-support-links li {
+    margin-bottom: 6px;
+}
+.everpsblog-support-links a {
+    color: #363a41;
+    text-decoration: underline;
+}
+.everpsblog-support-links a:hover,
+.everpsblog-support-links a:focus {
+    text-decoration: none;
+}
+.everpsblog-onboarding .panel-body {
+    padding: 25px 25px 15px;
+}
+.everpsblog-section-title {
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+.everpsblog-step-list,
+.everpsblog-advice-list {
+    margin: 0;
+}
+.everpsblog-step-list li,
+.everpsblog-advice-list li {
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+.everpsblog-onboarding-footer {
+    margin-top: 20px;
+    align-items: center;
+}
+.everpsblog-doc-link .btn {
+    margin-top: 10px;
+}

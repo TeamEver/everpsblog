@@ -636,6 +636,55 @@ class EverPsBlog extends Module
             (int) $this->context->language->id,
             (int) $this->context->shop->id
         );
+        $quickLinks = [
+            [
+                'href' => $this->context->link->getAdminLink('AdminEverPsBlogPost'),
+                'label' => $this->l('Manage posts'),
+                'description' => $this->l('Create, edit or schedule blog articles'),
+                'icon' => 'icon-pencil',
+            ],
+            [
+                'href' => $this->context->link->getAdminLink('AdminEverPsBlogCategory'),
+                'label' => $this->l('Organise categories'),
+                'description' => $this->l('Structure your content and improve navigation'),
+                'icon' => 'icon-folder-open',
+            ],
+            [
+                'href' => $this->context->link->getAdminLink('AdminEverPsBlogTag'),
+                'label' => $this->l('Curate tags'),
+                'description' => $this->l('Highlight related topics for your readers'),
+                'icon' => 'icon-tags',
+            ],
+            [
+                'href' => $this->context->link->getAdminLink('AdminEverPsBlogAuthor'),
+                'label' => $this->l('Manage authors'),
+                'description' => $this->l('Keep contributor profiles up to date'),
+                'icon' => 'icon-user',
+            ],
+            [
+                'href' => $this->context->link->getAdminLink('AdminEverPsBlogComment'),
+                'label' => $this->l('Moderate comments'),
+                'description' => $this->l('Review community feedback in one place'),
+                'icon' => 'icon-comments',
+            ],
+            [
+                'href' => $default_blog,
+                'label' => $this->l('View blog'),
+                'description' => $this->l('Open the blog in a new tab'),
+                'icon' => 'icon-external-link',
+                'blank' => true,
+            ],
+        ];
+        $supportLinks = [
+            [
+                'href' => 'https://www.team-ever.com/prestashop-1-7-un-module-de-blog-gratuit/',
+                'label' => $this->l('Read the full documentation'),
+            ],
+            [
+                'href' => 'https://www.team-ever.com/contact',
+                'label' => $this->l('Contact Team Ever support'),
+            ],
+        ];
         $this->context->smarty->assign([
             'blog_sitemaps' => $this->getSitemapIndexes(),
             'image_dir' => $this->_path.'views/img',
@@ -644,6 +693,8 @@ class EverPsBlog extends Module
             'everpsblogcronplanned' => $planned,
             'everpsblogcronsitemap' => $sitemap_link,
             'blog_url' => $default_blog,
+            'everpsblog_quick_links' => $quickLinks,
+            'everpsblog_support_links' => $supportLinks,
         ]);
         if ($this->checkLatestEverModuleVersion()) {
             $this->html .= $this->context->smarty->fetch($this->local_path . 'views/templates/admin/upgrade.tpl');
