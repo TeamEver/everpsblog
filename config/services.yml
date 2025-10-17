@@ -1,0 +1,5 @@
+services:
+  prestashop.module.everpsblog.command.run_cron:
+    class: PrestaShop\Module\Everpsblog\Command\RunCronCommand
+    tags:
+      - { name: 'console.command' }
