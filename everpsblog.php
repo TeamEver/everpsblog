@@ -30,6 +30,22 @@ require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogTaxonomy.php';
 require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogSitemap.php';
 require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogCleaner.php';
 require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogSortOrders.php';
+
+if (!class_exists('PrestaShop\\Module\\Everpsblog\\Command\\RunCronCommand', false)) {
+    spl_autoload_register(function ($className) {
+        $prefix = 'PrestaShop\\Module\\Everpsblog\\';
+        if (0 !== strpos($className, $prefix)) {
+            return;
+        }
+
+        $relativeClass = substr($className, strlen($prefix));
+        $file = __DIR__ . '/src/' . str_replace('\\', '/', $relativeClass) . '.php';
+
+        if (is_file($file)) {
+            require_once $file;
+        }
+    });
+}
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
