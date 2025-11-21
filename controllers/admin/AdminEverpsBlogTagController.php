@@ -115,8 +115,8 @@ class AdminEverPsBlogTagController extends EverPsBlogAdminController
                     ai.`id_ever_image` = a.`id_ever_tag`
                     AND ai.`image_type` = "tag"
                 )';
-        $this->_where = 'AND a.id_shop = ' . (int) $this->context->shop->id;
-        $this->_where = 'AND l.id_lang = ' . (int) $this->context->language->id;
+        $this->_where = 'AND a.id_shop = ' . (int) Context::getContext()->shop->id;
+        $this->_where = 'AND l.id_lang = ' . (int) Context::getContext()->language->id;
 
         parent::__construct();
     }
@@ -307,11 +307,11 @@ class AdminEverPsBlogTagController extends EverPsBlogAdminController
 
         $file_url = EverPsBlogImage::getBlogImageUrl(
             (int) $tag_id,
-            (int) $this->context->shop->id,
+            (int) Context::getContext()->shop->id,
             'tag'
         );
         $groups = Group::getGroups(
-            (int) $this->context->language->id
+            (int) Context::getContext()->language->id
         );
         $tagImg = '<image src="' . $file_url . '" style="max-width:150px;"/>';
 
@@ -624,7 +624,7 @@ class AdminEverPsBlogTagController extends EverPsBlogAdminController
             } else {
                 $tag->active = Tools::getValue('active');
             }
-            $tag->id_shop = (int) $this->context->shop->id;
+            $tag->id_shop = (int) Context::getContext()->shop->id;
             if (!(int) Tools::getValue($this->identifier)) {
                 $tag->date_add = date('Y-m-d H:i:s');
             }
@@ -750,7 +750,7 @@ class AdminEverPsBlogTagController extends EverPsBlogAdminController
         }
         $tag = new $this->className($id_ever_tag);
         $link = new Link();
-        $id_lang = (int) $this->context->language->id;
+        $id_lang = (int) Context::getContext()->language->id;
         $see_url = $link->getModuleLink(
             $this->module->name,
             'tag',

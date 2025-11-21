@@ -132,7 +132,7 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
             'LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_post_lang` l
                 ON (
                     l.`' . $this->identifier . '` = a.`' . $this->identifier . '`
-                    AND l.`id_lang` = ' . (int) $this->context->language->id . '
+                    AND l.`id_lang` = ' . (int) Context::getContext()->language->id . '
                 )
             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_author` au
                 ON (
@@ -146,10 +146,10 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category_lang` acl
                 ON (
                     acl.`id_ever_category` = a.`id_default_category`
-                    AND acl.`id_lang` = ' . (int) $this->context->language->id . '
+                    AND acl.`id_lang` = ' . (int) Context::getContext()->language->id . '
                 )';
-        $this->_where = 'AND a.id_shop = ' . (int) $this->context->shop->id;
-        $this->_where = 'AND l.id_lang = ' . (int) $this->context->language->id;
+        $this->_where = 'AND a.id_shop = ' . (int) Context::getContext()->shop->id;
+        $this->_where = 'AND l.id_lang = ' . (int) Context::getContext()->language->id;
         parent::__construct();
     }
 
@@ -431,7 +431,7 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
             return false;
         }
         $groups = Group::getGroups(
-            (int) $this->context->language->id
+            (int) Context::getContext()->language->id
         );
         $post_id = Tools::getValue($this->identifier);
         $obj = new $this->className(
@@ -440,7 +440,7 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
 
         $file_url = EverPsBlogImage::getBlogImageUrl(
             (int) $post_id,
-            (int) $this->context->shop->id,
+            (int) Context::getContext()->shop->id,
             'post'
         );
         $post_img = '<image src="'.(string) $file_url.'" style="max-width:150px;"/>';
@@ -475,7 +475,7 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
         $fields_form = [];
         if (Validate::isLoadedObject($obj)) {
             $link = new Link();
-            $id_lang = (int) $this->context->language->id;
+            $id_lang = (int) Context::getContext()->language->id;
             $objectUrl = $link->getModuleLink(
                 'everpsblog',
                 'post',
@@ -555,8 +555,8 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
                         'multiple' => true,
                         'options' => [
                             'query' => EverPsBlogCategory::getAllCategories(
-                                (int) $this->context->language->id,
-                                (int) $this->context->shop->id
+                                (int) Context::getContext()->language->id,
+                                (int) Context::getContext()->shop->id
                             ),
                             'id' => 'id_ever_category',
                             'name' => 'title',
@@ -570,8 +570,8 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
                         'name' => 'id_default_category',
                         'options' => [
                             'query' => EverPsBlogCategory::getAllCategories(
-                                (int) $this->context->language->id,
-                                (int) $this->context->shop->id,
+                                (int) Context::getContext()->language->id,
+                                (int) Context::getContext()->shop->id,
                                 1,
                                 0,
                                 true
@@ -590,8 +590,8 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
                         'multiple' => true,
                         'options' => [
                             'query' => EverPsBlogTag::getAllTags(
-                                (int) $this->context->language->id,
-                                (int) $this->context->shop->id
+                                (int) Context::getContext()->language->id,
+                                (int) Context::getContext()->shop->id
                             ),
                             'id' => 'id_ever_tag',
                             'name' => 'title',
@@ -607,7 +607,7 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
                         'multiple' => true,
                         'options' => [
                             'query' => Product::getProducts(
-                                (int) $this->context->language->id,
+                                (int) Context::getContext()->language->id,
                                 0,
                                 0,
                                 'name',
@@ -625,8 +625,8 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
                         'name' => 'id_author',
                         'options' => [
                             'query' => EverPsBlogAuthor::getAllAuthors(
-                                (int) $this->context->language->id,
-                                (int) $this->context->shop->id
+                                (int) Context::getContext()->language->id,
+                                (int) Context::getContext()->shop->id
                             ),
                             'id' => 'id_ever_author',
                             'name' => 'nickhandle',
@@ -855,7 +855,7 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
         $helper->tpl_vars = [
             'fields_value' => $this->getConfigFormValues($obj),
             'languages' => $this->context->controller->getLanguages(),
-            'id_language' => (int) $this->context->language->id,
+            'id_language' => (int) Context::getContext()->language->id,
         ];
         $helper->currentIndex = AdminController::$currentIndex;
         return $helper->generateForm($fields_form);
@@ -927,7 +927,7 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
                 );
             }
             // Validate functions
-            $post->id_shop = (int) $this->context->shop->id;
+            $post->id_shop = (int) Context::getContext()->shop->id;
             // SEO
             $indexable = (int) Tools::getValue('indexable', 0);
             if (!Validate::isBool($indexable)) {
@@ -1118,7 +1118,7 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
                         }
                         $featured_image = EverPsBlogImage::getBlogImage(
                             (int) $post->id,
-                            (int) $this->context->shop->id,
+                            (int) Context::getContext()->shop->id,
                             'post'
                         );
                         if (!$featured_image) {
@@ -1127,7 +1127,7 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
                         $featured_image->id_element = (int) $post->id;
                         $featured_image->image_type = 'post';
                         $featured_image->image_link = $post_img_link;
-                        $featured_image->id_shop = (int) $this->context->shop->id;
+                        $featured_image->id_shop = (int) Context::getContext()->shop->id;
                         return $featured_image->save();
                     }
                 } catch (Exception $e) {
@@ -1168,7 +1168,7 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
         }
         $post = new $this->className($id_ever_post);
         $link = new Link();
-        $id_lang = (int) $this->context->language->id;
+        $id_lang = (int) Context::getContext()->language->id;
         $see_url = $link->getModuleLink(
             $this->module->name,
             'post',
@@ -1199,7 +1199,7 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
             return;
         }
         $link = new Link();
-        $id_lang = (int) $this->context->language->id;
+        $id_lang = (int) Context::getContext()->language->id;
         $unprotect_url  = 'index.php?controller=AdminEverPsBlogPost&token=';
         $unprotect_url .= Tools::getAdminTokenLite('AdminEverPsBlogPost');
         $unprotect_url .= '&id_ever_post='.(int)$id_ever_post;
@@ -1335,7 +1335,7 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
             if ($new_everObj->save()) {
                 $everObj_featured_image = EverPsBlogImage::getBlogImage(
                     (int) $everObj->id,
-                    (int) $this->context->shop->id,
+                    (int) Context::getContext()->shop->id,
                     'post'
                 );
                 if (Validate::isLoadedObject($everObj_featured_image)) {

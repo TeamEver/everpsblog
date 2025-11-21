@@ -35,33 +35,33 @@ abstract class EverPsBlogAdminController extends ModuleAdminController
             'emptytrash',
             [
                 'token' => $ever_blog_token,
-                'id_shop' => (int) $this->context->shop->id,
+                'id_shop' => (int) Context::getContext()->shop->id,
             ],
             true,
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
+            (int) Context::getContext()->language->id,
+            (int) Context::getContext()->shop->id
         );
         $pending = $this->context->link->getModuleLink(
             $this->module_name,
             'pending',
             [
                 'token' => $ever_blog_token,
-                'id_shop' => (int) $this->context->shop->id,
+                'id_shop' => (int) Context::getContext()->shop->id,
             ],
             true,
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
+            (int) Context::getContext()->language->id,
+            (int) Context::getContext()->shop->id
         );
         $planned = $this->context->link->getModuleLink(
             $this->module_name,
             'planned',
             [
                 'token' => $ever_blog_token,
-                'id_shop' => (int) $this->context->shop->id,
+                'id_shop' => (int) Context::getContext()->shop->id,
             ],
             true,
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
+            (int) Context::getContext()->language->id,
+            (int) Context::getContext()->shop->id
         );
 
         $this->context->smarty->assign([

@@ -124,10 +124,10 @@ class AdminEverPsBlogCategoryController extends EverPsBlogAdminController
                     ai.`id_ever_image` = a.`' . $this->identifier . '`
                     AND ai.`image_type` = "category"
                 )';
-        $this->_where = 'AND a.id_shop = ' . (int) $this->context->shop->id
+        $this->_where = 'AND a.id_shop = ' . (int) Context::getContext()->shop->id
         .' AND a.is_root_category != 1'
         .' AND a.id_ever_category != ' . $this->unclassedCategory
-        .' AND l.id_lang = ' . (int) $this->context->language->id;
+        .' AND l.id_lang = ' . (int) Context::getContext()->language->id;
         parent::__construct();
     }
 
@@ -187,17 +187,17 @@ class AdminEverPsBlogCategoryController extends EverPsBlogAdminController
             (int) Tools::getValue($this->identifier)
         );
         $categories = EverPsBlogCategory::getAllCategories(
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id,
+            (int) Context::getContext()->language->id,
+            (int) Context::getContext()->shop->id,
             1
         );
         $fileUrl = EverPsBlogImage::getBlogImageUrl(
             (int) $category_id,
-            (int) $this->context->shop->id,
+            (int) Context::getContext()->shop->id,
             'category'
         );
         $groups = Group::getGroups(
-            (int) $this->context->language->id
+            (int) Context::getContext()->language->id
         );
         $categoryImg = '<image src="' . $fileUrl . '" style="max-width:150px;"/>';
 
@@ -657,7 +657,7 @@ class AdminEverPsBlogCategoryController extends EverPsBlogAdminController
             } else {
                 $category->active = Tools::getValue('active');
             }
-            $category->id_shop = (int) $this->context->shop->id;
+            $category->id_shop = (int) Context::getContext()->shop->id;
             // Multilingual fields
             if (!Tools::getValue('id_ever_category')) {
                 $category->date_add = date('Y-m-d H:i:s');

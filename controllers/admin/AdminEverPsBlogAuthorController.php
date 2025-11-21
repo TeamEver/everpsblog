@@ -116,8 +116,8 @@ class AdminEverPsBlogAuthorController extends EverPsBlogAdminController
                     ai.`id_ever_image` = a.`id_ever_author`
                     AND ai.`image_type` = "author"
                 )';
-        $this->_where = 'AND a.id_shop = ' . (int) $this->context->shop->id;
-        $this->_where = 'AND l.id_lang = ' . (int) $this->context->language->id;
+        $this->_where = 'AND a.id_shop = ' . (int) Context::getContext()->shop->id;
+        $this->_where = 'AND l.id_lang = ' . (int) Context::getContext()->language->id;
         parent::__construct();
     }
 
@@ -302,11 +302,11 @@ class AdminEverPsBlogAuthorController extends EverPsBlogAdminController
 
         $file_url = EverPsBlogImage::getBlogImageUrl(
             (int) $author_id,
-            (int) $this->context->shop->id,
+            (int) Context::getContext()->shop->id,
             'author'
         );
         $groups = Group::getGroups(
-            (int) $this->context->language->id
+            (int) Context::getContext()->language->id
         );
         $author_img = '<image src="' . $file_url . '" style="max-width:150px;"/>';
 
@@ -610,7 +610,7 @@ class AdminEverPsBlogAuthorController extends EverPsBlogAdminController
         $helper->tpl_vars = [
             'fields_value' => $this->getConfigFormValues($obj),
             'languages' => $this->context->controller->getLanguages(),
-            'id_language' => (int) $this->context->language->id,
+            'id_language' => (int) Context::getContext()->language->id,
         ];
         $helper->currentIndex = AdminController::$currentIndex;
         return $helper->generateForm($fields_form);
@@ -661,7 +661,7 @@ class AdminEverPsBlogAuthorController extends EverPsBlogAdminController
                 );
             }
             // Validate functions
-            $author->id_shop = (int) $this->context->shop->id;
+            $author->id_shop = (int) Context::getContext()->shop->id;
             if (Tools::getValue('allowed_groups')
                 && !Validate::isArrayWithIds(Tools::getValue('allowed_groups'))
             ) {

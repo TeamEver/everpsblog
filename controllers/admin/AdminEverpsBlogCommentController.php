@@ -148,8 +148,8 @@ class AdminEverPsBlogCommentController extends EverPsBlogAdminController
         }
         
         $posts_published = EverPsBlogPost::getPosts(
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id
+            (int) Context::getContext()->language->id,
+            (int) Context::getContext()->shop->id
         );
         if (!$posts_published) {
             $this->errors[] = $this->l('There is no post, please create at least one');
