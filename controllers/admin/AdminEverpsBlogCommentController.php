@@ -30,7 +30,7 @@ require_once _PS_MODULE_DIR_ . 'everpsblog/controllers/admin/EverPsBlogAdminCont
 
 class AdminEverPsBlogCommentController extends EverPsBlogAdminController
 {
-    private $html;
+    protected $html;
 
     public function __construct()
     {
