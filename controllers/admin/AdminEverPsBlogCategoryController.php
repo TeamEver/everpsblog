@@ -27,6 +27,7 @@ require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogTag.php';
 require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogComment.php';
 require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogCleaner.php';
 require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogImage.php';
+require_once _PS_MODULE_DIR_ . 'everpsblog/controllers/admin/EverPsBlogAdminController.php';
 
 class AdminEverPsBlogCategoryController extends EverPsBlogAdminController
 {
