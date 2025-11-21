@@ -1,0 +1,25 @@
+{
+    "name": "team-ever/everpsblog",
+    "description": "Ever PS Blog module for PrestaShop 1.7 and 8.",
+    "type": "prestashop-module",
+    "license": "AFL-3.0",
+    "authors": [
+        {
+            "name": "Team Ever",
+            "homepage": "https://www.team-ever.com/"
+        }
+    ],
+    "require": {
+        "php": ">=7.2",
+        "prestashop/module-lib-service": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "PrestaShop\\Module\\Everpsblog\\": "src/"
+        }
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true
+    }
+}
