@@ -41,8 +41,8 @@
                                         <strong>{l s='Automation tip:' mod='everpsblog'}</strong> {l s='Set up the cron tasks listed above to publish planned posts, clean the trash and keep notifications up to date.' mod='everpsblog'}
                                 </div>
                         </div>
-                        <div class="col-sm-4 text-right everpsblog-doc-link">
-                                <a href="https://www.team-ever.com/prestashop-1-7-un-module-de-blog-gratuit/" target="_blank" class="btn btn-default" rel="noopener">
+                        <div class="col-sm-4 text-right text-end everpsblog-doc-link">
+                                <a href="https://www.team-ever.com/prestashop-1-7-un-module-de-blog-gratuit/" target="_blank" class="btn btn-default btn-secondary" rel="noopener">
                                         <i class="icon icon-book"></i> {l s='Open the full documentation' mod='everpsblog'}
                                 </a>
                         </div>
