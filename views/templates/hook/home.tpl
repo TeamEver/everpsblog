@@ -24,7 +24,7 @@
         </a>
     </div>
     {if $everpsblog|@count gt 4}
-        <div id="everpsblogCarousel" class="carousel slide" data-ride="carousel">
+        <div id="everpsblogCarousel" class="carousel slide" data-ride="carousel" data-interval="false" data-wrap="true">
             <div class="carousel-inner">
                 {foreach from=$everpsblog item=item name=bloghome}
                     {if $smarty.foreach.bloghome.index % 4 == 0}
@@ -62,11 +62,11 @@
             </div>
             <a class="carousel-control-prev" href="#everpsblogCarousel" role="button" data-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">{l s='Previous' mod='everpsblog'}</span>
+                <span class="sr-only visually-hidden">{l s='Previous' mod='everpsblog'}</span>
             </a>
             <a class="carousel-control-next" href="#everpsblogCarousel" role="button" data-slide="next">
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">{l s='Next' mod='everpsblog'}</span>
+                <span class="sr-only visually-hidden">{l s='Next' mod='everpsblog'}</span>
             </a>
         </div>
     {else}
