@@ -878,13 +878,6 @@ class EverPsBlog extends Module
                     'Error : The field "Show categories on columns" is not valid'
                 );
             }
-            if (Tools::getValue('EVERBLOG_FANCYBOX')
-                && !Validate::isBool(Tools::getValue('EVERBLOG_FANCYBOX'))
-            ) {
-                $this->postErrors[] = $this->l(
-                    'Error : The field "Fancybox" is not valid'
-                );
-            }
             if (Tools::getValue('EVERBLOG_CAT_FEATURED')
                 && !Validate::isUnsignedInt(Tools::getValue('EVERBLOG_CAT_FEATURED'))
             ) {
@@ -1203,7 +1196,6 @@ class EverPsBlog extends Module
             'EVERBLOG_TAG_COLUMNS' => Configuration::get('EVERBLOG_TAG_COLUMNS'),
             'EVERBLOG_PRODUCT_COLUMNS' => Configuration::get('EVERBLOG_PRODUCT_COLUMNS'),
             'EVERBLOG_CATEG_COLUMNS' => Configuration::get('EVERBLOG_CATEG_COLUMNS'),
-            'EVERBLOG_FANCYBOX' => Configuration::get('EVERBLOG_FANCYBOX'),
             'EVERBLOG_CAT_FEATURED' => Configuration::get('EVERBLOG_CAT_FEATURED'),
             'EVERBLOG_TITLE' => static::getConfigInMultipleLangs(
                 'EVERBLOG_TITLE'
@@ -1918,26 +1910,6 @@ class EverPsBlog extends Module
                         ],
                     ],
                     [
-                        'type' => 'switch',
-                        'label' => $this->l('Enable Fancybox'),
-                        'hint' => $this->l('Set no if your theme already uses it'),
-                        'desc' => $this->l('Use Fancybox for popups on post images'),
-                        'name' => 'EVERBLOG_FANCYBOX',
-                        'is_bool' => true,
-                        'values' => [
-                            [
-                                'id' => 'active_on',
-                                'value' => 1,
-                                'label' => $this->l('Yes'),
-                            ],
-                            [
-                                'id' => 'active_off',
-                                'value' => 0,
-                                'label' => $this->l('No'),
-                            ],
-                        ],
-                    ],
-                    [
                         'type' => 'text',
                         'label' => $this->l('Featured category on blog default page'),
                         'name' => 'EVERBLOG_CAT_FEATURED',
@@ -2354,14 +2326,6 @@ class EverPsBlog extends Module
             $this->context->controller->addJs(
                 $this->_path . 'views/js/everpsblog.js'
             );
-            if ($controller_name == 'post') {
-                if ((int) Configuration::get('EVERBLOG_FANCYBOX')) {
-                    if ($controller_name != 'order') {
-                        $this->context->controller->addCSS(($this->_path) . 'views/css/jquery.fancybox.min.css', 'all');
-                        $this->context->controller->addJS(($this->_path) . 'views/js/jquery.fancybox.min.js', 'all');
-                    }
-                }
-            }
         }
         $this->context->controller->addCSS(
             $this->module_folder . '/views/css/everpsblog-columns.css',
@@ -2633,13 +2597,8 @@ class EverPsBlog extends Module
     {
         $controller_name = Tools::getValue('controller');
         $module_name = Tools::getValue('module');
-        if ($module_name == 'everpsblog') {
-            if ($controller_name == 'post') {
-                $this->context->smarty->assign([
-                    'everfancybox' => (bool) Configuration::get('EVERBLOG_FANCYBOX'),
-                ]);
-                return $this->display(__FILE__, 'views/templates/hook/footer.tpl');
-            }
+        if ($module_name == 'everpsblog' && $controller_name == 'post') {
+            return $this->display(__FILE__, 'views/templates/hook/footer.tpl');
         }
     }
 

@@ -16,6 +16,18 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 
-{if isset($everfancybox) && $everfancybox}
-<span id="ever_fancy_mark" style="display: none;"></span>
-{/if}
+<div class="modal fade everpsblog-image-modal" id="everpsblog-image-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{l s='Image preview' mod='everpsblog'}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="{l s='Close' mod='everpsblog'}">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="" alt="" class="img-fluid" />
+            </div>
+        </div>
+    </div>
+</div>
