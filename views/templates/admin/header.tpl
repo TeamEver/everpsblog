@@ -47,7 +47,7 @@
                 </p>
                 {if $blog_sitemaps}
                     <div class="dropdown everpsblog-sitemaps">
-                      <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {l s='View generated sitemaps' mod='everpsblog'}
                       </button>
                       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">

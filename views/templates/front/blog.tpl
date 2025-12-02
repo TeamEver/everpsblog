@@ -88,7 +88,7 @@
 <form id="everpsblog-filter" class="row mb-3" onsubmit="return false;">
     {if isset($evercategory) && $evercategory|count > 0}
     <div class="col">
-        <select id="everpsblog-category" class="form-select" name="category">
+        <select id="everpsblog-category" class="form-select custom-select" name="category">
             <option value="0">{l s='Category' mod='everpsblog'}</option>
             {foreach from=$evercategory item=item}
                 {if !$item.is_root_category}
@@ -100,7 +100,7 @@
     {/if}
     {if isset($evertags) && $evertags|count > 0}
     <div class="col">
-        <select id="everpsblog-tag" class="form-select" name="tag">
+        <select id="everpsblog-tag" class="form-select custom-select" name="tag">
             <option value="0">{l s='Tag' mod='everpsblog'}</option>
             {foreach from=$evertags item=tag}
                 <option value="{$tag.id_ever_tag}">{$tag.title|escape:'htmlall':'UTF-8'}</option>
@@ -121,7 +121,7 @@
 {if isset($allow_feed) && $allow_feed}
 <a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' mod='everpsblog'} {$page.meta.title|escape:'htmlall':'UTF-8'}</a>
 {/if}
-<span class="paginated float-end d-none">{if isset($pagination) && $pagination.current_page > 0}{l s='(page' mod='everpsblog'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' mod='everpsblog'}{/if}</span>
+<span class="paginated float-end float-right d-none">{if isset($pagination) && $pagination.current_page > 0}{l s='(page' mod='everpsblog'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' mod='everpsblog'}{/if}</span>
 {if isset($paginated) && !$paginated}
 {if isset($default_blog_top_text) && $default_blog_top_text}
 <div class="row mt-2">
