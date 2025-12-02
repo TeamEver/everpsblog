@@ -4637,8 +4637,12 @@ class EverPsBlog extends Module
 
     public function hookBeforeRenderingEverpsblogPostSlider($params)
     {
-        $settings = isset($params['block']['settings']) ? $params['block']['settings'] : [];
-        $items = $this->getPrettyBlocksRepeaterItems($settings, 'posts');
+        $block = isset($params['block']) && is_array($params['block']) ? $params['block'] : [];
+        $settings = isset($block['settings']) && is_array($block['settings'])
+            ? $block['settings']
+            : (isset($params['settings']) && is_array($params['settings']) ? $params['settings'] : []);
+
+        $items = $this->getPrettyBlocksRepeaterItems($params, 'posts');
         $posts = [];
         foreach ($items as $item) {
             if (!isset($item['post'])) {
@@ -4659,8 +4663,12 @@ class EverPsBlog extends Module
 
     public function hookBeforeRenderingEverpsblogCategorySlider($params)
     {
-        $settings = isset($params['block']['settings']) ? $params['block']['settings'] : [];
-        $items = $this->getPrettyBlocksRepeaterItems($settings, 'categories');
+        $block = isset($params['block']) && is_array($params['block']) ? $params['block'] : [];
+        $settings = isset($block['settings']) && is_array($block['settings'])
+            ? $block['settings']
+            : (isset($params['settings']) && is_array($params['settings']) ? $params['settings'] : []);
+
+        $items = $this->getPrettyBlocksRepeaterItems($params, 'categories');
         $categories = [];
         foreach ($items as $item) {
             if (!isset($item['category'])) {
@@ -4679,14 +4687,32 @@ class EverPsBlog extends Module
         ];
     }
 
-    private function getPrettyBlocksRepeaterItems($settings, $fallbackKey)
+    private function getPrettyBlocksRepeaterItems($params, $fallbackKey)
     {
-        if (isset($settings[$fallbackKey]) && is_array($settings[$fallbackKey])) {
-            return $settings[$fallbackKey];
-        }
+        $block = isset($params['block']) && is_array($params['block']) ? $params['block'] : [];
+        $settings = isset($block['settings']) && is_array($block['settings'])
+            ? $block['settings']
+            : (isset($params['settings']) && is_array($params['settings']) ? $params['settings'] : []);
 
-        if (isset($settings['repeater']) && is_array($settings['repeater'])) {
-            return $settings['repeater'];
+        $sources = [
+            isset($block['repeater_db']) && is_array($block['repeater_db']) ? $block['repeater_db'] : null,
+            isset($block['states']) && is_array($block['states']) ? $block['states'] : null,
+            isset($block['settings_formatted']) && is_array($block['settings_formatted']) ? $block['settings_formatted'] : null,
+            $settings,
+        ];
+
+        foreach ($sources as $source) {
+            if (!is_array($source)) {
+                continue;
+            }
+
+            if (isset($source[$fallbackKey]) && is_array($source[$fallbackKey])) {
+                return $source[$fallbackKey];
+            }
+
+            if (isset($source['repeater']) && is_array($source['repeater'])) {
+                return $source['repeater'];
+            }
         }
 
         return [];
