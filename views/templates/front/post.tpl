@@ -81,51 +81,53 @@
         {/foreach}
         </div>
         {/if}
-        {if isset($show_featured_post) && $show_featured_post}
-        <div class="row post-header">
-            <img class="img img-fluid post-featured-image featured-image" src="{$featured_image|escape:'htmlall':'UTF-8'}" alt="{$post->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$post->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                {if isset($show_featured_post) && $show_featured_post}
+                <div class="mb-3">
+                    <img class="img img-fluid post-featured-image featured-image rounded w-100" src="{$featured_image|escape:'htmlall':'UTF-8'}" alt="{$post->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$post->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
+                </div>
+                {/if}
+                <h1 class="text-start h2 mb-3">{$post->title|escape:'htmlall':'UTF-8'}</h1>
+                <p class="postpublished text-start text-muted mb-3">
+                    <strong>{$post->date_add|date_format:'%d %B %Y'|escape:'htmlall':'UTF-8'}</strong>
+                    {if isset($default_category) && $default_category && !$default_category->is_root_category}
+                        - <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category'=>$default_category->id_ever_category, 'link_rewrite'=>$default_category->link_rewrite])|escape:'htmlall':'UTF-8'}" class="text-decoration-none" title="{$default_category->title|escape:'htmlall':'UTF-8'}">{$default_category->title|escape:'htmlall':'UTF-8'}</a>
+                    {/if}
+                </p>
+                {if isset($show_author) && $show_author}
+                <div class="d-flex flex-column align-items-center mb-2 author_cover_container">
+                    <a href="{$author->url|escape:'htmlall':'UTF-8'}" class="text-center text-decoration-none" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
+                        <img src="{$author_cover|escape:'htmlall':'UTF-8'}" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" class="img-fluid author-icon rounded-circle mb-2" title="{$author->nickhandle|escape:'htmlall':'UTF-8'}">
+                        <strong>{l s='By' mod='everpsblog'} {$author->nickhandle|escape:'htmlall':'UTF-8'}</strong>
+                    </a>
+                </div>
+                {/if}
+            </div>
         </div>
-        {/if}
-        <h1 class="text-start">{$post->title|escape:'htmlall':'UTF-8'}</h1>
-        <p class="postpublished text-start">
-            <strong>{$post->date_add|date_format:'%d %B %Y'|escape:'htmlall':'UTF-8'}</strong>
-            {if isset($default_category) && $default_category && !$default_category->is_root_category}
-                - <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category'=>$default_category->id_ever_category, 'link_rewrite'=>$default_category->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$default_category->title|escape:'htmlall':'UTF-8'}">{$default_category->title|escape:'htmlall':'UTF-8'}</a>
-            {/if}
-        </p>
-        {if isset($show_author) && $show_author}
-        <p class="text-center author_cover_container">
-            <a href="{$author->url|escape:'htmlall':'UTF-8'}" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
-                <img src="{$author_cover|escape:'htmlall':'UTF-8'}" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" class="img-fluid author-icon rounded-circle" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'}" title="{$author->nickhandle|escape:'htmlall':'UTF-8'}">
-                <br>
-                {l s='By' mod='everpsblog'} {$author->nickhandle|escape:'htmlall':'UTF-8'}
-            </a>
-        </p>
-        {/if}
-    </div>
-    <div class="row">
-        <div class="col-12 col-md-12 postcontent {if $animated}zoomed{/if}">
-            {if isset($post->password_protected) && $post->password_protected}
-            <div class="alert alert-warning">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body postcontent {if $animated}zoomed{/if}">
+                {if isset($post->password_protected) && $post->password_protected}
+                <div class="alert alert-warning">
+                    {if isset($prettyblocks_enabled) && $prettyblocks_enabled}
+                    {widget name="prettyblocks" zone_name="displayPost{$post->id}"}
+                    {/if}
+                    {$post->content nofilter}
+                </div>
+                <form method="POST" class="mt-3">
+                    <div class="mb-3">
+                        <input type="password" class="form-control" id="post_psswd" name="post_psswd" placeholder="{l s='Password' mod='everpsblog'}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">{l s='Validate' mod='everpsblog'}</button>
+                </form>
+                {else}
                 {if isset($prettyblocks_enabled) && $prettyblocks_enabled}
                 {widget name="prettyblocks" zone_name="displayPost{$post->id}"}
                 {/if}
                 {$post->content nofilter}
+                {/if}
             </div>
-            <form method="POST">
-                <div class="mb-3">
-                    <input type="password" class="form-control" id="post_psswd" name="post_psswd" placeholder="{l s='Password' mod='everpsblog'}" required>
-                </div>
-                <button type="submit" class="btn btn-primary">{l s='Validate' mod='everpsblog'}</button>
-            </form>
-            {else}
-            {if isset($prettyblocks_enabled) && $prettyblocks_enabled}
-            {widget name="prettyblocks" zone_name="displayPost{$post->id}"}
-            {/if}
-            {$post->content nofilter}
-            {/if}
         </div>
-    </div>
 </div>
 {if !isset($post->password_protected)}
 <div class="container">
@@ -161,12 +163,12 @@
 {if isset($allow_comments) && $allow_comments && !isset($post->password_protected)}
 
 {if isset($logged) && $logged ==  false && isset($only_logged_comment) && $only_logged_comment == true}
-<div class="card card-body mt-2">
+<div class="card card-body mt-2 shadow-sm border-0">
     <form action="{$link->getPageLink('authentication', true)|escape:'htmlall':'UTF-8'}?back={$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $post->id_ever_post , 'link_rewrite' => $post->link_rewrite])|escape:'htmlall':'UTF-8'}" method="post" id="login-form" class="box">
         <h3 class="page-subheading">{l s='Log in to comment' mod='everpsblog'}</h3>
         <div class="form_content clearfix">
             <div class="mb-3">
-                <label>{l s='Email address' mod='everpsblog'}</label> 
+                <label>{l s='Email address' mod='everpsblog'}</label>
                 <input class="is_required validate account_input form-control" id="email" name="email" value="" type="text" />
             </div>
         <div class="mb-3">
@@ -189,8 +191,11 @@
 {else}
 <section class="container clearfix">
     <div class="row mt-2">
-        <span id="leaveComment">{l s='Leave a comment' mod='everpsblog'}</span>
-        <form enctype="multipart/form-data" method="post">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-body">
+                    <span id="leaveComment" class="h5 d-block mb-3">{l s='Leave a comment' mod='everpsblog'}</span>
+                    <form enctype="multipart/form-data" method="post">
             {if isset($logged) && $logged}
             <input type="hidden" name="customerEmail" id="customerEmail" value="{$customer.email|escape:'htmlall':'UTF-8'}">
             {else}
@@ -215,7 +220,10 @@
             </label>
             </div>
             <button type="submit" class="btn btn-primary btn-blog-primary" id="everpostcomment" name="everpostcomment">{l s='Submit' mod='everpsblog'}</button>
-        </form>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 {/if}
@@ -224,19 +232,23 @@
 {hook h="displayBeforeEverComment"}
 <section class="comments container clearfix mt-2">
     <span id="commentsTitle">{$commentsCount|escape:'htmlall':'UTF-8'} {l s='comment(s)' mod='everpsblog'}</span>
-    <div class="commentcontainer row g-3">
+    <div class="commentcontainer row mt-3">
         {foreach from=$comments item=comment}
-            <div class="container commentblock" id="{$comment->id|escape:'htmlall':'UTF-8'}">
-                <div class="row">
-                    <div class="col-12 col-md-8 commentname">
-                        {$comment->name|escape:'htmlall':'UTF-8'}
-                    </div>
-                    <div class="col-12 col-md-4 commentdate">
-                        {$comment->date_upd|escape:'htmlall':'UTF-8'}
-                    </div>
-                    <div class="col-12 col-md-12 comment">
-                        <div class="rte">
-                            {$comment->comment nofilter}
+            <div class="col-12 col-md-6 mb-3" id="{$comment->id|escape:'htmlall':'UTF-8'}">
+                <div class="card h-100 shadow-sm border-0 commentblock">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12 col-md-8 commentname">
+                                <strong>{$comment->name|escape:'htmlall':'UTF-8'}</strong>
+                            </div>
+                            <div class="col-12 col-md-4 commentdate text-md-right text-muted">
+                                {$comment->date_upd|escape:'htmlall':'UTF-8'}
+                            </div>
+                            <div class="col-12 comment mt-2">
+                                <div class="rte">
+                                    {$comment->comment nofilter}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

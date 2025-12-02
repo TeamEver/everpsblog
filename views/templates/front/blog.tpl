@@ -67,53 +67,70 @@
 {/block}
 
 {block name="page_content"}
-<div class="mb-3 text-center">
-    <h1 class="m-0">
-        {if isset($blog_page_title) && $blog_page_title}
-            {$blog_page_title|escape:'htmlall':'UTF-8'}
-        {else}
-            {l s='Our blog' mod='everpsblog'}
-        {/if}
-    </h1>
-</div>
-<div class="d-flex justify-content-center mb-3">
-    <form method="get" action="{$link->getModuleLink('everpsblog','search')|escape:'htmlall':'UTF-8'}" class="everpsblog-search" data-doofinder-ignore="true">
-        <div class="input-group">
-            <label class="input-group-text" for="everpsblog-search-input">{l s='Search the blog' mod='everpsblog'}</label>
-            <input id="everpsblog-search-input" class="form-control" type="search" name="s" data-doofinder-ignore="true" placeholder="{l s='Search by keywords' mod='everpsblog'}" required />
-            <button class="btn btn-info" type="submit">{l s='Search' mod='everpsblog'}</button>
+<div class="container my-4">
+    <div class="mb-4 text-center">
+        <h1 class="m-0">
+            {if isset($blog_page_title) && $blog_page_title}
+                {$blog_page_title|escape:'htmlall':'UTF-8'}
+            {else}
+                {l s='Our blog' mod='everpsblog'}
+            {/if}
+        </h1>
+    </div>
+    <div class="row justify-content-center mb-4">
+        <div class="col-12 col-lg-10">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <form method="get" action="{$link->getModuleLink('everpsblog','search')|escape:'htmlall':'UTF-8'}" class="everpsblog-search" data-doofinder-ignore="true">
+                        <div class="input-group">
+                            <label class="input-group-text" for="everpsblog-search-input">{l s='Search the blog' mod='everpsblog'}</label>
+                            <input id="everpsblog-search-input" class="form-control" type="search" name="s" data-doofinder-ignore="true" placeholder="{l s='Search by keywords' mod='everpsblog'}" required />
+                            <button class="btn btn-info" type="submit">{l s='Search' mod='everpsblog'}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-    </form>
-</div>
-{if ((isset($evercategory) && $evercategory|count > 0) || (isset($evertags) && $evertags|count > 0))}
-<form id="everpsblog-filter" class="row mb-3" onsubmit="return false;">
-    {if isset($evercategory) && $evercategory|count > 0}
-    <div class="col">
-        <select id="everpsblog-category" class="form-select custom-select" name="category">
-            <option value="0">{l s='Category' mod='everpsblog'}</option>
-            {foreach from=$evercategory item=item}
-                {if !$item.is_root_category}
-                <option value="{$item.id_ever_category}">{$item.title|escape:'htmlall':'UTF-8'}</option>
-                {/if}
-            {/foreach}
-        </select>
+    </div>
+    {if ((isset($evercategory) && $evercategory|count > 0) || (isset($evertags) && $evertags|count > 0))}
+    <div class="row justify-content-center mb-4">
+        <div class="col-12 col-lg-10">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <form id="everpsblog-filter" class="row" onsubmit="return false;">
+                        {if isset($evercategory) && $evercategory|count > 0}
+                        <div class="col-12 col-md-4 mb-3 mb-md-0">
+                            <label class="d-block mb-1" for="everpsblog-category">{l s='Category' mod='everpsblog'}</label>
+                            <select id="everpsblog-category" class="form-select custom-select" name="category">
+                                <option value="0">{l s='Category' mod='everpsblog'}</option>
+                                {foreach from=$evercategory item=item}
+                                    {if !$item.is_root_category}
+                                    <option value="{$item.id_ever_category}">{$item.title|escape:'htmlall':'UTF-8'}</option>
+                                    {/if}
+                                {/foreach}
+                            </select>
+                        </div>
+                        {/if}
+                        {if isset($evertags) && $evertags|count > 0}
+                        <div class="col-12 col-md-4 mb-3 mb-md-0">
+                            <label class="d-block mb-1" for="everpsblog-tag">{l s='Tag' mod='everpsblog'}</label>
+                            <select id="everpsblog-tag" class="form-select custom-select" name="tag">
+                                <option value="0">{l s='Tag' mod='everpsblog'}</option>
+                                {foreach from=$evertags item=tag}
+                                    <option value="{$tag.id_ever_tag}">{$tag.title|escape:'htmlall':'UTF-8'}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        {/if}
+                        <div class="col-12 col-md-4 d-flex align-items-end justify-content-start justify-content-md-end">
+                            <button id="everpsblog-filter-submit" class="btn btn-primary w-100">{l s='Filter' mod='everpsblog'}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
     {/if}
-    {if isset($evertags) && $evertags|count > 0}
-    <div class="col">
-        <select id="everpsblog-tag" class="form-select custom-select" name="tag">
-            <option value="0">{l s='Tag' mod='everpsblog'}</option>
-            {foreach from=$evertags item=tag}
-                <option value="{$tag.id_ever_tag}">{$tag.title|escape:'htmlall':'UTF-8'}</option>
-            {/foreach}
-        </select>
-    </div>
-    {/if}
-    <div class="col-auto">
-        <button id="everpsblog-filter-submit" class="btn btn-primary">{l s='Filter' mod='everpsblog'}</button>
-    </div>
-</form>
-{/if}
 {if isset($facet_url)}
 <script type="text/javascript">
     var facetUrl = '{$facet_url|escape:'javascript'}';
@@ -179,4 +196,5 @@
   </div>
 </section>
 {/if}
+</div>
 {/block}
