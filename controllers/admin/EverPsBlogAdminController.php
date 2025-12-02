@@ -88,8 +88,43 @@ abstract class EverPsBlogAdminController extends ModuleAdminController
         );
     }
 
+    protected function addToolbarNavigationButtons()
+    {
+        $this->page_header_toolbar_btn['module_config'] = [
+            'href' => 'index.php?controller=AdminModules&configure=' . $this->module_name . '&token=' . Tools::getAdminTokenLite('AdminModules'),
+            'desc' => $this->l('Module configuration'),
+            'icon' => 'process-icon-cogs',
+        ];
+        $this->page_header_toolbar_btn['posts'] = [
+            'href' => 'index.php?controller=AdminEverPsBlogPost&token=' . Tools::getAdminTokenLite('AdminEverPsBlogPost'),
+            'desc' => $this->l('Posts'),
+            'icon' => 'process-icon-list',
+        ];
+        $this->page_header_toolbar_btn['categories'] = [
+            'href' => 'index.php?controller=AdminEverPsBlogCategory&token=' . Tools::getAdminTokenLite('AdminEverPsBlogCategory'),
+            'desc' => $this->l('Categories'),
+            'icon' => 'process-icon-categories',
+        ];
+        $this->page_header_toolbar_btn['tags'] = [
+            'href' => 'index.php?controller=AdminEverPsBlogTag&token=' . Tools::getAdminTokenLite('AdminEverPsBlogTag'),
+            'desc' => $this->l('Tags'),
+            'icon' => 'process-icon-tag',
+        ];
+        $this->page_header_toolbar_btn['comments'] = [
+            'href' => 'index.php?controller=AdminEverPsBlogComment&token=' . Tools::getAdminTokenLite('AdminEverPsBlogComment'),
+            'desc' => $this->l('Comments'),
+            'icon' => 'process-icon-comments',
+        ];
+        $this->page_header_toolbar_btn['authors'] = [
+            'href' => 'index.php?controller=AdminEverPsBlogAuthor&token=' . Tools::getAdminTokenLite('AdminEverPsBlogAuthor'),
+            'desc' => $this->l('Authors'),
+            'icon' => 'process-icon-user',
+        ];
+    }
+
     public function initPageHeaderToolbar()
     {
+        $this->addToolbarNavigationButtons();
         $this->page_header_toolbar_btn['new'] = [
             'href' => self::$currentIndex . '&add' . $this->table . '&token=' . $this->token,
             'desc' => $this->l('Add new element'),

@@ -142,6 +142,7 @@ class AdminEverPsBlogCategoryController extends EverPsBlogAdminController
 
     public function initPageHeaderToolbar()
     {
+        $this->addToolbarNavigationButtons();
         $this->page_header_toolbar_btn['new'] = [
             'href' => self::$currentIndex . '&add' . $this->table . '&token=' . $this->token,
             'desc' => $this->l('Add new element'),
