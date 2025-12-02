@@ -2526,6 +2526,18 @@ class EverPsBlog extends Module
             if (!$starredPosts || !count($starredPosts)) {
                 return;
             }
+            foreach ($starredPosts as &$post) {
+                $featuredThumb = EverPsBlogImage::getBlogThumbUrl(
+                    (int) (is_array($post) ? $post['id_ever_post'] : $post->id_ever_post),
+                    (int) $this->context->shop->id,
+                    'post'
+                );
+                if (is_array($post)) {
+                    $post['featured_thumb'] = $featuredThumb;
+                } else {
+                    $post->featured_thumb = $featuredThumb;
+                }
+            }
             $evercategories = EverPsBlogCategory::getAllCategories(
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id
