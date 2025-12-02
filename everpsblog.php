@@ -3299,6 +3299,7 @@ class EverPsBlog extends Module
             $this->registerHook('displayAdminAfterHeader');
             $this->registerHook('actionAdminMetaAfterWriteRobotsFile');
             $this->registerHook('actionOutputHTMLBefore');
+            $this->registerHook('actionRegisterBlock');
         } catch (Exception $e) {
             PrestaShopLogger::addLog($this->name . ' : ' . $e->getMessage());
         }
@@ -4562,5 +4563,285 @@ class EverPsBlog extends Module
             'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
         ]);
         return $this->display(__FILE__, 'views/templates/hook/shortcode.tpl');
+    }
+
+    public function hookActionRegisterBlock()
+    {
+        $blocks = [];
+        $blocks[] = [
+            'name' => $this->l('Blog posts slider'),
+            'description' => $this->l('Display a selection of blog posts with an optional Bootstrap slider.'),
+            'code' => 'everpsblog_post_slider',
+            'icon' => 'Squares2X2Icon',
+            'need_reload' => true,
+            'nameFrom' => 'post',
+            'templates' => [
+                'default' => 'module:' . $this->name . '/views/templates/block/post-slider.tpl',
+            ],
+            'config' => [
+                'fields' => [
+                    'bootstrap_slider' => [
+                        'type' => 'checkbox',
+                        'label' => $this->l('Enable Bootstrap slider'),
+                        'default' => true,
+                    ],
+                ],
+            ],
+            'repeater' => [
+                'name' => $this->l('Posts'),
+                'nameFrom' => 'post',
+                'groups' => [
+                    'post' => [
+                        'type' => 'select',
+                        'label' => $this->l('Choose a post'),
+                        'choices' => $this->getPrettyBlocksPostChoices(),
+                    ],
+                ],
+            ],
+        ];
+
+        $blocks[] = [
+            'name' => $this->l('Blog categories slider'),
+            'description' => $this->l('Display a selection of blog categories with an optional Bootstrap slider.'),
+            'code' => 'everpsblog_category_slider',
+            'icon' => 'TagIcon',
+            'need_reload' => true,
+            'nameFrom' => 'category',
+            'templates' => [
+                'default' => 'module:' . $this->name . '/views/templates/block/category-slider.tpl',
+            ],
+            'config' => [
+                'fields' => [
+                    'bootstrap_slider' => [
+                        'type' => 'checkbox',
+                        'label' => $this->l('Enable Bootstrap slider'),
+                        'default' => true,
+                    ],
+                ],
+            ],
+            'repeater' => [
+                'name' => $this->l('Categories'),
+                'nameFrom' => 'category',
+                'groups' => [
+                    'category' => [
+                        'type' => 'select',
+                        'label' => $this->l('Choose a category'),
+                        'choices' => $this->getPrettyBlocksCategoryChoices(),
+                    ],
+                ],
+            ],
+        ];
+
+        return $blocks;
+    }
+
+    public function hookBeforeRenderingEverpsblogPostSlider($params)
+    {
+        $settings = isset($params['block']['settings']) ? $params['block']['settings'] : [];
+        $items = $this->getPrettyBlocksRepeaterItems($settings, 'posts');
+        $posts = [];
+        foreach ($items as $item) {
+            if (!isset($item['post'])) {
+                continue;
+            }
+            $post = $this->formatPrettyBlocksPost((int) $item['post']);
+            if ($post) {
+                $posts[] = $post;
+            }
+        }
+
+        return [
+            'posts' => $posts,
+            'use_slider' => !empty($settings['bootstrap_slider']) && count($posts) > 1,
+            'carousel_id' => 'everpsblog-post-slider-' . uniqid(),
+        ];
+    }
+
+    public function hookBeforeRenderingEverpsblogCategorySlider($params)
+    {
+        $settings = isset($params['block']['settings']) ? $params['block']['settings'] : [];
+        $items = $this->getPrettyBlocksRepeaterItems($settings, 'categories');
+        $categories = [];
+        foreach ($items as $item) {
+            if (!isset($item['category'])) {
+                continue;
+            }
+            $category = $this->formatPrettyBlocksCategory((int) $item['category']);
+            if ($category) {
+                $categories[] = $category;
+            }
+        }
+
+        return [
+            'categories' => $categories,
+            'use_slider' => !empty($settings['bootstrap_slider']) && count($categories) > 1,
+            'carousel_id' => 'everpsblog-category-slider-' . uniqid(),
+        ];
+    }
+
+    private function getPrettyBlocksRepeaterItems($settings, $fallbackKey)
+    {
+        if (isset($settings[$fallbackKey]) && is_array($settings[$fallbackKey])) {
+            return $settings[$fallbackKey];
+        }
+
+        if (isset($settings['repeater']) && is_array($settings['repeater'])) {
+            return $settings['repeater'];
+        }
+
+        return [];
+    }
+
+    private function getPrettyBlocksPostChoices()
+    {
+        $choices = [];
+        $posts = EverPsBlogPost::getPosts(
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id,
+            0,
+            500,
+            'published'
+        );
+
+        if (!$posts) {
+            return $choices;
+        }
+
+        foreach ($posts as $post) {
+            if (!isset($post['id_ever_post']) || !isset($post['title'])) {
+                continue;
+            }
+            $choices[(int) $post['id_ever_post']] = Tools::substr(strip_tags($post['title']), 0, 100);
+        }
+
+        return $choices;
+    }
+
+    private function getPrettyBlocksCategoryChoices()
+    {
+        $choices = [];
+        $categories = EverPsBlogCategory::getAllCategories(
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id,
+            1
+        );
+
+        if (!$categories) {
+            return $choices;
+        }
+
+        foreach ($categories as $category) {
+            if (!isset($category['id_ever_category']) || !isset($category['title'])) {
+                continue;
+            }
+            $choices[(int) $category['id_ever_category']] = Tools::substr(strip_tags($category['title']), 0, 100);
+        }
+
+        return $choices;
+    }
+
+    private function formatPrettyBlocksPost($id_ever_post)
+    {
+        if ($id_ever_post <= 0) {
+            return false;
+        }
+
+        $post = new EverPsBlogPost(
+            (int) $id_ever_post,
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
+        );
+
+        if (!Validate::isLoadedObject($post) || $post->post_status !== 'published') {
+            return false;
+        }
+
+        $category = new EverPsBlogCategory(
+            (int) $post->id_default_category,
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
+        );
+
+        $categoryData = false;
+        if (Validate::isLoadedObject($category) && (int) $category->active === 1) {
+            $categoryData = [
+                'id' => (int) $category->id_ever_category,
+                'title' => $category->title,
+                'url' => $this->context->link->getModuleLink(
+                    $this->name,
+                    'category',
+                    [
+                        'id_ever_category' => $category->id_ever_category,
+                        'link_rewrite' => $category->link_rewrite,
+                    ]
+                ),
+            ];
+        }
+
+        return [
+            'id' => (int) $post->id,
+            'title' => $post->title,
+            'excerpt' => Tools::substr(strip_tags($post->excerpt ?: $post->content), 0, 150),
+            'url' => $this->context->link->getModuleLink(
+                $this->name,
+                'post',
+                [
+                    'id_ever_post' => $post->id,
+                    'link_rewrite' => $post->link_rewrite,
+                ]
+            ),
+            'featured_thumb' => EverPsBlogImage::getBlogThumbUrl(
+                (int) $post->id,
+                (int) $this->context->shop->id,
+                'post'
+            ),
+            'featured_image' => EverPsBlogImage::getBlogImageUrl(
+                (int) $post->id,
+                (int) $this->context->shop->id,
+                'post'
+            ),
+            'category' => $categoryData,
+        ];
+    }
+
+    private function formatPrettyBlocksCategory($id_ever_category)
+    {
+        if ($id_ever_category <= 0) {
+            return false;
+        }
+
+        $category = new EverPsBlogCategory(
+            (int) $id_ever_category,
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
+        );
+
+        if (!Validate::isLoadedObject($category) || (int) $category->active !== 1) {
+            return false;
+        }
+
+        return [
+            'id' => (int) $category->id,
+            'title' => $category->title,
+            'description' => Tools::substr(strip_tags($category->content), 0, 160),
+            'url' => $this->context->link->getModuleLink(
+                $this->name,
+                'category',
+                [
+                    'id_ever_category' => $category->id,
+                    'link_rewrite' => $category->link_rewrite,
+                ]
+            ),
+            'featured_thumb' => EverPsBlogImage::getBlogThumbUrl(
+                (int) $category->id,
+                (int) $this->context->shop->id,
+                'category'
+            ),
+            'featured_image' => EverPsBlogImage::getBlogImageUrl(
+                (int) $category->id,
+                (int) $this->context->shop->id,
+                'category'
+            ),
+        ];
     }
 }
