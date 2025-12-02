@@ -236,26 +236,7 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
         if (Tools::isSubmit('submitBulkunprotectall' . $this->table)) {
             $this->processBulkUnprotect();
         }
-        $lists = parent::renderList();
-        $this->html .= $this->context->smarty->fetch(
-            _PS_MODULE_DIR_
-            . '/' . $this->module->name . '/views/templates/admin/headerController.tpl'
-        );
-        $blog_instance = Module::getInstanceByName($this->module->name);
-        if ($blog_instance->checkLatestEverModuleVersion()) {
-            $this->html .= $this->context->smarty->fetch(
-                _PS_MODULE_DIR_
-                . '/'
-                . $this->module->name
-                . '/views/templates/admin/upgrade.tpl'
-            );
-        }
-        $this->html .= $lists;
-        $this->html .= $this->context->smarty->fetch(
-            _PS_MODULE_DIR_
-            .'/' . $this->module->name . '/views/templates/admin/footer.tpl'
-        );
-        return $this->html;
+        return parent::renderList();
     }
 
     protected function getConfigFormValues($obj)
