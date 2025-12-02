@@ -4707,15 +4707,52 @@ class EverPsBlog extends Module
             }
 
             if (isset($source[$fallbackKey]) && is_array($source[$fallbackKey])) {
-                return $source[$fallbackKey];
+                return $this->normalizePrettyBlocksRepeaterItems($source[$fallbackKey]);
             }
 
             if (isset($source['repeater']) && is_array($source['repeater'])) {
-                return $source['repeater'];
+                return $this->normalizePrettyBlocksRepeaterItems($source['repeater']);
+            }
+
+            if (
+                count($source) > 0
+                && count(array_filter(array_keys($source), 'is_int')) === count($source)
+            ) {
+                return $this->normalizePrettyBlocksRepeaterItems($source);
             }
         }
 
         return [];
+    }
+
+    private function normalizePrettyBlocksRepeaterItems($items)
+    {
+        if (!is_array($items)) {
+            return [];
+        }
+
+        $normalized = [];
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
+            $normalizedItem = [];
+            foreach ($item as $key => $value) {
+                if (is_array($value) && array_key_exists('value', $value)) {
+                    $normalizedItem[$key] = $value['value'];
+                    continue;
+                }
+
+                $normalizedItem[$key] = $value;
+            }
+
+            if (!empty($normalizedItem)) {
+                $normalized[] = $normalizedItem;
+            }
+        }
+
+        return $normalized;
     }
 
     private function getPrettyBlocksPostChoices()
