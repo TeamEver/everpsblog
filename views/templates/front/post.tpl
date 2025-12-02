@@ -144,7 +144,7 @@
         </div>
             <div class="col-12 col-md-6">
           {if $social_share_links}
-            <div class="social-sharing d-none">
+            <div class="social-sharing">
               <span>{l s='Share' d='Shop.Theme.Actions'}</span>
               <ul>
                 {foreach from=$social_share_links item='social_share_link'}
