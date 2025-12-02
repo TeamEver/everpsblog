@@ -153,7 +153,7 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERBLOG_BANNED_USERS', '')
             && Configuration::updateValue('EVERBLOG_BANNED_IP', '')
             && Configuration::updateValue('EVERPSBLOG_PAGINATION', '10')
-            && Configuration::updateValue('EVERPSBLOG_HOME_NBR', '4')
+            && Configuration::updateValue('EVERPSBLOG_HOME_NBR', '12')
             && Configuration::updateValue('EVERPSBLOG_PRODUCT_NBR', '4')
             && Configuration::updateValue('EVERPSBLOG_EXCERPT', '150')
             && Configuration::updateValue('EVERPSBLOG_TITLE_LENGTH', '150')
