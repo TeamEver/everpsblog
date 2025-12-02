@@ -97,9 +97,15 @@
         <div class="col-12 col-lg-10">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <form id="everpsblog-filter" class="row" onsubmit="return false;">
+                    <div id="everpsblog-active-filters" class="alert alert-secondary d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-3" data-active-prefix="{l s='Active filters:' mod='everpsblog'}" data-category-label="{l s='Category:' mod='everpsblog'}" data-tag-label="{l s='Tag:' mod='everpsblog'}">
+                        <span id="everpsblog-active-filters-summary" data-default-text="{l s='No filter applied' mod='everpsblog'}">{l s='No filter applied' mod='everpsblog'}</span>
+                        <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
+                            <button type="button" id="everpsblog-filter-reset" class="btn btn-outline-secondary btn-sm" disabled>{l s='Reset' mod='everpsblog'}</button>
+                        </div>
+                    </div>
+                    <form id="everpsblog-filter" class="row g-3 g-md-4 align-items-end" data-filter-url="{if isset($facet_url)}{$facet_url|escape:'htmlall':'UTF-8'}{/if}">
                         {if isset($evercategory) && $evercategory|count > 0}
-                        <div class="col-12 col-md-4 mb-3 mb-md-0">
+                        <div class="col-12 col-md-4">
                             <label class="d-block mb-1" for="everpsblog-category">{l s='Category' mod='everpsblog'}</label>
                             <select id="everpsblog-category" class="form-select custom-select" name="category">
                                 <option value="0">{l s='Category' mod='everpsblog'}</option>
@@ -112,7 +118,7 @@
                         </div>
                         {/if}
                         {if isset($evertags) && $evertags|count > 0}
-                        <div class="col-12 col-md-4 mb-3 mb-md-0">
+                        <div class="col-12 col-md-4">
                             <label class="d-block mb-1" for="everpsblog-tag">{l s='Tag' mod='everpsblog'}</label>
                             <select id="everpsblog-tag" class="form-select custom-select" name="tag">
                                 <option value="0">{l s='Tag' mod='everpsblog'}</option>
@@ -122,8 +128,13 @@
                             </select>
                         </div>
                         {/if}
-                        <div class="col-12 col-md-4 d-flex align-items-end justify-content-start justify-content-md-end">
-                            <button id="everpsblog-filter-submit" class="btn btn-primary w-100">{l s='Filter' mod='everpsblog'}</button>
+                        <div class="col-12 col-md-4">
+                            <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-end gap-2">
+                                <button id="everpsblog-filter-submit" type="submit" class="btn btn-primary w-100">
+                                    <span class="everpsblog-filter-submit-label">{l s='Filter' mod='everpsblog'}</span>
+                                    <span class="spinner-border spinner-border-sm ms-2 d-none" id="everpsblog-filter-loading" role="status" aria-hidden="true"></span>
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -160,7 +171,7 @@
 {/if}
 
 {if isset($post_number) && $post_number > 0}
-<div class="row mt-2" id="everpsblog-posts">
+<div class="row mt-2" id="everpsblog-posts" data-empty-text="{l s='No posts match your filters yet.' mod='everpsblog'}">
 {hook h="displayBeforeEverLoop"}
 {foreach from=$everpsblog item=item}
 {include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
