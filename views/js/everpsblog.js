@@ -21,19 +21,35 @@ $(document).ready(function(){
         window.location.href = $(this).prop('href');
         return false;
     });
-    if ($('#ever_fancy_mark').length) {
+    var $imageModal = $('#everpsblog-image-modal');
+    if ($imageModal.length) {
+        var $modalImg = $imageModal.find('.modal-body img');
+        var $modalTitle = $imageModal.find('.modal-title');
+
+        var openModal = function(src, alt) {
+            $modalImg.attr('src', src || '');
+            $modalImg.attr('alt', alt || '');
+            $modalTitle.text(alt || '');
+            $imageModal.modal('show');
+        };
+
         // Post featured img
-        var featured_img = $('#module-everpsblog-post .post-header .post-featured-image');
-        var featured_src = featured_img.attr('src');
-        var featured_link = $('<a/>').attr('href', featured_src);
-        featured_img.wrap(featured_link).parent().addClass('fancybox').attr('rel', 'gallery').fancybox();
+        $('#module-everpsblog-post .post-header .post-featured-image').each(function() {
+            var $image = $(this);
+            var src = $image.attr('src');
+            $image.addClass('img-fluid').css('cursor', 'pointer');
+            $image.on('click', function() {
+                openModal(src, $image.attr('alt'));
+            });
+        });
+
         // Post content medias
         $('#module-everpsblog-post .postcontent img').each(function() {
             var $this = $(this);
-            var src = $this.attr('src');
-            $this.addClass('image');
-            var a = $('<a/>').attr('href', src);
-            $this.wrap(a).parent().addClass('fancybox').attr('rel', 'gallery').fancybox();
+            $this.addClass('image img-fluid').css('cursor', 'pointer');
+            $this.on('click', function() {
+                openModal($this.attr('src'), $this.attr('alt'));
+            });
         });
     }
 
