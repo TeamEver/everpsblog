@@ -23,33 +23,81 @@
             </h2>
         </a>
     </div>
-    <div class="bloghome mt-2 row">
-        {foreach from=$everpsblog item=item}
-            <div class="col-12 col-sm-6 col-lg-3 mb-3 article everpsblog" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
-                <div class="col-12 article-img {$blogcolor|escape:'htmlall':'UTF-8'}">
-                    {if isset($show_featured_post) && $show_featured_post}
-                        <img src="{$item->featured_thumb|escape:'htmlall':'UTF-8'}" width="320" height="180" class="img-fluid col-12 w-100 {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item->title|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}" />
+    {if $everpsblog|@count gt 4}
+        <div id="everpsblogCarousel" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+                {foreach from=$everpsblog item=item name=bloghome}
+                    {if $smarty.foreach.bloghome.index % 4 == 0}
+                        <div class="carousel-item {if $smarty.foreach.bloghome.first}active{/if}">
+                            <div class="bloghome mt-2 row">
                     {/if}
-                </div>
-                <div class="col-12">
-                    <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
-                        <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'}">
-                            {$item->title|escape:'htmlall':'UTF-8'}
-                        </a>
-                    </h3>
-                    {if isset($item->default_cat_obj) && $item->default_cat_obj}
-                        <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category'=>$item->default_cat_obj->id_ever_category, 'link_rewrite'=>$item->default_cat_obj->link_rewrite])|escape:'htmlall':'UTF-8'}" class="d-block {$blogcolor|escape:'htmlall':'UTF-8'}" title="{$item->default_cat_obj->title|escape:'htmlall':'UTF-8'}">
-                            {$item->default_cat_obj->title|escape:'htmlall':'UTF-8'}
-                        </a>
+                                <div class="col-12 col-sm-6 col-lg-3 mb-3 article everpsblog" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
+                                    <div class="col-12 article-img {$blogcolor|escape:'htmlall':'UTF-8'}">
+                                        {if isset($show_featured_post) && $show_featured_post}
+                                            <img src="{$item->featured_thumb|escape:'htmlall':'UTF-8'}" width="320" height="180" class="img-fluid col-12 w-100 {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item->title|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}" />
+                                        {/if}
+                                    </div>
+                                    <div class="col-12">
+                                        <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
+                                            <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'}">
+                                                {$item->title|escape:'htmlall':'UTF-8'}
+                                            </a>
+                                        </h3>
+                                        {if isset($item->default_cat_obj) && $item->default_cat_obj}
+                                            <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category'=>$item->default_cat_obj->id_ever_category, 'link_rewrite'=>$item->default_cat_obj->link_rewrite])|escape:'htmlall':'UTF-8'}" class="d-block {$blogcolor|escape:'htmlall':'UTF-8'}" title="{$item->default_cat_obj->title|escape:'htmlall':'UTF-8'}">
+                                                {$item->default_cat_obj->title|escape:'htmlall':'UTF-8'}
+                                            </a>
+                                        {/if}
+                                        <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
+                                            {if isset($item->excerpt) && !empty($item->excerpt)}{$item->excerpt|escape:'htmlall':'UTF-8'}{else}{$item->content|escape:'htmlall':'UTF-8'}{/if}
+                                        </div>
+                                        <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'} text-danger" title="{l s='Read more' mod='everpsblog'} {$item->title|escape:'htmlall':'UTF-8'}">&gt;&gt; {l s='Read more' mod='everpsblog'}</a>
+                                    </div>
+                                </div>
+                    {if $smarty.foreach.bloghome.index % 4 == 3 || $smarty.foreach.bloghome.last}
+                            </div>
+                        </div>
                     {/if}
-                    <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
-                        {if isset($item->excerpt) && !empty($item->excerpt)}{$item->excerpt|escape:'htmlall':'UTF-8'}{else}{$item->content|escape:'htmlall':'UTF-8'}{/if}
-                    </div>
-                    <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'} text-danger" title="{l s='Read more' mod='everpsblog'} {$item->title|escape:'htmlall':'UTF-8'}">&gt;&gt; {l s='Read more' mod='everpsblog'}</a>
-                </div>
+                {/foreach}
             </div>
-        {/foreach}
-    </div>
+            <a class="carousel-control-prev" href="#everpsblogCarousel" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">{l s='Previous' mod='everpsblog'}</span>
+            </a>
+            <a class="carousel-control-next" href="#everpsblogCarousel" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">{l s='Next' mod='everpsblog'}</span>
+            </a>
+        </div>
+    {else}
+        <div class="bloghome mt-2 row">
+            {foreach from=$everpsblog item=item}
+                <div class="col-12 col-sm-6 col-lg-3 mb-3 article everpsblog" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
+                    <div class="col-12 article-img {$blogcolor|escape:'htmlall':'UTF-8'}">
+                        {if isset($show_featured_post) && $show_featured_post}
+                            <img src="{$item->featured_thumb|escape:'htmlall':'UTF-8'}" width="320" height="180" class="img-fluid col-12 w-100 {if $animated}animated flipSideBySide zoomed{/if}" alt="{$item->title|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}" />
+                        {/if}
+                    </div>
+                    <div class="col-12">
+                        <h3 class="everpsblog article-content" id="everpsblog-post-title-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
+                            <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'}">
+                                {$item->title|escape:'htmlall':'UTF-8'}
+                            </a>
+                        </h3>
+                        {if isset($item->default_cat_obj) && $item->default_cat_obj}
+                            <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category'=>$item->default_cat_obj->id_ever_category, 'link_rewrite'=>$item->default_cat_obj->link_rewrite])|escape:'htmlall':'UTF-8'}" class="d-block {$blogcolor|escape:'htmlall':'UTF-8'}" title="{$item->default_cat_obj->title|escape:'htmlall':'UTF-8'}">
+                                {$item->default_cat_obj->title|escape:'htmlall':'UTF-8'}
+                            </a>
+                        {/if}
+                        <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
+                            {if isset($item->excerpt) && !empty($item->excerpt)}{$item->excerpt|escape:'htmlall':'UTF-8'}{else}{$item->content|escape:'htmlall':'UTF-8'}{/if}
+                        </div>
+                        <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'} text-danger" title="{l s='Read more' mod='everpsblog'} {$item->title|escape:'htmlall':'UTF-8'}">&gt;&gt; {l s='Read more' mod='everpsblog'}</a>
+                    </div>
+                </div>
+            {/foreach}
+        </div>
+    {/if}
     <div class="text-center">
         <a href="{$blogUrl|escape:'htmlall':'UTF-8'}" title="{l s='See all posts from the blog' mod='everpsblog'}" class="btn btn-info text-white">{l s='See all posts from the blog' mod='everpsblog'}</a>
     </div>
