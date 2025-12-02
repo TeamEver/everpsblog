@@ -2468,13 +2468,11 @@ class EverPsBlog extends Module
     {
         $idLang = $this->context->language->id;
         $idShop = $this->context->shop->id;
-        $cacheId = $this->name . '-hookDisplayBanner-' . $idLang . '-' . $idShop;
+        $post_number = (int) Configuration::get('EVERPSBLOG_HOME_NBR') > 0
+            ? (int) Configuration::get('EVERPSBLOG_HOME_NBR')
+            : 4;
+        $cacheId = $this->name . '-hookDisplayBanner-' . $idLang . '-' . $idShop . '-' . $post_number;
         if (!$this->isCached('home.tpl', $cacheId)) {
-            if ((int) Configuration::get('EVERPSBLOG_HOME_NBR') > 0) {
-                $post_number = (int) Configuration::get('EVERPSBLOG_HOME_NBR');
-            } else {
-                $post_number = 4;
-            }
             $blogUrl = Context::getContext()->link->getModuleLink(
                 $this->name,
                 'blog',
