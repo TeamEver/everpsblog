@@ -214,11 +214,23 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
             ],
         ];
         if (Tools::getIsset('deletePost'.$this->table)) {
-            $everObj = new $this->className(
-                (int) Tools::getValue($this->identifier)
-            );
-            if (Validate::isLoadedObject($everObj)) {
-                $everObj->delete();
+            $token = Tools::getValue('token');
+            $hasValidToken = (
+                (Tools::isSubmit('deletePost'.$this->table) && Tools::isSubmit('token'))
+                || $token
+            ) && $token === $this->token;
+
+            if (!$this->access('delete')) {
+                $this->errors[] = $this->l('You do not have permission to delete this post.');
+            } elseif (!$hasValidToken) {
+                $this->errors[] = $this->l('Invalid security token, the post was not deleted.');
+            } else {
+                $everObj = new $this->className(
+                    (int) Tools::getValue($this->identifier)
+                );
+                if (Validate::isLoadedObject($everObj)) {
+                    $everObj->delete();
+                }
             }
         }
         if (Tools::isSubmit('submitBulkdelete' . $this->table)) {
