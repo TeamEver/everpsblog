@@ -149,7 +149,7 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
                     AND acl.`id_lang` = ' . (int) Context::getContext()->language->id . '
                 )';
         $this->_where = 'AND a.id_shop = ' . (int) Context::getContext()->shop->id;
-        $this->_where = 'AND l.id_lang = ' . (int) Context::getContext()->language->id;
+        $this->_where .= ' AND l.id_lang = ' . (int) Context::getContext()->language->id;
         parent::__construct();
     }
 
