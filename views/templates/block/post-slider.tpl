@@ -18,7 +18,7 @@
 {if isset($posts) && $posts|@count}
 <div class="everpsblog-block everpsblog-post-slider">
     {if isset($use_slider) && $use_slider && isset($carousel_id)}
-        <div id="{$carousel_id|escape:'htmlall':'UTF-8'}" class="carousel slide" data-ride="carousel" data-interval="false" data-wrap="true">
+        <div id="{$carousel_id|escape:'htmlall':'UTF-8'}" class="carousel slide" data-bs-ride="carousel" data-bs-interval="false" data-bs-wrap="true">
             <div class="carousel-inner">
                 {foreach from=$posts item=post name=postslider}
                     <div class="carousel-item {if $smarty.foreach.postslider.first}active{/if}">
@@ -43,11 +43,11 @@
                     </div>
                 {/foreach}
             </div>
-            <a class="carousel-control-prev" href="#{$carousel_id|escape:'htmlall':'UTF-8'}" role="button" data-slide="prev">
+            <a class="carousel-control-prev" role="button" data-bs-target="#{$carousel_id|escape:'htmlall':'UTF-8'}" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                 <span class="sr-only visually-hidden">{l s='Previous' mod='everpsblog'}</span>
             </a>
-            <a class="carousel-control-next" href="#{$carousel_id|escape:'htmlall':'UTF-8'}" role="button" data-slide="next">
+            <a class="carousel-control-next" role="button" data-bs-target="#{$carousel_id|escape:'htmlall':'UTF-8'}" data-bs-slide="next">
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
                 <span class="sr-only visually-hidden">{l s='Next' mod='everpsblog'}</span>
             </a>
