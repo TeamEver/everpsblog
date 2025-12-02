@@ -80,7 +80,7 @@
     <form method="get" action="{$link->getModuleLink('everpsblog','search')|escape:'htmlall':'UTF-8'}" class="everpsblog-search" data-doofinder-ignore="true">
         <div class="input-group">
             <input class="form-control" type="search" name="s" data-doofinder-ignore="true" placeholder="{l s='Search by keywords' mod='everpsblog'}" required />
-            <button class="btn btn-danger" type="submit">{l s='Search' mod='everpsblog'}</button>
+            <button class="btn btn-info" type="submit">{l s='Search' mod='everpsblog'}</button>
         </div>
     </form>
 </div>
