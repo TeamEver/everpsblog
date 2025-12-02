@@ -154,10 +154,30 @@ abstract class EverPsBlogAdminController extends ModuleAdminController
 
     protected function processBulkDelete()
     {
-        foreach (Tools::getValue($this->table . 'Box') as $idEverObj) {
-            $everObj = new $this->className((int) $idEverObj);
+        if (!$this->access('delete')) {
+            $this->errors[] = $this->l('You do not have permission to delete this item.');
+
+            return;
+        }
+
+        $idsToDelete = Tools::getValue($this->table . 'Box');
+        if (!is_array($idsToDelete) || empty($idsToDelete)) {
+            return;
+        }
+
+        foreach ($idsToDelete as $idEverObj) {
+            $idEverObj = (int) $idEverObj;
+
+            if ($idEverObj <= 0) {
+                continue;
+            }
+
+            $everObj = new $this->className($idEverObj);
             if (!$everObj->delete()) {
-                $this->errors[] = $this->l('An error has occurred: Can\'t delete the current object');
+                $this->errors[] = sprintf(
+                    $this->l('An error has occurred: Can\'t delete the current object with ID %d'),
+                    $idEverObj
+                );
             }
         }
     }
