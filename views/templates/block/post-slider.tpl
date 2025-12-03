@@ -18,30 +18,38 @@
 {if isset($block.extra.states) && $block.extra.states|@count}
 <div class="everpsblog-block everpsblog-post-slider">
     {if isset($block.settings.bootstrap_slider) && $block.settings.bootstrap_slider}
-        <div id="block-{$block.id_prettyblocks}" class="carousel slide" data-bs-ride="carousel" data-bs-interval="false" data-bs-wrap="true">
+        <div id="block-{$block.id_prettyblocks}" class="carousel slide" data-bs-ride="false" data-bs-interval="false" data-bs-wrap="true">
             <div class="carousel-inner">
                 {foreach from=$block.extra.states item=post name=postslider}
                 {assign var="post" value=$post.post}
+                    {if $smarty.foreach.postslider.index % 4 == 0}
                     <div class="carousel-item {if $smarty.foreach.postslider.first}active{/if}">
-                        <article class="card h-100">
-                            {if isset($post.featured_thumb) && $post.featured_thumb}
-                                <img class="card-img-top img-fluid" src="{$post.featured_thumb|escape:'htmlall':'UTF-8'}" alt="{$post.title|escape:'htmlall':'UTF-8'}" loading="lazy">
-                            {/if}
-                            <div class="card-body">
-                                <h3 class="h5 card-title">
-                                    <a href="{$post.url|escape:'htmlall':'UTF-8'}" title="{$post.title|escape:'htmlall':'UTF-8'}">{$post.title|escape:'htmlall':'UTF-8'}</a>
-                                </h3>
-                                {if isset($post.category) && $post.category}
-                                    <div class="mb-2">
-                                        <a class="text-muted" href="{$post.category.url|escape:'htmlall':'UTF-8'}" title="{$post.category.title|escape:'htmlall':'UTF-8'}">{$post.category.title|escape:'htmlall':'UTF-8'}</a>
+                        <div class="row">
+                    {/if}
+                            <div class="col-12 col-md-6 col-lg-3 mb-3">
+                                <article class="card h-100">
+                                    {if isset($post.featured_thumb) && $post.featured_thumb}
+                                        <img class="card-img-top img-fluid" src="{$post.featured_thumb|escape:'htmlall':'UTF-8'}" alt="{$post.title|escape:'htmlall':'UTF-8'}" loading="lazy">
+                                    {/if}
+                                    <div class="card-body">
+                                        <h3 class="h5 card-title">
+                                            <a href="{$post.url|escape:'htmlall':'UTF-8'}" title="{$post.title|escape:'htmlall':'UTF-8'}">{$post.title|escape:'htmlall':'UTF-8'}</a>
+                                        </h3>
+                                        {if isset($post.category) && $post.category}
+                                            <div class="mb-2">
+                                                <a class="text-muted" href="{$post.category.url|escape:'htmlall':'UTF-8'}" title="{$post.category.title|escape:'htmlall':'UTF-8'}">{$post.category.title|escape:'htmlall':'UTF-8'}</a>
+                                            </div>
+                                        {/if}
+                                        {if isset($post.excerpt) && $post.excerpt}
+                                            <p class="card-text">{$post.excerpt|escape:'htmlall':'UTF-8'}</p>
+                                        {/if}
                                     </div>
-                                {/if}
-                                {if isset($post.excerpt) && $post.excerpt}
-                                    <p class="card-text">{$post.excerpt|escape:'htmlall':'UTF-8'}</p>
-                                {/if}
+                                </article>
                             </div>
-                        </article>
+                    {if ($smarty.foreach.postslider.index+1) % 4 == 0 || $smarty.foreach.postslider.last}
+                        </div>
                     </div>
+                    {/if}
                 {/foreach}
             </div>
             <a class="carousel-control-prev" role="button" data-bs-target="#{$carousel_id|escape:'htmlall':'UTF-8'}" data-bs-slide="prev">
