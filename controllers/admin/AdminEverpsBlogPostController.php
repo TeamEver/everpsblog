@@ -133,7 +133,6 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
                 ON (
                     l.`' . $this->identifier . '` = a.`' . $this->identifier . '`
                     AND l.`id_lang` = ' . (int) Context::getContext()->language->id . '
-                    AND l.`id_shop` = ' . (int) Context::getContext()->shop->id . '
                 )
             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_author` au
                 ON (
