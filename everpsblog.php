@@ -538,7 +538,7 @@ class EverPsBlog extends Module
 
     public function getContent()
     {
-        $this->checkObligatoryHooks();
+        $this->checkHooks();
         $this->checkAndFixDatabase();
         $this->html = '';
         // Process internal linking
@@ -3286,6 +3286,7 @@ class EverPsBlog extends Module
     {
         try {
             $this->registerHook('displayHeader');
+            $this->registerHook('beforeRenderingEverpsblogPostSlider');
             $this->registerHook('actionAdminControllerSetMedia');
             $this->registerHook('displayHome');
             $this->registerHook('displayLeftColumn');
@@ -4635,124 +4636,48 @@ class EverPsBlog extends Module
         return $blocks;
     }
 
-    public function hookBeforeRenderingEverpsblogPostSlider($params)
-    {
-        $block = isset($params['block']) && is_array($params['block']) ? $params['block'] : [];
-        $settings = isset($block['settings']) && is_array($block['settings'])
-            ? $block['settings']
-            : (isset($params['settings']) && is_array($params['settings']) ? $params['settings'] : []);
-
-        $items = $this->getPrettyBlocksRepeaterItems($params, 'posts');
-        $posts = [];
-        foreach ($items as $item) {
-            if (!isset($item['post'])) {
-                continue;
-            }
-            $post = $this->formatPrettyBlocksPost((int) $item['post']);
-            if ($post) {
-                $posts[] = $post;
-            }
-        }
-
-        return [
-            'posts' => $posts,
-            'use_slider' => !empty($settings['bootstrap_slider']) && count($posts) > 1,
-            'carousel_id' => 'everpsblog-post-slider-' . uniqid(),
-        ];
-    }
-
     public function hookBeforeRenderingEverpsblogCategorySlider($params)
     {
         $block = isset($params['block']) && is_array($params['block']) ? $params['block'] : [];
-        $settings = isset($block['settings']) && is_array($block['settings'])
-            ? $block['settings']
-            : (isset($params['settings']) && is_array($params['settings']) ? $params['settings'] : []);
+        $states = $block['states'] ?? [];
 
-        $items = $this->getPrettyBlocksRepeaterItems($params, 'categories');
-        $categories = [];
-        foreach ($items as $item) {
-            if (!isset($item['category'])) {
+        $newStates = [];
+
+        foreach ($states as $categoryId => $state) {
+            $categoryId = (int) $categoryId;
+
+            if ($categoryId <= 0) {
                 continue;
             }
-            $category = $this->formatPrettyBlocksCategory((int) $item['category']);
-            if ($category) {
-                $categories[] = $category;
-            }
+
+            $newStates[$categoryId] = [
+                'category' => $categoryId,
+            ];
         }
 
-        return [
-            'categories' => $categories,
-            'use_slider' => !empty($settings['bootstrap_slider']) && count($categories) > 1,
-            'carousel_id' => 'everpsblog-category-slider-' . uniqid(),
-        ];
+        return ['states' => $newStates];
     }
 
-    private function getPrettyBlocksRepeaterItems($params, $fallbackKey)
+    public function hookBeforeRenderingEverpsblogPostSlider($params)
     {
         $block = isset($params['block']) && is_array($params['block']) ? $params['block'] : [];
-        $settings = isset($block['settings']) && is_array($block['settings'])
-            ? $block['settings']
-            : (isset($params['settings']) && is_array($params['settings']) ? $params['settings'] : []);
+        $states = $block['states'] ?? [];
 
-        $sources = [
-            isset($block['repeater_db']) && is_array($block['repeater_db']) ? $block['repeater_db'] : null,
-            isset($block['states']) && is_array($block['states']) ? $block['states'] : null,
-            isset($block['settings_formatted']) && is_array($block['settings_formatted']) ? $block['settings_formatted'] : null,
-            $settings,
-        ];
+        $newStates = [];
 
-        foreach ($sources as $source) {
-            if (!is_array($source)) {
+        foreach ($states as $postId => $state) {
+            $postId = (int) $postId;
+
+            if ($postId <= 0) {
                 continue;
             }
-
-            if (isset($source[$fallbackKey]) && is_array($source[$fallbackKey])) {
-                return $this->normalizePrettyBlocksRepeaterItems($source[$fallbackKey]);
-            }
-
-            if (isset($source['repeater']) && is_array($source['repeater'])) {
-                return $this->normalizePrettyBlocksRepeaterItems($source['repeater']);
-            }
-
-            if (
-                count($source) > 0
-                && count(array_filter(array_keys($source), 'is_int')) === count($source)
-            ) {
-                return $this->normalizePrettyBlocksRepeaterItems($source);
-            }
+            $post = $this->formatPrettyBlocksPost($postId);
+            // On écrase la valeur textuelle "post" par l'ID réel
+            $newStates[$postId] = [
+                'post' => $post,
+            ];
         }
-
-        return [];
-    }
-
-    private function normalizePrettyBlocksRepeaterItems($items)
-    {
-        if (!is_array($items)) {
-            return [];
-        }
-
-        $normalized = [];
-        foreach ($items as $item) {
-            if (!is_array($item)) {
-                continue;
-            }
-
-            $normalizedItem = [];
-            foreach ($item as $key => $value) {
-                if (is_array($value) && array_key_exists('value', $value)) {
-                    $normalizedItem[$key] = $value['value'];
-                    continue;
-                }
-
-                $normalizedItem[$key] = $value;
-            }
-
-            if (!empty($normalizedItem)) {
-                $normalized[] = $normalizedItem;
-            }
-        }
-
-        return $normalized;
+        return ['states' => $newStates];
     }
 
     private function getPrettyBlocksPostChoices()

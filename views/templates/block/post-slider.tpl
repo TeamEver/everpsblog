@@ -15,12 +15,13 @@
  *  @copyright 2019-2025 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
-{if isset($posts) && $posts|@count}
+{if isset($block.extra.states) && $block.extra.states|@count}
 <div class="everpsblog-block everpsblog-post-slider">
     {if isset($use_slider) && $use_slider && isset($carousel_id)}
         <div id="{$carousel_id|escape:'htmlall':'UTF-8'}" class="carousel slide" data-bs-ride="carousel" data-bs-interval="false" data-bs-wrap="true">
             <div class="carousel-inner">
-                {foreach from=$posts item=post name=postslider}
+                {foreach from=$block.extra.states item=post name=postslider}
+                {assign var="post" value=$post.post}
                     <div class="carousel-item {if $smarty.foreach.postslider.first}active{/if}">
                         <article class="card h-100">
                             {if isset($post.featured_thumb) && $post.featured_thumb}
@@ -54,7 +55,8 @@
         </div>
     {else}
         <div class="row">
-            {foreach from=$posts item=post}
+            {foreach from=$block.extra.states item=post}
+            {assign var="post" value=$post.post}
                 <div class="col-12 col-md-6 col-lg-4 mb-3">
                     <article class="card h-100">
                         {if isset($post.featured_thumb) && $post.featured_thumb}
