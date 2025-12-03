@@ -18,7 +18,8 @@
 {if isset($block.extra.states) && $block.extra.states|@count}
 <div class="everpsblog-block everpsblog-post-slider">
     {if isset($block.settings.bootstrap_slider) && $block.settings.bootstrap_slider}
-        <div id="block-{$block.id_prettyblocks}" class="carousel slide" data-bs-ride="false" data-bs-interval="false" data-bs-wrap="true">
+        {assign var=carousel_id value='everpsblog-post-slider-'|cat:$block.id_prettyblocks}
+        <div id="{$carousel_id|escape:'htmlall':'UTF-8'}" class="carousel slide" data-bs-ride="false" data-bs-interval="false" data-bs-wrap="true">
             <div class="carousel-inner">
                 {foreach from=$block.extra.states item=post name=postslider}
                 {assign var="post" value=$post.post}
