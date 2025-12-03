@@ -4649,9 +4649,9 @@ class EverPsBlog extends Module
             if ($categoryId <= 0) {
                 continue;
             }
-
+            $category = $this->formatPrettyBlocksCategory($categoryId);
             $newStates[$categoryId] = [
-                'category' => $categoryId,
+                'category' => $category,
             ];
         }
 
