@@ -538,7 +538,7 @@ class EverPsBlog extends Module
 
     public function getContent()
     {
-        $this->checkHooks();
+        $this->checkObligatoryHooks();
         $this->checkAndFixDatabase();
         $this->html = '';
         // Process internal linking
