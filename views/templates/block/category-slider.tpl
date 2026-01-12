@@ -7,7 +7,7 @@
 
     {if isset($block.settings.bootstrap_slider) && $block.settings.bootstrap_slider && isset($carousel_id)}
         {assign var=carousel_id value='everpsblog-post-slider-'|cat:$block.id_prettyblocks}
-        <div id="{$carousel_id|escape:'htmlall':'UTF-8'}" class="carousel slide" data-bs-ride="false" data-bs-interval="false" data-bs-wrap="true">
+        <div id="{$carousel_id|escape:'htmlall':'UTF-8'}" class="carousel slide" data-bs-ride="false" data-bs-interval="false" data-bs-wrap="true" data-wrap="true">
 
             <div class="carousel-inner">
 
