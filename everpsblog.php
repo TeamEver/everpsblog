@@ -4602,6 +4602,41 @@ class EverPsBlog extends Module
         ];
 
         $blocks[] = [
+            'name' => $this->l('Latest blog posts'),
+            'description' => $this->l('Display the latest blog posts with an optional Bootstrap slider.'),
+            'code' => 'everpsblog_latest_posts',
+            'icon' => 'NewspaperIcon',
+            'need_reload' => true,
+            'templates' => [
+                'default' => 'module:' . $this->name . '/views/templates/block/latest-posts.tpl',
+            ],
+            'config' => [
+                'fields' => [
+                    'bootstrap_slider' => [
+                        'type' => 'checkbox',
+                        'label' => $this->l('Enable Bootstrap slider'),
+                        'default' => true,
+                    ],
+                    'items_per_slide_mobile' => [
+                        'type' => 'number',
+                        'label' => $this->l('Items per slide on mobile'),
+                        'default' => 1,
+                    ],
+                    'items_per_slide_desktop' => [
+                        'type' => 'number',
+                        'label' => $this->l('Items per slide on desktop'),
+                        'default' => 2,
+                    ],
+                    'total_posts' => [
+                        'type' => 'number',
+                        'label' => $this->l('Total posts to display'),
+                        'default' => 6,
+                    ],
+                ],
+            ],
+        ];
+
+        $blocks[] = [
             'name' => $this->l('Blog categories slider'),
             'description' => $this->l('Display a selection of blog categories with an optional Bootstrap slider.'),
             'code' => 'everpsblog_category_slider',
@@ -4678,6 +4713,46 @@ class EverPsBlog extends Module
             ];
         }
         return ['states' => $newStates];
+    }
+
+    public function hookBeforeRenderingEverpsblogLatestPosts($params)
+    {
+        $block = isset($params['block']) && is_array($params['block']) ? $params['block'] : [];
+        $settings = $block['settings'] ?? [];
+
+        $totalPosts = isset($settings['total_posts']) ? (int) $settings['total_posts'] : 6;
+        if ($totalPosts <= 0) {
+            $totalPosts = 6;
+        }
+
+        $posts = EverPsBlogPost::getLatestPosts(
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id,
+            0,
+            $totalPosts
+        );
+
+        $states = [];
+        if ($posts) {
+            foreach ($posts as $post) {
+                $postId = isset($post->id) ? (int) $post->id : 0;
+                if ($postId <= 0) {
+                    continue;
+                }
+                $formattedPost = $this->formatPrettyBlocksPost($postId);
+                if (!$formattedPost) {
+                    continue;
+                }
+                $states[] = [
+                    'post' => $formattedPost,
+                ];
+            }
+        }
+
+        return [
+            'states' => $states,
+            'blog_url' => $this->context->link->getModuleLink($this->name, 'blog'),
+        ];
     }
 
     private function getPrettyBlocksPostChoices()
