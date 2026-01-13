@@ -16,7 +16,7 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 {if isset($everpsblog) && $everpsblog|@count}
-    <div class="bloghome Container">
+    <div class="bloghome container">
         <div class="row bloghometitle">
             <a href="{$blogUrl|escape:'htmlall':'UTF-8'}" title="{l s='Latest posts from the blog' mod='everpsblog'}">
                 <h2 class="h2 products-section-title text-uppercase text-center">
