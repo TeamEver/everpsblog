@@ -3291,8 +3291,6 @@ class EverPsBlog extends Module
             $this->registerHook('beforeRenderingEverpsblogPostSlider');
             $this->registerHook('actionAdminControllerSetMedia');
             $this->registerHook('displayHome');
-            $this->registerHook('displayLeftColumn');
-            $this->registerHook('displayRightColumn');
             $this->registerHook('displayFooterProduct');
             $this->registerHook('displayFooter');
             $this->registerHook('displayCustomerAccount');
