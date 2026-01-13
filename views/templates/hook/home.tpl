@@ -25,7 +25,6 @@
             </a>
         </div>
         {if $everpsblog|@count > 1}
-            {assign var=carousel_id value='everpsblog-home-slider-'|cat:uniqid()}
             <div id="{$carousel_id|escape:'htmlall':'UTF-8'}" class="carousel slide" data-bs-ride="false" data-bs-interval="false" data-bs-wrap="true">
                 <div class="carousel-inner">
                     {foreach from=$everpsblog item=item name=homecarousel}
