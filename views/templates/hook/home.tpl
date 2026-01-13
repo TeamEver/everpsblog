@@ -16,7 +16,7 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 {if isset($everpsblog) && $everpsblog|@count}
-    <div class="bloghome">
+    <div class="bloghome Container">
         <div class="row bloghometitle">
             <a href="{$blogUrl|escape:'htmlall':'UTF-8'}" title="{l s='Latest posts from the blog' mod='everpsblog'}">
                 <h2 class="h2 products-section-title text-uppercase text-center">
@@ -72,7 +72,7 @@
                 </a>
             </div>
         {else}
-            <div class="bloghome mt-2 row">
+            <div class="bloghome Container mt-2 row">
                 {foreach from=$everpsblog item=item}
                     <div class="col-12 col-sm-6 col-lg-3 mb-3 article everpsblog" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
                         <div class="col-12 article-img {$blogcolor|escape:'htmlall':'UTF-8'}">
