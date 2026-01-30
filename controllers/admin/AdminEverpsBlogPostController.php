@@ -147,7 +147,11 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
                 ON (
                     acl.`id_ever_category` = a.`id_default_category`
                     AND acl.`id_lang` = ' . (int) Context::getContext()->language->id . '
-                    AND acl.`id_shop` = ' . (int) Context::getContext()->shop->id . '
+                )
+            LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category_shop` acs
+                ON (
+                    acs.`id_ever_category` = a.`id_default_category`
+                    AND acs.`id_shop` = ' . (int) Context::getContext()->shop->id . '
                 )';
         $this->_where = 'AND a.id_shop = ' . (int) Context::getContext()->shop->id;
         $this->_where .= ' AND l.id_lang = ' . (int) Context::getContext()->language->id;
