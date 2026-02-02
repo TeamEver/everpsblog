@@ -226,12 +226,12 @@ class EverPsBlogPost extends ObjectModel
             $sql = new DbQuery;
             $sql->select('*');
             $sql->from(self::$definition['table'] . '_lang', 'bpl');
-            $sql->leftJoin(
+            $sql->innerJoin(
                 self::$definition['table'],
                 'bp',
                 'bp.' . self::$definition['primary'] . ' = bpl.' . self::$definition['primary']
             );
-            $sql->leftJoin(
+            $sql->innerJoin(
                 self::$definition['table'] . '_shop',
                 'bps',
                 'bp.' . self::$definition['primary'] . ' = bps.' . self::$definition['primary']
