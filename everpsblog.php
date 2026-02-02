@@ -4758,10 +4758,9 @@ class EverPsBlog extends Module
     private function getPrettyBlocksPostChoices()
     {
         $choices = [];
-        $posts = EverPsBlogPost::getPosts(
+        $posts = EverPsBlogPost::getPostsForChoices(
             (int) $this->context->language->id,
             (int) $this->context->shop->id,
-            0,
             500,
             'published'
         );

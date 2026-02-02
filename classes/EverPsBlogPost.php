@@ -321,6 +321,52 @@ class EverPsBlogPost extends ObjectModel
         return Cache::retrieve($cache_id);
     }
 
+    public static function getPostsForChoices(
+        $id_lang,
+        $id_shop,
+        $limit = 500,
+        $post_status = 'published'
+    ) {
+        $cache_id = 'EverPsBlogPost::getPostsForChoices_'
+        . (int) $id_lang
+        . '_'
+        . (int) $id_shop
+        . '_'
+        . (int) $limit
+        . '_'
+        . $post_status;
+
+        if (!Cache::isStored($cache_id)) {
+            $limit = (int) $limit;
+            if ($limit <= 0) {
+                $limit = 500;
+            }
+
+            $sql = new DbQuery;
+            $sql->select('bp.' . self::$definition['primary'] . ', bpl.title');
+            $sql->from(self::$definition['table'] . '_lang', 'bpl');
+            $sql->innerJoin(
+                self::$definition['table'],
+                'bp',
+                'bp.' . self::$definition['primary'] . ' = bpl.' . self::$definition['primary']
+            );
+            $sql->innerJoin(
+                self::$definition['table'] . '_shop',
+                'bps',
+                'bp.' . self::$definition['primary'] . ' = bps.' . self::$definition['primary']
+                . ' AND bps.id_shop = ' . (int) $id_shop
+            );
+            $sql->where('bp.post_status = "' . pSQL($post_status) . '"');
+            $sql->where('bpl.id_lang = ' . (int) $id_lang);
+            $sql->orderBy('bp.date_add desc');
+            $sql->limit($limit);
+
+            Cache::store($cache_id, Db::getInstance()->executeS($sql));
+        }
+
+        return Cache::retrieve($cache_id);
+    }
+
     /**
      * Get latest posts
      * @param int id_lang, int id_shop, int start query, int limit query, string post_status
