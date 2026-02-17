@@ -188,6 +188,45 @@ class EverPsBlogPost extends ObjectModel
         ],
     ];
 
+
+    public function add($auto_date = true, $null_values = false)
+    {
+        $added = parent::add($auto_date, $null_values);
+        if ($added) {
+            return $this->ensureShopAssociation();
+        }
+
+        return false;
+    }
+
+    public function update($null_values = false)
+    {
+        $updated = parent::update($null_values);
+        if ($updated) {
+            return $this->ensureShopAssociation();
+        }
+
+        return false;
+    }
+
+    protected function ensureShopAssociation()
+    {
+        $id_shop = (int) $this->id_shop;
+        if (!$id_shop && Context::getContext()->shop) {
+            $id_shop = (int) Context::getContext()->shop->id;
+        }
+
+        if (!(int) $this->id || !$id_shop) {
+            return true;
+        }
+
+        return (bool) Db::getInstance()->execute(
+            'INSERT IGNORE INTO `' . _DB_PREFIX_ . bqSQL(self::$definition['table']) . '_shop` '
+            . '(`' . bqSQL(self::$definition['primary']) . '`, `id_shop`) '
+            . 'VALUES (' . (int) $this->id . ', ' . (int) $id_shop . ')'
+        );
+    }
+
     /**
      * Get all posts depending on start and limit
      * @param int id_lang, int id_shop, int start query, int limit query, string post_status, bool is feed page or not
