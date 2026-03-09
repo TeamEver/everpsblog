@@ -90,13 +90,15 @@
 }
 #module-everpsblog-post .social-sharing{
     margin-top: 0;
-    justify-content: flex-end;
+    justify-content: center;
 }
 #module-everpsblog-post .social-sharing.social-sharing-hero {
     justify-content: center;
 }
 #module-everpsblog-post .social-sharing.social-sharing-hero ul {
     margin: 0;
+    display: flex;
+    justify-content: center;
 }
 #module-everpsblog-post .social-sharing li a{
     display: block;
@@ -105,6 +107,14 @@
     white-space: nowrap;
     text-indent: 100%;
     overflow: hidden;
+}
+#module-everpsblog-post .social-sharing li,
+#module-everpsblog-post .social-sharing li:hover,
+#module-everpsblog-post .social-sharing li a,
+#module-everpsblog-post .social-sharing li a:hover {
+    transition: none;
+    opacity: 1;
+    transform: none;
 }
 #module-everpsblog-post .social-sharing li .text-hide {
     font: 0/0 a;
@@ -253,7 +263,7 @@
 /* Social links */
 .twitter:before {
     content: "";
-    background-image: url(../img/twitter.svg);
+    background-image: url(../img/x.svg);
     background-size: cover;
 }
 .facebook:before {
@@ -274,7 +284,7 @@
     background-position: center;
 }
 .twitter.icon-gray {
-    background-image: url(../img/twitter.svg);
+    background-image: url(../img/x.svg);
     background-size: cover;
     background-position: center;
 }
