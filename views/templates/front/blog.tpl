@@ -167,8 +167,8 @@
 {if isset($post_number) && $post_number > 0}
 <div class="row mt-2" id="everpsblog-posts" data-empty-text="{l s='No posts match your filters yet.' mod='everpsblog'}">
 {hook h="displayBeforeEverLoop"}
-{foreach from=$everpsblog item=item}
-{include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
+{foreach from=$posts item=item}
+{include file='module:everpsblog/views/templates/front/loop/post_object.tpl'}
 {/foreach}
 </div>
 {else}
