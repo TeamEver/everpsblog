@@ -315,3 +315,38 @@ body#module-everpsblog-post .product-miniature .product-miniature{
 .d-none{
     display: none;
 }
+
+#module-everpsblog-post .ai-summary-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .75rem 1.25rem;
+    padding: .9rem 1.1rem;
+    border-radius: 1.25rem;
+    background: #dce8df;
+}
+#module-everpsblog-post .ai-summary-heading {
+    color: #2f8c52;
+}
+#module-everpsblog-post .ai-summary-line-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .85rem;
+}
+#module-everpsblog-post .ai-summary-line-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    color: #2f8c52;
+    text-decoration: none;
+    font-weight: 500;
+}
+#module-everpsblog-post .ai-summary-line-links a:hover,
+#module-everpsblog-post .ai-summary-line-links a:focus {
+    text-decoration: underline;
+}
+#module-everpsblog-post .ai-summary-line-links img {
+    width: 16px;
+    height: 16px;
+    display: block;
+}
