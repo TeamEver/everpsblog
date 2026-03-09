@@ -26,7 +26,7 @@
 {if isset($post_number) && $post_number > 0}
 <div class="row mt-2">
     {foreach from=$posts item=item}
-        {include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
+        {include file='module:everpsblog/views/templates/front/loop/post_object.tpl'}
     {/foreach}
 </div>
 <div class="row">
