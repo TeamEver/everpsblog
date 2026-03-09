@@ -360,20 +360,23 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 (int) $this->post->id,
                 (int) $this->context->language->id
             );
-            $related_posts = EverPsBlogPost::getPostsByCategory(
-                (int) $this->context->language->id,
-                (int) $this->context->shop->id,
-                (int) $this->post->id_default_category,
-                0,
-                5
-            );
-            foreach ($related_posts as $key => $related) {
-                if ((int) $related->id === (int) $this->post->id) {
-                    unset($related_posts[$key]);
+            $related_posts = [];
+            if ((bool) Configuration::get('EVERBLOG_SHOW_RELATED_POSTS') === true) {
+                $related_posts = EverPsBlogPost::getPostsByCategory(
+                    (int) $this->context->language->id,
+                    (int) $this->context->shop->id,
+                    (int) $this->post->id_default_category,
+                    0,
+                    5
+                );
+                foreach ($related_posts as $key => $related) {
+                    if ((int) $related->id === (int) $this->post->id) {
+                        unset($related_posts[$key]);
+                    }
                 }
-            }
-            if ($related_posts && count($related_posts) > 4) {
-                $related_posts = array_slice($related_posts, 0, 4);
+                if ($related_posts && count($related_posts) > 4) {
+                    $related_posts = array_slice($related_posts, 0, 4);
+                }
             }
             // Password protected
             $cookieName = $this->context->shop->id . $this->post->id . Tools::encrypt('everpsblog/post-' . $this->post->id);
