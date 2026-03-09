@@ -358,6 +358,7 @@ body#module-everpsblog-post .product-miniature .product-miniature{
 
 #module-everpsblog-post .everpsblog-post-hero {
     position: relative;
+    background: linear-gradient(9deg, #0a0f54, #0a0f54 49%, #000 70%, #0a0f54 91%, #0a0f54);
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
@@ -369,7 +370,6 @@ body#module-everpsblog-post .product-miniature .product-miniature{
 #module-everpsblog-post .everpsblog-post-hero-overlay {
     max-width: 900px;
     margin: auto;
-    background: linear-gradient(9deg, #0a0f54, #0a0f54 49%, #000 70%, #0a0f54 91%, #0a0f54);
     min-height: 300px;
     display: flex;
     flex-direction: column;
