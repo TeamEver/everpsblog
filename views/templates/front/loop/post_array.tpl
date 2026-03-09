@@ -33,7 +33,7 @@
             <div class="col-12 col-lg-6">
                 <div class="card-body d-flex flex-column h-100 p-4">
             <p class="everpsblog article-content h2 mb-3" id="everpsblog-post-title-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
-                <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'} text-decoration-none">
+                <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'} text-dark text-decoration-none">
                     {$item.title|escape:'htmlall':'UTF-8'}
                 </a>
             </p>
