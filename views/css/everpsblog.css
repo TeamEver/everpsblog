@@ -92,6 +92,12 @@
     margin-top: 0;
     justify-content: flex-end;
 }
+#module-everpsblog-post .social-sharing.social-sharing-hero {
+    justify-content: center;
+}
+#module-everpsblog-post .social-sharing.social-sharing-hero ul {
+    margin: 0;
+}
 #module-everpsblog-post .social-sharing li a{
     display: block;
     width: 100%;
@@ -324,6 +330,59 @@ body#module-everpsblog-post .product-miniature .product-miniature{
     padding: .9rem 1.1rem;
     border-radius: 1.25rem;
     background: #dce8df;
+}
+
+#module-everpsblog-post .everpsblog-post-hero {
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-color: #20405c;
+    border-radius: .75rem;
+    overflow: hidden;
+}
+
+#module-everpsblog-post .everpsblog-post-hero-overlay {
+    background: linear-gradient(180deg, rgba(6, 26, 46, .45) 0%, rgba(6, 26, 46, .55) 100%);
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1rem;
+    text-align: center;
+}
+
+#module-everpsblog-post .everpsblog-post-title {
+    color: #fff;
+    font-size: 2.2rem;
+    font-weight: 700;
+    max-width: 900px;
+}
+
+#module-everpsblog-post .everpsblog-post-intro {
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1.15rem;
+}
+
+#module-everpsblog-post .everpsblog-post-intro p {
+    margin-bottom: 1rem;
+}
+
+#module-everpsblog-post .everpsblog-post-intro .postexcerpt {
+    font-size: 1.9rem;
+    line-height: 1.35;
+}
+
+@media (max-width: 767.98px) {
+    #module-everpsblog-post .everpsblog-post-title {
+        font-size: 1.7rem;
+    }
+
+    #module-everpsblog-post .everpsblog-post-intro .postexcerpt {
+        font-size: 1.4rem;
+    }
 }
 #module-everpsblog-post .ai-summary-heading {
     color: #2f8c52;
