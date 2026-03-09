@@ -110,7 +110,7 @@
     <div class="row">
         {hook h="displayBeforeEverLoop"}
         {foreach from=$posts item=item}
-        {include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
+        {include file='module:everpsblog/views/templates/front/loop/post_object.tpl'}
         {/foreach}
     </div>
 </div>
