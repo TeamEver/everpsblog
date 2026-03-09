@@ -157,7 +157,7 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERPSBLOG_PRODUCT_NBR', '4')
             && Configuration::updateValue('EVERPSBLOG_EXCERPT', '200')
             && Configuration::updateValue('EVERPSBLOG_TITLE_LENGTH', '150')
-            && Configuration::updateValue('EVERBLOG_PRODUCT_COLUMNS', 1)
+            && Configuration::updateValue('EVERBLOG_PRODUCT_COLUMNS', 0)
             && Configuration::updateValue('EVERBLOG_CATEG_COLUMNS', 1)
             && Configuration::updateValue('EVERPSBLOG_BLOG_LAYOUT', 'layouts/layout-full-width.tpl')
             && Configuration::updateValue('EVERPSBLOG_POST_LAYOUT', 'layouts/layout-full-width.tpl')
@@ -167,6 +167,7 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERBLOG_SHOW_FEAT_POST', 1)
             && Configuration::updateValue('EVERBLOG_SHOW_RELATED_POSTS', 1)
             && Configuration::updateValue('EVERBLOG_SHOW_POST_TAGS', 1)
+            && Configuration::updateValue('EVERBLOG_SHOW_AUTHOR', 1)
             && Configuration::updateValue('EVERBLOG_SITEMAP_NUMBER', 5000)
             && Configuration::updateValue('EVERBLOG_MAIN_TITLE', (function () {
                 $title = [];
