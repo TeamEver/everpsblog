@@ -109,7 +109,7 @@
                         <span>{$post->date_add|date_format:'%d/%m/%Y %H:%M'|escape:'htmlall':'UTF-8'}</span>
                     </p>
                     {if isset($post->excerpt) && $post->excerpt}
-                    <p class="postexcerpt mb-0">{$post->excerpt|escape:'htmlall':'UTF-8'}</p>
+                    <p class="postexcerpt mb-0">{$post->excerpt nofilter}</p>
                     {/if}
                 </div>
                 <section class="ai-summary-banner mb-3" data-qcd-ai-summary-banner="" data-ai-target-domain="{$shop.name|escape:'htmlall':'UTF-8'}">
