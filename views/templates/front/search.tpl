@@ -20,6 +20,9 @@
 
 {block name='content'}
 <h1 class="text-center">{l s='Search results for' mod='everpsblog'} "{$query|escape:'htmlall':'UTF-8'}"</h1>
+<div class="d-flex justify-content-center mb-3">
+    {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
+</div>
 {if isset($post_number) && $post_number > 0}
 <div class="row mt-2">
     {foreach from=$posts item=item}

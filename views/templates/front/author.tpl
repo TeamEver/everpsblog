@@ -74,12 +74,7 @@
             <h1 itemprop="headline" class="m-0">{$author->nickhandle|escape:'htmlall':'UTF-8'}</h1>
         </div>
         <div class="d-flex justify-content-center mb-3">
-            <form method="get" action="{$link->getModuleLink('everpsblog','search')|escape:'htmlall':'UTF-8'}" class="everpsblog-search" data-doofinder-ignore="true">
-                <div class="input-group">
-                    <input class="form-control" type="search" name="s" data-doofinder-ignore="true" placeholder="{l s='Search by keywords' mod='everpsblog'}" required />
-                    <button class="btn btn-info" type="submit">{l s='Search' mod='everpsblog'}</button>
-                </div>
-            </form>
+            {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
         </div>
         {if isset($allow_feed) && $allow_feed}
         <a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' mod='everpsblog'} {$author->nickhandle|escape:'htmlall':'UTF-8'}</a>
@@ -127,7 +122,7 @@
 <div class="container">
 {hook h="displayBeforeEverLoop"}
 {foreach from=$posts item=item}
-{include file='module:everpsblog/views/templates/front/loop/post_object.tpl'}
+{include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
 {/foreach}
 </div>
 {if isset($post_number) && $post_number > 0}

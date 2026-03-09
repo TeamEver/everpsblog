@@ -81,13 +81,7 @@
         <div class="col-12 col-lg-10">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <form method="get" action="{$link->getModuleLink('everpsblog','search')|escape:'htmlall':'UTF-8'}" class="everpsblog-search" data-doofinder-ignore="true">
-                        <div class="input-group">
-                            <label class="input-group-text" for="everpsblog-search-input">{l s='Search the blog' mod='everpsblog'}</label>
-                            <input id="everpsblog-search-input" class="form-control" type="search" name="s" data-doofinder-ignore="true" placeholder="{l s='Search by keywords' mod='everpsblog'}" required />
-                            <button class="btn btn-info" type="submit">{l s='Search' mod='everpsblog'}</button>
-                        </div>
-                    </form>
+                    {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
                 </div>
             </div>
         </div>
