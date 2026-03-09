@@ -23,7 +23,7 @@
                 </div>
                 <div class="col-12 col-12">
                     <h3 class="everpsblog article-content h3 product-title" id="everpsblog-post-title-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
-                        <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'}">
+                        <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'} text-dark">
                             {$item->title|escape:'htmlall':'UTF-8'}
                         </a>
                     </h3>
