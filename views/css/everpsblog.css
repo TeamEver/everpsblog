@@ -28,6 +28,32 @@
     display: flex;
     justify-content: center;
 }
+
+/* Blog posts listing cards */
+.everpsblog-listing-card {
+    border-radius: 1rem;
+}
+.everpsblog-listing-card .everpsblog-image-wrapper {
+    min-height: 100%;
+}
+.everpsblog-listing-card .article-content {
+    text-align: center;
+    line-height: 1.2;
+}
+.everpsblog-listing-card .everpsblogcontent {
+    text-align: center;
+}
+.everpsblog-listing-card .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+@media (min-width: 992px) {
+    .everpsblog-listing-card .article-content,
+    .everpsblog-listing-card .everpsblogcontent {
+        text-align: left;
+    }
+}
 /*Posts*/
 #module-everpsblog-post .post-header,
 #module-everpsblog-category .category-header,
