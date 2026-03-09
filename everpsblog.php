@@ -165,6 +165,7 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERPSBLOG_AUTHOR_LAYOUT', 'layouts/layout-full-width.tpl')
             && Configuration::updateValue('EVERPSBLOG_TAG_LAYOUT', 'layouts/layout-full-width.tpl')
             && Configuration::updateValue('EVERBLOG_SHOW_FEAT_POST', 1)
+            && Configuration::updateValue('EVERBLOG_SHOW_RELATED_POSTS', 1)
             && Configuration::updateValue('EVERBLOG_SHOW_POST_TAGS', 1)
             && Configuration::updateValue('EVERBLOG_SITEMAP_NUMBER', 5000)
             && Configuration::updateValue('EVERBLOG_MAIN_TITLE', (function () {
@@ -822,6 +823,13 @@ class EverPsBlog extends Module
                     'Error : The field "Show related posts on product page" is not valid'
                 );
             }
+            if (Tools::getValue('EVERBLOG_SHOW_RELATED_POSTS')
+                && !Validate::isBool(Tools::getValue('EVERBLOG_SHOW_RELATED_POSTS'))
+            ) {
+                $this->postErrors[] = $this->l(
+                    'Error : The field "Show related posts on post page" is not valid'
+                );
+            }
             if (Tools::getValue('EVERBLOG_SHOW_FEAT_CAT')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_SHOW_FEAT_CAT'))
             ) {
@@ -1188,6 +1196,7 @@ class EverPsBlog extends Module
             'EVERPSBLOG_TYPE' => Configuration::get('EVERPSBLOG_TYPE'),
             'EVERBLOG_ANIMATE' => Configuration::get('EVERBLOG_ANIMATE'),
             'EVERBLOG_RELATED_POST' => Configuration::get('EVERBLOG_RELATED_POST'),
+            'EVERBLOG_SHOW_RELATED_POSTS' => Configuration::get('EVERBLOG_SHOW_RELATED_POSTS'),
             'EVERBLOG_SHOW_FEAT_CAT' => Configuration::get('EVERBLOG_SHOW_FEAT_CAT'),
             'EVERBLOG_SHOW_FEAT_TAG' => Configuration::get('EVERBLOG_SHOW_FEAT_TAG'),
             'EVERBLOG_SHOW_FEAT_POST' => Configuration::get('EVERBLOG_SHOW_FEAT_POST'),
@@ -1815,6 +1824,27 @@ class EverPsBlog extends Module
                         'hint' => $this->l('Will show related posts on product page footer'),
                         'required' => false,
                         'name' => 'EVERBLOG_RELATED_POST',
+                        'is_bool' => true,
+                        'values' => [
+                            [
+                                'id' => 'active_on',
+                                'value' => 1,
+                                'label' => $this->l('Yes'),
+                            ],
+                            [
+                                'id' => 'active_off',
+                                'value' => 0,
+                                'label' => $this->l('No'),
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'switch',
+                        'label' => $this->l('Show related posts below each article ?'),
+                        'desc' => $this->l('Set yes to show related posts at the bottom of article pages'),
+                        'hint' => $this->l('Will show related posts block under article content'),
+                        'required' => false,
+                        'name' => 'EVERBLOG_SHOW_RELATED_POSTS',
                         'is_bool' => true,
                         'values' => [
                             [
