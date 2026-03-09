@@ -436,8 +436,8 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
                 'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
                 'featured_image' => $file_url,
-                // Hide featured image on the post page only
-                'show_featured_post' => false,
+                // Show featured image as hero background when available
+                'show_featured_post' => !empty($file_url),
                 'author_cover' => $this->author_cover,
                 'author' => $this->author,
                 'default_category' => $this->default_category,
