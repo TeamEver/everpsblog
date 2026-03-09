@@ -2538,7 +2538,7 @@ class EverPsBlog extends Module
                 'EVERBLOG_ANIMATE'
             );
             $siteUrl = Tools::getHttpHost(true) . __PS_BASE_URI__;
-            $carouselId = 'everpsblog-home-slider-' . uniqid('', true);
+            $carouselId = 'everpsblog-home-slider-' . str_replace('.', '-', uniqid('', true));
             $this->context->smarty->assign([
                 'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
                 'blogUrl' => $blogUrl,
