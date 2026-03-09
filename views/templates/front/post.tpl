@@ -118,7 +118,10 @@
                     </div>
                     <div class="ai-summary-line-links">
                         <a href="https://chat.openai.com/?prompt={'Résume cet article de manière concise, en listant les points clés à retenir. Ensuite, si pertinent, propose jusqu’à trois articles connexes publiés uniquement sur ce site (sans inclure d’autres sources). Titre : '|cat:$post->title|cat:' — URL : '|cat:$urls.current_url|escape:'url':'UTF-8'}" data-ai-provider="chatgpt" target="_blank" rel="noopener noreferrer" title="ChatGPT">
-                            <img src="{$module_dir|escape:'htmlall':'UTF-8'}views/img/ai-chatgpt.svg" alt="ChatGPT" width="16" height="16" loading="lazy">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M12 2.8c1.8 0 3.5 1 4.4 2.6a4.9 4.9 0 0 1 4.3 4.9c0 1.9-1.1 3.7-2.8 4.5.1 2.6-1.9 4.8-4.5 4.8-1 0-2-.3-2.8-.9a4.9 4.9 0 0 1-8.1-3.7c0-.2 0-.3 0-.5A4.9 4.9 0 0 1 3.5 6c.8-2 2.7-3.2 4.8-3.2.6 0 1.1.1 1.7.3.6-.2 1.3-.3 2-.3Z"/>
+                                <path d="M8.2 7.6 12 5.4l3.8 2.2v4.4L12 14.2l-3.8-2.2V7.6Z"/>
+                            </svg>
                             <span>ChatGPT</span>
                         </a>
                         <a href="https://chat.mistral.ai/chat?q={'Fournis un résumé concis de cet article en bullet points. Puis, si pertinent, liste jusqu\'à trois ressources complémentaires exclusivement issues de ce site. Titre : '|cat:$post->title|cat:' — URL : '|cat:$urls.current_url|escape:'url':'UTF-8'}" data-ai-provider="mistral" target="_blank" rel="noopener noreferrer" title="Mistral">
