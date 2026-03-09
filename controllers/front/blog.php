@@ -129,6 +129,9 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             (int) $this->context->shop->id,
             (int) $pagination['items_shown_from'] - 1
         );
+        $posts = array_map(function ($post) {
+            return (object) $post;
+        }, $everpsblogposts);
         $starredPosts = EverPsBlogPost::getPosts(
             (int) $this->context->language->id,
             (int) $this->context->shop->id,
@@ -194,6 +197,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             'post_number' => (int) $this->post_number,
             'pagination' => $pagination,
             'everpsblog' => $everpsblogposts,
+            'posts' => $posts,
             'starredPosts' => $starredPosts,
             'evercategory' => $evercategories,
             'evertags' => $evertags,

@@ -1775,6 +1775,7 @@ class EverPsBlogPost extends ObjectModel
             );
             $sql->where('bp.id_shop = '.(int) $id_shop);
             $sql->where('bpl.id_lang = '.(int) $id_lang);
+            $sql->where('bp.post_status = "published"');
             $sql->where('INSTR(title, "' . pSQL($query) . '") OR INSTR(content, "' . pSQL($query) . '")');
             $sql->orderBy('bp.date_add DESC');
             $sql->limit((int) $limit, (int) $start);
@@ -1858,6 +1859,7 @@ class EverPsBlogPost extends ObjectModel
             );
             $sql->where('bp.id_shop = ' . (int) $id_shop);
             $sql->where('bpl.id_lang = ' . (int) $id_lang);
+            $sql->where('bp.post_status = "published"');
             $sql->where('INSTR(title, "' . pSQL($query) . '") OR INSTR(content, "' . pSQL($query) . '")');
             $posts = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
             $count = 0;
