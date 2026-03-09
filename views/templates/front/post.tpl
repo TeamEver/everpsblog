@@ -83,12 +83,35 @@
         {/if}
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-body">
-                {if isset($show_featured_post) && $show_featured_post}
-                <div class="mb-3">
-                    <img class="img img-fluid post-featured-image featured-image rounded w-100" src="{$featured_image|escape:'htmlall':'UTF-8'}" alt="{$post->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$post->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
+                <div class="everpsblog-post-hero mb-4"{if isset($show_featured_post) && $show_featured_post} style="background-image:url('{$featured_image|escape:'htmlall':'UTF-8'}');"{/if}>
+                    <div class="everpsblog-post-hero-overlay">
+                        <h1 class="everpsblog-post-title mb-4">{$post->title|escape:'htmlall':'UTF-8'}</h1>
+                        {if $social_share_links}
+                        <div class="social-sharing social-sharing-hero">
+                            <ul>
+                            {foreach from=$social_share_links item='social_share_link'}
+                                <li class="{$social_share_link.class|escape:'htmlall':'UTF-8'} icon-gray"><a href="{$social_share_link.url|escape:'htmlall':'UTF-8'}" class="text-hide" title="{$social_share_link.label|escape:'htmlall':'UTF-8'}" target="_blank">{$social_share_link.label|escape:'htmlall':'UTF-8'}</a></li>
+                            {/foreach}
+                            </ul>
+                        </div>
+                        {/if}
+                    </div>
                 </div>
-                {/if}
-                <h1 class="text-start h2 mb-3">{$post->title|escape:'htmlall':'UTF-8'}</h1>
+                <div class="everpsblog-post-intro text-center mb-4">
+                    {if isset($show_author) && $show_author}
+                    <p class="mb-3">
+                        <strong>{l s='Auteur de l\'article :' mod='everpsblog'}</strong>
+                        <a href="{$author->url|escape:'htmlall':'UTF-8'}" class="text-decoration-none" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{$author->nickhandle|escape:'htmlall':'UTF-8'}</a>
+                    </p>
+                    {/if}
+                    <p class="mb-3">
+                        <strong>{l s='Date de publication :' mod='everpsblog'}</strong>
+                        <span>{$post->date_add|date_format:'%d/%m/%Y %H:%M'|escape:'htmlall':'UTF-8'}</span>
+                    </p>
+                    {if isset($post->excerpt) && $post->excerpt}
+                    <p class="postexcerpt mb-0">{$post->excerpt|escape:'htmlall':'UTF-8'}</p>
+                    {/if}
+                </div>
                 <section class="ai-summary-banner mb-3" data-qcd-ai-summary-banner="" data-ai-target-domain="{$shop.name|escape:'htmlall':'UTF-8'}">
                     <div class="ai-summary-heading">
                         <strong>{l s='Résumer cet article avec :' mod='everpsblog'}</strong>
@@ -116,20 +139,6 @@
                         </a>
                     </div>
                 </section>
-                <p class="postpublished text-start text-muted mb-3">
-                    <strong>{$post->date_add|date_format:'%d %B %Y'|escape:'htmlall':'UTF-8'}</strong>
-                    {if isset($default_category) && $default_category && !$default_category->is_root_category}
-                        - <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category'=>$default_category->id_ever_category, 'link_rewrite'=>$default_category->link_rewrite])|escape:'htmlall':'UTF-8'}" class="text-decoration-none" title="{$default_category->title|escape:'htmlall':'UTF-8'}">{$default_category->title|escape:'htmlall':'UTF-8'}</a>
-                    {/if}
-                </p>
-                {if isset($show_author) && $show_author}
-                <div class="d-flex flex-column align-items-center mb-2 author_cover_container">
-                    <a href="{$author->url|escape:'htmlall':'UTF-8'}" class="text-center text-decoration-none" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
-                        <img src="{$author_cover|escape:'htmlall':'UTF-8'}" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" class="img-fluid author-icon rounded-circle mb-2" title="{$author->nickhandle|escape:'htmlall':'UTF-8'}">
-                        <strong>{l s='By' mod='everpsblog'} {$author->nickhandle|escape:'htmlall':'UTF-8'}</strong>
-                    </a>
-                </div>
-                {/if}
             </div>
         </div>
         <div class="card shadow-sm border-0 mb-4">
@@ -159,7 +168,7 @@
 {if !isset($post->password_protected)}
 <div class="container">
     <div class="row mt-2">
-        <div class="col-12 col-md-6">
+        <div class="col-12">
             {if isset($allow_views_count) && $allow_views_count > 0}
             <span class="postviews"> | {$post->count|escape:'htmlall':'UTF-8'} {l s='Views' mod='everpsblog'}</span>
             {/if}
@@ -170,18 +179,6 @@
             {/foreach}
             </div>
             {/if}
-        </div>
-            <div class="col-12 col-md-6">
-          {if $social_share_links}
-            <div class="social-sharing">
-              <span>{l s='Share' d='Shop.Theme.Actions'}</span>
-              <ul>
-                {foreach from=$social_share_links item='social_share_link'}
-                  <li class="{$social_share_link.class|escape:'htmlall':'UTF-8'} icon-gray"><a href="{$social_share_link.url|escape:'htmlall':'UTF-8'}" class="text-hide" title="{$social_share_link.label|escape:'htmlall':'UTF-8'}" target="_blank">{$social_share_link.label|escape:'htmlall':'UTF-8'}</a></li>
-                {/foreach}
-              </ul>
-            </div>
-          {/if}
         </div>
     </div>
 </div>
