@@ -23,6 +23,6 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_2_3_8()
 {
-    Configuration::updateValue('EVERPSBLOG_EXCERPT', '150');
+    Configuration::updateValue('EVERPSBLOG_EXCERPT', '200');
     Configuration::updateValue('EVERPSBLOG_TITLE_LENGTH', '15');
 }

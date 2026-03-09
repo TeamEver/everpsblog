@@ -155,7 +155,7 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERPSBLOG_PAGINATION', '10')
             && Configuration::updateValue('EVERPSBLOG_HOME_NBR', '12')
             && Configuration::updateValue('EVERPSBLOG_PRODUCT_NBR', '4')
-            && Configuration::updateValue('EVERPSBLOG_EXCERPT', '150')
+            && Configuration::updateValue('EVERPSBLOG_EXCERPT', '200')
             && Configuration::updateValue('EVERPSBLOG_TITLE_LENGTH', '150')
             && Configuration::updateValue('EVERBLOG_PRODUCT_COLUMNS', 1)
             && Configuration::updateValue('EVERBLOG_CATEG_COLUMNS', 1)
