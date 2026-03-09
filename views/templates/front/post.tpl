@@ -81,6 +81,8 @@
         {/foreach}
         </div>
         {/if}
+    </div>
+    <div class="everpsblog-post-header container-fluid p-0">
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-body">
                 <div class="everpsblog-post-hero mb-4"{if isset($show_featured_post) && $show_featured_post} style="background-image:url('{$featured_image|escape:'htmlall':'UTF-8'}');"{/if}>
@@ -154,6 +156,8 @@
                 </section>
             </div>
         </div>
+    </div>
+    <div class="container">
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-body postcontent {if $animated}zoomed{/if}">
                 {if isset($post->password_protected) && $post->password_protected}
@@ -177,6 +181,7 @@
                 {/if}
             </div>
         </div>
+    </div>
 </div>
 {if !isset($post->password_protected)}
 <div class="container">
