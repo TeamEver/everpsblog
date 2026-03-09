@@ -77,14 +77,8 @@
             {/if}
         </h1>
     </div>
-    <div class="row justify-content-center mb-4">
-        <div class="col-12 col-lg-10">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
-                </div>
-            </div>
-        </div>
+    <div class="d-flex justify-content-center mb-3">
+        {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
     </div>
     {if ((isset($evercategory) && $evercategory|count > 0) || (isset($evertags) && $evertags|count > 0))}
     <div class="row justify-content-center mb-4">
