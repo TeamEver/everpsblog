@@ -38,6 +38,38 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
     public $post_number;
     public $controller_name = 'blog';
 
+    /**
+     * Build EverPsBlogPost objects from raw post rows while keeping listing fields.
+     *
+     * @param array $posts
+     *
+     * @return array
+     */
+    protected function getPostObjects(array $posts)
+    {
+        $postObjects = [];
+
+        foreach ($posts as $post) {
+            if (empty($post['id_ever_post'])) {
+                continue;
+            }
+
+            $postObject = new EverPsBlogPost(
+                (int) $post['id_ever_post'],
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id
+            );
+
+            foreach ($post as $key => $value) {
+                $postObject->{$key} = $value;
+            }
+
+            $postObjects[] = $postObject;
+        }
+
+        return $postObjects;
+    }
+
     public function init()
     {
         parent::init();
@@ -129,9 +161,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             (int) $this->context->shop->id,
             (int) $pagination['items_shown_from'] - 1
         );
-        $posts = array_map(function ($post) {
-            return (object) $post;
-        }, $everpsblogposts);
+        $posts = $this->getPostObjects($everpsblogposts);
         $starredPosts = EverPsBlogPost::getPosts(
             (int) $this->context->language->id,
             (int) $this->context->shop->id,
