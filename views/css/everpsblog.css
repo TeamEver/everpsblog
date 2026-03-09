@@ -348,8 +348,9 @@ body#module-everpsblog-post .product-miniature .product-miniature{
 
 #module-everpsblog-post .ai-summary-banner {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
+    justify-content: center;
     gap: .75rem 1.25rem;
     padding: .9rem 1.1rem;
     border-radius: 1.25rem;
@@ -416,7 +417,8 @@ body#module-everpsblog-post .product-miniature .product-miniature{
 }
 #module-everpsblog-post .ai-summary-line-links {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    justify-content: center;
     gap: .85rem;
 }
 #module-everpsblog-post .ai-summary-line-links a {
