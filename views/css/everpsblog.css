@@ -115,6 +115,17 @@
     opacity: 1;
     transform: none;
 }
+#module-everpsblog-post .social-sharing.social-sharing-hero li.icon-gray:hover,
+#module-everpsblog-post .social-sharing.social-sharing-hero li.icon-gray:hover a,
+#module-everpsblog-post .social-sharing.social-sharing-hero li.icon-gray:hover::before,
+#module-everpsblog-post .social-sharing.social-sharing-hero li.icon-gray:hover a::before {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    box-shadow: none;
+    background-color: transparent;
+    transition: none;
+}
 #module-everpsblog-post .social-sharing li .text-hide {
     font: 0/0 a;
     color: transparent;
