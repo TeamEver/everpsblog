@@ -351,7 +351,7 @@ body#module-everpsblog-post .product-miniature .product-miniature{
 }
 
 #module-everpsblog-post .everpsblog-post-hero-overlay {
-    background: linear-gradient(180deg, rgba(6, 26, 46, .45) 0%, rgba(6, 26, 46, .55) 100%);
+    background: linear-gradient(9deg, #0a0f54, #0a0f54 49%, #000 70%, #0a0f54 91%, #0a0f54);
     min-height: 300px;
     display: flex;
     flex-direction: column;
