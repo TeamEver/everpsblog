@@ -108,7 +108,7 @@
                     {/if}
                     <p class="mb-3">
                         <strong>{l s='Date de publication :' mod='everpsblog'}</strong>
-                        <span>{$post->date_add|date_format:'%d/%m/%Y %H:%M'|escape:'htmlall':'UTF-8'}</span>
+                        <span>{$post->date_add|date_format:'%d/%m/%Y %H'|escape:'htmlall':'UTF-8'}</span>
                     </p>
                     {if isset($post->excerpt) && $post->excerpt}
                     <p class="postexcerpt mb-0">{$post->excerpt nofilter}</p>
