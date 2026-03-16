@@ -377,6 +377,16 @@ body#module-everpsblog-post .product-miniature .product-miniature{
     margin-right: calc(50% - 50vw);
 }
 
+body#module-everpsblog-category .breadcrumb__wrapper {
+    background: linear-gradient(9deg, #0a0f54, #0a0f54 49%, #000 70%, #0a0f54 91%, #0a0f54);
+    background-position: center;
+}
+
+body#module-everpsblog-category .breadcrumb a,
+body#module-everpsblog-category .breadcrumb span {
+    color: #fff;
+}
+
 #module-everpsblog-category .everpsblog-category-hero {
     position: relative;
     background: linear-gradient(9deg, #0a0f54, #0a0f54 49%, #000 70%, #0a0f54 91%, #0a0f54);
