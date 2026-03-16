@@ -31,7 +31,7 @@
 
 
 #module-everpsblog-blog .everpsblog-blog-header {
-    width: 100vw;
+    width: 99.6vw;
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
 }
@@ -384,7 +384,7 @@ body#module-everpsblog-post .product-miniature .product-miniature{
 
 
 #module-everpsblog-category .everpsblog-category-header {
-    width: 99.5vw;
+    width: 99.6vw;
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
 }
@@ -482,7 +482,7 @@ body#module-everpsblog-category .breadcrumb span {
 }
 
 #module-everpsblog-post .everpsblog-post-header {
-    width: 99.5vw;
+    width: 99.6vw;
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
 }
