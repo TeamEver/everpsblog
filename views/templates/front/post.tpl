@@ -85,7 +85,7 @@
     <div class="everpsblog-post-header container-fluid p-0">
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-body mx-0 px-0">
-                <div class="everpsblog-post-hero mb-4"{if isset($show_featured_post) && $show_featured_post} style="background-image:url('{$featured_image|escape:'htmlall':'UTF-8'}');"{/if}>
+                <div class="everpsblog-post-hero mb-4">
                     <div class="everpsblog-post-hero-overlay">
                         <h1 class="everpsblog-post-title mb-4">{$post->title|escape:'htmlall':'UTF-8'}</h1>
                         {if $social_share_links}
