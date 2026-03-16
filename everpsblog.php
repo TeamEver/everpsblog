@@ -168,6 +168,7 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERBLOG_SHOW_RELATED_POSTS', 1)
             && Configuration::updateValue('EVERBLOG_SHOW_POST_TAGS', 1)
             && Configuration::updateValue('EVERBLOG_SHOW_AUTHOR', 1)
+            && Configuration::updateValue('EVERBLOG_DEFAULT_AUTHOR_NAME', Configuration::get('PS_SHOP_NAME'))
             && Configuration::updateValue('EVERBLOG_SITEMAP_NUMBER', 5000)
             && Configuration::updateValue('EVERBLOG_MAIN_TITLE', (function () {
                 $title = [];
@@ -781,6 +782,11 @@ class EverPsBlog extends Module
             ) {
                 $this->postErrors[] = $this->l('Error : The field "Show author" is not valid');
             }
+            if (Tools::getValue('EVERBLOG_DEFAULT_AUTHOR_NAME')
+                && !Validate::isGenericName(Tools::getValue('EVERBLOG_DEFAULT_AUTHOR_NAME'))
+            ) {
+                $this->postErrors[] = $this->l('Error : The field "Default author name" is not valid');
+            }
             if (Tools::getValue('EVERBLOG_BANNED_USERS')
                 && !Validate::isGenericName(Tools::getValue('EVERBLOG_BANNED_USERS'))
             ) {
@@ -1190,6 +1196,7 @@ class EverPsBlog extends Module
             'EVERBLOG_CHECK_COMMENTS' => Configuration::get('EVERBLOG_CHECK_COMMENTS'),
             'EVERBLOG_RSS' => Configuration::get('EVERBLOG_RSS'),
             'EVERBLOG_SHOW_AUTHOR' => Configuration::get('EVERBLOG_SHOW_AUTHOR'),
+            'EVERBLOG_DEFAULT_AUTHOR_NAME' => Configuration::get('EVERBLOG_DEFAULT_AUTHOR_NAME'),
             'EVERBLOG_BANNED_USERS' => Configuration::get('EVERBLOG_BANNED_USERS'),
             'EVERBLOG_BANNED_IP' => Configuration::get('EVERBLOG_BANNED_IP'),
             'EVERBLOG_ONLY_LOGGED_COMMENT' => Configuration::get('EVERBLOG_ONLY_LOGGED_COMMENT'),
@@ -1716,6 +1723,13 @@ class EverPsBlog extends Module
                                 'label' => $this->l('No'),
                             ],
                         ],
+                    ],
+                    [
+                        'type' => 'text',
+                        'label' => $this->l('Default author name'),
+                        'name' => 'EVERBLOG_DEFAULT_AUTHOR_NAME',
+                        'desc' => $this->l('Displayed when a post has no linked author'),
+                        'hint' => $this->l('Leave empty to fallback to shop name'),
                     ],
                     [
                         'type' => 'textarea',

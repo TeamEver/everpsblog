@@ -40,6 +40,10 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
 
     public function init()
     {
+        $defaultAuthorName = Configuration::get('EVERBLOG_DEFAULT_AUTHOR_NAME');
+        if (!$defaultAuthorName) {
+            $defaultAuthorName = Configuration::get('PS_SHOP_NAME');
+        }
         $this->module_name = 'everpsblog';
         $this->ip_banned = explode(',', Configuration::get('EVERBLOG_BANNED_IP'));
         $this->users_banned = explode(',', Configuration::get('EVERBLOG_BANNED_USERS'));
@@ -123,14 +127,14 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 $this->author = new stdClass();
                 $this->author->id_ever_author = 0;
                 $this->author->id = 0;
-                $this->author->nickhandle = Configuration::get('PS_SHOP_NAME');
+                $this->author->nickhandle = $defaultAuthorName;
                 $this->author->url = Tools::getHttpHost(true) . __PS_BASE_URI__;
             }
         } else {
             $this->author = new stdClass();
             $this->author->id_ever_author = 0;
             $this->author->id = 0;
-            $this->author->nickhandle = Configuration::get('PS_SHOP_NAME');
+            $this->author->nickhandle = $defaultAuthorName;
             $this->author->url = Tools::getHttpHost(true) . __PS_BASE_URI__;
         }
         // Get author cover if exists, else get shop logo
