@@ -29,6 +29,34 @@
     justify-content: center;
 }
 
+
+#module-everpsblog-blog .everpsblog-blog-header {
+    width: 100%;
+}
+#module-everpsblog-blog .everpsblog-blog-header__inner {
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    background: linear-gradient(90deg, #021241 0%, #0d2f7d 50%, #021241 100%);
+}
+#module-everpsblog-blog .everpsblog-blog-header__title {
+    color: #fff;
+}
+#module-everpsblog-blog .everpsblog-top-category-btn {
+    border: 1px solid #fff;
+    border-radius: 999px;
+    color: #fff;
+    background: transparent;
+    font-weight: 600;
+    padding: .45rem 1rem;
+}
+#module-everpsblog-blog .everpsblog-top-category-btn:hover,
+#module-everpsblog-blog .everpsblog-top-category-btn:focus,
+#module-everpsblog-blog .everpsblog-top-category-btn.active {
+    background-color: #fff;
+    color: #0d2f7d;
+}
+
 /* Blog posts listing cards */
 .everpsblog-listing-card {
     border-radius: 1rem;
