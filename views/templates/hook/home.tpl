@@ -100,7 +100,7 @@
             </div>
         {/if}
         <div class="text-center">
-            <a href="{$blogUrl|escape:'htmlall':'UTF-8'}" title="{l s='See all posts from the blog' mod='everpsblog'}" class="btn btn-info text-white">{l s='See all posts from the blog' mod='everpsblog'}</a>
+            <a href="{$blogUrl|escape:'htmlall':'UTF-8'}" title="{l s='See all posts from the blog' mod='everpsblog'}" class="btn btn-primary text-white">{l s='See all posts from the blog' mod='everpsblog'}</a>
         </div>
     </div>
 {/if}
