@@ -165,7 +165,7 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERPSBLOG_AUTHOR_LAYOUT', 'layouts/layout-full-width.tpl')
             && Configuration::updateValue('EVERPSBLOG_TAG_LAYOUT', 'layouts/layout-full-width.tpl')
             && Configuration::updateValue('EVERBLOG_SHOW_FEAT_POST', 1)
-            && Configuration::updateValue('EVERBLOG_SHOW_RELATED_POSTS', 1)
+            && Configuration::updateValue('EVERBLOG_SHOW_RELATED_POSTS', 0)
             && Configuration::updateValue('EVERBLOG_SHOW_POST_TAGS', 1)
             && Configuration::updateValue('EVERBLOG_SHOW_AUTHOR', 1)
             && Configuration::updateValue('EVERBLOG_DEFAULT_AUTHOR_NAME', Configuration::get('PS_SHOP_NAME'))
