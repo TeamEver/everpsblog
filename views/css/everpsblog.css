@@ -401,10 +401,10 @@ body#module-everpsblog-category .breadcrumb span {
 
 #module-everpsblog-category .everpsblog-category-hero {
     position: relative;
+    background: linear-gradient(90deg, #021241 0%, #0d2f7d 50%, #021241 100%);
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
-    background-color: #20405c;
     overflow: hidden;
 }
 
