@@ -67,16 +67,32 @@
 {/block}
 
 {block name="page_content"}
-<div class="container my-4">
-    <div class="mb-4 text-center">
-        <h1 class="m-0">
+<div class="everpsblog-blog-header container-fluid px-0 mb-4">
+    <div class="everpsblog-blog-header__inner text-center py-5">
+        <h1 class="m-0 everpsblog-blog-header__title">
             {if isset($blog_page_title) && $blog_page_title}
                 {$blog_page_title|escape:'htmlall':'UTF-8'}
             {else}
                 {l s='Our blog' mod='everpsblog'}
             {/if}
         </h1>
+        <div class="everpsblog-blog-header__categories d-flex flex-wrap justify-content-center gap-2 mt-4">
+            <a class="btn everpsblog-top-category-btn active" href="{$link->getModuleLink('everpsblog', 'blog')|escape:'htmlall':'UTF-8'}" title="{l s='All blog posts' mod='everpsblog'}">
+                {l s='Le Blog' mod='everpsblog'}
+            </a>
+            {if isset($evercategory) && $evercategory|count > 0}
+                {foreach from=$evercategory item=item}
+                    {if !$item.is_root_category && $item.id_parent_category == 1}
+                        <a class="btn everpsblog-top-category-btn" href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category' => $item.id_ever_category, 'link_rewrite' => $item.link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'}">
+                            {$item.title|escape:'htmlall':'UTF-8'}
+                        </a>
+                    {/if}
+                {/foreach}
+            {/if}
+        </div>
     </div>
+</div>
+<div class="container my-4">
     <div class="d-flex justify-content-center mb-3">
         {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
     </div>
