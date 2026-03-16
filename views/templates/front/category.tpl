@@ -68,13 +68,22 @@
 
 {block name="page_content"}
 {hook h="displayBeforeEverCategory" everblogcategory=$category}
-{if isset($show_featured_cat) && $show_featured_cat}
-<div class="category-header">
-  <img src="{$featured_image|escape:'htmlall':'UTF-8'}" class="img img-fluid category-featured-image featured-image" alt="{$category->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$category->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
-</div>
-{/if}
-<div class="mb-3 text-center">
-    <h1 class="m-0">{$category->title|escape:'htmlall':'UTF-8'}</h1>
+<div class="everpsblog-category-header container-fluid p-0 mb-4">
+  <div class="everpsblog-category-hero"{if isset($show_featured_cat) && $show_featured_cat} style="background-image:url('{$featured_image|escape:'htmlall':'UTF-8'}');"{/if}>
+    <div class="everpsblog-category-hero-overlay">
+      <h1 class="everpsblog-category-title m-0">{$category->title|escape:'htmlall':'UTF-8'}</h1>
+      {if isset($children_categories) && $children_categories && !empty($children_categories)}
+      <div class="everpsblog-subcategories" role="navigation" aria-label="{l s='Sous-catégories' mod='everpsblog'}">
+        <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category'=>$category->id_ever_category, 'link_rewrite'=>$category->link_rewrite])|escape:'htmlall':'UTF-8'}" class="everpsblog-subcategory-btn active" title="{$category->title|escape:'htmlall':'UTF-8'}">{$category->title|escape:'htmlall':'UTF-8'}</a>
+        {foreach from=$children_categories item=item}
+          {if !$item->is_root_category}
+          <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category'=>$item->id_ever_category, 'link_rewrite'=>$item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="everpsblog-subcategory-btn" title="{$item->title|escape:'htmlall':'UTF-8'}">{$item->title|escape:'htmlall':'UTF-8'}</a>
+          {/if}
+        {/foreach}
+      </div>
+      {/if}
+    </div>
+  </div>
 </div>
 <div class="d-flex justify-content-center mb-3">
     {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
@@ -95,16 +104,6 @@
     </div>
 </div>
 {/if}
-{* Hide children categories *}
-{*{if isset($children_categories) && $children_categories && !empty($children_categories)}
-<div class="row mt-2">
-{foreach from=$children_categories item=item}
-    {if !$item->is_root_category}
-    {include file='module:everpsblog/views/templates/front/loop/category_object.tpl'}
-    {/if}
-{/foreach}
-</div>
-{/if}*}
 {if isset($post_number) && $post_number > 0}
 <div class="container">
     <div class="row">

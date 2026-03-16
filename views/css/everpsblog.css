@@ -342,6 +342,94 @@ body#module-everpsblog-post .product-miniature .product-miniature{
     display: none;
 }
 
+
+#module-everpsblog-category .everpsblog-category-header {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+}
+
+#module-everpsblog-category .everpsblog-category-hero {
+    position: relative;
+    background: linear-gradient(9deg, #0a0f54, #0a0f54 49%, #000 70%, #0a0f54 91%, #0a0f54);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-color: #20405c;
+    overflow: hidden;
+}
+
+#module-everpsblog-category .everpsblog-category-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(5, 13, 62, .62);
+}
+
+#module-everpsblog-category .everpsblog-category-hero-overlay {
+    position: relative;
+    z-index: 1;
+    max-width: 1024px;
+    margin: auto;
+    min-height: 230px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2.5rem 1rem;
+    text-align: center;
+    gap: 1.5rem;
+}
+
+#module-everpsblog-category .everpsblog-category-title {
+    color: #fff;
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+#module-everpsblog-category .everpsblog-subcategories {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .75rem;
+}
+
+#module-everpsblog-category .everpsblog-subcategory-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: .5rem 1.25rem;
+    border: 2px solid rgba(255, 255, 255, .9);
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    line-height: 1.2;
+    transition: all .2s ease;
+}
+
+#module-everpsblog-category .everpsblog-subcategory-btn.active,
+#module-everpsblog-category .everpsblog-subcategory-btn:hover,
+#module-everpsblog-category .everpsblog-subcategory-btn:focus {
+    background: #fff;
+    color: #0a0f54;
+    border-color: #fff;
+    text-decoration: none;
+}
+
+@media (max-width: 767.98px) {
+    #module-everpsblog-category .everpsblog-category-title {
+        font-size: 1.7rem;
+    }
+
+    #module-everpsblog-category .everpsblog-subcategory-btn {
+        min-height: 40px;
+        padding: .45rem 1rem;
+    }
+}
+
 #module-everpsblog-post .everpsblog-post-header {
     width: 100vw;
     margin-left: calc(50% - 50vw);
