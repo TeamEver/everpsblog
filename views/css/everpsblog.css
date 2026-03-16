@@ -39,7 +39,7 @@
     width: 100%;
     padding-left: 1rem;
     padding-right: 1rem;
-    background: linear-gradient(90deg, #021241 0%, #0d2f7d 50%, #021241 100%);
+    background: linear-gradient(90deg, #0a0f54 0%, #0a0f54 50%, #0a0f54 100%);
 }
 #module-everpsblog-blog .everpsblog-blog-header__title {
     color: #fff;
@@ -60,7 +60,7 @@
 }
 
 body#module-everpsblog-blog .breadcrumb__wrapper {
-    background: linear-gradient(90deg, #021241 0%, #0d2f7d 50%, #021241 100%);
+    background: linear-gradient(90deg, #0a0f54 0%, #0a0f54 50%, #0a0f54 100%);
     background-position: center;
 }
 
@@ -390,7 +390,7 @@ body#module-everpsblog-post .product-miniature .product-miniature{
 }
 
 body#module-everpsblog-category .breadcrumb__wrapper {
-    background: linear-gradient(90deg, #021241 0%, #0d2f7d 50%, #021241 100%);
+    background: linear-gradient(90deg, #0a0f54 0%, #0a0f54 50%, #0a0f54 100%);
     background-position: center;
 }
 
@@ -401,7 +401,7 @@ body#module-everpsblog-category .breadcrumb span {
 
 #module-everpsblog-category .everpsblog-category-hero {
     position: relative;
-    background: linear-gradient(90deg, #021241 0%, #0d2f7d 50%, #021241 100%);
+    background: linear-gradient(90deg, #0a0f54 0%, #0a0f54 50%, #0a0f54 100%);
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
