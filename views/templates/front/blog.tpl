@@ -76,10 +76,8 @@
                 {l s='Our blog' mod='everpsblog'}
             {/if}
         </h1>
+        {if !isset($pagination) || $pagination.current_page <= 1}
         <div class="everpsblog-blog-header__categories d-flex flex-wrap justify-content-center gap-2 mt-4">
-            <a class="btn everpsblog-top-category-btn active" href="{$link->getModuleLink('everpsblog', 'blog')|escape:'htmlall':'UTF-8'}" title="{l s='All blog posts' mod='everpsblog'}">
-                {l s='Le Blog' mod='everpsblog'}
-            </a>
             {if isset($evercategory) && $evercategory|count > 0}
                 {foreach from=$evercategory item=item}
                     {if !$item.is_root_category && $item.link_rewrite != 'home' && $item.title|lower != 'home'}
@@ -90,6 +88,7 @@
                 {/foreach}
             {/if}
         </div>
+        {/if}
     </div>
 </div>
 <div class="container my-4">
