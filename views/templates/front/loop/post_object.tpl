@@ -35,7 +35,7 @@
                         </a>
                     </h2>
                     {if isset($item->date_add) && $item->date_add}
-                    <p class="h4 fw-bold text-primary mb-3">{$item->date_add|escape:'htmlall':'UTF-8'}</p>
+                    <p class="h4 fw-bold text-primary mb-3 text-center text-md-start">{$item->date_add|escape:'htmlall':'UTF-8'}</p>
                     {/if}
                     <div class="everpsblogcontent rte mb-3" id="everpsblog-post-content-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">{if isset($item->excerpt) && !empty($item->excerpt)}{$item->excerpt|escape:'htmlall':'UTF-8'}{else}{$item->content|escape:'htmlall':'UTF-8'}{/if}</div>
                     <div class="mt-auto">
