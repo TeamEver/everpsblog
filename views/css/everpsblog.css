@@ -372,7 +372,7 @@ body#module-everpsblog-post .product-miniature .product-miniature{
 
 
 #module-everpsblog-category .everpsblog-category-header {
-    width: 100vw;
+    width: 99.5vw;
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
 }
