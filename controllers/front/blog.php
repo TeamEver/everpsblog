@@ -177,7 +177,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             (int) $this->context->language->id,
             (int) $this->context->shop->id,
             true,
-            1
+            0
         );
         $evertags = EverPsBlogTag::getAllTags(
             (int) $this->context->language->id,
