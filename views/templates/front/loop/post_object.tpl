@@ -38,7 +38,7 @@
                     <p class="h4 fw-bold text-primary mb-3 text-center text-md-start">{$item->date_add|escape:'htmlall':'UTF-8'}</p>
                     {/if}
                     <div class="everpsblogcontent rte mb-3" id="everpsblog-post-content-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">{if isset($item->excerpt) && !empty($item->excerpt)}{$item->excerpt|escape:'htmlall':'UTF-8'}{else}{$item->content|escape:'htmlall':'UTF-8'}{/if}</div>
-                    <div class="mt-auto">
+                    <div class="mt-auto text-center text-lg-start">
                         <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary rounded-pill px-4 {$blogcolor|escape:'htmlall':'UTF-8'} fw-semibold" title="{$item->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{l s='Lire la suite' mod='everpsblog'} <i class="material-icons" aria-hidden="true">chevron_right</i></a>
                     </div>
                 </div>
