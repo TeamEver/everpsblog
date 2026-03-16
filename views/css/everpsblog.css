@@ -31,7 +31,9 @@
 
 
 #module-everpsblog-blog .everpsblog-blog-header {
-    width: 100%;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
 }
 #module-everpsblog-blog .everpsblog-blog-header__inner {
     width: 100%;
@@ -55,6 +57,16 @@
 #module-everpsblog-blog .everpsblog-top-category-btn.active {
     background-color: #fff;
     color: #0d2f7d;
+}
+
+body#module-everpsblog-blog .breadcrumb__wrapper {
+    background: linear-gradient(90deg, #021241 0%, #0d2f7d 50%, #021241 100%);
+    background-position: center;
+}
+
+body#module-everpsblog-blog .breadcrumb a,
+body#module-everpsblog-blog .breadcrumb span {
+    color: #fff;
 }
 
 /* Blog posts listing cards */
