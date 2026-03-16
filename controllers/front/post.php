@@ -128,14 +128,20 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 $this->author->id_ever_author = 0;
                 $this->author->id = 0;
                 $this->author->nickhandle = $defaultAuthorName;
-                $this->author->url = Tools::getHttpHost(true) . __PS_BASE_URI__;
+                $this->author->url = $this->context->link->getModuleLink(
+                    'everpsblog',
+                    'blog'
+                );
             }
         } else {
             $this->author = new stdClass();
             $this->author->id_ever_author = 0;
             $this->author->id = 0;
             $this->author->nickhandle = $defaultAuthorName;
-            $this->author->url = Tools::getHttpHost(true) . __PS_BASE_URI__;
+            $this->author->url = $this->context->link->getModuleLink(
+                'everpsblog',
+                'blog'
+            );
         }
         // Get author cover if exists, else get shop logo
         $this->author_cover = EverPsBlogImage::getBlogImageUrl(
