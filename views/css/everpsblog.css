@@ -488,7 +488,7 @@ body#module-everpsblog-category .breadcrumb span {
 
 #module-everpsblog-post .ai-summary-banner {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
     gap: .75rem 1.25rem;
@@ -566,7 +566,7 @@ body#module-everpsblog-post .breadcrumb span {
 }
 #module-everpsblog-post .ai-summary-line-links {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     justify-content: center;
     gap: .85rem;
 }
@@ -586,4 +586,21 @@ body#module-everpsblog-post .breadcrumb span {
     width: 16px;
     height: 16px;
     display: block;
+}
+
+@media (max-width: 767.98px) {
+    #module-everpsblog-post .ai-summary-banner {
+        justify-content: flex-start;
+        padding: .85rem 1rem;
+    }
+
+    #module-everpsblog-post .ai-summary-heading,
+    #module-everpsblog-post .ai-summary-line-links {
+        width: 100%;
+    }
+
+    #module-everpsblog-post .ai-summary-line-links {
+        justify-content: flex-start;
+        gap: .65rem .9rem;
+    }
 }
