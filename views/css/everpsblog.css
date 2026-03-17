@@ -605,8 +605,10 @@ body#module-everpsblog-post .breadcrumb span {
 
 @media (max-width: 767.98px) {
     #module-everpsblog-post .ai-summary-banner {
-        justify-content: flex-start;
-        padding: .85rem 1rem;
+        justify-content: center;
+        padding: 1rem 1.25rem;
+        border-radius: 1.5rem;
+        gap: .65rem;
     }
 
     #module-everpsblog-post .ai-summary-heading,
@@ -614,22 +616,38 @@ body#module-everpsblog-post .breadcrumb span {
         width: 100%;
     }
 
+    #module-everpsblog-post .ai-summary-heading {
+        text-align: center;
+    }
+
     #module-everpsblog-post .ai-summary-line-links {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        justify-content: stretch;
-        gap: .65rem;
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: center;
+        gap: .85rem;
     }
 
     #module-everpsblog-post .ai-summary-line-links a {
-        justify-content: flex-start;
-        min-height: 32px;
-        white-space: normal;
+        justify-content: center;
+        min-height: 36px;
+        min-width: 28px;
+        line-height: 1;
+    }
+
+    #module-everpsblog-post .ai-summary-line-links a span {
+        display: none;
+    }
+
+    #module-everpsblog-post .ai-summary-line-links a svg {
+        width: 24px;
+        height: 24px;
+        display: block;
     }
 }
 
 @media (max-width: 420px) {
     #module-everpsblog-post .ai-summary-line-links {
-        grid-template-columns: minmax(0, 1fr);
+        gap: .7rem;
     }
 }
