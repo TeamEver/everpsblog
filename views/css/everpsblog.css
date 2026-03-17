@@ -490,6 +490,14 @@ body#module-everpsblog-category .breadcrumb span {
     margin-right: calc(50% - 50vw);
 }
 
+@media (max-width: 767.98px) {
+    #module-everpsblog-blog .everpsblog-blog-header,
+    #module-everpsblog-category .everpsblog-category-header,
+    #module-everpsblog-post .everpsblog-post-header {
+        width: 100vw;
+    }
+}
+
 #module-everpsblog-post .ai-summary-banner {
     display: flex;
     flex-wrap: wrap;
