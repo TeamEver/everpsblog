@@ -1830,6 +1830,11 @@ class EverPsBlogPost extends ObjectModel
                         (int) $id_shop,
                         'post'
                     );
+                    $post['featured_thumb'] = EverPsBlogImage::getBlogThumbUrl(
+                        (int) $post[self::$definition['primary']],
+                        (int) $id_shop,
+                        'post'
+                    );
                     $return[] = $post;
                 }
             } else {
