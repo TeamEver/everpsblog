@@ -31,7 +31,7 @@ class EverPsBlogsearchModuleFrontController extends EverPsBlogModuleFrontControl
 
     public function init()
     {
-        $this->query = Tools::getValue('s');
+        $this->query = Tools::getValue('keyword', Tools::getValue('s'));
         parent::init();
     }
 
@@ -99,7 +99,7 @@ class EverPsBlogsearchModuleFrontController extends EverPsBlogModuleFrontControl
         ];
         $breadcrumb['links'][] = [
             'title' => $this->l('Search results'),
-            'url' => $this->context->link->getModuleLink('everpsblog', 'search', ['s' => $this->query]),
+            'url' => $this->context->link->getModuleLink('everpsblog', 'search', ['keyword' => $this->query]),
         ];
         return $breadcrumb;
     }
