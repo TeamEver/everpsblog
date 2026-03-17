@@ -19,10 +19,13 @@
     <div class="card h-100 shadow-sm border-0 everpsblog everpsblog-listing-card overflow-hidden">
         <div class="row g-0 h-100 align-items-stretch">
             <div class="col-12 col-lg-6">
+                {assign var='post_link' value=$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])}
                 <div class="article-img text-center mb-0 h-100">
                     <div class="everpsblog-image-wrapper position-relative overflow-hidden h-100" style="aspect-ratio: 16 / 9;">
                 {if isset($show_featured_post) && $show_featured_post && isset($item.featured_thumb) && $item.featured_thumb}
-                <img src="{$item.featured_thumb|escape:'htmlall':'UTF-8'}" width="320" height="180" class="card-img-top img-fluid w-100 h-100 {if $animated}animated flipSideBySide zoomed{/if}" style="object-fit: cover;" alt="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" />
+                <a href="{$post_link|escape:'htmlall':'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}" class="d-block h-100">
+                    <img src="{$item.featured_thumb|escape:'htmlall':'UTF-8'}" width="320" height="180" class="card-img-top img-fluid w-100 h-100 {if $animated}animated flipSideBySide zoomed{/if}" style="object-fit: cover;" alt="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" />
+                </a>
                 {else}
                 <div class="d-flex align-items-center justify-content-center w-100 h-100 bg-light text-muted">
                     <span class="small fw-semibold">{l s='Image not available' mod='everpsblog'}</span>
@@ -33,7 +36,7 @@
             <div class="col-12 col-lg-6">
                 <div class="card-body d-flex flex-column h-100 p-4">
             <h2 class="everpsblog article-content h2 mb-3" id="everpsblog-post-title-{$item.id_ever_post|escape:'htmlall':'UTF-8'}">
-                <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'} text-dark text-decoration-none">
+                <a href="{$post_link|escape:'htmlall':'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'} text-dark text-decoration-none">
                     {$item.title|escape:'htmlall':'UTF-8'}
                 </a>
             </h2>
@@ -44,7 +47,7 @@
                 {if isset($item.excerpt) && !empty($item.excerpt)}{$item.excerpt|escape:'htmlall':'UTF-8'}{else}{$item.content|escape:'htmlall':'UTF-8'}{/if}
             </div>
             <div class="mt-auto text-center text-lg-start">
-                <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id_ever_post , 'link_rewrite' => $item.link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary rounded-pill px-4 {$blogcolor|escape:'htmlall':'UTF-8'} fw-semibold" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}">{l s='Lire la suite' mod='everpsblog'} <i class="material-icons" aria-hidden="true">chevron_right</i></a>
+                <a href="{$post_link|escape:'htmlall':'UTF-8'}" class="btn btn-primary rounded-pill px-4 {$blogcolor|escape:'htmlall':'UTF-8'} fw-semibold" title="{$item.title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}">{l s='Lire la suite' mod='everpsblog'} <i class="material-icons" aria-hidden="true">chevron_right</i></a>
             </div>
         </div>
             </div>
