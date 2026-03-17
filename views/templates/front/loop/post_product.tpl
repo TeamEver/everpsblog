@@ -16,20 +16,23 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
         <div class="col-12 col-md-3 article everpsblog mb-3" id="everpsblog-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
+                {assign var='post_link' value=$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])}
                 <div class="col-12 article-img">
                     {if isset($show_featured_post) && $show_featured_post}
-                    <img src="{$item->featured_thumb|escape:'htmlall':'UTF-8'}" width="320" height="180" class="img img-fluid {if $animated}animated flipSideBySide zoomed{/if}" title="{$item->title|escape:'htmlall':'UTF-8'}" alt="{$item->title|escape:'htmlall':'UTF-8'}"/>
+                    <a href="{$post_link|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}" class="d-block">
+                        <img src="{$item->featured_thumb|escape:'htmlall':'UTF-8'}" width="320" height="180" class="img img-fluid {if $animated}animated flipSideBySide zoomed{/if}" title="{$item->title|escape:'htmlall':'UTF-8'}" alt="{$item->title|escape:'htmlall':'UTF-8'}"/>
+                    </a>
                     {/if}
                 </div>
                 <div class="col-12 col-12">
                     <h3 class="everpsblog article-content h3 product-title" id="everpsblog-post-title-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
-                        <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'} text-dark">
+                        <a href="{$post_link|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'} text-dark">
                             {$item->title|escape:'htmlall':'UTF-8'}
                         </a>
                     </h3>
                     <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
                         {if isset($item->excerpt) && !empty($item->excerpt)}{$item->excerpt|escape:'htmlall':'UTF-8'}{else}{$item->content|escape:'htmlall':'UTF-8'}{/if}
                     </div>
-                    <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}">&gt;&gt; {l s='Read more' mod='everpsblog'}</a>
+                    <a href="{$post_link|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'}" title="{$item->title|escape:'htmlall':'UTF-8'}">&gt;&gt; {l s='Read more' mod='everpsblog'}</a>
                 </div>
         </div>
