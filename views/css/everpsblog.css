@@ -155,6 +155,10 @@ body#module-everpsblog-blog .breadcrumb span {
     opacity: 1;
     transform: none;
 }
+#module-everpsblog-post .social-sharing.social-sharing-hero li.icon-gray,
+#module-everpsblog-post .social-sharing.social-sharing-hero li.icon-gray a,
+#module-everpsblog-post .social-sharing.social-sharing-hero li.icon-gray::before,
+#module-everpsblog-post .social-sharing.social-sharing-hero li.icon-gray a::before,
 #module-everpsblog-post .social-sharing.social-sharing-hero li.icon-gray:hover,
 #module-everpsblog-post .social-sharing.social-sharing-hero li.icon-gray:hover a,
 #module-everpsblog-post .social-sharing.social-sharing-hero li.icon-gray:hover::before,
