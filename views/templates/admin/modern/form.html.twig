@@ -1,0 +1,13 @@
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+
+{% block content %}
+  <div class="card">
+    <h3 class="card-header">{{ resource|capitalize }} #{{ entityId ?: 'new' }}</h3>
+    <div class="card-body">
+      {{ form_start(form) }}
+      {{ form_widget(form) }}
+      <button type="submit" class="btn btn-primary">Enregistrer</button>
+      {{ form_end(form) }}
+    </div>
+  </div>
+{% endblock %}
