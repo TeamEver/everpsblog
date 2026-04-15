@@ -884,10 +884,13 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
             );
         }
         if (Tools::getIsset('deleteever_blog_post')) {
-            $everObj = new $this->className(
-                (int) Tools::getValue($this->identifier)
+            $symfonyContainer = \PrestaShop\PrestaShop\Adapter\SymfonyContainer::getInstance();
+            $commandBus = $symfonyContainer->get('prestashop.module.everpsblog.blog.command_bus');
+            $commandBus->handle(
+                new \PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\DeletePostCommand(
+                    (int) Tools::getValue($this->identifier)
+                )
             );
-            $everObj->delete();
         }
         if (Tools::getIsset('statusindexever_blog_post')) {
             $everObj = new $this->className(
@@ -918,176 +921,28 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
             $everObj->save();
         }
         if (Tools::isSubmit('save')) {
-            if (!Tools::getValue($this->identifier)) {
-                $post = new $this->className();
-            } else {
-                $post = new $this->className(
-                    (int) Tools::getValue($this->identifier)
-                );
-            }
-            // Validate functions
-            $post->id_shop = (int) Context::getContext()->shop->id;
-            // SEO
-            $indexable = (int) Tools::getValue('indexable', 0);
-            if (!Validate::isBool($indexable)) {
-                $this->errors[] = $this->l('Index is not valid');
-            } else {
-                $post->indexable = $indexable;
-            }
-
-            $follow = (int) Tools::getValue('follow', 0);
-            if (!Validate::isBool($follow)) {
-                $this->errors[] = $this->l('Follow is not valid');
-            } else {
-                $post->follow = $follow;
-            }
-
-            $sitemap = (int) Tools::getValue('sitemap', 0);
-            if (!Validate::isBool($sitemap)) {
-                $this->errors[] = $this->l('Sitemap is not valid');
-            } else {
-                $post->sitemap = $sitemap;
-            }
-
-            $starred = (int) Tools::getValue('starred', 0);
-            if (!Validate::isBool($starred)) {
-                $this->errors[] = $this->l('Starred is not valid');
-            } else {
-                $post->starred = $starred;
-            }
-            // Date add
-            if (!Tools::getValue('date_add')) {
-                $post->date_add = date('Y-m-d H:i:s');
-            }
-            if (Tools::getValue('date_add')
-                && !Validate::isDate(Tools::getValue('date_add'))
-            ) {
-                 $this->errors[] = $this->l('Date add is not valid');
-            } else {
-                $post->date_add = Tools::getValue('date_add');
-            }
-            if ($post->date_add > date('Y-m-d H:i:s')) {
-                $post->post_status = 'planned';
-            } else {
-                $post->post_status = Tools::getValue('post_status');
-            }
-            // Author
-            if (Tools::getValue('id_author')
-                && !Validate::isInt(Tools::getValue('id_author'))
-            ) {
-                 $this->errors[] = $this->l('Author is not valid');
-            } else {
-                $post->id_author = Tools::getValue('id_author');
-            }
-            // Categories, products and tags
-            // Default category cannot be root and defaults to unclassed
-            $rootCategory = EverPsBlogCategory::getRootCategory();
-            $idDefaultCategory = (int) Tools::getValue('id_default_category');
-            if (!$idDefaultCategory || !Validate::isUnsignedInt($idDefaultCategory)) {
-                $post->id_default_category = (int) $this->unclassedCategory;
-            } elseif ($idDefaultCategory == (int) $rootCategory->id) {
-                $this->errors[] = $this->l('Default category cannot be the root category');
-            } else {
-                $post->id_default_category = $idDefaultCategory;
-            }
-            $post_categories = Tools::getValue('post_categories');
-            if (!is_array($post_categories)) {
-                $post_categories = [$post_categories];
-            }
-            if (!in_array($post->id_default_category, $post_categories)) {
-                $post_categories[] = (int) $post->id_default_category;
-            }
-            $post->post_categories = json_encode($post_categories);
-            $post->allowed_groups = json_encode(Tools::getValue('allowed_groups'));
-            $post->post_tags = json_encode(Tools::getValue('post_tags'));
-            $post->post_products = json_encode(Tools::getValue('post_products'));
-            $post->date_upd = date('Y-m-d H:i:s');
-            if (Tools::getValue('post_status') != 'protected') {
-                $post->psswd = null;
-            } else {
-                $post->psswd = md5(_COOKIE_KEY_ . Tools::getValue('psswd'));
-            }
-            // Multilingual fields
-            foreach (Language::getLanguages(false) as $lang) {
-                if (Tools::getValue('title_' . $lang['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('title_' . $lang['id_lang']))
-                ) {
-                    $this->errors[] = $this->l('Title is not valid for lang ') . $lang['id_lang'];
-                } else {
-                    $post->title[$lang['id_lang']] = Tools::getValue('title_' . $lang['id_lang']);
-                }
-                if (Tools::getValue('content_' . $lang['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('content_' . $lang['id_lang']), true)
-                ) {
-                    $this->errors[] = $this->l('Content is not valid for lang ') . $lang['id_lang'];
-                } else {
-                    $post->content[$lang['id_lang']] = Tools::getValue('content_' . $lang['id_lang']);
-                }
-                if (Tools::getValue('excerpt_' . $lang['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('excerpt_' . $lang['id_lang']), true)
-                ) {
-                    $this->errors[] = $this->l('Excerpt is not valid for lang ') . $lang['id_lang'];
-                } else {
-                    $post->excerpt[$lang['id_lang']] = Tools::getValue('excerpt_' . $lang['id_lang']);
-                }
-                if (Tools::getValue('meta_title_' . $lang['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('meta_title_' . $lang['id_lang']))
-                ) {
-                    $this->errors[] = $this->l('Meta title is not valid for lang ') . $lang['id_lang'];
-                } else {
-                    $post->meta_title[$lang['id_lang']] = Tools::getValue('meta_title_' . $lang['id_lang']);
-                }
-                if (Tools::getValue('meta_description_' . $lang['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('meta_description_' . $lang['id_lang']))
-                ) {
-                    $this->errors[] = $this->l('Meta description is not valid for lang ') . $lang['id_lang'];
-                } else {
-                    $post->meta_description[$lang['id_lang']] = Tools::getValue('meta_description_' . $lang['id_lang']);
-                }
-                if (!Tools::getValue('link_rewrite_' . $lang['id_lang'])
-                    || !Validate::isLinkRewrite(Tools::getValue('link_rewrite_' . $lang['id_lang']))
-                ) {
-                    $post->link_rewrite[$lang['id_lang']] = Tools::str2url(
-                        Tools::getValue('title_' . $lang['id_lang'])
-                    );
-                } else {
-                    $post->link_rewrite[$lang['id_lang']] = Tools::str2url(
-                        Tools::getValue('link_rewrite_' . $lang['id_lang'])
-                    );
-                }
-            }
-            // Copy default language values to empty translations
-            $defaultLang = (int) Configuration::get('PS_LANG_DEFAULT');
-            foreach (Language::getLanguages(false) as $lang) {
-                $idLang = (int) $lang['id_lang'];
-                if (empty($post->title[$idLang])) {
-                    $post->title[$idLang] = $post->title[$defaultLang] ?? '';
-                }
-                if (empty($post->content[$idLang])) {
-                    $post->content[$idLang] = $post->content[$defaultLang] ?? '';
-                }
-                if (empty($post->excerpt[$idLang])) {
-                    $post->excerpt[$idLang] = $post->excerpt[$defaultLang] ?? '';
-                }
-                if (empty($post->meta_title[$idLang])) {
-                    $post->meta_title[$idLang] = $post->meta_title[$defaultLang] ?? '';
-                }
-                if (empty($post->meta_description[$idLang])) {
-                    $post->meta_description[$idLang] = $post->meta_description[$defaultLang] ?? '';
-                }
-                if (empty($post->link_rewrite[$idLang])) {
-                    $post->link_rewrite[$idLang] = $post->link_rewrite[$defaultLang] ?? '';
-                }
-            }
             if (!count($this->errors)) {
                 try {
-                    $post->save();
+                    $symfonyContainer = \PrestaShop\PrestaShop\Adapter\SymfonyContainer::getInstance();
+                    $postDataBuilder = $symfonyContainer->get('prestashop.module.everpsblog.blog.post_data_builder');
+                    $commandBus = $symfonyContainer->get('prestashop.module.everpsblog.blog.command_bus');
+                    $commandData = $postDataBuilder->buildFromRequestData($_POST);
+                    $postId = (int) Tools::getValue($this->identifier);
+                    if ($postId > 0) {
+                        $commandBus->handle(
+                            new \PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\UpdatePostCommand($postId, $commandData)
+                        );
+                    } else {
+                        $postId = (int) $commandBus->handle(
+                            new \PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\CreatePostCommand($commandData)
+                        );
+                    }
                     $post_img_link = 'img/post/'
-                    . (int) $post->id
+                    . (int) $postId
                     . '.jpg';
                     $ps_posts_destination = _PS_IMG_DIR_
                     . 'post/'
-                    . (int) $post->id
+                    . (int) $postId
                     . '.jpg';
                     if (!file_exists(_PS_IMG_DIR_ . 'post')) {
                         mkdir(_PS_IMG_DIR_ . 'post', 0755, true);
@@ -1116,14 +971,14 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
                             unlink($tmp_name);
                         }
                         $featured_image = EverPsBlogImage::getBlogImage(
-                            (int) $post->id,
+                            (int) $postId,
                             (int) Context::getContext()->shop->id,
                             'post'
                         );
                         if (!$featured_image) {
                             $featured_image = new EverPsBlogImage();
                         }
-                        $featured_image->id_element = (int) $post->id;
+                        $featured_image->id_element = (int) $postId;
                         $featured_image->image_type = 'post';
                         $featured_image->image_link = $post_img_link;
                         $featured_image->id_shop = (int) Context::getContext()->shop->id;
