@@ -208,22 +208,21 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
             ],
         ];
         if (Tools::getIsset('deletePost'.$this->table)) {
-            $token = Tools::getValue('token');
-            $hasValidToken = (
-                (Tools::isSubmit('deletePost'.$this->table) && Tools::isSubmit('token'))
-                || $token
-            ) && $token === $this->token;
+            $submittedToken = (string) Tools::getValue('everpsblog_csrf_token');
+            $tokenId = 'everpsblog_post_delete_' . (int) Tools::getValue($this->identifier);
 
             if (!$this->access('delete')) {
                 $this->errors[] = $this->l('You do not have permission to delete this post.');
-            } elseif (!$hasValidToken) {
-                $this->errors[] = $this->l('Invalid security token, the post was not deleted.');
+            } elseif (!$this->isValidCsrfToken($tokenId, $submittedToken)) {
+                $this->errors[] = $this->l('Invalid CSRF token, the post was not deleted.');
             } else {
                 $everObj = new $this->className(
                     (int) Tools::getValue($this->identifier)
                 );
-                if (Validate::isLoadedObject($everObj)) {
-                    $everObj->delete();
+                if (Validate::isLoadedObject($everObj) && $everObj->delete()) {
+                    $this->logSensitiveAction('bo_post_delete', [
+                        'post_id' => (int) Tools::getValue($this->identifier),
+                    ]);
                 }
             }
         }
@@ -973,7 +972,16 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
                         $featured_image->image_type = 'post';
                         $featured_image->image_link = $post_img_link;
                         $featured_image->id_shop = (int) Context::getContext()->shop->id;
-                        return $featured_image->save();
+                        $saved = (bool) $featured_image->save();
+                        if ($saved) {
+                            $this->logSensitiveAction('bo_media_import', [
+                                'resource' => 'post',
+                                'post_id' => (int) $postId,
+                                'filename' => (string) $_FILES['post_image']['name'],
+                            ]);
+                        }
+
+                        return $saved;
                     }
                 } catch (Exception $e) {
                     PrestaShopLogger::addLog($e->getMessage());
@@ -996,6 +1004,7 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
         $drop_url .= '&id_ever_post='.$id_ever_post;
         $drop_url .= '&token=';
         $drop_url .= Tools::getAdminTokenLite('AdminEverPsBlogPost');
+        $drop_url .= '&everpsblog_csrf_token=' . $this->getCsrfToken('everpsblog_post_delete_' . (int) $id_ever_post);
         $this->context->smarty->assign([
             'href' => $drop_url,
             'confirm' => $this->l('Delete post ?'),
@@ -1110,7 +1119,13 @@ class AdminEverPsBlogPostController extends EverPsBlogAdminController
             $everObj->post_status = 'published';
             if (!$everObj->save()) {
                 $this->errors[] = $this->l('An error has occurred: Can\'t publish the current object');
+
+                continue;
             }
+
+            $this->logSensitiveAction('bo_bulk_publish', [
+                'post_id' => (int) $idEverObj,
+            ]);
         }
     }
 

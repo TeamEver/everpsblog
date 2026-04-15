@@ -216,8 +216,63 @@ abstract class EverPsBlogAdminController extends ModuleAdminController
                     $this->l('An error has occurred: Can\'t delete the current object with ID %d'),
                     $idEverObj
                 );
+
+                continue;
             }
+
+            $this->logSensitiveAction('bo_bulk_delete', [
+                'resource' => $this->table,
+                'entity_id' => $idEverObj,
+            ]);
         }
+    }
+
+
+    protected function getCsrfToken(string $tokenId): string
+    {
+        try {
+            $tokenManager = \PrestaShop\PrestaShop\Adapter\SymfonyContainer::getInstance()->get('security.csrf.token_manager');
+
+            return $tokenManager->getToken($tokenId)->getValue();
+        } catch (Exception $exception) {
+            PrestaShopLogger::addLog($exception->getMessage());
+
+            return '';
+        }
+    }
+
+    protected function isValidCsrfToken(string $tokenId, string $token): bool
+    {
+        if (empty($token)) {
+            return false;
+        }
+
+        try {
+            $tokenManager = \PrestaShop\PrestaShop\Adapter\SymfonyContainer::getInstance()->get('security.csrf.token_manager');
+
+            return $tokenManager->isTokenValid(new \Symfony\Component\Security\Csrf\CsrfToken($tokenId, $token));
+        } catch (Exception $exception) {
+            PrestaShopLogger::addLog($exception->getMessage());
+
+            return false;
+        }
+    }
+
+    protected function logSensitiveAction(string $action, array $context = [])
+    {
+        $employeeId = (int) (Context::getContext()->employee->id ?? 0);
+        $shopId = (int) (Context::getContext()->shop->id ?? 0);
+
+        $message = sprintf(
+            '[everpsblog][sensitive_action] %s %s',
+            $action,
+            json_encode(array_merge([
+                'employee_id' => $employeeId,
+                'shop_id' => $shopId,
+            ], $context))
+        );
+
+        PrestaShopLogger::addLog($message, 1, null, 'EverPsBlog', 0, true);
     }
 
     protected function displayError($message, $description = false)

@@ -765,7 +765,16 @@ class AdminEverPsBlogCategoryController extends EverPsBlogAdminController
                         $featured_image->image_type = 'category';
                         $featured_image->image_link = $category_img_link;
                         $featured_image->id_shop = (int) Context::getContext()->shop->id;
-                        return $featured_image->save();
+                        $saved = (bool) $featured_image->save();
+                        if ($saved) {
+                            $this->logSensitiveAction('bo_media_import', [
+                                'resource' => 'category',
+                                'categoryId' => (int) $categoryId,
+                                'filename' => (string) $_FILES['category_image']['name'],
+                            ]);
+                        }
+
+                        return $saved;
                     }
                 } catch (Exception $e) {
                     PrestaShopLogger::addLog($this->module->name . ' : admin category : ' . $e->getMessage());
