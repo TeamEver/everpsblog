@@ -59,6 +59,7 @@ class EverPsBlogTaxonomy extends ObjectModel
             && !empty($table)
             && isset($key)
             && !empty($key)
+            && self::postExists((int) $id_post)
             && self::taxonomyExists($id_obj, $obj_name)
         ) {
             set_time_limit(0);
@@ -77,6 +78,22 @@ class EverPsBlogTaxonomy extends ObjectModel
                 return true;
             }
         }
+    }
+
+    /**
+     * Check if post exists to avoid orphan taxonomies
+     *
+     * @param int $id_post
+     * @return bool
+     */
+    protected static function postExists($id_post)
+    {
+        $sql = new DbQuery();
+        $sql->select('id_ever_post');
+        $sql->from('ever_blog_post');
+        $sql->where('id_ever_post = ' . (int) $id_post);
+
+        return (bool) Db::getInstance()->getValue($sql);
     }
 
     /**
@@ -457,40 +474,47 @@ class EverPsBlogTaxonomy extends ObjectModel
     {
         set_time_limit(0);
         $sql = new DbQuery;
-        $sql->select('*');
+        $sql->select('id_ever_post, id_default_category, post_categories, post_tags, post_products');
         $sql->from('ever_blog_post');
         $posts = Db::getInstance()->executeS($sql);
         foreach ($posts as $post_array) {
-            $post = new EverPsBlogPost(
-                (int) $post_array['id_ever_post']
-            );
-            $post_categories = json_decode(
-                $post->post_categories
-            );
+            $id_post = (int) $post_array['id_ever_post'];
+            $post_categories = json_decode((string) $post_array['post_categories'], true);
+            if (!is_array($post_categories)) {
+                $post_categories = [];
+            }
+            if ((int) $post_array['id_default_category'] > 0) {
+                $post_categories[] = (int) $post_array['id_default_category'];
+            }
+            $post_categories = array_unique(array_map('intval', $post_categories));
             foreach ($post_categories as $post_category) {
                 self::insertTaxonomy(
                     (int) $post_category,
-                    (int) $post->id,
+                    $id_post,
                     'category'
                 );
             }
-            $post_tags = json_decode(
-                $post->post_tags
-            );
+            $post_tags = json_decode((string) $post_array['post_tags'], true);
+            if (!is_array($post_tags)) {
+                $post_tags = [];
+            }
+            $post_tags = array_unique(array_map('intval', $post_tags));
             foreach ($post_tags as $post_tag) {
                 self::insertTaxonomy(
                     (int) $post_tag,
-                    (int) $post->id,
+                    $id_post,
                     'tag'
                 );
             }
-            $post_products = json_decode(
-                $post->post_products
-            );
+            $post_products = json_decode((string) $post_array['post_products'], true);
+            if (!is_array($post_products)) {
+                $post_products = [];
+            }
+            $post_products = array_unique(array_map('intval', $post_products));
             foreach ($post_products as $post_product) {
                 self::insertTaxonomy(
                     (int) $post_product,
-                    (int) $post->id,
+                    $id_post,
                     'product'
                 );
             }

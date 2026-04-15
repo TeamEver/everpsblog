@@ -1180,32 +1180,7 @@ class EverPsBlogPost extends ObjectModel
         . '_'
         . (bool) $starred;
         if (!Cache::isStored($cache_id)) {
-            $sql = new DbQuery();
-            $sql->select('post_categories');
-            $sql->from(self::$definition['table'], 'ep');
-            $sql->leftJoin(
-                self::$definition['table'] . '_lang',
-                'bpl',
-                'ep.' . self::$definition['primary'] . ' = bpl.' . self::$definition['primary'] . ''
-            );
-            $sql->where(
-                'ep.' . self::$definition['primary'] . ' = ' . (int) $id_ever_post
-            );
-            $sql->where(
-                'ep.id_shop = ' . (int) $id_shop
-            );
-            $sql->where(
-                'ep.id_lang = ' . (int) $id_lang
-            );
-            $sql->where(
-                'ep.active = ' . (int) $active
-            );
-            if ((bool) $starred === true) {
-                $sql->where('bp.starred = 1');
-            }
-            $sql->orderBy('ep.date_add DESC');
-            $post_categories = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
-            $return = json_decode($post_categories);
+            $return = EverPsBlogTaxonomy::getPostCategoriesTaxonomies((int) $id_ever_post);
             Cache::store($cache_id, $return);
             return $return;
         }
