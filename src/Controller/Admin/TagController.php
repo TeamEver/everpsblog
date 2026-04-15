@@ -6,6 +6,7 @@ use PrestaShop\Module\Everpsblog\Form\DataProvider\TagFormDataProvider;
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\TagType;
 use PrestaShop\Module\Everpsblog\Grid\Data\TagGridDataFactory;
 use PrestaShop\Module\Everpsblog\Grid\Definition\TagGridDefinitionFactory;
+use PrestaShop\Module\Everpsblog\Service\ContextStateService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -15,8 +16,9 @@ class TagController extends AbstractDomainController
     private $dataFactory;
     private $formDataProvider;
 
-    public function __construct(TagGridDefinitionFactory $definitionFactory, TagGridDataFactory $dataFactory, TagFormDataProvider $formDataProvider)
+    public function __construct(ContextStateService $contextStateService, TagGridDefinitionFactory $definitionFactory, TagGridDataFactory $dataFactory, TagFormDataProvider $formDataProvider)
     {
+        parent::__construct($contextStateService);
         $this->definitionFactory = $definitionFactory;
         $this->dataFactory = $dataFactory;
         $this->formDataProvider = $formDataProvider;

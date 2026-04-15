@@ -6,6 +6,7 @@ use PrestaShop\Module\Everpsblog\Form\DataProvider\CommentFormDataProvider;
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\CommentType;
 use PrestaShop\Module\Everpsblog\Grid\Data\CommentGridDataFactory;
 use PrestaShop\Module\Everpsblog\Grid\Definition\CommentGridDefinitionFactory;
+use PrestaShop\Module\Everpsblog\Service\ContextStateService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -15,8 +16,9 @@ class CommentController extends AbstractDomainController
     private $dataFactory;
     private $formDataProvider;
 
-    public function __construct(CommentGridDefinitionFactory $definitionFactory, CommentGridDataFactory $dataFactory, CommentFormDataProvider $formDataProvider)
+    public function __construct(ContextStateService $contextStateService, CommentGridDefinitionFactory $definitionFactory, CommentGridDataFactory $dataFactory, CommentFormDataProvider $formDataProvider)
     {
+        parent::__construct($contextStateService);
         $this->definitionFactory = $definitionFactory;
         $this->dataFactory = $dataFactory;
         $this->formDataProvider = $formDataProvider;

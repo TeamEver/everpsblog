@@ -2,18 +2,26 @@
 
 namespace PrestaShop\Module\Everpsblog\Controller\Admin;
 
-use Context;
+use PrestaShop\Module\Everpsblog\Service\ContextStateService;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 
 abstract class AbstractDomainController extends FrameworkBundleAdminController
 {
+    /** @var ContextStateService */
+    protected $contextStateService;
+
+    public function __construct(ContextStateService $contextStateService)
+    {
+        $this->contextStateService = $contextStateService;
+    }
+
     protected function getContextShopId(): int
     {
-        return (int) Context::getContext()->shop->id;
+        return $this->contextStateService->getShopId();
     }
 
     protected function getContextLangId(): int
     {
-        return (int) Context::getContext()->language->id;
+        return $this->contextStateService->getLanguageId();
     }
 }
