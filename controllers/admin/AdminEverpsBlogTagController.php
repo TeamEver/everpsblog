@@ -725,7 +725,16 @@ class AdminEverPsBlogTagController extends EverPsBlogAdminController
                         $featured_image->image_type = 'tag';
                         $featured_image->image_link = $tag_img_link;
                         $featured_image->id_shop = (int) Context::getContext()->shop->id;
-                        return $featured_image->save();
+                        $saved = (bool) $featured_image->save();
+                        if ($saved) {
+                            $this->logSensitiveAction('bo_media_import', [
+                                'resource' => 'tag',
+                                'tagId' => (int) $tagId,
+                                'filename' => (string) $_FILES['tag_image']['name'],
+                            ]);
+                        }
+
+                        return $saved;
                     }
                 } catch (Exception $e) {
                     PrestaShopLogger::addLog($e->getMessage());

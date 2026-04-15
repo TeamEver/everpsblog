@@ -822,7 +822,16 @@ class AdminEverPsBlogAuthorController extends EverPsBlogAdminController
                     $featured_image->image_type = 'author';
                     $featured_image->image_link = $author_img_link;
                     $featured_image->id_shop = (int) Context::getContext()->shop->id;
-                    return $featured_image->save();
+                    $saved = (bool) $featured_image->save();
+                    if ($saved) {
+                        $this->logSensitiveAction('bo_media_import', [
+                            'resource' => 'author',
+                            'author_id' => (int) $author->id,
+                            'filename' => (string) $_FILES['author_image']['name'],
+                        ]);
+                    }
+
+                    return $saved;
                 }
             } else {
                 $this->display = 'edit';

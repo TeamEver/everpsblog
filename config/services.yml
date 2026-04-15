@@ -112,6 +112,25 @@ services:
 
   PrestaShop\Module\Everpsblog\Service\AdminRouteSigner: ~
 
+
+  prestashop.module.everpsblog.security.permission_provider:
+    class: PrestaShop\Module\Everpsblog\Service\Security\BackOfficePermissionProvider
+
+  prestashop.module.everpsblog.security.resource_voter:
+    class: PrestaShop\Module\Everpsblog\Security\BlogResourceVoter
+    arguments:
+      - '@prestashop.module.everpsblog.security.permission_provider'
+    tags:
+      - { name: security.voter }
+
+  prestashop.module.everpsblog.audit.sensitive_action_logger:
+    class: PrestaShop\Module\Everpsblog\Service\Audit\SensitiveActionLogger
+    arguments:
+      - '@logger'
+
+  PrestaShop\Module\Everpsblog\Service\Security\BackOfficePermissionProvider: '@prestashop.module.everpsblog.security.permission_provider'
+  PrestaShop\Module\Everpsblog\Service\Audit\SensitiveActionLogger: '@prestashop.module.everpsblog.audit.sensitive_action_logger'
+
   prestashop.module.everpsblog.controller.admin.post:
     class: PrestaShop\Module\Everpsblog\Controller\Admin\PostController
     arguments:
@@ -121,6 +140,7 @@ services:
       - '@PrestaShop\Module\Everpsblog\Grid\Definition\PostGridDefinitionFactory'
       - '@PrestaShop\Module\Everpsblog\Grid\Data\PostGridDataFactory'
       - '@PrestaShop\Module\Everpsblog\Form\DataProvider\PostFormDataProvider'
+      - '@prestashop.module.everpsblog.audit.sensitive_action_logger'
     public: true
 
   prestashop.module.everpsblog.controller.admin.category:
@@ -176,3 +196,12 @@ services:
 
   PrestaShop\Module\Everpsblog\Application\Blog\:
     resource: '../src/Application/Blog/*'
+
+  PrestaShop\Module\Everpsblog\Security\:
+    resource: '../src/Security/*'
+
+  PrestaShop\Module\Everpsblog\Service\Security\:
+    resource: '../src/Service/Security/*'
+
+  PrestaShop\Module\Everpsblog\Service\Audit\:
+    resource: '../src/Service/Audit/*'
