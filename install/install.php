@@ -44,7 +44,10 @@ $sql[] =
         `starred` int(10) unsigned DEFAULT 0,
         `count` int(10) unsigned DEFAULT 0,
         `groups` text DEFAULT NULL,
-        PRIMARY KEY (`id_ever_post`)
+        PRIMARY KEY (`id_ever_post`),
+        KEY `idx_ever_blog_post_shop_status` (`id_shop`, `post_status`, `active`, `date_add`),
+        KEY `idx_ever_blog_post_author` (`id_author`),
+        KEY `idx_ever_blog_post_default_category` (`id_default_category`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
@@ -153,7 +156,8 @@ $sql[] =
         `date_add` DATETIME DEFAULT NULL,
         `date_upd` DATETIME DEFAULT NULL,
         `active` int(10) DEFAULT NULL,
-        PRIMARY KEY (`id_ever_comment`)
+        PRIMARY KEY (`id_ever_comment`),
+        KEY `idx_ever_blog_comment_post_lang` (`id_ever_post`, `id_lang`, `active`, `date_add`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
@@ -217,21 +221,24 @@ $sql[] =
     'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_post_category` (
         `id_ever_post_category` int(10) NOT NULL,
         `id_ever_post` int(10) unsigned NOT NULL,
-        PRIMARY KEY (`id_ever_post`, `id_ever_post_category`)
+        PRIMARY KEY (`id_ever_post`, `id_ever_post_category`),
+        KEY `idx_ever_blog_post_category_reverse` (`id_ever_post_category`, `id_ever_post`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
     'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_post_tag` (
         `id_ever_post_tag` int(10) NOT NULL,
         `id_ever_post` int(10) unsigned NOT NULL,
-        PRIMARY KEY (`id_ever_post`, `id_ever_post_tag`)
+        PRIMARY KEY (`id_ever_post`, `id_ever_post_tag`),
+        KEY `idx_ever_blog_post_tag_reverse` (`id_ever_post_tag`, `id_ever_post`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
     'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_post_product` (
         `id_ever_post_product` int(10) NOT NULL,
         `id_ever_post` int(10) unsigned NOT NULL,
-        PRIMARY KEY (`id_ever_post`, `id_ever_post_product`)
+        PRIMARY KEY (`id_ever_post`, `id_ever_post_product`),
+        KEY `idx_ever_blog_post_product_reverse` (`id_ever_post_product`, `id_ever_post`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =
