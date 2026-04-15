@@ -1,0 +1,34 @@
+everpsblog_admin_post:
+  path: /everpsblog/post
+  methods: [GET]
+  defaults:
+    _controller: 'PrestaShop\\Module\\Everpsblog\\Controller\\Admin\\PostController::indexAction'
+    _legacy_controller: AdminEverPsBlogPost
+
+everpsblog_admin_category:
+  path: /everpsblog/category
+  methods: [GET]
+  defaults:
+    _controller: 'PrestaShop\\Module\\Everpsblog\\Controller\\Admin\\CategoryController::indexAction'
+    _legacy_controller: AdminEverPsBlogCategory
+
+everpsblog_admin_tag:
+  path: /everpsblog/tag
+  methods: [GET]
+  defaults:
+    _controller: 'PrestaShop\\Module\\Everpsblog\\Controller\\Admin\\TagController::indexAction'
+    _legacy_controller: AdminEverPsBlogTag
+
+everpsblog_admin_author:
+  path: /everpsblog/author
+  methods: [GET]
+  defaults:
+    _controller: 'PrestaShop\\Module\\Everpsblog\\Controller\\Admin\\AuthorController::indexAction'
+    _legacy_controller: AdminEverPsBlogAuthor
+
+everpsblog_admin_comment:
+  path: /everpsblog/comment
+  methods: [GET]
+  defaults:
+    _controller: 'PrestaShop\\Module\\Everpsblog\\Controller\\Admin\\CommentController::indexAction'
+    _legacy_controller: AdminEverPsBlogComment

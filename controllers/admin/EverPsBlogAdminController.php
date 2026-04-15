@@ -9,6 +9,13 @@ abstract class EverPsBlogAdminController extends ModuleAdminController
     protected $shop_url;
     protected $img_url;
     protected $html;
+    protected $legacyToSymfonyRoutes = [
+        'AdminEverPsBlogPost' => 'everpsblog_admin_post',
+        'AdminEverPsBlogCategory' => 'everpsblog_admin_category',
+        'AdminEverPsBlogTag' => 'everpsblog_admin_tag',
+        'AdminEverPsBlogComment' => 'everpsblog_admin_comment',
+        'AdminEverPsBlogAuthor' => 'everpsblog_admin_author',
+    ];
 
     public function __construct()
     {
@@ -20,14 +27,45 @@ abstract class EverPsBlogAdminController extends ModuleAdminController
         $this->assignCommonVars();
     }
 
+    public function init()
+    {
+        $this->redirectToSymfonyRouteIfNeeded();
+        parent::init();
+    }
+
+    protected function redirectToSymfonyRouteIfNeeded()
+    {
+        if ((bool) Tools::getValue('legacy_proxy')) {
+            return;
+        }
+
+        $controllerName = Tools::getValue('controller');
+        if (!$controllerName || !isset($this->legacyToSymfonyRoutes[$controllerName])) {
+            return;
+        }
+
+        $queryParameters = $_GET;
+        unset($queryParameters['controller'], $queryParameters['token']);
+        $queryParameters['legacy_redirect'] = 1;
+
+        $url = $this->context->link->getAdminLink(
+            $this->legacyToSymfonyRoutes[$controllerName],
+            true,
+            [],
+            $queryParameters
+        );
+
+        Tools::redirectAdmin($url);
+    }
+
     protected function assignCommonVars()
     {
         $moduleConfUrl = 'index.php?controller=AdminModules&configure=' . $this->module_name . '&token=' . Tools::getAdminTokenLite('AdminModules');
-        $postUrl = 'index.php?controller=AdminEverPsBlogPost&token=' . Tools::getAdminTokenLite('AdminEverPsBlogPost');
-        $authorUrl = 'index.php?controller=AdminEverPsBlogAuthor&token=' . Tools::getAdminTokenLite('AdminEverPsBlogAuthor');
-        $categoryUrl = 'index.php?controller=AdminEverPsBlogCategory&token=' . Tools::getAdminTokenLite('AdminEverPsBlogCategory');
-        $tagUrl = 'index.php?controller=AdminEverPsBlogTag&token=' . Tools::getAdminTokenLite('AdminEverPsBlogTag');
-        $commentUrl = 'index.php?controller=AdminEverPsBlogComment&token=' . Tools::getAdminTokenLite('AdminEverPsBlogComment');
+        $postUrl = $this->context->link->getAdminLink('everpsblog_admin_post');
+        $authorUrl = $this->context->link->getAdminLink('everpsblog_admin_author');
+        $categoryUrl = $this->context->link->getAdminLink('everpsblog_admin_category');
+        $tagUrl = $this->context->link->getAdminLink('everpsblog_admin_tag');
+        $commentUrl = $this->context->link->getAdminLink('everpsblog_admin_comment');
         $blogUrl = $this->context->link->getModuleLink($this->module_name, 'blog', [], true);
         $ever_blog_token = Tools::encrypt('everpsblog/cron');
         $emptytrash = $this->context->link->getModuleLink(
@@ -96,27 +134,27 @@ abstract class EverPsBlogAdminController extends ModuleAdminController
             'icon' => 'process-icon-cogs',
         ];
         $this->page_header_toolbar_btn['posts'] = [
-            'href' => 'index.php?controller=AdminEverPsBlogPost&token=' . Tools::getAdminTokenLite('AdminEverPsBlogPost'),
+            'href' => $this->context->link->getAdminLink('everpsblog_admin_post'),
             'desc' => $this->l('Posts'),
             'icon' => 'process-icon-list',
         ];
         $this->page_header_toolbar_btn['categories'] = [
-            'href' => 'index.php?controller=AdminEverPsBlogCategory&token=' . Tools::getAdminTokenLite('AdminEverPsBlogCategory'),
+            'href' => $this->context->link->getAdminLink('everpsblog_admin_category'),
             'desc' => $this->l('Categories'),
             'icon' => 'process-icon-categories',
         ];
         $this->page_header_toolbar_btn['tags'] = [
-            'href' => 'index.php?controller=AdminEverPsBlogTag&token=' . Tools::getAdminTokenLite('AdminEverPsBlogTag'),
+            'href' => $this->context->link->getAdminLink('everpsblog_admin_tag'),
             'desc' => $this->l('Tags'),
             'icon' => 'process-icon-tag',
         ];
         $this->page_header_toolbar_btn['comments'] = [
-            'href' => 'index.php?controller=AdminEverPsBlogComment&token=' . Tools::getAdminTokenLite('AdminEverPsBlogComment'),
+            'href' => $this->context->link->getAdminLink('everpsblog_admin_comment'),
             'desc' => $this->l('Comments'),
             'icon' => 'process-icon-comments',
         ];
         $this->page_header_toolbar_btn['authors'] = [
-            'href' => 'index.php?controller=AdminEverPsBlogAuthor&token=' . Tools::getAdminTokenLite('AdminEverPsBlogAuthor'),
+            'href' => $this->context->link->getAdminLink('everpsblog_admin_author'),
             'desc' => $this->l('Authors'),
             'icon' => 'process-icon-user',
         ];
