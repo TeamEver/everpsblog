@@ -37,6 +37,8 @@ You can use a module like **Ever Block** to insert content on these hooks.
 - `[everpsblog product="ID" orderby="FIELD" orderway="asc|desc" limit="X"]` lists posts linked to a product.
 
 ### Documentation
+Le plan de migration progressif Symfony/Doctrine est détaillé ici: `docs/migration-plan-symfony-doctrine.md`.
+
 A detailed guide in French is available at <https://www.team-ever.com/prestashop-1-7-un-module-de-blog-gratuit/>. You can also [support the project with a donation](https://www.paypal.com/donate?hosted_button_id=3CM3XREMKTMSE).
 
 ### Upgrade from 5.x
