@@ -21,15 +21,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogPost.php';
-require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogCategory.php';
-require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogTag.php';
-require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogComment.php';
-require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogAuthor.php';
-require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogTaxonomy.php';
-require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogImage.php';
-require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogCleaner.php';
-require_once _PS_MODULE_DIR_ . 'everpsblog/controllers/admin/EverPsBlogAdminController.php';
 
 class AdminEverPsBlogPostController extends EverPsBlogAdminController
 {

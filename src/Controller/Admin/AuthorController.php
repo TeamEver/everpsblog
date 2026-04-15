@@ -6,6 +6,7 @@ use PrestaShop\Module\Everpsblog\Form\DataProvider\AuthorFormDataProvider;
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\AuthorType;
 use PrestaShop\Module\Everpsblog\Grid\Data\AuthorGridDataFactory;
 use PrestaShop\Module\Everpsblog\Grid\Definition\AuthorGridDefinitionFactory;
+use PrestaShop\Module\Everpsblog\Service\ContextStateService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -15,8 +16,9 @@ class AuthorController extends AbstractDomainController
     private $dataFactory;
     private $formDataProvider;
 
-    public function __construct(AuthorGridDefinitionFactory $definitionFactory, AuthorGridDataFactory $dataFactory, AuthorFormDataProvider $formDataProvider)
+    public function __construct(ContextStateService $contextStateService, AuthorGridDefinitionFactory $definitionFactory, AuthorGridDataFactory $dataFactory, AuthorFormDataProvider $formDataProvider)
     {
+        parent::__construct($contextStateService);
         $this->definitionFactory = $definitionFactory;
         $this->dataFactory = $dataFactory;
         $this->formDataProvider = $formDataProvider;

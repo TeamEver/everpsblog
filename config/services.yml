@@ -64,19 +64,60 @@ services:
     factory: ['@doctrine.orm.entity_manager', getRepository]
     arguments: ['PrestaShop\Module\Everpsblog\Entity\Comment']
 
+  prestashop.module.everpsblog.repository.image:
+    class: PrestaShop\Module\Everpsblog\Repository\ImageRepository
+    factory: ['@doctrine.orm.entity_manager', getRepository]
+    arguments: ['PrestaShop\Module\Everpsblog\Entity\Image']
+
   PrestaShop\Module\Everpsblog\Repository\PostRepository: '@prestashop.module.everpsblog.repository.post'
   PrestaShop\Module\Everpsblog\Repository\CategoryRepository: '@prestashop.module.everpsblog.repository.category'
   PrestaShop\Module\Everpsblog\Repository\TagRepository: '@prestashop.module.everpsblog.repository.tag'
   PrestaShop\Module\Everpsblog\Repository\AuthorRepository: '@prestashop.module.everpsblog.repository.author'
   PrestaShop\Module\Everpsblog\Repository\CommentRepository: '@prestashop.module.everpsblog.repository.comment'
+  PrestaShop\Module\Everpsblog\Repository\ImageRepository: '@prestashop.module.everpsblog.repository.image'
+
+  prestashop.module.everpsblog.adapter.legacy_context:
+    class: PrestaShop\Module\Everpsblog\Adapter\LegacyContextAdapter
+
+  prestashop.module.everpsblog.adapter.legacy_configuration:
+    class: PrestaShop\Module\Everpsblog\Adapter\LegacyConfigurationAdapter
+
+  prestashop.module.everpsblog.adapter.legacy_shop:
+    class: PrestaShop\Module\Everpsblog\Adapter\LegacyShopAdapter
+
+  prestashop.module.everpsblog.adapter.legacy_language:
+    class: PrestaShop\Module\Everpsblog\Adapter\LegacyLanguageAdapter
+
+  prestashop.module.everpsblog.service.context_state:
+    class: PrestaShop\Module\Everpsblog\Service\ContextStateService
+    arguments:
+      - '@prestashop.module.everpsblog.adapter.legacy_context'
+
+  prestashop.module.everpsblog.blog.validator.post_request:
+    class: PrestaShop\Module\Everpsblog\Application\Blog\PostRequestValidator
+
+  prestashop.module.everpsblog.blog.assembler.post_command:
+    class: PrestaShop\Module\Everpsblog\Application\Blog\PostCommandAssembler
+    arguments:
+      - '@prestashop.module.everpsblog.blog.post_data_builder'
+      - '@prestashop.module.everpsblog.blog.validator.post_request'
+
+  prestashop.module.everpsblog.blog.image_uploader:
+    class: PrestaShop\Module\Everpsblog\Service\ImageUploader
+
+  PrestaShop\Module\Everpsblog\Service\ContextStateService: '@prestashop.module.everpsblog.service.context_state'
+  PrestaShop\Module\Everpsblog\Application\Blog\PostCommandAssembler: '@prestashop.module.everpsblog.blog.assembler.post_command'
+  PrestaShop\Module\Everpsblog\Application\Blog\PostRequestValidator: '@prestashop.module.everpsblog.blog.validator.post_request'
+  PrestaShop\Module\Everpsblog\Service\ImageUploader: '@prestashop.module.everpsblog.blog.image_uploader'
 
   PrestaShop\Module\Everpsblog\Service\AdminRouteSigner: ~
 
   prestashop.module.everpsblog.controller.admin.post:
     class: PrestaShop\Module\Everpsblog\Controller\Admin\PostController
     arguments:
+      - '@prestashop.module.everpsblog.service.context_state'
       - '@prestashop.module.everpsblog.blog.command_bus'
-      - '@prestashop.module.everpsblog.blog.post_data_builder'
+      - '@prestashop.module.everpsblog.blog.assembler.post_command'
       - '@PrestaShop\Module\Everpsblog\Grid\Definition\PostGridDefinitionFactory'
       - '@PrestaShop\Module\Everpsblog\Grid\Data\PostGridDataFactory'
       - '@PrestaShop\Module\Everpsblog\Form\DataProvider\PostFormDataProvider'
@@ -85,6 +126,7 @@ services:
   prestashop.module.everpsblog.controller.admin.category:
     class: PrestaShop\Module\Everpsblog\Controller\Admin\CategoryController
     arguments:
+      - '@prestashop.module.everpsblog.service.context_state'
       - '@PrestaShop\Module\Everpsblog\Grid\Definition\CategoryGridDefinitionFactory'
       - '@PrestaShop\Module\Everpsblog\Grid\Data\CategoryGridDataFactory'
       - '@PrestaShop\Module\Everpsblog\Form\DataProvider\CategoryFormDataProvider'
@@ -93,6 +135,7 @@ services:
   prestashop.module.everpsblog.controller.admin.tag:
     class: PrestaShop\Module\Everpsblog\Controller\Admin\TagController
     arguments:
+      - '@prestashop.module.everpsblog.service.context_state'
       - '@PrestaShop\Module\Everpsblog\Grid\Definition\TagGridDefinitionFactory'
       - '@PrestaShop\Module\Everpsblog\Grid\Data\TagGridDataFactory'
       - '@PrestaShop\Module\Everpsblog\Form\DataProvider\TagFormDataProvider'
@@ -101,6 +144,7 @@ services:
   prestashop.module.everpsblog.controller.admin.author:
     class: PrestaShop\Module\Everpsblog\Controller\Admin\AuthorController
     arguments:
+      - '@prestashop.module.everpsblog.service.context_state'
       - '@PrestaShop\Module\Everpsblog\Grid\Definition\AuthorGridDefinitionFactory'
       - '@PrestaShop\Module\Everpsblog\Grid\Data\AuthorGridDataFactory'
       - '@PrestaShop\Module\Everpsblog\Form\DataProvider\AuthorFormDataProvider'
@@ -109,6 +153,7 @@ services:
   prestashop.module.everpsblog.controller.admin.comment:
     class: PrestaShop\Module\Everpsblog\Controller\Admin\CommentController
     arguments:
+      - '@prestashop.module.everpsblog.service.context_state'
       - '@PrestaShop\Module\Everpsblog\Grid\Definition\CommentGridDefinitionFactory'
       - '@PrestaShop\Module\Everpsblog\Grid\Data\CommentGridDataFactory'
       - '@PrestaShop\Module\Everpsblog\Form\DataProvider\CommentFormDataProvider'
@@ -125,3 +170,9 @@ services:
 
   PrestaShop\Module\Everpsblog\Form\DataProvider\:
     resource: '../src/Form/DataProvider/*'
+
+  PrestaShop\Module\Everpsblog\Adapter\:
+    resource: '../src/Adapter/*'
+
+  PrestaShop\Module\Everpsblog\Application\Blog\:
+    resource: '../src/Application/Blog/*'

@@ -2,37 +2,36 @@
 
 namespace PrestaShop\Module\Everpsblog\Controller\Admin;
 
-use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\CreatePostCommand;
+use PrestaShop\Module\Everpsblog\Application\Blog\PostCommandAssembler;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\DeletePostCommand;
-use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\UpdatePostCommand;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandBus\CommandBusInterface;
-use PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\PostCommandDataBuilder;
 use PrestaShop\Module\Everpsblog\Form\DataProvider\PostFormDataProvider;
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\PostType;
 use PrestaShop\Module\Everpsblog\Grid\Data\PostGridDataFactory;
 use PrestaShop\Module\Everpsblog\Grid\Definition\PostGridDefinitionFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class PostController extends AbstractDomainController
 {
     private $commandBus;
-    private $dataBuilder;
+    private $commandAssembler;
     private $definitionFactory;
     private $dataFactory;
     private $formDataProvider;
 
     public function __construct(
+        \PrestaShop\Module\Everpsblog\Service\ContextStateService $contextStateService,
         CommandBusInterface $commandBus,
-        PostCommandDataBuilder $dataBuilder,
+        PostCommandAssembler $commandAssembler,
         PostGridDefinitionFactory $definitionFactory,
         PostGridDataFactory $dataFactory,
         PostFormDataProvider $formDataProvider
     ) {
+        parent::__construct($contextStateService);
         $this->commandBus = $commandBus;
-        $this->dataBuilder = $dataBuilder;
+        $this->commandAssembler = $commandAssembler;
         $this->definitionFactory = $definitionFactory;
         $this->dataFactory = $dataFactory;
         $this->formDataProvider = $formDataProvider;
@@ -64,9 +63,7 @@ class PostController extends AbstractDomainController
 
     public function createAction(Request $request): JsonResponse
     {
-        $command = new CreatePostCommand(
-            $this->dataBuilder->buildFromRequestData($request->request->all())
-        );
+        $command = $this->commandAssembler->assembleCreate($request->request->all());
 
         $postId = $this->commandBus->handle($command);
 
@@ -75,10 +72,7 @@ class PostController extends AbstractDomainController
 
     public function updateAction(int $postId, Request $request): JsonResponse
     {
-        $command = new UpdatePostCommand(
-            $postId,
-            $this->dataBuilder->buildFromRequestData($request->request->all())
-        );
+        $command = $this->commandAssembler->assembleUpdate($postId, $request->request->all());
 
         $updatedPostId = $this->commandBus->handle($command);
 

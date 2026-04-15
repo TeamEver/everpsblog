@@ -6,6 +6,7 @@ use PrestaShop\Module\Everpsblog\Form\DataProvider\CategoryFormDataProvider;
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\CategoryType;
 use PrestaShop\Module\Everpsblog\Grid\Data\CategoryGridDataFactory;
 use PrestaShop\Module\Everpsblog\Grid\Definition\CategoryGridDefinitionFactory;
+use PrestaShop\Module\Everpsblog\Service\ContextStateService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -15,8 +16,9 @@ class CategoryController extends AbstractDomainController
     private $dataFactory;
     private $formDataProvider;
 
-    public function __construct(CategoryGridDefinitionFactory $definitionFactory, CategoryGridDataFactory $dataFactory, CategoryFormDataProvider $formDataProvider)
+    public function __construct(ContextStateService $contextStateService, CategoryGridDefinitionFactory $definitionFactory, CategoryGridDataFactory $dataFactory, CategoryFormDataProvider $formDataProvider)
     {
+        parent::__construct($contextStateService);
         $this->definitionFactory = $definitionFactory;
         $this->dataFactory = $dataFactory;
         $this->formDataProvider = $formDataProvider;
