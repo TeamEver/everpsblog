@@ -1,0 +1,59 @@
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+
+{% block content %}
+  <div class="card">
+    <h3 class="card-header">{{ definition.title }}</h3>
+    <div class="card-body">
+      <form method="get" class="mb-3">
+        <div class="row">
+          {% for id, label in definition.filters %}
+            <div class="col-md-3">
+              <label class="form-control-label" for="{{ id }}">{{ label }}</label>
+              <input class="form-control" type="text" id="{{ id }}" name="{{ id }}" value="{{ app.request.get(id) }}">
+            </div>
+          {% endfor %}
+        </div>
+        <button class="btn btn-primary mt-2" type="submit">Filtrer</button>
+      </form>
+
+      <form method="post">
+        <table class="table">
+          <thead>
+            <tr>
+              <th></th>
+              {% for column in definition.columns %}
+                <th>{{ column.name }}</th>
+              {% endfor %}
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in data.records %}
+              <tr>
+                <td><input type="checkbox" name="bulk_ids[]" value="{{ attribute(row, definition.columns|first.id) }}"></td>
+                {% for column in definition.columns %}
+                  <td>{{ attribute(row, column.id) }}</td>
+                {% endfor %}
+                <td>
+                  <a class="btn btn-sm btn-outline-primary" href="{{ row._actions.edit }}">Éditer</a>
+                  <a class="btn btn-sm btn-outline-danger" href="{{ row._actions.delete }}">Supprimer</a>
+                </td>
+              </tr>
+            {% else %}
+              <tr><td colspan="{{ definition.columns|length + 2 }}">Aucune donnée</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <div class="form-inline">
+          <select class="custom-select" name="bulk_action">
+            {% for action in definition.bulkActions %}
+              <option value="{{ action.id }}">{{ action.name }}</option>
+            {% endfor %}
+          </select>
+          <button class="btn btn-outline-secondary ml-2" type="submit">Appliquer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

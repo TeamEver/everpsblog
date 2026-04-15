@@ -2,13 +2,44 @@
 
 namespace PrestaShop\Module\Everpsblog\Controller\Admin;
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use PrestaShop\Module\Everpsblog\Form\DataProvider\CategoryFormDataProvider;
+use PrestaShop\Module\Everpsblog\Form\Type\Admin\CategoryType;
+use PrestaShop\Module\Everpsblog\Grid\Data\CategoryGridDataFactory;
+use PrestaShop\Module\Everpsblog\Grid\Definition\CategoryGridDefinitionFactory;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class CategoryController extends AbstractDomainController
 {
-    public function indexAction(Request $request): RedirectResponse
+    private $definitionFactory;
+    private $dataFactory;
+    private $formDataProvider;
+
+    public function __construct(CategoryGridDefinitionFactory $definitionFactory, CategoryGridDataFactory $dataFactory, CategoryFormDataProvider $formDataProvider)
     {
-        return $this->redirectToLegacyController($request, 'AdminEverPsBlogCategory');
+        $this->definitionFactory = $definitionFactory;
+        $this->dataFactory = $dataFactory;
+        $this->formDataProvider = $formDataProvider;
+    }
+
+    public function indexAction(Request $request): Response
+    {
+        return $this->render('@Modules/everpsblog/views/templates/admin/modern/resource.html.twig', [
+            'definition' => $this->definitionFactory->build(),
+            'data' => $this->dataFactory->build($this->getContextShopId(), $this->getContextLangId(), $request->query->all()),
+            'resource' => 'category',
+        ]);
+    }
+
+    public function formAction(Request $request, ?int $categoryId = null): Response
+    {
+        $form = $this->createForm(CategoryType::class, $this->formDataProvider->getData($categoryId));
+        $form->handleRequest($request);
+
+        return $this->render('@Modules/everpsblog/views/templates/admin/modern/form.html.twig', [
+            'resource' => 'category',
+            'entityId' => $categoryId,
+            'form' => $form->createView(),
+        ]);
     }
 }

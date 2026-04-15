@@ -7,26 +7,59 @@ use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\DeletePostCommand;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\UpdatePostCommand;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandBus\CommandBusInterface;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\PostCommandDataBuilder;
+use PrestaShop\Module\Everpsblog\Form\DataProvider\PostFormDataProvider;
+use PrestaShop\Module\Everpsblog\Form\Type\Admin\PostType;
+use PrestaShop\Module\Everpsblog\Grid\Data\PostGridDataFactory;
+use PrestaShop\Module\Everpsblog\Grid\Definition\PostGridDefinitionFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class PostController extends AbstractDomainController
 {
-    /** @var CommandBusInterface */
     private $commandBus;
-    /** @var PostCommandDataBuilder */
     private $dataBuilder;
+    private $definitionFactory;
+    private $dataFactory;
+    private $formDataProvider;
 
-    public function __construct(CommandBusInterface $commandBus, PostCommandDataBuilder $dataBuilder)
-    {
+    public function __construct(
+        CommandBusInterface $commandBus,
+        PostCommandDataBuilder $dataBuilder,
+        PostGridDefinitionFactory $definitionFactory,
+        PostGridDataFactory $dataFactory,
+        PostFormDataProvider $formDataProvider
+    ) {
         $this->commandBus = $commandBus;
         $this->dataBuilder = $dataBuilder;
+        $this->definitionFactory = $definitionFactory;
+        $this->dataFactory = $dataFactory;
+        $this->formDataProvider = $formDataProvider;
     }
 
-    public function indexAction(Request $request): RedirectResponse
+    public function indexAction(Request $request): Response
     {
-        return $this->redirectToLegacyController($request, 'AdminEverPsBlogPost');
+        $definition = $this->definitionFactory->build();
+        $data = $this->dataFactory->build($this->getContextShopId(), $this->getContextLangId(), $request->query->all());
+
+        return $this->render('@Modules/everpsblog/views/templates/admin/modern/resource.html.twig', [
+            'definition' => $definition,
+            'data' => $data,
+            'resource' => 'post',
+        ]);
+    }
+
+    public function formAction(Request $request, ?int $postId = null): Response
+    {
+        $form = $this->createForm(PostType::class, $this->formDataProvider->getData($postId));
+        $form->handleRequest($request);
+
+        return $this->render('@Modules/everpsblog/views/templates/admin/modern/form.html.twig', [
+            'resource' => 'post',
+            'entityId' => $postId,
+            'form' => $form->createView(),
+        ]);
     }
 
     public function createAction(Request $request): JsonResponse

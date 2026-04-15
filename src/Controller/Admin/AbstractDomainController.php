@@ -3,24 +3,17 @@
 namespace PrestaShop\Module\Everpsblog\Controller\Admin;
 
 use Context;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
+use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 
-abstract class AbstractDomainController
+abstract class AbstractDomainController extends FrameworkBundleAdminController
 {
-    protected function redirectToLegacyController(Request $request, string $legacyController): RedirectResponse
+    protected function getContextShopId(): int
     {
-        $queryParameters = $request->query->all();
-        unset($queryParameters['legacy_redirect']);
-        $queryParameters['legacy_proxy'] = 1;
+        return (int) Context::getContext()->shop->id;
+    }
 
-        $legacyUrl = Context::getContext()->link->getAdminLink(
-            $legacyController,
-            true,
-            [],
-            $queryParameters
-        );
-
-        return new RedirectResponse($legacyUrl, RedirectResponse::HTTP_FOUND);
+    protected function getContextLangId(): int
+    {
+        return (int) Context::getContext()->language->id;
     }
 }

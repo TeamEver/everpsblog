@@ -1,4 +1,9 @@
 services:
+  _defaults:
+    autowire: true
+    autoconfigure: false
+    public: false
+
   prestashop.module.everpsblog.command.run_cron:
     class: PrestaShop\Module\Everpsblog\Command\RunCronCommand
     tags:
@@ -34,9 +39,89 @@ services:
         PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\UpdatePostCommand: '@prestashop.module.everpsblog.blog.update_post_handler'
         PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\DeletePostCommand: '@prestashop.module.everpsblog.blog.delete_post_handler'
 
+  prestashop.module.everpsblog.repository.post:
+    class: PrestaShop\Module\Everpsblog\Repository\PostRepository
+    factory: ['@doctrine.orm.entity_manager', getRepository]
+    arguments: ['PrestaShop\Module\Everpsblog\Entity\Post']
+
+  prestashop.module.everpsblog.repository.category:
+    class: PrestaShop\Module\Everpsblog\Repository\CategoryRepository
+    factory: ['@doctrine.orm.entity_manager', getRepository]
+    arguments: ['PrestaShop\Module\Everpsblog\Entity\Category']
+
+  prestashop.module.everpsblog.repository.tag:
+    class: PrestaShop\Module\Everpsblog\Repository\TagRepository
+    factory: ['@doctrine.orm.entity_manager', getRepository]
+    arguments: ['PrestaShop\Module\Everpsblog\Entity\Tag']
+
+  prestashop.module.everpsblog.repository.author:
+    class: PrestaShop\Module\Everpsblog\Repository\AuthorRepository
+    factory: ['@doctrine.orm.entity_manager', getRepository]
+    arguments: ['PrestaShop\Module\Everpsblog\Entity\Author']
+
+  prestashop.module.everpsblog.repository.comment:
+    class: PrestaShop\Module\Everpsblog\Repository\CommentRepository
+    factory: ['@doctrine.orm.entity_manager', getRepository]
+    arguments: ['PrestaShop\Module\Everpsblog\Entity\Comment']
+
+  PrestaShop\Module\Everpsblog\Repository\PostRepository: '@prestashop.module.everpsblog.repository.post'
+  PrestaShop\Module\Everpsblog\Repository\CategoryRepository: '@prestashop.module.everpsblog.repository.category'
+  PrestaShop\Module\Everpsblog\Repository\TagRepository: '@prestashop.module.everpsblog.repository.tag'
+  PrestaShop\Module\Everpsblog\Repository\AuthorRepository: '@prestashop.module.everpsblog.repository.author'
+  PrestaShop\Module\Everpsblog\Repository\CommentRepository: '@prestashop.module.everpsblog.repository.comment'
+
+  PrestaShop\Module\Everpsblog\Service\AdminRouteSigner: ~
+
   prestashop.module.everpsblog.controller.admin.post:
     class: PrestaShop\Module\Everpsblog\Controller\Admin\PostController
     arguments:
       - '@prestashop.module.everpsblog.blog.command_bus'
       - '@prestashop.module.everpsblog.blog.post_data_builder'
+      - '@PrestaShop\Module\Everpsblog\Grid\Definition\PostGridDefinitionFactory'
+      - '@PrestaShop\Module\Everpsblog\Grid\Data\PostGridDataFactory'
+      - '@PrestaShop\Module\Everpsblog\Form\DataProvider\PostFormDataProvider'
     public: true
+
+  prestashop.module.everpsblog.controller.admin.category:
+    class: PrestaShop\Module\Everpsblog\Controller\Admin\CategoryController
+    arguments:
+      - '@PrestaShop\Module\Everpsblog\Grid\Definition\CategoryGridDefinitionFactory'
+      - '@PrestaShop\Module\Everpsblog\Grid\Data\CategoryGridDataFactory'
+      - '@PrestaShop\Module\Everpsblog\Form\DataProvider\CategoryFormDataProvider'
+    public: true
+
+  prestashop.module.everpsblog.controller.admin.tag:
+    class: PrestaShop\Module\Everpsblog\Controller\Admin\TagController
+    arguments:
+      - '@PrestaShop\Module\Everpsblog\Grid\Definition\TagGridDefinitionFactory'
+      - '@PrestaShop\Module\Everpsblog\Grid\Data\TagGridDataFactory'
+      - '@PrestaShop\Module\Everpsblog\Form\DataProvider\TagFormDataProvider'
+    public: true
+
+  prestashop.module.everpsblog.controller.admin.author:
+    class: PrestaShop\Module\Everpsblog\Controller\Admin\AuthorController
+    arguments:
+      - '@PrestaShop\Module\Everpsblog\Grid\Definition\AuthorGridDefinitionFactory'
+      - '@PrestaShop\Module\Everpsblog\Grid\Data\AuthorGridDataFactory'
+      - '@PrestaShop\Module\Everpsblog\Form\DataProvider\AuthorFormDataProvider'
+    public: true
+
+  prestashop.module.everpsblog.controller.admin.comment:
+    class: PrestaShop\Module\Everpsblog\Controller\Admin\CommentController
+    arguments:
+      - '@PrestaShop\Module\Everpsblog\Grid\Definition\CommentGridDefinitionFactory'
+      - '@PrestaShop\Module\Everpsblog\Grid\Data\CommentGridDataFactory'
+      - '@PrestaShop\Module\Everpsblog\Form\DataProvider\CommentFormDataProvider'
+    public: true
+
+  PrestaShop\Module\Everpsblog\Grid\Definition\:
+    resource: '../src/Grid/Definition/*'
+
+  PrestaShop\Module\Everpsblog\Grid\Data\:
+    resource: '../src/Grid/Data/*'
+
+  PrestaShop\Module\Everpsblog\Form\Type\Admin\:
+    resource: '../src/Form/Type/Admin/*'
+
+  PrestaShop\Module\Everpsblog\Form\DataProvider\:
+    resource: '../src/Form/DataProvider/*'

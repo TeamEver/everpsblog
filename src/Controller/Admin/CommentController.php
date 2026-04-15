@@ -2,13 +2,44 @@
 
 namespace PrestaShop\Module\Everpsblog\Controller\Admin;
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use PrestaShop\Module\Everpsblog\Form\DataProvider\CommentFormDataProvider;
+use PrestaShop\Module\Everpsblog\Form\Type\Admin\CommentType;
+use PrestaShop\Module\Everpsblog\Grid\Data\CommentGridDataFactory;
+use PrestaShop\Module\Everpsblog\Grid\Definition\CommentGridDefinitionFactory;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class CommentController extends AbstractDomainController
 {
-    public function indexAction(Request $request): RedirectResponse
+    private $definitionFactory;
+    private $dataFactory;
+    private $formDataProvider;
+
+    public function __construct(CommentGridDefinitionFactory $definitionFactory, CommentGridDataFactory $dataFactory, CommentFormDataProvider $formDataProvider)
     {
-        return $this->redirectToLegacyController($request, 'AdminEverPsBlogComment');
+        $this->definitionFactory = $definitionFactory;
+        $this->dataFactory = $dataFactory;
+        $this->formDataProvider = $formDataProvider;
+    }
+
+    public function indexAction(Request $request): Response
+    {
+        return $this->render('@Modules/everpsblog/views/templates/admin/modern/resource.html.twig', [
+            'definition' => $this->definitionFactory->build(),
+            'data' => $this->dataFactory->build($this->getContextLangId(), $request->query->all()),
+            'resource' => 'comment',
+        ]);
+    }
+
+    public function formAction(Request $request, ?int $commentId = null): Response
+    {
+        $form = $this->createForm(CommentType::class, $this->formDataProvider->getData($commentId));
+        $form->handleRequest($request);
+
+        return $this->render('@Modules/everpsblog/views/templates/admin/modern/form.html.twig', [
+            'resource' => 'comment',
+            'entityId' => $commentId,
+            'form' => $form->createView(),
+        ]);
     }
 }
