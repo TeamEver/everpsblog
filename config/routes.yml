@@ -5,6 +5,31 @@ everpsblog_admin_post:
     _controller: 'PrestaShop\\Module\\Everpsblog\\Controller\\Admin\\PostController::indexAction'
     _legacy_controller: AdminEverPsBlogPost
 
+everpsblog_admin_post_create:
+  path: /everpsblog/post
+  methods: [POST]
+  defaults:
+    _controller: 'PrestaShop\\Module\\Everpsblog\\Controller\\Admin\\PostController::createAction'
+    _legacy_controller: AdminEverPsBlogPost
+
+everpsblog_admin_post_update:
+  path: /everpsblog/post/{postId}
+  methods: [PUT]
+  defaults:
+    _controller: 'PrestaShop\\Module\\Everpsblog\\Controller\\Admin\\PostController::updateAction'
+    _legacy_controller: AdminEverPsBlogPost
+  requirements:
+    postId: '\\d+'
+
+everpsblog_admin_post_delete:
+  path: /everpsblog/post/{postId}
+  methods: [DELETE]
+  defaults:
+    _controller: 'PrestaShop\\Module\\Everpsblog\\Controller\\Admin\\PostController::deleteAction'
+    _legacy_controller: AdminEverPsBlogPost
+  requirements:
+    postId: '\\d+'
+
 everpsblog_admin_category:
   path: /everpsblog/category
   methods: [GET]

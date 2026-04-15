@@ -3,3 +3,40 @@ services:
     class: PrestaShop\Module\Everpsblog\Command\RunCronCommand
     tags:
       - { name: 'console.command' }
+
+  prestashop.module.everpsblog.blog.post_rules_applier:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\PostRulesApplier
+
+  prestashop.module.everpsblog.blog.post_data_builder:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\PostCommandDataBuilder
+    arguments:
+      - '@=service("prestashop.adapter.legacy.context").getContext().shop.id'
+      - '@=service("prestashop.adapter.legacy.configuration").get("EVERBLOG_UNCLASSED_ID")'
+
+  prestashop.module.everpsblog.blog.create_post_handler:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\CreatePostHandler
+    arguments:
+      - '@prestashop.module.everpsblog.blog.post_rules_applier'
+
+  prestashop.module.everpsblog.blog.update_post_handler:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\UpdatePostHandler
+    arguments:
+      - '@prestashop.module.everpsblog.blog.post_rules_applier'
+
+  prestashop.module.everpsblog.blog.delete_post_handler:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\DeletePostHandler
+
+  prestashop.module.everpsblog.blog.command_bus:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandBus\InMemoryCommandBus
+    arguments:
+      -
+        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\CreatePostCommand: '@prestashop.module.everpsblog.blog.create_post_handler'
+        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\UpdatePostCommand: '@prestashop.module.everpsblog.blog.update_post_handler'
+        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\DeletePostCommand: '@prestashop.module.everpsblog.blog.delete_post_handler'
+
+  prestashop.module.everpsblog.controller.admin.post:
+    class: PrestaShop\Module\Everpsblog\Controller\Admin\PostController
+    arguments:
+      - '@prestashop.module.everpsblog.blog.command_bus'
+      - '@prestashop.module.everpsblog.blog.post_data_builder'
+    public: true
