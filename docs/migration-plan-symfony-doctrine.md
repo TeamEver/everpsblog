@@ -19,6 +19,12 @@ Ce plan propose une coexistence contrôlée entre le legacy (`ObjectModel`, cont
 
 ---
 
+
+## Décision appliquée (BO)
+- Les contrôleurs BO legacy ne portent plus de logique métier: ils servent uniquement de proxy de redirection vers les routes Symfony (`/src/Controller/Admin`).
+- Le BO n'utilise plus les templates Smarty legacy (`views/templates/admin/*.tpl`) pour les écrans métier Posts/Catégories/Tags/Auteurs/Commentaires ; les écrans actifs sont rendus via Twig (`views/templates/admin/modern/*.html.twig`).
+- La couche legacy front reste limitée au contrôleur front historique (`classes/controller/FrontController.php`) pour conserver la compatibilité FO pendant la transition.
+
 ## Phase 1 — Ressource pilote : Posts
 
 ### Périmètre
