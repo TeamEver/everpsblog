@@ -30,6 +30,9 @@ class CommentController extends AbstractDomainController
             'definition' => $this->definitionFactory->build(),
             'data' => $this->dataFactory->build($this->getContextLangId(), $request->query->all()),
             'resource' => 'comment',
+            'currentResource' => 'comment',
+            'createUrl' => $this->generateUrl('everpsblog_admin_comment_form'),
+            'navigationLinks' => $this->getAdminNavigationLinks(),
         ]);
     }
 
@@ -42,6 +45,9 @@ class CommentController extends AbstractDomainController
             'resource' => 'comment',
             'entityId' => $commentId,
             'form' => $form->createView(),
+            'currentResource' => 'comment',
+            'createUrl' => $this->generateUrl('everpsblog_admin_comment_form'),
+            'navigationLinks' => $this->getAdminNavigationLinks(),
         ]);
     }
 }

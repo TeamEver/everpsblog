@@ -41,11 +41,8 @@ class ConfigurationController extends AbstractDomainController
         }
 
         return $this->render('@Modules/everpsblog/views/templates/admin/modern/configuration.html.twig', [
-            'postUrl' => $this->generateUrl('everpsblog_admin_post'),
-            'categoryUrl' => $this->generateUrl('everpsblog_admin_category'),
-            'tagUrl' => $this->generateUrl('everpsblog_admin_tag'),
-            'authorUrl' => $this->generateUrl('everpsblog_admin_author'),
-            'commentUrl' => $this->generateUrl('everpsblog_admin_comment'),
+            'currentResource' => 'configuration',
+            'navigationLinks' => $this->getAdminNavigationLinks(),
             'configurationForm' => $form->createView(),
         ]);
     }

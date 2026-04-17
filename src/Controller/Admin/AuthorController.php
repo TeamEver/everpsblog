@@ -30,6 +30,9 @@ class AuthorController extends AbstractDomainController
             'definition' => $this->definitionFactory->build(),
             'data' => $this->dataFactory->build($this->getContextShopId(), $this->getContextLangId(), $request->query->all()),
             'resource' => 'author',
+            'currentResource' => 'author',
+            'createUrl' => $this->generateUrl('everpsblog_admin_author_form'),
+            'navigationLinks' => $this->getAdminNavigationLinks(),
         ]);
     }
 
@@ -42,6 +45,9 @@ class AuthorController extends AbstractDomainController
             'resource' => 'author',
             'entityId' => $authorId,
             'form' => $form->createView(),
+            'currentResource' => 'author',
+            'createUrl' => $this->generateUrl('everpsblog_admin_author_form'),
+            'navigationLinks' => $this->getAdminNavigationLinks(),
         ]);
     }
 }

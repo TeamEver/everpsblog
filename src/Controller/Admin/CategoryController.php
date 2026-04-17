@@ -30,6 +30,9 @@ class CategoryController extends AbstractDomainController
             'definition' => $this->definitionFactory->build(),
             'data' => $this->dataFactory->build($this->getContextShopId(), $this->getContextLangId(), $request->query->all()),
             'resource' => 'category',
+            'currentResource' => 'category',
+            'createUrl' => $this->generateUrl('everpsblog_admin_category_form'),
+            'navigationLinks' => $this->getAdminNavigationLinks(),
         ]);
     }
 
@@ -42,6 +45,9 @@ class CategoryController extends AbstractDomainController
             'resource' => 'category',
             'entityId' => $categoryId,
             'form' => $form->createView(),
+            'currentResource' => 'category',
+            'createUrl' => $this->generateUrl('everpsblog_admin_category_form'),
+            'navigationLinks' => $this->getAdminNavigationLinks(),
         ]);
     }
 }

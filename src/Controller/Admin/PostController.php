@@ -50,6 +50,9 @@ class PostController extends AbstractDomainController
             'definition' => $definition,
             'data' => $data,
             'resource' => 'post',
+            'currentResource' => 'post',
+            'createUrl' => $this->generateUrl('everpsblog_admin_post_form'),
+            'navigationLinks' => $this->getAdminNavigationLinks(),
         ]);
     }
 
@@ -62,6 +65,9 @@ class PostController extends AbstractDomainController
             'resource' => 'post',
             'entityId' => $postId,
             'form' => $form->createView(),
+            'currentResource' => 'post',
+            'createUrl' => $this->generateUrl('everpsblog_admin_post_form'),
+            'navigationLinks' => $this->getAdminNavigationLinks(),
         ]);
     }
 

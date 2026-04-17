@@ -30,6 +30,9 @@ class TagController extends AbstractDomainController
             'definition' => $this->definitionFactory->build(),
             'data' => $this->dataFactory->build($this->getContextShopId(), $this->getContextLangId(), $request->query->all()),
             'resource' => 'tag',
+            'currentResource' => 'tag',
+            'createUrl' => $this->generateUrl('everpsblog_admin_tag_form'),
+            'navigationLinks' => $this->getAdminNavigationLinks(),
         ]);
     }
 
@@ -42,6 +45,9 @@ class TagController extends AbstractDomainController
             'resource' => 'tag',
             'entityId' => $tagId,
             'form' => $form->createView(),
+            'currentResource' => 'tag',
+            'createUrl' => $this->generateUrl('everpsblog_admin_tag_form'),
+            'navigationLinks' => $this->getAdminNavigationLinks(),
         ]);
     }
 }
