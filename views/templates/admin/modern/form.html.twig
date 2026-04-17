@@ -20,7 +20,11 @@
         <input type="hidden" name="_csrf_token" value="{{ csrf_token(csrfTokenId) }}">
       {% endif %}
       {{ form_widget(form) }}
-      <button type="submit" class="btn btn-primary">Enregistrer</button>
+      <div class="d-flex flex-wrap">
+        <a class="btn btn-outline-secondary mr-2 mb-2" href="{{ cancelUrl }}">Annuler</a>
+        <button type="submit" class="btn btn-primary mr-2 mb-2" name="_submit_action" value="save">Enregistrer</button>
+        <button type="submit" class="btn btn-primary" name="_submit_action" value="save_and_stay">Enregistrer et rester</button>
+      </div>
       {{ form_end(form) }}
     </div>
   </div>

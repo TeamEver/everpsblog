@@ -68,10 +68,15 @@ class CategoryController extends AbstractDomainController
                     $savedCategoryId = $isEdit
                         ? $this->commandBus->handle($this->commandAssembler->assembleUpdate((int) $categoryId, $data))
                         : $this->commandBus->handle($this->commandAssembler->assembleCreate($data));
+                    $submitAction = (string) $request->request->get('_submit_action', 'save');
 
                     $this->addFlash('success', $isEdit ? 'Catégorie mise à jour.' : 'Catégorie créée.');
 
-                    return $this->redirectToRoute('everpsblog_admin_category_edit', ['categoryId' => $savedCategoryId]);
+                    if ('save_and_stay' === $submitAction) {
+                        return $this->redirectToRoute('everpsblog_admin_category_edit', ['categoryId' => $savedCategoryId]);
+                    }
+
+                    return $this->redirectToRoute('everpsblog_admin_category');
                 } catch (\Throwable $exception) {
                     $form->addError(new FormError('Impossible d\'enregistrer la catégorie.'));
                 }
@@ -84,6 +89,7 @@ class CategoryController extends AbstractDomainController
             'csrfTokenId' => $csrfTokenId,
             'form' => $form->createView(),
             'currentResource' => 'category',
+            'cancelUrl' => $this->generateUrl('everpsblog_admin_category'),
             'createUrl' => $this->generateUrl('everpsblog_admin_category_form'),
             'navigationLinks' => $this->getAdminNavigationLinks(),
         ]);

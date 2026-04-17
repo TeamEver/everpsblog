@@ -66,10 +66,15 @@ class TagController extends AbstractDomainController
                     $savedTagId = $isEdit
                         ? $this->commandBus->handle($this->commandAssembler->assembleUpdate((int) $tagId, (array) $form->getData()))
                         : $this->commandBus->handle($this->commandAssembler->assembleCreate((array) $form->getData()));
+                    $submitAction = (string) $request->request->get('_submit_action', 'save');
 
                     $this->addFlash('success', $isEdit ? 'Tag mis à jour.' : 'Tag créé.');
 
-                    return $this->redirectToRoute('everpsblog_admin_tag_edit', ['tagId' => $savedTagId]);
+                    if ('save_and_stay' === $submitAction) {
+                        return $this->redirectToRoute('everpsblog_admin_tag_edit', ['tagId' => $savedTagId]);
+                    }
+
+                    return $this->redirectToRoute('everpsblog_admin_tag');
                 } catch (\Throwable $exception) {
                     $form->addError(new FormError('Impossible d\'enregistrer le tag.'));
                 }
@@ -82,6 +87,7 @@ class TagController extends AbstractDomainController
             'csrfTokenId' => $csrfTokenId,
             'form' => $form->createView(),
             'currentResource' => 'tag',
+            'cancelUrl' => $this->generateUrl('everpsblog_admin_tag'),
             'createUrl' => $this->generateUrl('everpsblog_admin_tag_form'),
             'navigationLinks' => $this->getAdminNavigationLinks(),
         ]);
