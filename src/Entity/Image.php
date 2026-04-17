@@ -4,9 +4,10 @@ namespace PrestaShop\Module\Everpsblog\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use PrestaShop\Module\Everpsblog\Repository\ImageRepository;
 
 /**
- * @ORM\Entity(repositoryClass="PrestaShop\\Module\\Everpsblog\\Repository\\ImageRepository")
+ * @ORM\Entity(repositoryClass=ImageRepository::class)
  * @ORM\Table(name="ever_blog_image")
  */
 class Image

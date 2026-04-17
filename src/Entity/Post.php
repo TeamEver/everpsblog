@@ -6,9 +6,10 @@ use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use PrestaShop\Module\Everpsblog\Repository\PostRepository;
 
 /**
- * @ORM\Entity(repositoryClass="PrestaShop\\Module\\Everpsblog\\Repository\\PostRepository")
+ * @ORM\Entity(repositoryClass=PostRepository::class)
  * @ORM\Table(name="ever_blog_post")
  */
 class Post
