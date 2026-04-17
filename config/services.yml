@@ -248,6 +248,9 @@ services:
   prestashop.module.everpsblog.blog.image_uploader:
     class: PrestaShop\Module\Everpsblog\Service\ImageUploader
 
+  PrestaShop\Module\Everpsblog\Service\ImageUploader:
+    alias: prestashop.module.everpsblog.blog.image_uploader
+
   PrestaShop\Module\Everpsblog\Service\AdminRouteSigner:
     class: PrestaShop\Module\Everpsblog\Service\AdminRouteSigner
 
