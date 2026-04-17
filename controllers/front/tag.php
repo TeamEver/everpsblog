@@ -167,13 +167,6 @@ class EverPsBlogtagModuleFrontController extends TagController
                 'show_featured_post' => true,
                 'show_featured_tag' => (bool) Configuration::get('EVERBLOG_SHOW_FEAT_TAG'),
             ]);
-            if (Module::isInstalled('prettyblocks')
-                && Module::isEnabled('prettyblocks')
-            ) {
-                $this->context->smarty->assign([
-                    'prettyblocks_enabled' => true,
-                ]);
-            }
             $this->setTemplate('module:everpsblog/views/templates/front/tag.tpl');
         } else {
             Tools::redirect('index.php?controller=404');

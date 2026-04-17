@@ -162,9 +162,6 @@
             <div class="card-body postcontent {if $animated}zoomed{/if}">
                 {if isset($post->password_protected) && $post->password_protected}
                 <div class="alert alert-warning">
-                    {if isset($prettyblocks_enabled) && $prettyblocks_enabled}
-                    {widget name="prettyblocks" zone_name="displayPost{$post->id}"}
-                    {/if}
                     {$post->content nofilter}
                 </div>
                 <form method="POST" class="mt-3">
@@ -174,9 +171,6 @@
                     <button type="submit" class="btn btn-primary">{l s='Validate' mod='everpsblog'}</button>
                 </form>
                 {else}
-                {if isset($prettyblocks_enabled) && $prettyblocks_enabled}
-                {widget name="prettyblocks" zone_name="displayPost{$post->id}"}
-                {/if}
                 {$post->content nofilter}
                 {/if}
             </div>

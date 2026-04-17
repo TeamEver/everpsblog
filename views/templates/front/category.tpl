@@ -97,9 +97,6 @@
         {$category->date_add|escape:'htmlall':'UTF-8'}
     </div>
     <div class="row categorycontent">
-        {if isset($prettyblocks_enabled) && $prettyblocks_enabled}
-        {widget name="prettyblocks" zone_name="displayBeforeCategory{$category->id}"}
-        {/if}
         {$category->content nofilter}
     </div>
 </div>
@@ -122,9 +119,6 @@
 {if isset($paginated) && !$paginated}
 <div class="container">
     <div class="row categorybottomcontent {if $animated}zoomed{/if}" itemprop="articleBody">
-        {if isset($prettyblocks_enabled) && $prettyblocks_enabled}
-        {widget name="prettyblocks" zone_name="displayAfterCategory{$category->id}"}
-        {/if}
         {$category->bottom_content nofilter}
     </div>
 </div>

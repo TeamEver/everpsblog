@@ -110,9 +110,6 @@
     {$default_blog_top_text nofilter}
 </div>
 {/if}
-{if isset($prettyblocks_enabled) && $prettyblocks_enabled}
-{widget name="prettyblocks" zone_name="displayBeforeBlog"}
-{/if}
 {* Hide categories list on blog pages *}
 {*<div class="row mt-2">
 {foreach from=$evercategory item=item}
@@ -145,9 +142,6 @@
 <div class="row mt-2">
     {$default_blog_bottom_text nofilter}
 </div>
-{/if}
-{if isset($prettyblocks_enabled) && $prettyblocks_enabled}
-{widget name="prettyblocks" zone_name="displayAfterBlog"}
 {/if}
 {/if}
 {if isset($everhome_products) && $everhome_products}
