@@ -21,8 +21,6 @@ if (!defined('_PS_VERSION_')) {
 }
 
 require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogComment.php';
-require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogCleaner.php';
-require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogSortOrders.php';
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
@@ -208,6 +206,21 @@ class EverPsBlog extends Module
     private function getBlogTaxonomyService()
     {
         return $this->getModuleService('prestashop.module.everpsblog.service.blog_taxonomy');
+    }
+
+    private function getBlogImageService()
+    {
+        return $this->getModuleService('prestashop.module.everpsblog.service.blog_image');
+    }
+
+    private function getBlogCleanerService()
+    {
+        return $this->getModuleService('prestashop.module.everpsblog.service.blog_cleaner');
+    }
+
+    private function getBlogSortOrderService()
+    {
+        return $this->getModuleService('prestashop.module.everpsblog.service.blog_sort_order');
     }
 
     private function getBlogSitemapService()
@@ -2570,7 +2583,7 @@ class EverPsBlog extends Module
                 return;
             }
             foreach ($starredPosts as &$post) {
-                $featuredThumb = EverPsBlogImage::getBlogThumbUrl(
+                $featuredThumb = $this->getBlogImageService()->getBlogThumbUrl(
                     (int) (is_array($post) ? $post['id_ever_post'] : $post->id_ever_post),
                     (int) $this->context->shop->id,
                     'post'
@@ -2850,13 +2863,13 @@ class EverPsBlog extends Module
         if (!in_array(Context::getContext()->controller->controller_type, $controllerTypes)) {
             return;
         }
-        $post_categories = EverPsBlogCleaner::convertToArray(
+        $post_categories = $this->getBlogCleanerService()->convertToArray(
             json_decode($params['object']->post_categories, true)
         );
-        $post_tags = EverPsBlogCleaner::convertToArray(
+        $post_tags = $this->getBlogCleanerService()->convertToArray(
             json_decode($params['object']->post_tags, true)
         );
-        $post_products = EverPsBlogCleaner::convertToArray(
+        $post_products = $this->getBlogCleanerService()->convertToArray(
             json_decode($params['object']->post_products, true)
         );
         // First drop post taxonomies
@@ -2978,7 +2991,7 @@ class EverPsBlog extends Module
         if (file_exists($old_img)) {
             unlink($old_img);
         }
-        $image = EverPsBlogImage::getBlogImage(
+        $image = $this->getBlogImageService()->getBlogImage(
             (int) $params['object']->id,
             (int) Context::getContext()->shop->id,
             'post'
@@ -3015,7 +3028,7 @@ class EverPsBlog extends Module
         if (file_exists($old_img)) {
             unlink($old_img);
         }
-        $image = EverPsBlogImage::getBlogImage(
+        $image = $this->getBlogImageService()->getBlogImage(
             (int) $params['object']->id,
             (int) Context::getContext()->shop->id,
             'category'
@@ -3059,7 +3072,7 @@ class EverPsBlog extends Module
         if (file_exists($old_img)) {
             unlink($old_img);
         }
-        $image = EverPsBlogImage::getBlogImage(
+        $image = $this->getBlogImageService()->getBlogImage(
             (int) $params['object']->id,
             (int) Context::getContext()->shop->id,
             'author'
@@ -3093,216 +3106,9 @@ class EverPsBlog extends Module
         }
     }
 
-    private function processSitemapPost($id_shop, $id_lang)
-    {
-        $iso_lang = Language::getIsoById((int) $id_lang);
-        $sitemap = new EverPsBlogSitemap(
-            Tools::getHttpHost(true) . __PS_BASE_URI__
-        );
-        $sitemap->setPath(_PS_ROOT_DIR_.'/');
-        $sitemap->setFilename('blogpost_' . (int) $id_shop . '_lang_' . $iso_lang);
-        $sql = 'SELECT id_ever_post FROM ' . _DB_PREFIX_ . 'ever_blog_post
-            WHERE sitemap = 1 AND post_status = "published"';
-        if ($results = Db::getInstance()->executeS($sql)) {
-            foreach ($results as $result) {
-                $link = new Link();
-                $post = new EverPsBlogPost(
-                    (int) $result['id_ever_post'],
-                    (int) $this->context->language->id,
-                    (int) $this->context->shop->id
-                );
-                if (isset($post->allowed_groups) && $post->allowed_groups) {
-                    $allowedGroups = json_decode($post->allowed_groups);
-                    // Allow on sitemap only on visitor group
-                    if (is_array($allowedGroups) && !in_array('1', $allowedGroups)) {
-                        continue;
-                    }
-                }
-                $post_url = $link->getModuleLink(
-                    'everpsblog',
-                    'post',
-                    [
-                        'id_ever_post' => $post->id,
-                        'link_rewrite' => $post->link_rewrite,
-                    ],
-                );
-                $sitemap->addItem(
-                    $post_url,
-                    1,
-                    'weekly',
-                    $post->date_upd
-                );
-            }
-            return $sitemap->createSitemapIndex(
-                Tools::getHttpHost(true) . __PS_BASE_URI__,
-                'Today'
-            );
-        }
-    }
-
-    private function processSitemapAuthor($id_shop, $id_lang)
-    {
-        $iso_lang = Language::getIsoById((int) $id_lang);
-
-        $sitemap = new EverPsBlogSitemap(
-            Tools::getHttpHost(true) . __PS_BASE_URI__
-        );
-        $sitemap->setPath(_PS_ROOT_DIR_ . '/');
-        $sitemap->setFilename('blogauthor_' . (int) $id_shop . '_lang_' . $iso_lang);
-        $sql = 'SELECT id_ever_author FROM ' . _DB_PREFIX_ . 'ever_blog_author
-            WHERE sitemap = 1 AND active = 1';
-        if ($results = Db::getInstance()->executeS($sql)) {
-            foreach ($results as $result) {
-                $link = new Link();
-                $author = new EverPsBlogAuthor(
-                    (int) $result['id_ever_author'],
-                    (int) $this->context->language->id,
-                    (int) $this->context->shop->id
-                );
-                if (isset($author->allowed_groups) && $author->allowed_groups) {
-                    $allowedGroups = json_decode($author->allowed_groups);
-                    // Allow on sitemap only on visitor group
-                    if (is_array($allowedGroups) && !in_array('1', $allowedGroups)) {
-                        continue;
-                    }
-                }
-                $author_url = $link->getModuleLink(
-                    'everpsblog',
-                    'author',
-                    [
-                        'id_ever_author' => $author->id,
-                        'link_rewrite' => $author->link_rewrite,
-                    ],
-                );
-                if ((bool) $author->active === true) {
-                    $sitemap->addItem(
-                        $author_url,
-                        1,
-                        'weekly',
-                        $author->date_upd
-                    );
-                }
-            }
-            return $sitemap->createSitemapIndex(
-                Tools::getHttpHost(true) . __PS_BASE_URI__,
-                'Today'
-            );
-        }
-    }
-
-    private function processSitemapTag($id_shop, $id_lang)
-    {
-        $iso_lang = Language::getIsoById((int) $id_lang);
-        $sitemap = new EverPsBlogSitemap(
-            Tools::getHttpHost(true) . __PS_BASE_URI__
-        );
-        $sitemap->setPath(_PS_ROOT_DIR_ . '/');
-        $sitemap->setFilename('blogtag_' . (int) $id_shop . '_lang_' . $iso_lang);
-        $sql = 'SELECT id_ever_tag FROM ' . _DB_PREFIX_ . 'ever_blog_tag
-            WHERE sitemap = 1 AND active = 1';
-        if ($results = Db::getInstance()->executeS($sql)) {
-            foreach ($results as $result) {
-                $link = new Link();
-                $tag = new EverPsBlogTag(
-                    (int) $result['id_ever_tag'],
-                    (int) $this->context->language->id,
-                    (int) $this->context->shop->id
-                );
-                if (isset($tag->allowed_groups) && $tag->allowed_groups) {
-                    $allowedGroups = json_decode($tag->allowed_groups);
-                    // Allow on sitemap only on visitor group
-                    if (is_array($allowedGroups) && !in_array('1', $allowedGroups)) {
-                        continue;
-                    }
-                }
-                $tag_url = $link->getModuleLink(
-                    'everpsblog',
-                    'tag',
-                    [
-                        'id_ever_tag' => $tag->id,
-                        'link_rewrite' => $tag->link_rewrite,
-                    ],
-                );
-                if ((bool) $tag->active === true) {
-                    $sitemap->addItem(
-                        $tag_url,
-                        1,
-                        'weekly',
-                        $tag->date_upd
-                    );
-                }
-            }
-            return $sitemap->createSitemapIndex(
-                Tools::getHttpHost(true) . __PS_BASE_URI__,
-                'Today'
-            );
-        }
-    }
-
-    private function processSitemapCategory($id_shop, $id_lang)
-    {
-        $iso_lang = Language::getIsoById((int) $id_lang);
-        $sitemap = new EverPsBlogSitemap(
-            Tools::getHttpHost(true) . __PS_BASE_URI__
-        );
-        $sitemap->setPath(_PS_ROOT_DIR_.'/');
-        $sitemap->setFilename('blogcategory_' . (int) $id_shop . '_lang_' . $iso_lang);
-        $sql = 'SELECT id_ever_category FROM ' . _DB_PREFIX_ . 'ever_blog_category
-            WHERE sitemap = 1 AND active = 1';
-        if ($results = Db::getInstance()->executeS($sql)) {
-            foreach ($results as $result) {
-                $link = new Link();
-                $category = new EverPsBlogCategory(
-                    (int) $result['id_ever_category'],
-                    (int) $this->context->language->id,
-                    (int) $this->context->shop->id
-                );
-                if (isset($category->allowed_groups) && $category->allowed_groups) {
-                    $allowedGroups = json_decode($category->allowed_groups);
-                    // Allow on sitemap only on visitor group
-                    if (is_array($allowedGroups) && !in_array('1', $allowedGroups)) {
-                        continue;
-                    }
-                }
-                $category_url = $link->getModuleLink(
-                    'everpsblog',
-                    'category',
-                    [
-                        'id_ever_category' => $category->id,
-                        'link_rewrite' => $category->link_rewrite,
-                    ],
-                );
-                if ((bool) $category->active === true
-                    && (bool) $category->is_root_category === false
-                ) {
-                    $sitemap->addItem(
-                        $category_url,
-                        1,
-                        'weekly',
-                        $category->date_upd
-                    );
-                }
-            }
-            return $sitemap->createSitemapIndex(
-                Tools::getHttpHost(true) . __PS_BASE_URI__,
-                'Today'
-            );
-        }
-    }
-
     public function getSitemapIndexes()
     {
-        $indexes = [];
-        $sitemap_indexes_dir = glob(_PS_ROOT_DIR_ . '/*');
-        foreach ($sitemap_indexes_dir as $index) {
-            if (is_file($index)
-                && pathinfo($index, PATHINFO_EXTENSION) == 'xml'
-                && strpos(basename($index), 'index')
-            ) {
-                $indexes[] = Tools::getHttpHost(true) . __PS_BASE_URI__ . basename($index);
-            }
-        }
-        return (array) $indexes;
+        return $this->getBlogSitemapService()->getSitemapIndexes();
     }
 
     public function hookActionAdminMetaAfterWriteRobotsFile($params)
@@ -3670,7 +3476,7 @@ class EverPsBlog extends Module
                 if ($featured_url) {
                     $local = $this->downloadImage($featured_url);
                     if ($local) {
-                        $image = EverPsBlogImage::getBlogImage(
+                        $image = $this->getBlogImageService()->getBlogImage(
                             (int) $post->id,
                             (int) Context::getContext()->shop->id,
                             'post'
@@ -4913,12 +4719,12 @@ class EverPsBlog extends Module
                     'link_rewrite' => $post->link_rewrite,
                 ]
             ),
-            'featured_thumb' => EverPsBlogImage::getBlogThumbUrl(
+            'featured_thumb' => $this->getBlogImageService()->getBlogThumbUrl(
                 (int) $post->id,
                 (int) $this->context->shop->id,
                 'post'
             ),
-            'featured_image' => EverPsBlogImage::getBlogImageUrl(
+            'featured_image' => $this->getBlogImageService()->getBlogImageUrl(
                 (int) $post->id,
                 (int) $this->context->shop->id,
                 'post'
@@ -4955,12 +4761,12 @@ class EverPsBlog extends Module
                     'link_rewrite' => $category->link_rewrite,
                 ]
             ),
-            'featured_thumb' => EverPsBlogImage::getBlogThumbUrl(
+            'featured_thumb' => $this->getBlogImageService()->getBlogThumbUrl(
                 (int) $category->id,
                 (int) $this->context->shop->id,
                 'category'
             ),
-            'featured_image' => EverPsBlogImage::getBlogImageUrl(
+            'featured_image' => $this->getBlogImageService()->getBlogImageUrl(
                 (int) $category->id,
                 (int) $this->context->shop->id,
                 'category'

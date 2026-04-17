@@ -21,10 +21,11 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
+
 function upgrade_module_5_0_1()
 {
-    require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogImage.php';
-    set_time_limit(0);
+        set_time_limit(0);
     $result = true;
     if (!file_exists(_PS_IMG_DIR_ . 'post')) {
         $result &= mkdir(_PS_IMG_DIR_ . 'post', 0755, true);
@@ -38,9 +39,10 @@ function upgrade_module_5_0_1()
     if (!file_exists(_PS_IMG_DIR_ . 'author')) {
         $result &= mkdir(_PS_IMG_DIR_ . 'author', 0755, true);
     }
-    $featured_images = EverPsBlogImage::getAllBlogImages();
+    $service = SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_image');
+    $featured_images = $service->getAllBlogImages();
     foreach ($featured_images as $featured_image) {
-        $exists = EverPsBlogImage::oldBlogFileExist(
+        $exists = $service->oldBlogFileExist(
             (int) $featured_image->id_element,
             $featured_image->image_type
         );

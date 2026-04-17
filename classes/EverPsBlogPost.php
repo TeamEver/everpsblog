@@ -21,6 +21,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Presenter\AbstractLazyArray;
 use PrestaShop\PrestaShop\Adapter\Presenter\Product\ProductListingPresenter;
@@ -30,8 +31,6 @@ use PrestaShop\PrestaShop\Core\Addon\Module\ModuleManagerBuilder;
 use PrestaShop\PrestaShop\Core\Product\ProductExtraContentFinder;
 use PrestaShop\PrestaShop\Core\Product\ProductInterface;
 
-require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogCleaner.php';
-require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogImage.php';
 
 class EverPsBlogPost extends ObjectModel
 {
@@ -339,12 +338,12 @@ class EverPsBlogPost extends ObjectModel
                             (int) Configuration::get('EVERPSBLOG_EXCERPT')
                         );
                     }
-                    $post['featured_image'] = EverPsBlogImage::getBlogImageUrl(
+                    $post['featured_image'] = self::getBlogImageService()->getBlogImageUrl(
                         (int) $post[self::$definition['primary']],
                         (int) $id_shop,
                         'post'
                     );
-                    $post['featured_thumb'] = EverPsBlogImage::getBlogThumbUrl(
+                    $post['featured_thumb'] = self::getBlogImageService()->getBlogThumbUrl(
                         (int) $post[self::$definition['primary']],
                         (int) $id_shop,
                         'post'
@@ -513,12 +512,12 @@ class EverPsBlogPost extends ObjectModel
                     0,
                     (int) Configuration::get('EVERPSBLOG_EXCERPT')
                 );
-                $post->featured_image = EverPsBlogImage::getBlogImageUrl(
+                $post->featured_image = self::getBlogImageService()->getBlogImageUrl(
                     (int) $post->id,
                     (int) $id_shop,
                     'post'
                 );
-                $post->featured_thumb = EverPsBlogImage::getBlogThumbUrl(
+                $post->featured_thumb = self::getBlogImageService()->getBlogThumbUrl(
                     (int) $post->id,
                     (int) $id_shop,
                     'post'
@@ -638,7 +637,7 @@ class EverPsBlogPost extends ObjectModel
                     0,
                     (int) Configuration::get('EVERPSBLOG_EXCERPT')
                 );
-                $post->featured_image = EverPsBlogImage::getBlogImageUrl(
+                $post->featured_image = self::getBlogImageService()->getBlogImageUrl(
                     (int) $post->id,
                     (int) $id_shop,
                     'post'
@@ -767,12 +766,12 @@ class EverPsBlogPost extends ObjectModel
                         (int) Configuration::get('EVERPSBLOG_EXCERPT')
                     );
                 }
-                $post->featured_image = EverPsBlogImage::getBlogImageUrl(
+                $post->featured_image = self::getBlogImageService()->getBlogImageUrl(
                     (int) $post->id,
                     (int) $id_shop,
                     'post'
                 );
-                $post->featured_thumb = EverPsBlogImage::getBlogThumbUrl(
+                $post->featured_thumb = self::getBlogImageService()->getBlogThumbUrl(
                     (int) $post->id,
                     (int) $id_shop,
                     'post'
@@ -899,12 +898,12 @@ class EverPsBlogPost extends ObjectModel
                         (int) Configuration::get('EVERPSBLOG_EXCERPT')
                     );
                 }
-                $post->featured_image = EverPsBlogImage::getBlogImageUrl(
+                $post->featured_image = self::getBlogImageService()->getBlogImageUrl(
                     (int) $post->id,
                     (int) $id_shop,
                     'post'
                 );
-                $post->featured_thumb = EverPsBlogImage::getBlogThumbUrl(
+                $post->featured_thumb = self::getBlogImageService()->getBlogThumbUrl(
                     (int) $post->id,
                     (int) $id_shop,
                     'post'
@@ -1021,12 +1020,12 @@ class EverPsBlogPost extends ObjectModel
                         (int) Configuration::get('EVERPSBLOG_EXCERPT')
                     );
                 }
-                $post->featured_image = EverPsBlogImage::getBlogImageUrl(
+                $post->featured_image = self::getBlogImageService()->getBlogImageUrl(
                     (int) $post->id,
                     (int) $id_shop,
                     'post'
                 );
-                $post->featured_thumb = EverPsBlogImage::getBlogThumbUrl(
+                $post->featured_thumb = self::getBlogImageService()->getBlogThumbUrl(
                     (int) $post->id,
                     (int) $id_shop,
                     'post'
@@ -1142,12 +1141,12 @@ class EverPsBlogPost extends ObjectModel
                     0,
                     (int) Configuration::get('EVERPSBLOG_EXCERPT')
                 );
-                $post->featured_image = EverPsBlogImage::getBlogImageUrl(
+                $post->featured_image = self::getBlogImageService()->getBlogImageUrl(
                     (int) $post->id,
                     (int) $id_shop,
                     'post'
                 );
-                $post->featured_thumb = EverPsBlogImage::getBlogThumbUrl(
+                $post->featured_thumb = self::getBlogImageService()->getBlogThumbUrl(
                     (int) $post->id,
                     (int) $id_shop,
                     'post'
@@ -1180,7 +1179,7 @@ class EverPsBlogPost extends ObjectModel
         . '_'
         . (bool) $starred;
         if (!Cache::isStored($cache_id)) {
-            $return = EverPsBlogTaxonomy::getPostCategoriesTaxonomies((int) $id_ever_post);
+            $return = self::getBlogTaxonomyService()->getPostCategoriesTaxonomies((int) $id_ever_post);
             Cache::store($cache_id, $return);
             return $return;
         }
@@ -1621,12 +1620,12 @@ class EverPsBlogPost extends ObjectModel
                     0,
                     (int) Configuration::get('EVERPSBLOG_EXCERPT')
                 );
-                $post->featured_image = EverPsBlogImage::getBlogImageUrl(
+                $post->featured_image = self::getBlogImageService()->getBlogImageUrl(
                     (int) $post->id,
                     (int) $id_shop,
                     'post'
                 );
-                $post->featured_thumb = EverPsBlogImage::getBlogThumbUrl(
+                $post->featured_thumb = self::getBlogImageService()->getBlogThumbUrl(
                     (int) $post->id,
                     (int) $id_shop,
                     'post'
@@ -1800,12 +1799,12 @@ class EverPsBlogPost extends ObjectModel
                             (int) Configuration::get('EVERPSBLOG_EXCERPT')
                         );
                     }
-                    $post['featured_image'] = EverPsBlogImage::getBlogImageUrl(
+                    $post['featured_image'] = self::getBlogImageService()->getBlogImageUrl(
                         (int) $post[self::$definition['primary']],
                         (int) $id_shop,
                         'post'
                     );
-                    $post['featured_thumb'] = EverPsBlogImage::getBlogThumbUrl(
+                    $post['featured_thumb'] = self::getBlogImageService()->getBlogThumbUrl(
                         (int) $post[self::$definition['primary']],
                         (int) $id_shop,
                         'post'
@@ -2030,4 +2029,20 @@ class EverPsBlogPost extends ObjectModel
             );
         }
     }
+
+    private static function getBlogImageService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_image');
+    }
+
+    private static function getBlogTaxonomyService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_taxonomy');
+    }
+
+    private static function getBlogCleanerService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_cleaner');
+    }
+
 }

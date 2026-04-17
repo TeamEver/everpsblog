@@ -21,6 +21,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 class EverPsBlogCategory extends ObjectModel
 {
     public $id_ever_category;
@@ -296,7 +297,7 @@ class EverPsBlogCategory extends ObjectModel
                 if ((bool) $without_parent === true) {
                     // continue;
                 }
-                $blog_cat['featured_image'] = EverPsBlogImage::getBlogImageUrl(
+                $blog_cat['featured_image'] = self::getBlogImageService()->getBlogImageUrl(
                     (int) $blog_cat[self::$definition['primary']],
                     (int) $id_shop,
                     'category'
@@ -413,7 +414,7 @@ class EverPsBlogCategory extends ObjectModel
                         continue;
                     }
                 }
-                $featured_image = EverPsBlogImage::getBlogImageUrl(
+                $featured_image = self::getBlogImageService()->getBlogImageUrl(
                     (int) $child_cat[self::$definition['primary']],
                     (int) $id_shop,
                     'category'
@@ -454,4 +455,20 @@ class EverPsBlogCategory extends ObjectModel
         }
         return false;
     }
+
+    private static function getBlogImageService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_image');
+    }
+
+    private static function getBlogTaxonomyService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_taxonomy');
+    }
+
+    private static function getBlogCleanerService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_cleaner');
+    }
+
 }

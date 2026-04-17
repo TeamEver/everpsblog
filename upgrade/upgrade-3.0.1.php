@@ -21,6 +21,8 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
+
 function upgrade_module_3_0_1()
 {
     set_time_limit(0);
@@ -139,8 +141,8 @@ function upgrade_module_3_0_1()
     }
     $result &= $tab->add();
     // Migrate all json datas to taxonomy
-    require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogTaxonomy.php';
-    $result &= EverPsBlogTaxonomy::migrateJsonPostsData();
+        $taxonomyService = SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_taxonomy');
+    $result &= $taxonomyService->migrateJsonPostsData();
 
     return $result;
 }
