@@ -22,7 +22,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
-use PrestaShop\Module\Everpsblog\Controller\Front\BlogController;
+use PrestaShop\Module\Everpsblog\Controller\Front\AbstractFrontController;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
@@ -30,7 +30,7 @@ use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
 use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 
-class EverPsBlogblogModuleFrontController extends BlogController
+class EverPsBlogblogModuleFrontController extends AbstractFrontController
 {
     protected $author;
     protected $category;
