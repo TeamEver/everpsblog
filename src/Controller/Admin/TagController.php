@@ -27,7 +27,7 @@ class TagController extends AbstractDomainController
 
     public function indexAction(Request $request): Response
     {
-        $this->denyBlogAccess(BlogPermission::READ, BlogPermission::RES_TAG);
+        $this->denyAccessUnlessGranted(BlogPermission::READ, BlogPermission::RES_TAG);
         return $this->render('@Modules/everpsblog/views/templates/admin/modern/resource.html.twig', [
             'definition' => $this->definitionFactory->build(),
             'data' => $this->dataFactory->build($this->getContextShopId(), $this->getContextLangId(), $request->query->all()),
@@ -37,7 +37,7 @@ class TagController extends AbstractDomainController
 
     public function formAction(Request $request, ?int $tagId = null): Response
     {
-        $this->denyBlogAccess($tagId ? BlogPermission::UPDATE : BlogPermission::CREATE, BlogPermission::RES_TAG);
+        $this->denyAccessUnlessGranted($tagId ? BlogPermission::UPDATE : BlogPermission::CREATE, BlogPermission::RES_TAG);
 
         $form = $this->createForm(TagType::class, $this->formDataProvider->getData($tagId));
         $form->handleRequest($request);

@@ -25,8 +25,4 @@ abstract class AbstractDomainController extends FrameworkBundleAdminController
         return $this->contextStateService->getLanguageId();
     }
 
-    protected function denyBlogAccess(string $permission, string $resource): void
-    {
-        $this->denyAccessUnlessGranted($permission, $resource);
-    }
 }

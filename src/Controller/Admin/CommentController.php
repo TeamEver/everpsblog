@@ -27,7 +27,7 @@ class CommentController extends AbstractDomainController
 
     public function indexAction(Request $request): Response
     {
-        $this->denyBlogAccess(BlogPermission::READ, BlogPermission::RES_COMMENT);
+        $this->denyAccessUnlessGranted(BlogPermission::READ, BlogPermission::RES_COMMENT);
         return $this->render('@Modules/everpsblog/views/templates/admin/modern/resource.html.twig', [
             'definition' => $this->definitionFactory->build(),
             'data' => $this->dataFactory->build($this->getContextLangId(), $request->query->all()),
@@ -37,7 +37,7 @@ class CommentController extends AbstractDomainController
 
     public function formAction(Request $request, ?int $commentId = null): Response
     {
-        $this->denyBlogAccess($commentId ? BlogPermission::UPDATE : BlogPermission::CREATE, BlogPermission::RES_COMMENT);
+        $this->denyAccessUnlessGranted($commentId ? BlogPermission::UPDATE : BlogPermission::CREATE, BlogPermission::RES_COMMENT);
 
         $form = $this->createForm(CommentType::class, $this->formDataProvider->getData($commentId));
         $form->handleRequest($request);
