@@ -33,6 +33,14 @@
     <meta property="og:site_name" content="{$shop.name|escape:'htmlall':'UTF-8'}">
     <meta property="og:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
     <meta property="og:image" content="{$featured_image|escape:'htmlall':'UTF-8'}">
+    {if isset($hreflang_links) && $hreflang_links}
+        {foreach from=$hreflang_links item=hreflang_link}
+            <link rel="alternate" hreflang="{$hreflang_link.hreflang|escape:'htmlall':'UTF-8'}" href="{$hreflang_link.href|escape:'htmlall':'UTF-8'}">
+        {/foreach}
+        {if isset($hreflang_x_default) && $hreflang_x_default}
+            <link rel="alternate" hreflang="x-default" href="{$hreflang_x_default|escape:'htmlall':'UTF-8'}">
+        {/if}
+    {/if}
     <script type="application/ld+json">
     {
     "@context": "https://schema.org",

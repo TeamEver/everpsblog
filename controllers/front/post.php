@@ -192,6 +192,11 @@ class EverPsBlogpostModuleFrontController extends PostController
     {
         parent::initContent();
         if (Tools::getValue('id_ever_post')) {
+            $this->assignHreflangLinks('post', $this->getLocalizedParamsByLang(
+                'ever_blog_post_lang',
+                'id_ever_post',
+                (int) $this->post->id
+            ));
             $errors = [];
             $success = [];
             $animate = Configuration::get(
