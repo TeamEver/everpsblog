@@ -7,8 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 /** @ORM\Entity @ORM\Table(name="ever_blog_author_product") */
 class AuthorProduct
 {
-    /** @ORM\Id @ORM\Column(name="id_ever_author", type="integer") */
-    private $authorId;
+    /** @ORM\Id @ORM\ManyToOne(targetEntity="Author", inversedBy="products") @ORM\JoinColumn(name="id_ever_author", referencedColumnName="id_ever_author", nullable=false, onDelete="CASCADE") */
+    private $author;
 
     /** @ORM\Id @ORM\Column(name="id_ever_author_product", type="integer") */
     private $productId;
