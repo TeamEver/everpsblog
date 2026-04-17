@@ -6,11 +6,13 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class PostType extends AbstractType
 {
@@ -18,7 +20,7 @@ final class PostType extends AbstractType
     {
         $this->buildContentTab($builder);
         $this->buildSeoTab($builder);
-        $this->buildPublicationTab($builder);
+        $this->buildPublicationTab($builder, $options);
         $this->buildTaxonomyTab($builder);
     }
 
@@ -100,7 +102,7 @@ final class PostType extends AbstractType
         $builder->add($seoTab);
     }
 
-    private function buildPublicationTab(FormBuilderInterface $builder): void
+    private function buildPublicationTab(FormBuilderInterface $builder, array $options): void
     {
         $publicationTab = $builder->create('publication_tab', FormType::class, [
             'inherit_data' => true,
@@ -139,6 +141,13 @@ final class PostType extends AbstractType
                 'required' => false,
                 'label' => 'Mot de passe',
                 'empty_data' => '',
+            ])
+            ->add('featured_image_file', FileType::class, [
+                'required' => false,
+                'mapped' => false,
+                'label' => 'Image à la une',
+                'help' => $options['featured_image_help'],
+                'help_html' => true,
             ])
         ;
 
@@ -307,5 +316,13 @@ final class PostType extends AbstractType
         }
 
         return $choices;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'featured_image_help' => '',
+        ]);
+        $resolver->setAllowedTypes('featured_image_help', 'string');
     }
 }
