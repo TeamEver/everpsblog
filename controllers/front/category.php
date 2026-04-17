@@ -90,6 +90,11 @@ class EverPsBlogcategoryModuleFrontController extends CategoryController
     {
         parent::initContent();
         if (Tools::getValue('id_ever_category')) {
+            $this->assignHreflangLinks('category', $this->getLocalizedParamsByLang(
+                'ever_blog_category_lang',
+                'id_ever_category',
+                (int) $this->category->id
+            ));
             $this->post_number = EverPsBlogPost::countPostsByCategory(
                 (int) Tools::getValue('id_ever_category'),
                 (int) $this->context->language->id,

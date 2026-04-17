@@ -81,6 +81,11 @@ class EverPsBlogtagModuleFrontController extends TagController
     {
         parent::initContent();
         if (Tools::getValue('id_ever_tag')) {
+            $this->assignHreflangLinks('tag', $this->getLocalizedParamsByLang(
+                'ever_blog_tag_lang',
+                'id_ever_tag',
+                (int) $this->tag->id
+            ));
             $this->post_number = EverPsBlogPost::countPostsByTag(
                 (int) Tools::getValue('id_ever_tag'),
                 (int) $this->context->language->id,

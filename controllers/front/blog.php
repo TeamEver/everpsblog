@@ -136,6 +136,7 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
     public function initContent()
     {
         parent::initContent();
+        $this->assignHreflangLinks('blog');
         $this->post_number = $this->getPostRowsCount(
             (int) $this->context->language->id,
             (int) $this->context->shop->id

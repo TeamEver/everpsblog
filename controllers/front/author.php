@@ -84,6 +84,11 @@ class EverPsBlogauthorModuleFrontController extends AuthorController
     {
         parent::initContent();
         if (Tools::getValue('id_ever_author')) {
+            $this->assignHreflangLinks('author', $this->getLocalizedParamsByLang(
+                'ever_blog_author_lang',
+                'id_ever_author',
+                (int) $this->author->id
+            ));
             $this->post_number = EverPsBlogPost::countPostsByAuthor(
                 (int) Tools::getValue('id_ever_author'),
                 (int) $this->context->language->id,

@@ -241,4 +241,121 @@ abstract class AbstractFrontController extends \ModuleFrontController
         header('Cache-Control: no-cache');
         \Tools::redirectLink($finalUrl);
     }
+
+    /**
+     * @param array<int, array<string, int|string>> $localizedParamsByLang
+     */
+    protected function assignHreflangLinks(string $controllerName, array $localizedParamsByLang = []): void
+    {
+        $idShop = (int) $this->context->shop->id;
+        $defaultLangId = (int) \Configuration::get('PS_LANG_DEFAULT');
+        $currentPage = (int) \Tools::getValue('page');
+        $hreflangLinks = [];
+        $xDefaultHref = '';
+
+        foreach (\Language::getLanguages(true, $idShop) as $language) {
+            $idLang = (int) ($language['id_lang'] ?? 0);
+            if ($idLang <= 0) {
+                continue;
+            }
+
+            $params = $localizedParamsByLang[$idLang] ?? [];
+            if ($currentPage > 1) {
+                $params['page'] = $currentPage;
+            }
+
+            $href = $this->context->link->getModuleLink(
+                $this->module->name,
+                $controllerName,
+                $params,
+                true,
+                $idLang,
+                $idShop
+            );
+
+            if (!$href) {
+                continue;
+            }
+
+            $hreflangLinks[] = [
+                'hreflang' => $this->formatHreflangCode((array) $language),
+                'href' => $href,
+            ];
+
+            if ($idLang === $defaultLangId) {
+                $xDefaultHref = $href;
+            }
+        }
+
+        if (!$xDefaultHref && !empty($hreflangLinks[0]['href'])) {
+            $xDefaultHref = (string) $hreflangLinks[0]['href'];
+        }
+
+        $this->context->smarty->assign([
+            'hreflang_links' => $hreflangLinks,
+            'hreflang_x_default' => $xDefaultHref,
+        ]);
+    }
+
+    /**
+     * @return array<int, array<string, int|string>>
+     */
+    protected function getLocalizedParamsByLang(string $langTable, string $idColumn, int $resourceId): array
+    {
+        if ($resourceId <= 0) {
+            return [];
+        }
+
+        $sql = sprintf(
+            'SELECT `id_lang`, `%s`, `link_rewrite`
+            FROM `%s%s`
+            WHERE `%s` = %d',
+            \pSQL($idColumn),
+            _DB_PREFIX_,
+            \pSQL($langTable),
+            \pSQL($idColumn),
+            $resourceId
+        );
+
+        $rows = \Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+        if (!$rows) {
+            return [];
+        }
+
+        $paramsByLang = [];
+        foreach ($rows as $row) {
+            $idLang = (int) ($row['id_lang'] ?? 0);
+            $idValue = (int) ($row[$idColumn] ?? 0);
+            $linkRewrite = (string) ($row['link_rewrite'] ?? '');
+
+            if ($idLang <= 0 || $idValue <= 0 || $linkRewrite === '') {
+                continue;
+            }
+
+            $paramsByLang[$idLang] = [
+                $idColumn => $idValue,
+                'link_rewrite' => $linkRewrite,
+            ];
+        }
+
+        return $paramsByLang;
+    }
+
+    private function formatHreflangCode(array $language): string
+    {
+        $locale = (string) ($language['locale'] ?? $language['language_code'] ?? $language['iso_code'] ?? '');
+        $locale = str_replace('_', '-', $locale);
+        $parts = array_values(array_filter(explode('-', $locale)));
+
+        if (empty($parts)) {
+            return 'x-default';
+        }
+
+        $code = strtolower((string) $parts[0]);
+        if (!empty($parts[1])) {
+            $code .= '-' . strtoupper((string) $parts[1]);
+        }
+
+        return $code;
+    }
 }
