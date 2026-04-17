@@ -1,9 +1,18 @@
+everpsblog_admin_dashboard:
+  path: /everpsblog
+  methods: [GET]
+  defaults:
+    _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\ConfigurationController::indexAction'
+    _legacy_controller: AdminEverPsBlog
+    _legacy_link: AdminEverPsBlog
+
 everpsblog_admin_post:
   path: /everpsblog/post
   methods: [GET]
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\PostController::indexAction'
     _legacy_controller: AdminEverPsBlogPost
+    _legacy_link: AdminEverPsBlogPost
 
 everpsblog_admin_post_form:
   path: /everpsblog/post/new
@@ -11,6 +20,7 @@ everpsblog_admin_post_form:
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\PostController::formAction'
     _legacy_controller: AdminEverPsBlogPost
+    _legacy_link: AdminEverPsBlogPost:add
 
 everpsblog_admin_post_edit:
   path: /everpsblog/post/{postId}/edit
@@ -18,6 +28,7 @@ everpsblog_admin_post_edit:
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\PostController::formAction'
     _legacy_controller: AdminEverPsBlogPost
+    _legacy_link: AdminEverPsBlogPost:edit
   requirements:
     postId: '\d+'
 
@@ -52,6 +63,7 @@ everpsblog_admin_category:
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\CategoryController::indexAction'
     _legacy_controller: AdminEverPsBlogCategory
+    _legacy_link: AdminEverPsBlogCategory
 
 everpsblog_admin_category_form:
   path: /everpsblog/category/new
@@ -59,6 +71,7 @@ everpsblog_admin_category_form:
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\CategoryController::formAction'
     _legacy_controller: AdminEverPsBlogCategory
+    _legacy_link: AdminEverPsBlogCategory:add
 
 everpsblog_admin_category_edit:
   path: /everpsblog/category/{categoryId}/edit
@@ -66,6 +79,7 @@ everpsblog_admin_category_edit:
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\CategoryController::formAction'
     _legacy_controller: AdminEverPsBlogCategory
+    _legacy_link: AdminEverPsBlogCategory:edit
   requirements:
     categoryId: '\d+'
 
@@ -75,6 +89,7 @@ everpsblog_admin_tag:
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\TagController::indexAction'
     _legacy_controller: AdminEverPsBlogTag
+    _legacy_link: AdminEverPsBlogTag
 
 everpsblog_admin_tag_form:
   path: /everpsblog/tag/new
@@ -82,6 +97,7 @@ everpsblog_admin_tag_form:
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\TagController::formAction'
     _legacy_controller: AdminEverPsBlogTag
+    _legacy_link: AdminEverPsBlogTag:add
 
 everpsblog_admin_tag_edit:
   path: /everpsblog/tag/{tagId}/edit
@@ -89,6 +105,7 @@ everpsblog_admin_tag_edit:
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\TagController::formAction'
     _legacy_controller: AdminEverPsBlogTag
+    _legacy_link: AdminEverPsBlogTag:edit
   requirements:
     tagId: '\d+'
 
@@ -98,6 +115,7 @@ everpsblog_admin_author:
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\AuthorController::indexAction'
     _legacy_controller: AdminEverPsBlogAuthor
+    _legacy_link: AdminEverPsBlogAuthor
 
 everpsblog_admin_author_form:
   path: /everpsblog/author/new
@@ -105,6 +123,7 @@ everpsblog_admin_author_form:
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\AuthorController::formAction'
     _legacy_controller: AdminEverPsBlogAuthor
+    _legacy_link: AdminEverPsBlogAuthor:add
 
 everpsblog_admin_author_edit:
   path: /everpsblog/author/{authorId}/edit
@@ -112,6 +131,7 @@ everpsblog_admin_author_edit:
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\AuthorController::formAction'
     _legacy_controller: AdminEverPsBlogAuthor
+    _legacy_link: AdminEverPsBlogAuthor:edit
   requirements:
     authorId: '\d+'
 
@@ -121,6 +141,7 @@ everpsblog_admin_comment:
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\CommentController::indexAction'
     _legacy_controller: AdminEverPsBlogComment
+    _legacy_link: AdminEverPsBlogComment
 
 everpsblog_admin_comment_form:
   path: /everpsblog/comment/new
@@ -128,6 +149,7 @@ everpsblog_admin_comment_form:
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\CommentController::formAction'
     _legacy_controller: AdminEverPsBlogComment
+    _legacy_link: AdminEverPsBlogComment:add
 
 everpsblog_admin_comment_edit:
   path: /everpsblog/comment/{commentId}/edit
@@ -135,5 +157,6 @@ everpsblog_admin_comment_edit:
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\CommentController::formAction'
     _legacy_controller: AdminEverPsBlogComment
+    _legacy_link: AdminEverPsBlogComment:edit
   requirements:
     commentId: '\d+'
