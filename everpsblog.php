@@ -217,6 +217,65 @@ class EverPsBlog extends Module
         return $this->getModuleService('prestashop.module.everpsblog.service.blog_image');
     }
 
+
+    private function getFrontLocalizedCategories($idLang, $idShop)
+    {
+        $sql = new DbQuery();
+        $sql->select('c.id_ever_category, c.is_root_category, cl.title, cl.link_rewrite');
+        $sql->from('ever_blog_category', 'c');
+        $sql->innerJoin('ever_blog_category_lang', 'cl', 'cl.id_ever_category = c.id_ever_category AND cl.id_lang = ' . (int) $idLang);
+        $sql->innerJoin('ever_blog_category_shop', 'cs', 'cs.id_ever_category = c.id_ever_category AND cs.id_shop = ' . (int) $idShop);
+        $sql->where('c.active = 1');
+        $sql->orderBy('cl.title ASC');
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql) ?: [];
+    }
+
+    private function getFrontLocalizedTags($idLang, $idShop)
+    {
+        $sql = new DbQuery();
+        $sql->select('t.id_ever_tag, tl.title, tl.link_rewrite');
+        $sql->from('ever_blog_tag', 't');
+        $sql->innerJoin('ever_blog_tag_lang', 'tl', 'tl.id_ever_tag = t.id_ever_tag AND tl.id_lang = ' . (int) $idLang);
+        $sql->innerJoin('ever_blog_tag_shop', 'ts', 'ts.id_ever_tag = t.id_ever_tag AND ts.id_shop = ' . (int) $idShop);
+        $sql->where('t.active = 1');
+        $sql->orderBy('tl.title ASC');
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql) ?: [];
+    }
+
+    private function getStarredPostsForHome($idLang, $idShop, $limit)
+    {
+        $sql = new DbQuery();
+        $sql->select('p.id_ever_post, p.id_default_category, pl.title, pl.link_rewrite, pl.excerpt, pl.content, dcl.id_ever_category AS default_category_id, dcl.title AS default_category_title, dcl.link_rewrite AS default_category_link_rewrite');
+        $sql->from('ever_blog_post', 'p');
+        $sql->innerJoin('ever_blog_post_lang', 'pl', 'pl.id_ever_post = p.id_ever_post AND pl.id_lang = ' . (int) $idLang);
+        $sql->innerJoin('ever_blog_post_shop', 'ps', 'ps.id_ever_post = p.id_ever_post AND ps.id_shop = ' . (int) $idShop);
+        $sql->leftJoin('ever_blog_category_lang', 'dcl', 'dcl.id_ever_category = p.id_default_category AND dcl.id_lang = ' . (int) $idLang);
+        $sql->where('p.status = "published"');
+        $sql->where('p.starred = 1');
+        $sql->orderBy('p.created_at DESC, p.id_ever_post DESC');
+        $sql->limit((int) $limit);
+
+        $rows = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql) ?: [];
+        $posts = [];
+        foreach ($rows as $row) {
+            $post = (object) $row;
+            if (!empty($row['default_category_id'])) {
+                $post->default_cat_obj = (object) [
+                    'id_ever_category' => (int) $row['default_category_id'],
+                    'title' => $row['default_category_title'],
+                    'link_rewrite' => $row['default_category_link_rewrite'],
+                ];
+            } else {
+                $post->default_cat_obj = null;
+            }
+            $posts[] = $post;
+        }
+
+        return $posts;
+    }
+
     private function getBlogCleanerService()
     {
         return $this->getModuleService('prestashop.module.everpsblog.service.blog_cleaner');
@@ -2331,20 +2390,15 @@ class EverPsBlog extends Module
             [],
             true
         );
-        $tags = EverPsBlogTag::getAllTags(
+        $tags = $this->getFrontLocalizedTags(
             (int) $this->context->language->id,
             (int) $this->context->shop->id
         );
-        $categories = EverPsBlogCategory::getAllCategories(
+        $categories = $this->getFrontLocalizedCategories(
             (int) $this->context->language->id,
             (int) $this->context->shop->id
         );
-        $latest_posts = EverPsBlogPost::getLatestPosts(
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id,
-            0,
-            (int) $post_number
-        );
+        $latest_posts = [];
         $animate = Configuration::get(
             'EVERBLOG_ANIMATE'
         );
@@ -2410,10 +2464,9 @@ class EverPsBlog extends Module
                 [],
                 true
             );
-            $starredPosts = EverPsBlogPost::getStarredPosts(
+            $starredPosts = $this->getStarredPostsForHome(
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id,
-                0,
                 (int) $post_number
             );
             if (!$starredPosts || !count($starredPosts)) {
@@ -2431,7 +2484,7 @@ class EverPsBlog extends Module
                     $post->featured_thumb = $featuredThumb;
                 }
             }
-            $evercategories = EverPsBlogCategory::getAllCategories(
+            $evercategories = $this->getFrontLocalizedCategories(
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id
             );
