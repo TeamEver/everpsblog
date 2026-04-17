@@ -10,6 +10,7 @@ use PrestaShop\Module\Everpsblog\Form\Type\Admin\PostType;
 use PrestaShop\Module\Everpsblog\Grid\Data\PostGridDataFactory;
 use PrestaShop\Module\Everpsblog\Grid\Definition\PostGridDefinitionFactory;
 use PrestaShop\Module\Everpsblog\Service\Audit\SensitiveActionLogger;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -58,12 +59,41 @@ class PostController extends AbstractDomainController
 
     public function formAction(Request $request, ?int $postId = null): Response
     {
-        $form = $this->createForm(PostType::class, $this->formDataProvider->getData($postId));
+        $isEdit = null !== $postId;
+        $csrfTokenId = $isEdit ? 'everpsblog_post_update_' . $postId : 'everpsblog_post_create';
+        $form = $this->createForm(PostType::class, $this->formDataProvider->getData($postId), [
+            'method' => Request::METHOD_POST,
+            'action' => $isEdit
+                ? $this->generateUrl('everpsblog_admin_post_edit', ['postId' => $postId])
+                : $this->generateUrl('everpsblog_admin_post_form'),
+        ]);
         $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $this->validateCsrfToken($request, $csrfTokenId);
+
+            if ($form->isValid()) {
+                $postData = (array) $form->getData();
+
+                try {
+                    $savedPostId = $isEdit
+                        ? $this->commandBus->handle($this->commandAssembler->assembleUpdate((int) $postId, $postData))
+                        : $this->commandBus->handle($this->commandAssembler->assembleCreate($postData));
+
+                    $this->addFlash('success', $isEdit ? 'Article mis à jour.' : 'Article créé.');
+
+                    return $this->redirectToRoute('everpsblog_admin_post_edit', ['postId' => $savedPostId]);
+                } catch (\Throwable $exception) {
+                    $form->addError(new FormError('Impossible d\'enregistrer l\'article.'));
+                    $this->addFlash('error', 'Impossible d\'enregistrer l\'article.');
+                }
+            }
+        }
 
         return $this->render('@Modules/everpsblog/views/templates/admin/modern/form.html.twig', [
             'resource' => 'post',
             'entityId' => $postId,
+            'csrfTokenId' => $csrfTokenId,
             'form' => $form->createView(),
             'currentResource' => 'post',
             'createUrl' => $this->generateUrl('everpsblog_admin_post_form'),
@@ -104,7 +134,11 @@ class PostController extends AbstractDomainController
 
     private function validateCsrfToken(Request $request, string $tokenId): void
     {
-        $token = (string) ($request->request->get('_csrf_token') ?: $request->headers->get('X-CSRF-TOKEN'));
+        $token = (string) (
+            $request->request->get('_csrf_token')
+            ?: $request->request->get('_token')
+            ?: $request->headers->get('X-CSRF-TOKEN')
+        );
 
         if (!$this->isCsrfTokenValid($tokenId, $token)) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');

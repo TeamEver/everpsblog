@@ -16,6 +16,9 @@
       </div>
 
       {{ form_start(form) }}
+      {% if csrfTokenId is defined and csrfTokenId %}
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token(csrfTokenId) }}">
+      {% endif %}
       {{ form_widget(form) }}
       <button type="submit" class="btn btn-primary">Enregistrer</button>
       {{ form_end(form) }}

@@ -16,7 +16,7 @@ everpsblog_admin_post:
 
 everpsblog_admin_post_form:
   path: /everpsblog/post/new
-  methods: [GET]
+  methods: [GET, POST]
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\PostController::formAction'
     _legacy_controller: AdminEverPsBlogPost
@@ -24,7 +24,7 @@ everpsblog_admin_post_form:
 
 everpsblog_admin_post_edit:
   path: /everpsblog/post/{postId}/edit
-  methods: [GET]
+  methods: [GET, POST]
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\PostController::formAction'
     _legacy_controller: AdminEverPsBlogPost
