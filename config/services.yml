@@ -91,6 +91,9 @@ services:
   prestashop.module.everpsblog.service.context_state:
     class: PrestaShop\Module\Everpsblog\Service\ContextStateService
 
+  PrestaShop\Module\Everpsblog\Service\ContextStateService:
+    alias: prestashop.module.everpsblog.service.context_state
+
   prestashop.module.everpsblog.service.blog_image:
     class: PrestaShop\Module\Everpsblog\Service\BlogImageService
     arguments:
