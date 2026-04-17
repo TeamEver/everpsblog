@@ -7,10 +7,6 @@ namespace PrestaShop\Module\Everpsblog\Controller\Front;
 use PrestaShop\PrestaShop\Core\Product\Search\Pagination;
 
 require_once dirname(__DIR__, 3) . '/everpsblog.php';
-require_once dirname(__DIR__, 3) . '/classes/EverPsBlogPost.php';
-require_once dirname(__DIR__, 3) . '/classes/EverPsBlogCategory.php';
-require_once dirname(__DIR__, 3) . '/classes/EverPsBlogTag.php';
-require_once dirname(__DIR__, 3) . '/classes/EverPsBlogAuthor.php';
 
 abstract class AbstractFrontController extends \ModuleFrontController
 {
@@ -86,20 +82,16 @@ abstract class AbstractFrontController extends \ModuleFrontController
 
         switch ($controllerName) {
             case 'post':
-                $post = new \EverPsBlogPost((int) \Tools::getValue('id_ever_post'), (int) $this->context->language->id, (int) $this->context->shop->id);
-                $params = ['id_ever_post' => $post->id, 'link_rewrite' => $post->link_rewrite];
+                $params = $this->resolveCanonicalParams('ever_blog_post_lang', 'id_ever_post', (int) \Tools::getValue('id_ever_post'));
                 break;
             case 'category':
-                $category = new \EverPsBlogCategory((int) \Tools::getValue('id_ever_category'), (int) $this->context->language->id, (int) $this->context->shop->id);
-                $params = ['id_ever_category' => $category->id, 'link_rewrite' => $category->link_rewrite];
+                $params = $this->resolveCanonicalParams('ever_blog_category_lang', 'id_ever_category', (int) \Tools::getValue('id_ever_category'));
                 break;
             case 'tag':
-                $tag = new \EverPsBlogTag((int) \Tools::getValue('id_ever_tag'), (int) $this->context->language->id, (int) $this->context->shop->id);
-                $params = ['id_ever_tag' => $tag->id, 'link_rewrite' => $tag->link_rewrite];
+                $params = $this->resolveCanonicalParams('ever_blog_tag_lang', 'id_ever_tag', (int) \Tools::getValue('id_ever_tag'));
                 break;
             case 'author':
-                $author = new \EverPsBlogAuthor((int) \Tools::getValue('id_ever_author'), (int) $this->context->language->id, (int) $this->context->shop->id);
-                $params = ['id_ever_author' => $author->id, 'link_rewrite' => $author->link_rewrite];
+                $params = $this->resolveCanonicalParams('ever_blog_author_lang', 'id_ever_author', (int) \Tools::getValue('id_ever_author'));
                 break;
         }
 
@@ -113,6 +105,37 @@ abstract class AbstractFrontController extends \ModuleFrontController
 
             $this->canonicalRedirection($canonicalUrl);
         }
+    }
+
+
+    /**
+     * @return array<string, int|string>
+     */
+    private function resolveCanonicalParams(string $table, string $idColumn, int $resourceId): array
+    {
+        if ($resourceId <= 0) {
+            return [];
+        }
+
+        $sql = sprintf(
+            'SELECT `%s`, `link_rewrite` FROM `%s%s` WHERE `%s` = %d AND `id_lang` = %d',
+            \pSQL($idColumn),
+            _DB_PREFIX_,
+            \pSQL($table),
+            \pSQL($idColumn),
+            $resourceId,
+            (int) $this->context->language->id
+        );
+
+        $row = \Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
+        if (!is_array($row) || empty($row[$idColumn]) || empty($row['link_rewrite'])) {
+            return [];
+        }
+
+        return [
+            $idColumn => (int) $row[$idColumn],
+            'link_rewrite' => (string) $row['link_rewrite'],
+        ];
     }
 
     protected function getTemplateVarPagination($total = 0)
