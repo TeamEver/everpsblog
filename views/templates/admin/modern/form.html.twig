@@ -208,7 +208,9 @@
     <div class="tab-pane fade" id="ever-pane-seo" role="tabpanel">
       {% for field in everBlogSections.seo %}
         {% set fieldName = field.vars.name %}
-        <div class="ever-seo-field {% if fieldName starts with 'meta_title_' %}ever-meta-title{% elseif fieldName starts with 'meta_description_' %}ever-meta-description{% elseif fieldName starts with 'link_rewrite_' %}ever-slug-field{% endif %}">
+        {% set fieldLangParts = fieldName|split('_') %}
+        {% set fieldLangId = fieldLangParts|last matches '/^\d+$/' ? fieldLangParts|last : null %}
+        <div class="ever-seo-field {% if fieldName starts with 'meta_title_' %}ever-meta-title{% elseif fieldName starts with 'meta_description_' %}ever-meta-description{% elseif fieldName starts with 'link_rewrite_' %}ever-slug-field{% endif %}"{% if fieldLangId %} data-lang-id="{{ fieldLangId }}"{% endif %}>
           {{ form_row(field) }}
           {% if fieldName starts with 'meta_title_' %}
             <small class="form-text text-muted">
@@ -465,6 +467,7 @@
       var langSwitchers = root.querySelectorAll('.ever-lang-switch');
       var langErrorItems = root.querySelectorAll('.ever-lang-error-item');
       var fieldsWithLang = root.querySelectorAll('[name]');
+      var seoFieldBlocks = root.querySelectorAll('.ever-seo-field[data-lang-id]');
 
       function setActiveLang(langId) {
         Array.prototype.forEach.call(langSwitchers, function (btn) {
@@ -479,6 +482,10 @@
           }
 
           wrapper.style.display = lang === langId ? '' : 'none';
+        });
+
+        Array.prototype.forEach.call(seoFieldBlocks, function (block) {
+          block.style.display = block.getAttribute('data-lang-id') === langId ? '' : 'none';
         });
       }
 
