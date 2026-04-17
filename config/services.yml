@@ -1,61 +1,20 @@
 services:
   _defaults:
     autowire: true
-    autoconfigure: false
+    autoconfigure: true
     public: false
 
+  # ─────────────────────────────────────────────
+  # COMMAND
+  # ─────────────────────────────────────────────
   prestashop.module.everpsblog.command.run_cron:
     class: PrestaShop\Module\Everpsblog\Command\RunCronCommand
     tags:
       - { name: 'console.command' }
 
-  prestashop.module.everpsblog.blog.post_rules_applier:
-    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\PostRulesApplier
-
-  prestashop.module.everpsblog.blog.post_data_builder:
-    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\PostCommandDataBuilder
-    arguments:
-      - '@=service("prestashop.adapter.legacy.context").getContext().shop.id'
-      - '@=service("prestashop.adapter.legacy.configuration").get("EVERBLOG_UNCLASSED_ID")'
-
-  prestashop.module.everpsblog.blog.create_post_handler:
-    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\CreatePostHandler
-    arguments:
-      - '@prestashop.module.everpsblog.blog.post_rules_applier'
-      - '@prestashop.module.everpsblog.blog.repository.post_write'
-
-  prestashop.module.everpsblog.blog.update_post_handler:
-    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\UpdatePostHandler
-    arguments:
-      - '@doctrine.orm.entity_manager'
-      - '@prestashop.module.everpsblog.blog.post_rules_applier'
-      - '@prestashop.module.everpsblog.blog.repository.post_write'
-
-  prestashop.module.everpsblog.blog.delete_post_handler:
-    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\DeletePostHandler
-    arguments:
-      - '@doctrine.orm.entity_manager'
-      - '@prestashop.module.everpsblog.blog.repository.post_write'
-
-
-  prestashop.module.everpsblog.blog.repository.post_read:
-    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository\PostReadRepository
-    arguments:
-      - '@doctrine.orm.entity_manager'
-
-  prestashop.module.everpsblog.blog.repository.post_write:
-    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository\PostWriteRepository
-    arguments:
-      - '@doctrine.orm.entity_manager'
-
-  prestashop.module.everpsblog.blog.command_bus:
-    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandBus\InMemoryCommandBus
-    arguments:
-      -
-        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\CreatePostCommand: '@prestashop.module.everpsblog.blog.create_post_handler'
-        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\UpdatePostCommand: '@prestashop.module.everpsblog.blog.update_post_handler'
-        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\DeletePostCommand: '@prestashop.module.everpsblog.blog.delete_post_handler'
-
+  # ─────────────────────────────────────────────
+  # REPOSITORIES (Doctrine)
+  # ─────────────────────────────────────────────
   prestashop.module.everpsblog.repository.post:
     class: PrestaShop\Module\Everpsblog\Repository\PostRepository
     factory: ['@doctrine.orm.entity_manager', getRepository]
@@ -86,6 +45,7 @@ services:
     factory: ['@doctrine.orm.entity_manager', getRepository]
     arguments: ['PrestaShop\Module\Everpsblog\Entity\Image']
 
+  # Alias FQCN
   PrestaShop\Module\Everpsblog\Repository\PostRepository: '@prestashop.module.everpsblog.repository.post'
   PrestaShop\Module\Everpsblog\Repository\CategoryRepository: '@prestashop.module.everpsblog.repository.category'
   PrestaShop\Module\Everpsblog\Repository\TagRepository: '@prestashop.module.everpsblog.repository.tag'
@@ -93,157 +53,60 @@ services:
   PrestaShop\Module\Everpsblog\Repository\CommentRepository: '@prestashop.module.everpsblog.repository.comment'
   PrestaShop\Module\Everpsblog\Repository\ImageRepository: '@prestashop.module.everpsblog.repository.image'
 
+  # ─────────────────────────────────────────────
+  # ADAPTERS / CONTEXT
+  # ─────────────────────────────────────────────
   prestashop.module.everpsblog.adapter.legacy_context:
     class: PrestaShop\Module\Everpsblog\Adapter\LegacyContextAdapter
 
   prestashop.module.everpsblog.adapter.legacy_configuration:
     class: PrestaShop\Module\Everpsblog\Adapter\LegacyConfigurationAdapter
 
-  prestashop.module.everpsblog.adapter.legacy_shop:
-    class: PrestaShop\Module\Everpsblog\Adapter\LegacyShopAdapter
-
-  prestashop.module.everpsblog.adapter.legacy_language:
-    class: PrestaShop\Module\Everpsblog\Adapter\LegacyLanguageAdapter
-
   prestashop.module.everpsblog.service.context_state:
     class: PrestaShop\Module\Everpsblog\Service\ContextStateService
     arguments:
       - '@prestashop.module.everpsblog.adapter.legacy_context'
 
-  prestashop.module.everpsblog.blog.validator.post_request:
-    class: PrestaShop\Module\Everpsblog\Application\Blog\PostRequestValidator
-
-  prestashop.module.everpsblog.blog.assembler.post_command:
-    class: PrestaShop\Module\Everpsblog\Application\Blog\PostCommandAssembler
-    arguments:
-      - '@prestashop.module.everpsblog.blog.post_data_builder'
-      - '@prestashop.module.everpsblog.blog.validator.post_request'
-
-  prestashop.module.everpsblog.blog.image_uploader:
-    class: PrestaShop\Module\Everpsblog\Service\ImageUploader
-
   PrestaShop\Module\Everpsblog\Service\ContextStateService: '@prestashop.module.everpsblog.service.context_state'
 
-  prestashop.module.everpsblog.service.blog_install:
-    class: PrestaShop\Module\Everpsblog\Service\BlogInstallService
-
+  # ─────────────────────────────────────────────
+  # SERVICES
+  # ─────────────────────────────────────────────
   prestashop.module.everpsblog.service.blog_image:
     class: PrestaShop\Module\Everpsblog\Service\BlogImageService
     arguments:
       - '@cache.app'
 
-  prestashop.module.everpsblog.service.blog_cleaner:
-    class: PrestaShop\Module\Everpsblog\Service\BlogCleanerService
-
-  prestashop.module.everpsblog.service.blog_sort_order:
-    class: PrestaShop\Module\Everpsblog\Service\BlogSortOrderService
-
-  prestashop.module.everpsblog.service.blog_taxonomy:
-    class: PrestaShop\Module\Everpsblog\Service\BlogTaxonomyService
-    arguments:
-      - '@cache.app'
-
   prestashop.module.everpsblog.service.blog_sitemap:
     class: PrestaShop\Module\Everpsblog\Service\BlogSitemapService
+    public: true
 
+  prestashop.module.everpsblog.blog.image_uploader:
+    class: PrestaShop\Module\Everpsblog\Service\ImageUploader
 
-  prestashop.module.everpsblog.service.upgrade.image_table_migration:
-    class: PrestaShop\Module\Everpsblog\Service\Upgrade\UpgradeImageTableMigrationService
-
-  prestashop.module.everpsblog.service.upgrade.image_filesystem_migration:
-    class: PrestaShop\Module\Everpsblog\Service\Upgrade\UpgradeImageFilesystemMigrationService
-
-  prestashop.module.everpsblog.service.upgrade.v301_migration:
-    class: PrestaShop\Module\Everpsblog\Service\Upgrade\Upgrade301MigrationService
-
-  PrestaShop\Module\Everpsblog\Service\Upgrade\UpgradeImageTableMigrationService: '@prestashop.module.everpsblog.service.upgrade.image_table_migration'
-  PrestaShop\Module\Everpsblog\Service\Upgrade\UpgradeImageFilesystemMigrationService: '@prestashop.module.everpsblog.service.upgrade.image_filesystem_migration'
-  PrestaShop\Module\Everpsblog\Service\Upgrade\Upgrade301MigrationService: '@prestashop.module.everpsblog.service.upgrade.v301_migration'
-  prestashop.module.everpsblog.service.legacy_import_adapter:
-    class: PrestaShop\Module\Everpsblog\Service\LegacyImportAdapter
+  # ─────────────────────────────────────────────
+  # COMMAND BUS
+  # ─────────────────────────────────────────────
+  prestashop.module.everpsblog.blog.command_bus:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandBus\InMemoryCommandBus
     arguments:
-      - '@prestashop.module.everpsblog.service.blog_image'
+      -
+        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\CreatePostCommand: '@prestashop.module.everpsblog.blog.create_post_handler'
+        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\UpdatePostCommand: '@prestashop.module.everpsblog.blog.update_post_handler'
+        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\DeletePostCommand: '@prestashop.module.everpsblog.blog.delete_post_handler'
 
-  PrestaShop\Module\Everpsblog\Service\BlogInstallService: '@prestashop.module.everpsblog.service.blog_install'
-  PrestaShop\Module\Everpsblog\Service\BlogImageService: '@prestashop.module.everpsblog.service.blog_image'
-  PrestaShop\Module\Everpsblog\Service\BlogCleanerService: '@prestashop.module.everpsblog.service.blog_cleaner'
-  PrestaShop\Module\Everpsblog\Service\BlogSortOrderService: '@prestashop.module.everpsblog.service.blog_sort_order'
-  PrestaShop\Module\Everpsblog\Service\BlogTaxonomyService: '@prestashop.module.everpsblog.service.blog_taxonomy'
-  PrestaShop\Module\Everpsblog\Service\BlogSitemapService: '@prestashop.module.everpsblog.service.blog_sitemap'
-  PrestaShop\Module\Everpsblog\Service\LegacyImportAdapter: '@prestashop.module.everpsblog.service.legacy_import_adapter'
-  PrestaShop\Module\Everpsblog\Application\Blog\PostCommandAssembler: '@prestashop.module.everpsblog.blog.assembler.post_command'
-  PrestaShop\Module\Everpsblog\Application\Blog\PostRequestValidator: '@prestashop.module.everpsblog.blog.validator.post_request'
-  PrestaShop\Module\Everpsblog\Service\ImageUploader: '@prestashop.module.everpsblog.blog.image_uploader'
-
-  PrestaShop\Module\Everpsblog\Service\AdminRouteSigner: ~
-
-
-  prestashop.module.everpsblog.security.permission_provider:
-    class: PrestaShop\Module\Everpsblog\Service\Security\BackOfficePermissionProvider
-
-  prestashop.module.everpsblog.security.resource_voter:
-    class: PrestaShop\Module\Everpsblog\Security\BlogResourceVoter
-    arguments:
-      - '@prestashop.module.everpsblog.security.permission_provider'
+  # ─────────────────────────────────────────────
+  # CONTROLLERS (AUTOLOAD SAFE)
+  # ─────────────────────────────────────────────
+  PrestaShop\Module\Everpsblog\Controller\Admin\:
+    resource: '../src/Controller/Admin/*'
+    public: true
     tags:
-      - { name: security.voter }
+      - { name: controller.service_arguments }
 
-  prestashop.module.everpsblog.audit.sensitive_action_logger:
-    class: PrestaShop\Module\Everpsblog\Service\Audit\SensitiveActionLogger
-    arguments:
-      - '@logger'
-
-  PrestaShop\Module\Everpsblog\Service\Security\BackOfficePermissionProvider: '@prestashop.module.everpsblog.security.permission_provider'
-  PrestaShop\Module\Everpsblog\Service\Audit\SensitiveActionLogger: '@prestashop.module.everpsblog.audit.sensitive_action_logger'
-
-  prestashop.module.everpsblog.controller.admin.post:
-    class: PrestaShop\Module\Everpsblog\Controller\Admin\PostController
-    arguments:
-      - '@prestashop.module.everpsblog.service.context_state'
-      - '@prestashop.module.everpsblog.blog.command_bus'
-      - '@prestashop.module.everpsblog.blog.assembler.post_command'
-      - '@PrestaShop\Module\Everpsblog\Grid\Definition\PostGridDefinitionFactory'
-      - '@PrestaShop\Module\Everpsblog\Grid\Data\PostGridDataFactory'
-      - '@PrestaShop\Module\Everpsblog\Form\DataProvider\PostFormDataProvider'
-      - '@prestashop.module.everpsblog.audit.sensitive_action_logger'
-    public: true
-
-  prestashop.module.everpsblog.controller.admin.category:
-    class: PrestaShop\Module\Everpsblog\Controller\Admin\CategoryController
-    arguments:
-      - '@prestashop.module.everpsblog.service.context_state'
-      - '@PrestaShop\Module\Everpsblog\Grid\Definition\CategoryGridDefinitionFactory'
-      - '@PrestaShop\Module\Everpsblog\Grid\Data\CategoryGridDataFactory'
-      - '@PrestaShop\Module\Everpsblog\Form\DataProvider\CategoryFormDataProvider'
-    public: true
-
-  prestashop.module.everpsblog.controller.admin.tag:
-    class: PrestaShop\Module\Everpsblog\Controller\Admin\TagController
-    arguments:
-      - '@prestashop.module.everpsblog.service.context_state'
-      - '@PrestaShop\Module\Everpsblog\Grid\Definition\TagGridDefinitionFactory'
-      - '@PrestaShop\Module\Everpsblog\Grid\Data\TagGridDataFactory'
-      - '@PrestaShop\Module\Everpsblog\Form\DataProvider\TagFormDataProvider'
-    public: true
-
-  prestashop.module.everpsblog.controller.admin.author:
-    class: PrestaShop\Module\Everpsblog\Controller\Admin\AuthorController
-    arguments:
-      - '@prestashop.module.everpsblog.service.context_state'
-      - '@PrestaShop\Module\Everpsblog\Grid\Definition\AuthorGridDefinitionFactory'
-      - '@PrestaShop\Module\Everpsblog\Grid\Data\AuthorGridDataFactory'
-      - '@PrestaShop\Module\Everpsblog\Form\DataProvider\AuthorFormDataProvider'
-    public: true
-
-  prestashop.module.everpsblog.controller.admin.comment:
-    class: PrestaShop\Module\Everpsblog\Controller\Admin\CommentController
-    arguments:
-      - '@prestashop.module.everpsblog.service.context_state'
-      - '@PrestaShop\Module\Everpsblog\Grid\Definition\CommentGridDefinitionFactory'
-      - '@PrestaShop\Module\Everpsblog\Grid\Data\CommentGridDataFactory'
-      - '@PrestaShop\Module\Everpsblog\Form\DataProvider\CommentFormDataProvider'
-    public: true
-
+  # ─────────────────────────────────────────────
+  # GRID / FORM / SECURITY (AUTOLOAD)
+  # ─────────────────────────────────────────────
   PrestaShop\Module\Everpsblog\Grid\Definition\:
     resource: '../src/Grid/Definition/*'
 
@@ -255,12 +118,6 @@ services:
 
   PrestaShop\Module\Everpsblog\Form\DataProvider\:
     resource: '../src/Form/DataProvider/*'
-
-  PrestaShop\Module\Everpsblog\Adapter\:
-    resource: '../src/Adapter/*'
-
-  PrestaShop\Module\Everpsblog\Application\Blog\:
-    resource: '../src/Application/Blog/*'
 
   PrestaShop\Module\Everpsblog\Security\:
     resource: '../src/Security/*'
