@@ -220,7 +220,7 @@
             </small>
           {% elseif fieldName starts with 'link_rewrite_' %}
             <div class="d-flex justify-content-end mb-2">
-              <button type="button" class="btn btn-sm btn-outline-secondary ever-generate-slug" data-target="{{ field.vars.id }}" data-lang-id="{{ fieldName|split('_')|last }}">
+              <button type="button" class="btn btn-sm btn-outline-secondary ever-generate-slug" data-target="{{ field.vars.id }}" data-lang-id="{{ field.vars.id|split('_')|last }}">
                 Auto-générer le slug
               </button>
             </div>
@@ -402,9 +402,21 @@
           .replace(/-+$/, '');
       }
 
-      function detectLangForField(fieldName) {
-        var match = fieldName.match(/_(\d+)$/);
+      function extractLangId(value) {
+        if (!value) {
+          return null;
+        }
+
+        var match = value.match(/_(\d+)(?:\]|$)/);
         return match ? match[1] : null;
+      }
+
+      function detectLangForField(field) {
+        if (!field) {
+          return null;
+        }
+
+        return extractLangId(field.getAttribute('name') || '') || extractLangId(field.id || '');
       }
 
       function updateCounter(input, counter) {
@@ -432,7 +444,7 @@
       Array.prototype.forEach.call(slugButtons, function (btn) {
         btn.addEventListener('click', function () {
           var target = getInput(btn.getAttribute('data-target'));
-          var langId = btn.getAttribute('data-lang-id');
+          var langId = extractLangId(btn.getAttribute('data-lang-id')) || btn.getAttribute('data-lang-id');
           var titleInput = getInputBySelector('[id$="_title_' + langId + '"]')
             || getInputBySelector('[id$="_meta_title_' + langId + '"]')
             || getInputBySelector('[id$="_nickhandle"]');
@@ -460,7 +472,7 @@
         });
 
         Array.prototype.forEach.call(fieldsWithLang, function (field) {
-          var lang = detectLangForField(field.getAttribute('name') || '');
+          var lang = detectLangForField(field);
           var wrapper = field.closest('.form-group, .form-control-group, .mb-3') || field.parentNode;
           if (!lang || !wrapper) {
             return;
@@ -475,7 +487,7 @@
           var langId = item.getAttribute('data-lang-id');
           var invalid = false;
           Array.prototype.forEach.call(fieldsWithLang, function (field) {
-            var lang = detectLangForField(field.getAttribute('name') || '');
+            var lang = detectLangForField(field);
             if (lang !== langId) {
               return;
             }
