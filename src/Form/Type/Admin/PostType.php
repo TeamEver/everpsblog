@@ -5,10 +5,8 @@ namespace PrestaShop\Module\Everpsblog\Form\Type\Admin;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -127,9 +125,11 @@ final class PostType extends AbstractType
                 'html5' => false,
                 'format' => 'yyyy-MM-dd HH:mm:ss',
             ])
-            ->add('id_author', IntegerType::class, [
+            ->add('id_author', ChoiceType::class, [
                 'required' => false,
-                'label' => 'ID auteur',
+                'label' => 'Auteur',
+                'placeholder' => 'Sélectionnez un auteur',
+                'choices' => $this->getAuthorChoices(),
             ])
             ->add('starred', CheckboxType::class, [
                 'required' => false,
@@ -154,44 +154,158 @@ final class PostType extends AbstractType
         ]);
 
         $taxonomyTab
-            ->add('id_default_category', IntegerType::class, [
+            ->add('id_default_category', ChoiceType::class, [
                 'required' => false,
-                'label' => 'Catégorie par défaut (ID)',
+                'label' => 'Catégorie par défaut',
+                'placeholder' => 'Sélectionnez une catégorie',
+                'choices' => $this->getCategoryChoices(),
             ])
-            ->add('post_categories', CollectionType::class, [
+            ->add('post_categories', ChoiceType::class, [
                 'required' => false,
                 'label' => 'Catégories',
-                'entry_type' => IntegerType::class,
-                'allow_add' => true,
-                'allow_delete' => true,
-                'prototype' => true,
+                'choices' => $this->getCategoryChoices(),
+                'multiple' => true,
+                'expanded' => false,
+                'attr' => ['data-ever-tagify' => '1'],
             ])
-            ->add('post_tags', CollectionType::class, [
+            ->add('post_tags', ChoiceType::class, [
                 'required' => false,
                 'label' => 'Tags',
-                'entry_type' => TextType::class,
-                'allow_add' => true,
-                'allow_delete' => true,
-                'prototype' => true,
+                'choices' => $this->getTagChoices(),
+                'multiple' => true,
+                'expanded' => false,
+                'attr' => ['data-ever-tagify' => '1'],
             ])
-            ->add('post_products', CollectionType::class, [
+            ->add('post_products', ChoiceType::class, [
                 'required' => false,
                 'label' => 'Produits liés',
-                'entry_type' => IntegerType::class,
-                'allow_add' => true,
-                'allow_delete' => true,
-                'prototype' => true,
+                'choices' => $this->getProductChoices(),
+                'multiple' => true,
+                'expanded' => false,
+                'attr' => ['data-ever-tagify' => '1'],
             ])
-            ->add('allowed_groups', CollectionType::class, [
+            ->add('allowed_groups', ChoiceType::class, [
                 'required' => false,
                 'label' => 'Groupes autorisés',
-                'entry_type' => IntegerType::class,
-                'allow_add' => true,
-                'allow_delete' => true,
-                'prototype' => true,
+                'choices' => $this->getGroupChoices(),
+                'multiple' => true,
+                'expanded' => true,
             ])
         ;
 
         $builder->add($taxonomyTab);
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function getAuthorChoices(): array
+    {
+        $rows = \Db::getInstance()->executeS(
+            'SELECT a.id_ever_author, al.meta_title
+            FROM `' . _DB_PREFIX_ . 'ever_blog_author` a
+            LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_author_lang` al ON (al.id_ever_author = a.id_ever_author AND al.id_lang = ' . (int) \Context::getContext()->language->id . ')
+            WHERE a.active = 1
+            ORDER BY a.id_ever_author ASC'
+        ) ?: [];
+
+        $choices = [];
+        foreach ($rows as $row) {
+            $id = (int) $row['id_ever_author'];
+            $label = trim((string) ($row['meta_title'] ?? ''));
+            $choices[$label ?: sprintf('Auteur #%d', $id)] = $id;
+        }
+
+        return $choices;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function getCategoryChoices(): array
+    {
+        $rows = \Db::getInstance()->executeS(
+            'SELECT c.id_ever_category, cl.title
+            FROM `' . _DB_PREFIX_ . 'ever_blog_category` c
+            LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category_lang` cl ON (cl.id_ever_category = c.id_ever_category AND cl.id_lang = ' . (int) \Context::getContext()->language->id . ')
+            WHERE c.active = 1
+            ORDER BY c.id_ever_category ASC'
+        ) ?: [];
+
+        $choices = [];
+        foreach ($rows as $row) {
+            $id = (int) $row['id_ever_category'];
+            $label = trim((string) ($row['title'] ?? ''));
+            $choices[$label ?: sprintf('Catégorie #%d', $id)] = $id;
+        }
+
+        return $choices;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function getTagChoices(): array
+    {
+        $rows = \Db::getInstance()->executeS(
+            'SELECT t.id_ever_tag, tl.title
+            FROM `' . _DB_PREFIX_ . 'ever_blog_tag` t
+            LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_tag_lang` tl ON (tl.id_ever_tag = t.id_ever_tag AND tl.id_lang = ' . (int) \Context::getContext()->language->id . ')
+            WHERE t.active = 1
+            ORDER BY t.id_ever_tag ASC'
+        ) ?: [];
+
+        $choices = [];
+        foreach ($rows as $row) {
+            $id = (int) $row['id_ever_tag'];
+            $label = trim((string) ($row['title'] ?? ''));
+            $choices[$label ?: sprintf('Tag #%d', $id)] = $id;
+        }
+
+        return $choices;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function getProductChoices(): array
+    {
+        $rows = \Db::getInstance()->executeS(
+            'SELECT p.id_product, pl.name
+            FROM `' . _DB_PREFIX_ . 'product` p
+            LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl ON (pl.id_product = p.id_product AND pl.id_lang = ' . (int) \Context::getContext()->language->id . ' AND pl.id_shop = ' . (int) \Context::getContext()->shop->id . ')
+            ORDER BY p.id_product DESC
+            LIMIT 500'
+        ) ?: [];
+
+        $choices = [];
+        foreach ($rows as $row) {
+            $id = (int) $row['id_product'];
+            $label = trim((string) ($row['name'] ?? ''));
+            $choices[$label ?: sprintf('Produit #%d', $id)] = $id;
+        }
+
+        return $choices;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function getGroupChoices(): array
+    {
+        $groups = \Group::getGroups((int) \Context::getContext()->language->id) ?: [];
+        $choices = [];
+
+        foreach ($groups as $group) {
+            $id = (int) ($group['id_group'] ?? 0);
+            if ($id <= 0) {
+                continue;
+            }
+
+            $label = trim((string) ($group['name'] ?? ''));
+            $choices[$label ?: sprintf('Groupe #%d', $id)] = $id;
+        }
+
+        return $choices;
     }
 }
