@@ -36,7 +36,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '6.0.4';
+        $this->version = '6.0.5';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -85,27 +85,27 @@ class EverPsBlog extends Module
                 $this->l('Blog')
             )
             && $this->installModuleTab(
-                'everpsblog_admin_post',
+                'AdminEverPsBlogPost',
                 'AdminEverPsBlog',
                 $this->l('Posts')
             )
             && $this->installModuleTab(
-                'everpsblog_admin_category',
+                'AdminEverPsBlogCategory',
                 'AdminEverPsBlog',
                 $this->l('Categories')
             )
             && $this->installModuleTab(
-                'everpsblog_admin_tag',
+                'AdminEverPsBlogTag',
                 'AdminEverPsBlog',
                 $this->l('Tags')
             )
             && $this->installModuleTab(
-                'everpsblog_admin_comment',
+                'AdminEverPsBlogComment',
                 'AdminEverPsBlog',
                 $this->l('Comments')
             )
             && $this->installModuleTab(
-                'everpsblog_admin_author',
+                'AdminEverPsBlogAuthor',
                 'AdminEverPsBlog',
                 $this->l('Authors')
             )
@@ -158,11 +158,11 @@ class EverPsBlog extends Module
         Configuration::deleteByName('EVERBLOG_SHOW_POST_TAGS');
         return parent::uninstall()
             && $this->uninstallModuleTab('AdminEverPsBlog')
-            && $this->uninstallModuleTab('everpsblog_admin_post')
-            && $this->uninstallModuleTab('everpsblog_admin_category')
-            && $this->uninstallModuleTab('everpsblog_admin_tag')
-            && $this->uninstallModuleTab('everpsblog_admin_comment')
-            && $this->uninstallModuleTab('everpsblog_admin_author');
+            && $this->uninstallModuleTab('AdminEverPsBlogPost')
+            && $this->uninstallModuleTab('AdminEverPsBlogCategory')
+            && $this->uninstallModuleTab('AdminEverPsBlogTag')
+            && $this->uninstallModuleTab('AdminEverPsBlogComment')
+            && $this->uninstallModuleTab('AdminEverPsBlogAuthor');
     }
 
     private function installModuleTab($tabClass, $parent, $tabName)
@@ -689,31 +689,31 @@ class EverPsBlog extends Module
         );
         $quickLinks = [
             [
-                'href' => $this->context->link->getAdminLink('everpsblog_admin_post'),
+                'href' => $this->context->link->getAdminLink('AdminEverPsBlogPost'),
                 'label' => $this->l('Manage posts'),
                 'description' => $this->l('Create, edit or schedule blog articles'),
                 'icon' => 'icon-pencil',
             ],
             [
-                'href' => $this->context->link->getAdminLink('everpsblog_admin_category'),
+                'href' => $this->context->link->getAdminLink('AdminEverPsBlogCategory'),
                 'label' => $this->l('Organise categories'),
                 'description' => $this->l('Structure your content and improve navigation'),
                 'icon' => 'icon-folder-open',
             ],
             [
-                'href' => $this->context->link->getAdminLink('everpsblog_admin_tag'),
+                'href' => $this->context->link->getAdminLink('AdminEverPsBlogTag'),
                 'label' => $this->l('Curate tags'),
                 'description' => $this->l('Highlight related topics for your readers'),
                 'icon' => 'icon-tags',
             ],
             [
-                'href' => $this->context->link->getAdminLink('everpsblog_admin_author'),
+                'href' => $this->context->link->getAdminLink('AdminEverPsBlogAuthor'),
                 'label' => $this->l('Manage authors'),
                 'description' => $this->l('Keep contributor profiles up to date'),
                 'icon' => 'icon-user',
             ],
             [
-                'href' => $this->context->link->getAdminLink('everpsblog_admin_comment'),
+                'href' => $this->context->link->getAdminLink('AdminEverPsBlogComment'),
                 'label' => $this->l('Moderate comments'),
                 'description' => $this->l('Review community feedback in one place'),
                 'icon' => 'icon-comments',
@@ -2373,16 +2373,12 @@ class EverPsBlog extends Module
         }
         if ((bool) Configuration::get('EVERBLOG_TINYMCE') === true) {
             $blogAdminControllers = [
+                'AdminEverPsBlog',
                 'AdminEverPsBlogPost',
                 'AdminEverPsBlogTag',
                 'AdminEverPsBlogAuthor',
                 'AdminEverPsBlogCategory',
                 'AdminEverPsBlogComment',
-                'everpsblog_admin_post',
-                'everpsblog_admin_tag',
-                'everpsblog_admin_author',
-                'everpsblog_admin_category',
-                'everpsblog_admin_comment',
             ];
             if (in_array(Tools::getValue('controller'), $blogAdminControllers)
                 || Tools::getValue('configure') == $this->name

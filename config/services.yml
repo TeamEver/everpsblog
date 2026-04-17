@@ -144,3 +144,24 @@ services:
     factory: ['@doctrine.orm.entity_manager', getRepository]
     arguments:
       - 'PrestaShop\Module\Everpsblog\Entity\Image'
+
+  PrestaShop\Module\Everpsblog\Form\DataProvider\:
+    resource: '../src/Form/DataProvider/*'
+
+  PrestaShop\Module\Everpsblog\Grid\Definition\:
+    resource: '../src/Grid/Definition/*'
+
+  PrestaShop\Module\Everpsblog\Grid\Data\:
+    resource: '../src/Grid/Data/*'
+
+  PrestaShop\Module\Everpsblog\Service\Audit\:
+    resource: '../src/Service/Audit/*'
+
+  PrestaShop\Module\Everpsblog\Controller\Admin\:
+    resource: '../src/Controller/Admin/*'
+    public: true
+    tags: ['controller.service_arguments']
+
+  PrestaShop\Module\Everpsblog\Form\Type\Admin\:
+    resource: '../src/Form/Type/Admin/*'
+    tags: ['form.type']

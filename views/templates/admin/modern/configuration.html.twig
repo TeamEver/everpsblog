@@ -1,0 +1,25 @@
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+
+{% block content %}
+  <div class="card mb-3">
+    <h3 class="card-header">Ever Blog</h3>
+    <div class="card-body">
+      <p class="mb-3">Le back-office Ever Blog utilise désormais des contrôleurs Symfony.</p>
+      <div class="btn-group" role="group" aria-label="Ever Blog links">
+        <a class="btn btn-primary" href="{{ postUrl }}">Articles</a>
+        <a class="btn btn-outline-primary" href="{{ categoryUrl }}">Catégories</a>
+        <a class="btn btn-outline-primary" href="{{ tagUrl }}">Tags</a>
+        <a class="btn btn-outline-primary" href="{{ authorUrl }}">Auteurs</a>
+        <a class="btn btn-outline-primary" href="{{ commentUrl }}">Commentaires</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="card-header">Paramètres</h3>
+    <div class="card-body">
+      <p>Le formulaire historique reste disponible pendant la transition.</p>
+      <a class="btn btn-outline-secondary" href="{{ legacyConfigureUrl }}">Configurer le module</a>
+    </div>
+  </div>
+{% endblock %}
