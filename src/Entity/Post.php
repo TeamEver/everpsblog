@@ -2,6 +2,7 @@
 
 namespace PrestaShop\Module\Everpsblog\Entity;
 
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -60,6 +61,30 @@ class Post
         return $this->id;
     }
 
+    public function getAuthorId()
+    {
+        return $this->authorId;
+    }
+
+    public function setAuthorId($authorId)
+    {
+        $this->authorId = $authorId;
+
+        return $this;
+    }
+
+    public function getDefaultCategoryId()
+    {
+        return $this->defaultCategoryId;
+    }
+
+    public function setDefaultCategoryId($defaultCategoryId)
+    {
+        $this->defaultCategoryId = $defaultCategoryId;
+
+        return $this;
+    }
+
     public function getStatus()
     {
         return $this->status;
@@ -68,6 +93,62 @@ class Post
     public function setStatus($status)
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function setIndexable($indexable)
+    {
+        $this->indexable = $indexable;
+
+        return $this;
+    }
+
+    public function setFollow($follow)
+    {
+        $this->follow = $follow;
+
+        return $this;
+    }
+
+    public function setSitemap($sitemap)
+    {
+        $this->sitemap = $sitemap;
+
+        return $this;
+    }
+
+    public function setPassword($password)
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    public function setStarred($starred)
+    {
+        $this->starred = $starred;
+
+        return $this;
+    }
+
+    public function setAllowedGroups($allowedGroups)
+    {
+        $this->allowedGroups = $allowedGroups;
+
+        return $this;
+    }
+
+    public function setCreatedAt(DateTimeInterface $createdAt)
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function setUpdatedAt(DateTimeInterface $updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

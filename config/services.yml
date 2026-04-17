@@ -22,14 +22,31 @@ services:
     class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\CreatePostHandler
     arguments:
       - '@prestashop.module.everpsblog.blog.post_rules_applier'
+      - '@prestashop.module.everpsblog.blog.repository.post_write'
 
   prestashop.module.everpsblog.blog.update_post_handler:
     class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\UpdatePostHandler
     arguments:
+      - '@doctrine.orm.entity_manager'
       - '@prestashop.module.everpsblog.blog.post_rules_applier'
+      - '@prestashop.module.everpsblog.blog.repository.post_write'
 
   prestashop.module.everpsblog.blog.delete_post_handler:
     class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\DeletePostHandler
+    arguments:
+      - '@doctrine.orm.entity_manager'
+      - '@prestashop.module.everpsblog.blog.repository.post_write'
+
+
+  prestashop.module.everpsblog.blog.repository.post_read:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository\PostReadRepository
+    arguments:
+      - '@doctrine.orm.entity_manager'
+
+  prestashop.module.everpsblog.blog.repository.post_write:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository\PostWriteRepository
+    arguments:
+      - '@doctrine.orm.entity_manager'
 
   prestashop.module.everpsblog.blog.command_bus:
     class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandBus\InMemoryCommandBus

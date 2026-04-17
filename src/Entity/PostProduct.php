@@ -12,4 +12,25 @@ class PostProduct
 
     /** @ORM\Id @ORM\Column(name="id_ever_post_product", type="integer") */
     private $productId;
+
+    public static function create(?int $postId, int $productId): self
+    {
+        $postProduct = new self();
+        $postProduct->postId = $postId;
+        $postProduct->productId = $productId;
+
+        return $postProduct;
+    }
+
+    public function setPostId(int $postId): self
+    {
+        $this->postId = $postId;
+
+        return $this;
+    }
+
+    public function getPostId(): ?int
+    {
+        return $this->postId;
+    }
 }

@@ -12,4 +12,25 @@ class PostTag
 
     /** @ORM\Id @ORM\Column(name="id_ever_post_tag", type="integer") */
     private $tagId;
+
+    public static function create(?int $postId, int $tagId): self
+    {
+        $postTag = new self();
+        $postTag->postId = $postId;
+        $postTag->tagId = $tagId;
+
+        return $postTag;
+    }
+
+    public function setPostId(int $postId): self
+    {
+        $this->postId = $postId;
+
+        return $this;
+    }
+
+    public function getPostId(): ?int
+    {
+        return $this->postId;
+    }
 }
