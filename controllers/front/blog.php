@@ -246,13 +246,6 @@ class EverPsBlogblogModuleFrontController extends BlogController
             'sort_orders' => $sortOrders,
             'sort_selected' => $sortSelected ? $sortSelected['label'] : null,
         ]);
-        if (Module::isInstalled('prettyblocks')
-            && Module::isEnabled('prettyblocks')
-        ) {
-            $this->context->smarty->assign([
-                'prettyblocks_enabled' => true,
-            ]);
-        }
         $this->setTemplate('module:everpsblog/views/templates/front/blog.tpl');
     }
 

@@ -196,13 +196,6 @@ class EverPsBlogcategoryModuleFrontController extends CategoryController
                 'sort_orders' => $sortOrders,
                 'sort_selected' => $sortSelected ? $sortSelected['label'] : null,
             ]);
-            if (Module::isInstalled('prettyblocks')
-                && Module::isEnabled('prettyblocks')
-            ) {
-                $this->context->smarty->assign([
-                    'prettyblocks_enabled' => true,
-                ]);
-            }
             $this->setTemplate('module:' . $this->module->name . '/views/templates/front/category.tpl');
         } else {
             Tools::redirect('index.php?controller=404');

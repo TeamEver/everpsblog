@@ -60,9 +60,6 @@
 {if isset($paginated) && !$paginated}
 <div class="container">
     <div class="row tagcontent">
-        {if isset($prettyblocks_enabled) && $prettyblocks_enabled}
-        {widget name="prettyblocks" zone_name="displayBeforeTag{$tag->id}"}
-        {/if}
         {$tag->content nofilter}
     </div>
 </div>
@@ -86,9 +83,6 @@
 {if isset($paginated) && !$paginated}
 <div class="container">
     <div class="row tagbottomcontent {if $animated}zoomed{/if}" itemprop="articleBody">
-        {if isset($prettyblocks_enabled) && $prettyblocks_enabled}
-        {widget name="prettyblocks" zone_name="displayAfterTag{$tag->id}"}
-        {/if}
         {$tag->bottom_content nofilter}
     </div>
 </div>

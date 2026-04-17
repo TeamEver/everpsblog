@@ -473,13 +473,6 @@ class EverPsBlogpostModuleFrontController extends PostController
                 'show_post_tags' => (bool) Configuration::get('EVERBLOG_SHOW_POST_TAGS'),
                 'only_logged_comment' => (bool) Configuration::get('EVERBLOG_ONLY_LOGGED_COMMENT'),
             ]);
-            if (Module::isInstalled('prettyblocks')
-                && Module::isEnabled('prettyblocks')
-            ) {
-                $this->context->smarty->assign([
-                    'prettyblocks_enabled' => true,
-                ]);
-            }
             $this->setTemplate('module:everpsblog/views/templates/front/post.tpl');
         }
     }
