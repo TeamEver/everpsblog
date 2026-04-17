@@ -70,14 +70,15 @@ class AuthorWriteRepository
             $langId = (int) $language['id_lang'];
             $metaTitle = (string) ($data['meta_title_' . $langId] ?? $data['meta_title']);
             $metaDescription = (string) ($data['meta_description_' . $langId] ?? $data['meta_description']);
-            $content = (string) ($data['bio_' . $langId] ?? $data['bio']);
+            $content = (string) ($data['content_' . $langId] ?? ($data['bio_' . $langId] ?? $data['bio']));
+            $slug = (string) ($data['link_rewrite_' . $langId] ?? '');
 
             $connection->insert('ever_blog_author_lang', [
                 'id_ever_author' => $authorId,
                 'id_lang' => $langId,
                 'meta_title' => $metaTitle,
                 'meta_description' => $metaDescription,
-                'link_rewrite' => Tools::str2url((string) ($data['nickhandle'] ?? 'author-' . $authorId)),
+                'link_rewrite' => Tools::str2url($slug ?: (string) ($data['nickhandle'] ?? 'author-' . $authorId)),
                 'content' => $content,
                 'bottom_content' => (string) ($data['bottom_content_' . $langId] ?? ''),
             ]);
