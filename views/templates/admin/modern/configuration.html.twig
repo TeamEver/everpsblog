@@ -18,8 +18,10 @@
   <div class="card">
     <h3 class="card-header">Paramètres</h3>
     <div class="card-body">
-      <p>Le formulaire historique reste disponible pendant la transition.</p>
-      <a class="btn btn-outline-secondary" href="{{ legacyConfigureUrl }}">Configurer le module</a>
+      {{ form_start(configurationForm) }}
+      {{ form_widget(configurationForm) }}
+      <button type="submit" class="btn btn-primary">Enregistrer</button>
+      {{ form_end(configurationForm) }}
     </div>
   </div>
 {% endblock %}
