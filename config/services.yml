@@ -160,6 +160,9 @@ services:
   PrestaShop\Module\Everpsblog\Service\Audit\:
     resource: '../src/Service/Audit/*'
 
+  PrestaShop\Module\Everpsblog\Adapter\:
+    resource: '../src/Adapter/*'
+
   PrestaShop\Module\Everpsblog\Controller\Admin\:
     resource: '../src/Controller/Admin/*'
     public: true
