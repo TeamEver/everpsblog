@@ -20,11 +20,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 require_once __DIR__ . '/vendor/autoload.php';
-require_once __DIR__ . '/classes/EverPsBlogPost.php';
-require_once __DIR__ . '/classes/EverPsBlogCategory.php';
-require_once __DIR__ . '/classes/EverPsBlogTag.php';
-require_once __DIR__ . '/classes/EverPsBlogAuthor.php';
-require_once __DIR__ . '/classes/EverPsBlogComment.php';
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
