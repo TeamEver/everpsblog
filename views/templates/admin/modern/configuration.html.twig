@@ -1,25 +1,64 @@
 {% extends '@PrestaShop/Admin/layout.html.twig' %}
 
+{% block stylesheets %}
+  {{ parent() }}
+  <style>
+    .ever-config-shell {
+      background: linear-gradient(180deg, #f3f6ff 0%, #f8f9fc 100%);
+      border: 1px solid #edf0ff;
+      border-radius: .85rem;
+      padding: 1.15rem;
+    }
+
+    .ever-config-card {
+      border: 1px solid #e4e9ff;
+      border-radius: .85rem;
+      box-shadow: 0 16px 42px -35px rgba(16, 24, 40, .6);
+      overflow: hidden;
+    }
+
+    .ever-config-card .card-header {
+      background: #fff;
+      border-bottom: 1px solid #edf1ff;
+      font-weight: 700;
+    }
+
+    .ever-config-nav .btn {
+      border-radius: 999px;
+      font-weight: 600;
+      padding-inline: .85rem;
+      margin-bottom: .4rem;
+    }
+
+    .ever-config-intro {
+      color: #667085;
+      margin-bottom: .8rem;
+    }
+  </style>
+{% endblock %}
+
 {% block content %}
-  <div class="card mb-3">
-    <h3 class="card-header">Ever Blog</h3>
-    <div class="card-body">
-      <p class="mb-3">Le back-office Ever Blog utilise désormais des contrôleurs Symfony.</p>
-      <div class="btn-group" role="group" aria-label="Ever Blog links">
-        {% for link in navigationLinks %}
-          <a class="btn {{ currentResource == link.key ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ link.url }}">{{ link.label }}</a>
-        {% endfor %}
+  <div class="ever-config-shell">
+    <div class="card mb-3 ever-config-card">
+      <h3 class="card-header">Ever Blog</h3>
+      <div class="card-body">
+        <p class="ever-config-intro">Le back-office Ever Blog utilise désormais des contrôleurs Symfony avec une interface modernisée et orientée productivité.</p>
+        <div class="ever-config-nav btn-group flex-wrap" role="group" aria-label="Ever Blog links">
+          {% for link in navigationLinks %}
+            <a class="btn {{ currentResource == link.key ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ link.url }}">{{ link.label }}</a>
+          {% endfor %}
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="card">
-    <h3 class="card-header">Paramètres</h3>
-    <div class="card-body">
-      {{ form_start(configurationForm) }}
-      {{ form_widget(configurationForm) }}
-      <button type="submit" class="btn btn-primary">Enregistrer</button>
-      {{ form_end(configurationForm) }}
+    <div class="card ever-config-card">
+      <h3 class="card-header">Paramètres</h3>
+      <div class="card-body">
+        {{ form_start(configurationForm) }}
+        {{ form_widget(configurationForm) }}
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        {{ form_end(configurationForm) }}
+      </div>
     </div>
   </div>
 {% endblock %}
