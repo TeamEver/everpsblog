@@ -6,7 +6,6 @@ use PrestaShop\Module\Everpsblog\Form\DataProvider\CommentFormDataProvider;
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\CommentType;
 use PrestaShop\Module\Everpsblog\Grid\Data\CommentGridDataFactory;
 use PrestaShop\Module\Everpsblog\Grid\Definition\CommentGridDefinitionFactory;
-use PrestaShop\Module\Everpsblog\Security\BlogPermission;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,7 +26,6 @@ class CommentController extends AbstractDomainController
 
     public function indexAction(Request $request): Response
     {
-        $this->denyAccessUnlessGranted(BlogPermission::READ, BlogPermission::RES_COMMENT);
         return $this->render('@Modules/everpsblog/views/templates/admin/modern/resource.html.twig', [
             'definition' => $this->definitionFactory->build(),
             'data' => $this->dataFactory->build($this->getContextLangId(), $request->query->all()),
@@ -37,8 +35,6 @@ class CommentController extends AbstractDomainController
 
     public function formAction(Request $request, ?int $commentId = null): Response
     {
-        $this->denyAccessUnlessGranted($commentId ? BlogPermission::UPDATE : BlogPermission::CREATE, BlogPermission::RES_COMMENT);
-
         $form = $this->createForm(CommentType::class, $this->formDataProvider->getData($commentId));
         $form->handleRequest($request);
 

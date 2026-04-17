@@ -9,7 +9,6 @@ use PrestaShop\Module\Everpsblog\Form\DataProvider\PostFormDataProvider;
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\PostType;
 use PrestaShop\Module\Everpsblog\Grid\Data\PostGridDataFactory;
 use PrestaShop\Module\Everpsblog\Grid\Definition\PostGridDefinitionFactory;
-use PrestaShop\Module\Everpsblog\Security\BlogPermission;
 use PrestaShop\Module\Everpsblog\Service\Audit\SensitiveActionLogger;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,8 +43,6 @@ class PostController extends AbstractDomainController
 
     public function indexAction(Request $request): Response
     {
-        $this->denyAccessUnlessGranted(BlogPermission::READ, BlogPermission::RES_POST);
-
         $definition = $this->definitionFactory->build();
         $data = $this->dataFactory->build($this->getContextShopId(), $this->getContextLangId(), $request->query->all());
 
@@ -58,8 +55,6 @@ class PostController extends AbstractDomainController
 
     public function formAction(Request $request, ?int $postId = null): Response
     {
-        $this->denyAccessUnlessGranted($postId ? BlogPermission::UPDATE : BlogPermission::CREATE, BlogPermission::RES_POST);
-
         $form = $this->createForm(PostType::class, $this->formDataProvider->getData($postId));
         $form->handleRequest($request);
 
@@ -72,7 +67,6 @@ class PostController extends AbstractDomainController
 
     public function createAction(Request $request): JsonResponse
     {
-        $this->denyAccessUnlessGranted(BlogPermission::CREATE, BlogPermission::RES_POST);
         $this->validateCsrfToken($request, 'everpsblog_post_create');
 
         $command = $this->commandAssembler->assembleCreate($request->request->all());
@@ -83,7 +77,6 @@ class PostController extends AbstractDomainController
 
     public function updateAction(int $postId, Request $request): JsonResponse
     {
-        $this->denyAccessUnlessGranted(BlogPermission::UPDATE, BlogPermission::RES_POST);
         $this->validateCsrfToken($request, 'everpsblog_post_update_' . $postId);
 
         $command = $this->commandAssembler->assembleUpdate($postId, $request->request->all());
@@ -95,7 +88,6 @@ class PostController extends AbstractDomainController
 
     public function deleteAction(int $postId, Request $request): JsonResponse
     {
-        $this->denyAccessUnlessGranted(BlogPermission::DELETE, BlogPermission::RES_POST);
         $this->validateCsrfToken($request, 'everpsblog_post_delete_' . $postId);
 
         $this->commandBus->handle(new DeletePostCommand($postId));

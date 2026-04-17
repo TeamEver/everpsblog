@@ -2,15 +2,12 @@
 
 namespace PrestaShop\Module\Everpsblog\Controller\Admin;
 
-use PrestaShop\Module\Everpsblog\Security\BlogPermission;
 use Symfony\Component\HttpFoundation\Response;
 
 class ConfigurationController extends AbstractDomainController
 {
     public function indexAction(): Response
     {
-        $this->denyAccessUnlessGranted(BlogPermission::READ, BlogPermission::RES_POST);
-
         return $this->render('@Modules/everpsblog/views/templates/admin/modern/configuration.html.twig', [
             'postUrl' => $this->generateUrl('everpsblog_admin_post'),
             'categoryUrl' => $this->generateUrl('everpsblog_admin_category'),

@@ -6,7 +6,6 @@ use PrestaShop\Module\Everpsblog\Form\DataProvider\AuthorFormDataProvider;
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\AuthorType;
 use PrestaShop\Module\Everpsblog\Grid\Data\AuthorGridDataFactory;
 use PrestaShop\Module\Everpsblog\Grid\Definition\AuthorGridDefinitionFactory;
-use PrestaShop\Module\Everpsblog\Security\BlogPermission;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,7 +26,6 @@ class AuthorController extends AbstractDomainController
 
     public function indexAction(Request $request): Response
     {
-        $this->denyAccessUnlessGranted(BlogPermission::READ, BlogPermission::RES_AUTHOR);
         return $this->render('@Modules/everpsblog/views/templates/admin/modern/resource.html.twig', [
             'definition' => $this->definitionFactory->build(),
             'data' => $this->dataFactory->build($this->getContextShopId(), $this->getContextLangId(), $request->query->all()),
@@ -37,8 +35,6 @@ class AuthorController extends AbstractDomainController
 
     public function formAction(Request $request, ?int $authorId = null): Response
     {
-        $this->denyAccessUnlessGranted($authorId ? BlogPermission::UPDATE : BlogPermission::CREATE, BlogPermission::RES_AUTHOR);
-
         $form = $this->createForm(AuthorType::class, $this->formDataProvider->getData($authorId));
         $form->handleRequest($request);
 
