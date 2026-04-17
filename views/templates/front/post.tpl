@@ -25,7 +25,7 @@
     <meta name="twitter:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
     <meta name="twitter:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
     {* <meta name="twitter:creator" content="@author_handle"> *}
-    <meta name="twitter:image" content="{$featured_image|escape:'htmlall':'UTF-8'}>
+    <meta name="twitter:image" content="{$featured_image|escape:'htmlall':'UTF-8'}">
     <!-- Open Graph Card data -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{$urls.current_url|escape:'htmlall':'UTF-8'}">
