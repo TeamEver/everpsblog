@@ -21,14 +21,16 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-include_once(dirname(__FILE__).'/../../classes/controller/FrontController.php');
+use PrestaShop\Module\Everpsblog\Controller\Front\CategoryController;
+use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
+use PrestaShop\Module\Everpsblog\ViewModel\Front\TaxonomyViewModel;
 
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
 use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 
-class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontController
+class EverPsBlogcategoryModuleFrontController extends CategoryController
 {
     protected $author;
     protected $category;
@@ -148,6 +150,8 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                 $this->category->content;
             $this->category->bottom_content = 
                 $this->category->bottom_content;
+            $postsViewModel = PostViewModel::listFromLegacy($posts);
+            $categoryViewModel = TaxonomyViewModel::fromLegacy($this->category, 'category');
             Hook::exec('actionBeforeEverCategoryInitContent', [
                 'blog_category' => $this->category,
                 'blog_posts' => $posts,
@@ -178,8 +182,10 @@ class EverPsBlogcategoryModuleFrontController extends EverPsBlogModuleFrontContr
                 'paginated' => Tools::getValue('page'),
                 'post_number' => (int) $this->post_number,
                 'pagination' => $pagination,
-                'category' => $this->category,
-                'posts' => $posts,
+                'category' => $categoryViewModel,
+                'category_legacy' => $this->category,
+                'posts' => $postsViewModel,
+                'posts_legacy' => $posts,
                 'default_lang' => (int) $this->context->language->id,
                 'id_lang' => $this->context->language->id,
                 'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'modules/' . $this->module->name . '/views/img/',

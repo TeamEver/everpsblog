@@ -21,14 +21,15 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-include_once(dirname(__FILE__).'/../../classes/controller/FrontController.php');
+use PrestaShop\Module\Everpsblog\Controller\Front\BlogController;
+use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
 use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 
-class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontController
+class EverPsBlogblogModuleFrontController extends BlogController
 {
     protected $author;
     protected $category;
@@ -162,6 +163,7 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             (int) $pagination['items_shown_from'] - 1
         );
         $posts = $this->getPostObjects($everpsblogposts);
+        $postsViewModel = PostViewModel::listFromLegacy($posts);
         $starredPosts = EverPsBlogPost::getPosts(
             (int) $this->context->language->id,
             (int) $this->context->shop->id,
@@ -227,7 +229,8 @@ class EverPsBlogblogModuleFrontController extends EverPsBlogModuleFrontControlle
             'post_number' => (int) $this->post_number,
             'pagination' => $pagination,
             'everpsblog' => $everpsblogposts,
-            'posts' => $posts,
+            'posts' => $postsViewModel,
+            'posts_legacy' => $posts,
             'starredPosts' => $starredPosts,
             'evercategory' => $evercategories,
             'evertags' => $evertags,

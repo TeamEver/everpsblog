@@ -21,14 +21,14 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-include_once(dirname(__FILE__).'/../../classes/controller/FrontController.php');
+use PrestaShop\Module\Everpsblog\Controller\Front\CustomerCommentsController;
 
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
 use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 
-class EverPsBlogcustomercommentsModuleFrontController extends EverPsBlogModuleFrontController
+class EverPsBlogcustomercommentsModuleFrontController extends CustomerCommentsController
 {
     public $controller_name = 'customercomments';
     

@@ -21,14 +21,15 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(dirname(__FILE__).'/../../classes/controller/FrontController.php');
+use PrestaShop\Module\Everpsblog\Controller\Front\PostController;
+use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
 use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 
-class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontController
+class EverPsBlogpostModuleFrontController extends PostController
 {
     protected $category;
     protected $tag;
@@ -441,6 +442,7 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 (int) $this->context->shop->id,
                 'post'
             );
+            $postViewModel = PostViewModel::fromLegacy($this->post);
             $this->context->smarty->assign([
                 'show_author' => (bool) Configuration::get('EVERBLOG_SHOW_AUTHOR'),
                 'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
@@ -453,7 +455,8 @@ class EverPsBlogpostModuleFrontController extends EverPsBlogModuleFrontControlle
                 'default_category' => $this->default_category,
                 'social_share_links' => $social_share_links,
                 'count_products' => $count_products,
-                'post' => $this->post,
+                'post' => $postViewModel,
+                'post_legacy' => $this->post,
                 'tags' => $tags,
                 'ps_products' => $ps_products,
                 'related_posts' => $related_posts,

@@ -21,9 +21,11 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-include_once(dirname(__FILE__).'/../../classes/controller/FrontController.php');
+use PrestaShop\Module\Everpsblog\Controller\Front\AuthorController;
+use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
+use PrestaShop\Module\Everpsblog\ViewModel\Front\TaxonomyViewModel;
 
-class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontController
+class EverPsBlogauthorModuleFrontController extends AuthorController
 {
     protected $author;
     protected $category;
@@ -130,6 +132,8 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
                 (int) $this->author->id,
                 (int) $pagination['items_shown_from'] - 1
             );
+            $postsViewModel = PostViewModel::listFromLegacy($posts);
+            $authorViewModel = TaxonomyViewModel::fromLegacy($this->author, 'author');
             Hook::exec('actionBeforeEverAuthorInitContent', [
                 'blog_author' => $this->author,
             ]);
@@ -167,12 +171,14 @@ class EverPsBlogauthorModuleFrontController extends EverPsBlogModuleFrontControl
                 'feed_url' => $feed_url,
                 'featured_image' => $file_url,
                 'show_featured_post' => true,
-                'posts' => $posts,
+                'posts' => $postsViewModel,
+                'posts_legacy' => $posts,
                 'paginated' => Tools::getValue('page'),
                 'post_number' => (int) $this->post_number,
                 'pagination' => $pagination,
                 'social_share_links' => $social_share_links,
-                'author' => $this->author,
+                'author' => $authorViewModel,
+                'author_legacy' => $this->author,
                 'default_lang' => (int) $this->context->language->id,
                 'id_lang' => (int) $this->context->language->id,
                 'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__ . 'modules/everpsblog/views/img/',
