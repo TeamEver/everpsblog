@@ -40,36 +40,83 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
     public $post_number;
     public $controller_name = 'blog';
 
-    /**
-     * Build EverPsBlogPost objects from raw post rows while keeping listing fields.
-     *
-     * @param array $posts
-     *
-     * @return array
-     */
-    protected function getPostObjects(array $posts)
+    private function getPostRowsCount($idLang, $idShop)
     {
-        $postObjects = [];
+        $sql = new DbQuery();
+        $sql->select('COUNT(DISTINCT p.id_ever_post)');
+        $sql->from('ever_blog_post', 'p');
+        $sql->innerJoin('ever_blog_post_lang', 'pl', 'pl.id_ever_post = p.id_ever_post AND pl.id_lang = ' . (int) $idLang);
+        $sql->innerJoin('ever_blog_post_shop', 'ps', 'ps.id_ever_post = p.id_ever_post AND ps.id_shop = ' . (int) $idShop);
+        $sql->where('p.post_status = "published"');
+        $sql->where('p.active = 1');
 
-        foreach ($posts as $post) {
-            if (empty($post['id_ever_post'])) {
-                continue;
-            }
+        return (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
+    }
 
-            $postObject = new EverPsBlogPost(
-                (int) $post['id_ever_post'],
-                (int) $this->context->language->id,
-                (int) $this->context->shop->id
+    private function getPostRows($idLang, $idShop, $start, $limit, $starred = null, $sortBy = 'p.date_add', $sortWay = 'DESC')
+    {
+        $allowedSortBy = ['p.date_add', 'p.id_ever_post', 'pl.title', 'p.count'];
+        $allowedSortWay = ['ASC', 'DESC'];
+        $sortBy = in_array($sortBy, $allowedSortBy, true) ? $sortBy : 'p.date_add';
+        $sortWay = in_array(strtoupper($sortWay), $allowedSortWay, true) ? strtoupper($sortWay) : 'DESC';
+
+        $sql = new DbQuery();
+        $sql->select('p.id_ever_post, p.id_ever_post AS id, p.id_default_category, p.id_author AS id_ever_author, p.date_add, pl.title, pl.link_rewrite, pl.meta_title, pl.meta_description, pl.excerpt, pl.content');
+        $sql->from('ever_blog_post', 'p');
+        $sql->innerJoin('ever_blog_post_lang', 'pl', 'pl.id_ever_post = p.id_ever_post AND pl.id_lang = ' . (int) $idLang);
+        $sql->innerJoin('ever_blog_post_shop', 'ps', 'ps.id_ever_post = p.id_ever_post AND ps.id_shop = ' . (int) $idShop);
+        $sql->where('p.post_status = "published"');
+        $sql->where('p.active = 1');
+        if (null !== $starred) {
+            $sql->where('p.starred = ' . (int) $starred);
+        }
+        $sql->orderBy($sortBy . ' ' . $sortWay . ', p.id_ever_post DESC');
+        $sql->limit((int) $limit, (int) $start);
+
+        $rows = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql) ?: [];
+        foreach ($rows as &$row) {
+            $row['url'] = $this->context->link->getModuleLink(
+                $this->module->name,
+                'post',
+                [
+                    'id_ever_post' => (int) $row['id_ever_post'],
+                    'link_rewrite' => (string) $row['link_rewrite'],
+                ]
             );
-
-            foreach ($post as $key => $value) {
-                $postObject->{$key} = $value;
-            }
-
-            $postObjects[] = $postObject;
+            $row['cover'] = $this->getBlogImageService()->getBlogThumbUrl(
+                (int) $row['id_ever_post'],
+                (int) $idShop,
+                'post'
+            );
         }
 
-        return $postObjects;
+        return $rows;
+    }
+
+    private function getFrontLocalizedCategories($idLang, $idShop)
+    {
+        $sql = new DbQuery();
+        $sql->select('c.id_ever_category, c.is_root_category, cl.title, cl.link_rewrite');
+        $sql->from('ever_blog_category', 'c');
+        $sql->innerJoin('ever_blog_category_lang', 'cl', 'cl.id_ever_category = c.id_ever_category AND cl.id_lang = ' . (int) $idLang);
+        $sql->innerJoin('ever_blog_category_shop', 'cs', 'cs.id_ever_category = c.id_ever_category AND cs.id_shop = ' . (int) $idShop);
+        $sql->where('c.active = 1');
+        $sql->orderBy('cl.title ASC');
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql) ?: [];
+    }
+
+    private function getFrontLocalizedTags($idLang, $idShop)
+    {
+        $sql = new DbQuery();
+        $sql->select('t.id_ever_tag, tl.title, tl.link_rewrite');
+        $sql->from('ever_blog_tag', 't');
+        $sql->innerJoin('ever_blog_tag_lang', 'tl', 'tl.id_ever_tag = t.id_ever_tag AND tl.id_lang = ' . (int) $idLang);
+        $sql->innerJoin('ever_blog_tag_shop', 'ts', 'ts.id_ever_tag = t.id_ever_tag AND ts.id_shop = ' . (int) $idShop);
+        $sql->where('t.active = 1');
+        $sql->orderBy('tl.title ASC');
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql) ?: [];
     }
 
     public function init()
@@ -90,7 +137,7 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
     public function initContent()
     {
         parent::initContent();
-        $this->post_number = EverPsBlogPost::countPosts(
+        $this->post_number = $this->getPostRowsCount(
             (int) $this->context->language->id,
             (int) $this->context->shop->id
         );
@@ -158,31 +205,30 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
             $page['meta']['robots'] = 'noindex, follow';
         }
         $this->context->smarty->assign('page', $page);
-        $everpsblogposts = EverPsBlogPost::getPosts(
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id,
-            (int) $pagination['items_shown_from'] - 1
-        );
-        $posts = $this->getPostObjects($everpsblogposts);
-        $postsViewModel = PostViewModel::listFromLegacy($posts);
-        $starredPosts = EverPsBlogPost::getPosts(
+        $everpsblogposts = $this->getPostRows(
             (int) $this->context->language->id,
             (int) $this->context->shop->id,
             (int) $pagination['items_shown_from'] - 1,
+            (int) Configuration::get('EVERPSBLOG_PAGINATION'),
             null,
-            'published',
-            false,
-            true,
-            $sortSelected && Validate::isOrderBy($sortSelected['order_by']) ? $sortSelected['order_by'] : null,
-            $sortSelected && Validate::isOrderWay($sortSelected['order_way']) ? $sortSelected['order_way'] : null,
+            $sortSelected && Validate::isOrderBy($sortSelected['order_by']) ? 'p.' . $sortSelected['order_by'] : 'p.date_add',
+            $sortSelected && Validate::isOrderWay($sortSelected['order_way']) ? $sortSelected['order_way'] : 'DESC'
         );
-        $evercategories = EverPsBlogCategory::getAllCategories(
+        $postsViewModel = PostViewModel::listFromLegacy($everpsblogposts);
+        $starredPosts = $this->getPostRows(
             (int) $this->context->language->id,
             (int) $this->context->shop->id,
+            (int) $pagination['items_shown_from'] - 1,
+            (int) Configuration::get('EVERPSBLOG_PAGINATION'),
             true,
-            0
+            $sortSelected && Validate::isOrderBy($sortSelected['order_by']) ? 'p.' . $sortSelected['order_by'] : 'p.date_add',
+            $sortSelected && Validate::isOrderWay($sortSelected['order_way']) ? $sortSelected['order_way'] : null,
         );
-        $evertags = EverPsBlogTag::getAllTags(
+        $evercategories = $this->getFrontLocalizedCategories(
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
+        );
+        $evertags = $this->getFrontLocalizedTags(
             (int) $this->context->language->id,
             (int) $this->context->shop->id
         );
@@ -231,7 +277,7 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
             'pagination' => $pagination,
             'everpsblog' => $everpsblogposts,
             'posts' => $postsViewModel,
-            'posts_legacy' => $posts,
+            'posts_legacy' => $everpsblogposts,
             'starredPosts' => $starredPosts,
             'evercategory' => $evercategories,
             'evertags' => $evertags,
