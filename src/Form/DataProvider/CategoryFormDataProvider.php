@@ -2,17 +2,111 @@
 
 namespace PrestaShop\Module\Everpsblog\Form\DataProvider;
 
+use PrestaShop\Module\Everpsblog\Repository\CategoryRepository;
 use Tools;
 
 final class CategoryFormDataProvider
 {
+    /** @var CategoryRepository */
+    private $categoryRepository;
+
+    public function __construct(CategoryRepository $categoryRepository)
+    {
+        $this->categoryRepository = $categoryRepository;
+    }
+
     /**
      * @return array<string, mixed>
      */
     public function getData(?int $id = null): array
     {
+        if (null === $id) {
+            return $this->getCreationData(null);
+        }
+
+        $entity = $this->categoryRepository->find($id);
+        if (null === $entity) {
+            return $this->getCreationData($id);
+        }
+
+        $connection = $this->categoryRepository->getEntityManager()->getConnection();
+        /** @var array<string, mixed>|false $category */
+        $category = $connection->fetchAssociative(
+            'SELECT * FROM ever_blog_category WHERE id_ever_category = :id',
+            ['id' => $id]
+        );
+
+        if (!$category) {
+            return $this->getCreationData($id);
+        }
+
         $data = [
             'id' => $id,
+            'id_parent_category' => isset($category['id_parent_category']) ? (int) $category['id_parent_category'] : null,
+            'active' => (bool) ($category['active'] ?? 0),
+            'indexable' => (bool) ($category['indexable'] ?? 0),
+            'follow' => (bool) ($category['follow'] ?? 0),
+            'sitemap' => (bool) ($category['sitemap'] ?? 0),
+            'is_root_category' => (bool) ($category['is_root_category'] ?? 0),
+            'title' => '',
+            'meta_title' => '',
+            'meta_description' => '',
+            'link_rewrite' => '',
+            'content' => '',
+            'bottom_content' => '',
+        ];
+
+        $translations = $connection->fetchAllAssociative(
+            'SELECT id_lang, title, meta_title, meta_description, link_rewrite, content, bottom_content
+             FROM ever_blog_category_lang
+             WHERE id_ever_category = :id',
+            ['id' => $id]
+        );
+        /** @var array<int, array<string, mixed>> $translationsByLang */
+        $translationsByLang = [];
+        foreach ($translations as $translation) {
+            $translationsByLang[(int) $translation['id_lang']] = $translation;
+        }
+
+        foreach (\Language::getLanguages(false) as $language) {
+            $langId = (int) $language['id_lang'];
+            $translation = $translationsByLang[$langId] ?? [];
+            $title = (string) ($translation['title'] ?? $data['title']);
+            $metaTitle = (string) ($translation['meta_title'] ?? $data['meta_title']);
+
+            $data['title_' . $langId] = $title;
+            $data['meta_title_' . $langId] = $metaTitle;
+            $data['meta_description_' . $langId] = (string) ($translation['meta_description'] ?? $data['meta_description']);
+            $data['link_rewrite_' . $langId] = (string) ($translation['link_rewrite'] ?? Tools::str2url($title ?: $metaTitle));
+            $data['content_' . $langId] = (string) ($translation['content'] ?? $data['content']);
+            $data['bottom_content_' . $langId] = (string) ($translation['bottom_content'] ?? $data['bottom_content']);
+
+            if ('' === $data['title']) {
+                $data['title'] = $title;
+                $data['meta_title'] = $metaTitle;
+                $data['meta_description'] = (string) $data['meta_description_' . $langId];
+                $data['link_rewrite'] = (string) $data['link_rewrite_' . $langId];
+                $data['content'] = (string) $data['content_' . $langId];
+                $data['bottom_content'] = (string) $data['bottom_content_' . $langId];
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function getCreationData(?int $id): array
+    {
+        $data = [
+            'id' => $id,
+            'id_parent_category' => null,
+            'active' => true,
+            'indexable' => true,
+            'follow' => true,
+            'sitemap' => true,
+            'is_root_category' => false,
             'title' => '',
             'meta_title' => '',
             'meta_description' => '',
@@ -23,15 +117,12 @@ final class CategoryFormDataProvider
 
         foreach (\Language::getLanguages(false) as $language) {
             $langId = (int) $language['id_lang'];
-            $title = (string) ($data['title_' . $langId] ?? $data['title']);
-            $metaTitle = (string) ($data['meta_title_' . $langId] ?? $data['meta_title']);
-
-            $data['title_' . $langId] = $title;
-            $data['meta_title_' . $langId] = $metaTitle;
-            $data['meta_description_' . $langId] = (string) ($data['meta_description_' . $langId] ?? $data['meta_description']);
-            $data['link_rewrite_' . $langId] = (string) ($data['link_rewrite_' . $langId] ?? Tools::str2url($title ?: $metaTitle));
-            $data['content_' . $langId] = (string) ($data['content_' . $langId] ?? $data['content']);
-            $data['bottom_content_' . $langId] = (string) ($data['bottom_content_' . $langId] ?? $data['bottom_content']);
+            $data['title_' . $langId] = '';
+            $data['meta_title_' . $langId] = '';
+            $data['meta_description_' . $langId] = '';
+            $data['link_rewrite_' . $langId] = '';
+            $data['content_' . $langId] = '';
+            $data['bottom_content_' . $langId] = '';
         }
 
         return $data;
