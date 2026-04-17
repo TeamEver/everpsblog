@@ -67,7 +67,7 @@ everpsblog_admin_category:
 
 everpsblog_admin_category_form:
   path: /everpsblog/category/new
-  methods: [GET]
+  methods: [GET, POST]
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\CategoryController::formAction'
     _legacy_controller: AdminEverPsBlogCategory
@@ -75,7 +75,7 @@ everpsblog_admin_category_form:
 
 everpsblog_admin_category_edit:
   path: /everpsblog/category/{categoryId}/edit
-  methods: [GET]
+  methods: [GET, POST]
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\CategoryController::formAction'
     _legacy_controller: AdminEverPsBlogCategory
@@ -93,7 +93,7 @@ everpsblog_admin_tag:
 
 everpsblog_admin_tag_form:
   path: /everpsblog/tag/new
-  methods: [GET]
+  methods: [GET, POST]
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\TagController::formAction'
     _legacy_controller: AdminEverPsBlogTag
@@ -101,7 +101,7 @@ everpsblog_admin_tag_form:
 
 everpsblog_admin_tag_edit:
   path: /everpsblog/tag/{tagId}/edit
-  methods: [GET]
+  methods: [GET, POST]
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\TagController::formAction'
     _legacy_controller: AdminEverPsBlogTag
@@ -119,7 +119,7 @@ everpsblog_admin_author:
 
 everpsblog_admin_author_form:
   path: /everpsblog/author/new
-  methods: [GET]
+  methods: [GET, POST]
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\AuthorController::formAction'
     _legacy_controller: AdminEverPsBlogAuthor
@@ -127,7 +127,7 @@ everpsblog_admin_author_form:
 
 everpsblog_admin_author_edit:
   path: /everpsblog/author/{authorId}/edit
-  methods: [GET]
+  methods: [GET, POST]
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\AuthorController::formAction'
     _legacy_controller: AdminEverPsBlogAuthor
@@ -145,7 +145,7 @@ everpsblog_admin_comment:
 
 everpsblog_admin_comment_form:
   path: /everpsblog/comment/new
-  methods: [GET]
+  methods: [GET, POST]
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\CommentController::formAction'
     _legacy_controller: AdminEverPsBlogComment
@@ -153,10 +153,118 @@ everpsblog_admin_comment_form:
 
 everpsblog_admin_comment_edit:
   path: /everpsblog/comment/{commentId}/edit
-  methods: [GET]
+  methods: [GET, POST]
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\CommentController::formAction'
     _legacy_controller: AdminEverPsBlogComment
     _legacy_link: AdminEverPsBlogComment:edit
   requirements:
     commentId: '\d+'
+
+
+everpsblog_admin_category_create:
+  path: /everpsblog/category
+  methods: [POST]
+  defaults:
+    _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\CategoryController::createAction'
+    _legacy_controller: AdminEverPsBlogCategory
+
+everpsblog_admin_category_update:
+  path: /everpsblog/category/{categoryId}
+  methods: [PUT]
+  defaults:
+    _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\CategoryController::updateAction'
+    _legacy_controller: AdminEverPsBlogCategory
+  requirements:
+    categoryId: '\d+'
+
+everpsblog_admin_category_delete:
+  path: /everpsblog/category/{categoryId}
+  methods: [DELETE]
+  defaults:
+    _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\CategoryController::deleteAction'
+    _legacy_controller: AdminEverPsBlogCategory
+  requirements:
+    categoryId: '\d+'
+
+
+
+everpsblog_admin_tag_create:
+  path: /everpsblog/tag
+  methods: [POST]
+  defaults:
+    _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\TagController::createAction'
+    _legacy_controller: AdminEverPsBlogTag
+
+everpsblog_admin_tag_update:
+  path: /everpsblog/tag/{tagId}
+  methods: [PUT]
+  defaults:
+    _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\TagController::updateAction'
+    _legacy_controller: AdminEverPsBlogTag
+  requirements:
+    tagId: '\d+'
+
+everpsblog_admin_tag_delete:
+  path: /everpsblog/tag/{tagId}
+  methods: [DELETE]
+  defaults:
+    _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\TagController::deleteAction'
+    _legacy_controller: AdminEverPsBlogTag
+  requirements:
+    tagId: '\d+'
+
+
+
+everpsblog_admin_author_create:
+  path: /everpsblog/author
+  methods: [POST]
+  defaults:
+    _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\AuthorController::createAction'
+    _legacy_controller: AdminEverPsBlogAuthor
+
+everpsblog_admin_author_update:
+  path: /everpsblog/author/{authorId}
+  methods: [PUT]
+  defaults:
+    _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\AuthorController::updateAction'
+    _legacy_controller: AdminEverPsBlogAuthor
+  requirements:
+    authorId: '\d+'
+
+everpsblog_admin_author_delete:
+  path: /everpsblog/author/{authorId}
+  methods: [DELETE]
+  defaults:
+    _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\AuthorController::deleteAction'
+    _legacy_controller: AdminEverPsBlogAuthor
+  requirements:
+    authorId: '\d+'
+
+
+
+everpsblog_admin_comment_create:
+  path: /everpsblog/comment
+  methods: [POST]
+  defaults:
+    _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\CommentController::createAction'
+    _legacy_controller: AdminEverPsBlogComment
+
+everpsblog_admin_comment_update:
+  path: /everpsblog/comment/{commentId}
+  methods: [PUT]
+  defaults:
+    _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\CommentController::updateAction'
+    _legacy_controller: AdminEverPsBlogComment
+  requirements:
+    commentId: '\d+'
+
+everpsblog_admin_comment_delete:
+  path: /everpsblog/comment/{commentId}
+  methods: [DELETE]
+  defaults:
+    _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\CommentController::deleteAction'
+    _legacy_controller: AdminEverPsBlogComment
+  requirements:
+    commentId: '\d+'
+
