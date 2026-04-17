@@ -48,6 +48,8 @@ class CategoryCommandAssembler
             'sitemap' => 1,
             'id_parent_category' => null,
             'is_root_category' => 0,
+            'allowed_groups' => [],
+            'category_products' => [],
         ], $data);
     }
 }

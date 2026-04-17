@@ -22,11 +22,15 @@ class AuthorWriteRepository
             'id_employee' => (int) $data['id_employee'],
             'id_shop' => (int) $data['id_shop'],
             'nickhandle' => (string) $data['nickhandle'],
+            'twitter' => (string) ($data['twitter'] ?? ''),
+            'facebook' => (string) ($data['facebook'] ?? ''),
+            'linkedin' => (string) ($data['linkedin'] ?? ''),
             'active' => (int) $data['active'],
             'indexable' => (int) $data['indexable'],
             'follow' => (int) $data['follow'],
             'sitemap' => (int) $data['sitemap'],
-            'allowed_groups' => null,
+            'allowed_groups' => $this->encodeArray($data['allowed_groups'] ?? null),
+            'author_products' => $this->encodeArray($data['author_products'] ?? null),
             'count' => 0,
         ]);
 
@@ -42,10 +46,15 @@ class AuthorWriteRepository
         $connection->update('ever_blog_author', [
             'id_employee' => (int) $data['id_employee'],
             'nickhandle' => (string) $data['nickhandle'],
+            'twitter' => (string) ($data['twitter'] ?? ''),
+            'facebook' => (string) ($data['facebook'] ?? ''),
+            'linkedin' => (string) ($data['linkedin'] ?? ''),
             'active' => (int) $data['active'],
             'indexable' => (int) $data['indexable'],
             'follow' => (int) $data['follow'],
             'sitemap' => (int) $data['sitemap'],
+            'allowed_groups' => $this->encodeArray($data['allowed_groups'] ?? null),
+            'author_products' => $this->encodeArray($data['author_products'] ?? null),
         ], ['id_ever_author' => $authorId]);
 
         $this->replaceRelations($authorId, $data);
@@ -83,5 +92,17 @@ class AuthorWriteRepository
                 'bottom_content' => (string) ($data['bottom_content_' . $langId] ?? ''),
             ]);
         }
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function encodeArray($value): ?string
+    {
+        if (!is_array($value) || empty($value)) {
+            return null;
+        }
+
+        return json_encode(array_values(array_map('intval', $value)));
     }
 }

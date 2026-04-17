@@ -46,6 +46,8 @@ class TagCommandAssembler
             'indexable' => 1,
             'follow' => 1,
             'sitemap' => 1,
+            'allowed_groups' => [],
+            'tag_products' => [],
         ], $data);
     }
 }

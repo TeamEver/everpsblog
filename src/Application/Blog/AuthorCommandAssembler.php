@@ -42,10 +42,15 @@ class AuthorCommandAssembler
             'bio' => '',
             'meta_title' => '',
             'meta_description' => '',
+            'twitter' => '',
+            'facebook' => '',
+            'linkedin' => '',
             'active' => 1,
             'indexable' => 1,
             'follow' => 1,
             'sitemap' => 1,
+            'allowed_groups' => [],
+            'author_products' => [],
         ], $data);
     }
 }
