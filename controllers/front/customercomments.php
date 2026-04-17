@@ -21,7 +21,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 use PrestaShop\Module\Everpsblog\Controller\Front\CustomerCommentsController;
 
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
@@ -132,17 +131,17 @@ class EverPsBlogcustomercommentsModuleFrontController extends CustomerCommentsCo
 
     private function getBlogImageService()
     {
-        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_image');
+        return $this->getModuleService('prestashop.module.everpsblog.service.blog_image');
     }
 
     private function getBlogTaxonomyService()
     {
-        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_taxonomy');
+        return $this->getModuleService('prestashop.module.everpsblog.service.blog_taxonomy');
     }
 
     private function getBlogSortOrderService()
     {
-        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_sort_order');
+        return $this->getModuleService('prestashop.module.everpsblog.service.blog_sort_order');
     }
 
 }

@@ -2693,28 +2693,28 @@ class EverPsBlog extends Module
 
     public function publishPlannedPosts($id_shop)
     {
-        $context = Context::getContext();
-        $posts = EverPsBlogPost::getPosts(
-            (int) $context->language->id,
-            (int) $id_shop,
-            0,
-            0,
-            'planned'
-        );
-        if (!count($posts)) {
+        $sql = new DbQuery();
+        $sql->select('p.id_ever_post');
+        $sql->from('ever_blog_post', 'p');
+        $sql->innerJoin('ever_blog_post_shop', 'ps', 'ps.id_ever_post = p.id_ever_post AND ps.id_shop = ' . (int) $id_shop);
+        $sql->where('p.post_status = "planned"');
+        $sql->where('p.date_add <= "' . pSQL(date('Y-m-d H:i:s')) . '"');
+
+        $posts = Db::getInstance()->executeS($sql) ?: [];
+        if (!$posts) {
             return;
         }
+
         foreach ($posts as $planned) {
-            $post = new EverPsBlogPost(
-                (int) $planned['id_ever_post'],
-                (int) $context->language->id,
-                (int) $id_shop
+            Db::getInstance()->update(
+                'ever_blog_post',
+                [
+                    'post_status' => 'published',
+                ],
+                'id_ever_post = ' . (int) $planned['id_ever_post']
             );
-            if ($post->date_add <= date('Y-m-d H:i:s')) {
-                $post->post_status = 'published';
-                $post->save();
-            }
         }
+
         return true;
     }
 
