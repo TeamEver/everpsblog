@@ -20,14 +20,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogAuthor.php';
-require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogCategory.php';
-require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogTag.php';
-require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogImage.php';
-require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogPost.php';
 require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogComment.php';
-require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogTaxonomy.php';
-require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogSitemap.php';
 require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogCleaner.php';
 require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogSortOrders.php';
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
@@ -85,34 +78,8 @@ class EverPsBlog extends Module
             mkdir(_PS_IMG_DIR_ . 'author', 0755, true);
         }
         Configuration::updateValue('EVERBLOG_SHOW_HOME', true);
-        // Creating root category
-        $shops = Shop::getShops();
-        foreach ($shops as $shop) {
-            $root_category = new EverPsBlogCategory();
-            $root_category->is_root_category = 1;
-            $root_category->active = 1;
-            $root_category->id_shop = (int) $shop['id_shop'];
-            $root_category->id_shop_list = [(int) $shop['id_shop']];
-            foreach (Language::getLanguages(false) as $language) {
-                $root_category->title[$language['id_lang']] = 'Root';
-                $root_category->content[$language['id_lang']] = 'Root';
-                $root_category->link_rewrite[$language['id_lang']] = 'root';
-            }
-            $root_category->save();
-            // Unclassed
-            $unclassed_category = new EverPsBlogCategory();
-            $unclassed_category->id_parent_category = 0;
-            $unclassed_category->active = 1;
-            $unclassed_category->id_shop = (int) $shop['id_shop'];
-            $unclassed_category->id_shop_list = [(int) $shop['id_shop']];
-            foreach (Language::getLanguages(false) as $language) {
-                $unclassed_category->title[$language['id_lang']] = $this->l('Unclassed');
-                $unclassed_category->content[$language['id_lang']] = '';
-                $unclassed_category->link_rewrite[$language['id_lang']] = $this->l('Unclassed');
-            }
-            $unclassed_category->save();
-            Configuration::updateValue('EVERBLOG_UNCLASSED_ID', $unclassed_category->id);
-        }
+        // Creating root + unclassed categories through application service
+        $this->getBlogInstallService()->seedRootAndUnclassedCategories($this);
         // Install
         return parent::install()
             && $this->installModuleTab(
@@ -222,6 +189,35 @@ class EverPsBlog extends Module
     {
         $tab = new Tab((int) Tab::getIdFromClassName($tabClass));
         return $tab->delete();
+    }
+
+    private function getModuleService($serviceId)
+    {
+        if (method_exists($this, 'get')) {
+            return $this->get($serviceId);
+        }
+
+        return \PrestaShop\PrestaShop\Adapter\SymfonyContainer::getInstance()->get($serviceId);
+    }
+
+    private function getBlogInstallService()
+    {
+        return $this->getModuleService('prestashop.module.everpsblog.service.blog_install');
+    }
+
+    private function getBlogTaxonomyService()
+    {
+        return $this->getModuleService('prestashop.module.everpsblog.service.blog_taxonomy');
+    }
+
+    private function getBlogSitemapService()
+    {
+        return $this->getModuleService('prestashop.module.everpsblog.service.blog_sitemap');
+    }
+
+    private function getLegacyImportAdapter()
+    {
+        return $this->getModuleService('prestashop.module.everpsblog.service.legacy_import_adapter');
     }
 
     /**
@@ -419,14 +415,14 @@ class EverPsBlog extends Module
             //     SET content = "' . pSQL($post['post_content'], true) . '", excerpt = "' . pSQL($cleanedExcerpt) . '"
             //     WHERE id_ever_post = ' . (int)$postId
             // );
-            EverPsBlogTaxonomy::insertTaxonomy($defaultCategoryId, $postId, 'category');
+            $this->getBlogTaxonomyService()->insert($defaultCategoryId, $postId, 'category');
             $newPost->save();
             // Insérer la catégorie par défaut "Non classé" pour chaque post
 
             // Insérer les autres catégories associées au post
             $postCategories = Db::getInstance()->executeS('SELECT * FROM aw_blog_post_cat WHERE post_id = ' . (int)$post['post_id']);
             foreach ($postCategories as $postCategory) {
-                EverPsBlogTaxonomy::insertTaxonomy($postCategory['cat_id'], $postId, 'category');
+                $this->getBlogTaxonomyService()->insert($postCategory['cat_id'], $postId, 'category');
             }
 
             // Insérer les tags associés au post
@@ -434,7 +430,7 @@ class EverPsBlog extends Module
             foreach ($postTags as $tag) {
                 $existingTag = Db::getInstance()->getRow('SELECT id_ever_tag FROM ' . _DB_PREFIX_ . 'ever_blog_tag_lang WHERE title = "' . pSQL($tag) . '"');
                 if ($existingTag) {
-                    EverPsBlogTaxonomy::insertTaxonomy($existingTag['id_ever_tag'], $postId, 'tag');
+                    $this->getBlogTaxonomyService()->insert($existingTag['id_ever_tag'], $postId, 'tag');
                 }
             }
             $newPost->save();
@@ -2407,7 +2403,7 @@ class EverPsBlog extends Module
         ) {
             $id_post = (int) Tools::getValue('id_ever_post');
             if ($id_post) {
-                $post_products = EverPsBlogTaxonomy::getPostProductsTaxonomies($id_post);
+                $post_products = $this->getBlogTaxonomyService()->getPostProductsTaxonomies($id_post);
                 if ($post_products) {
                     $assembler = new ProductAssembler($this->context);
                     $presenterFactory = new ProductPresenterFactory($this->context);
@@ -2829,42 +2825,31 @@ class EverPsBlog extends Module
             json_decode($params['object']->post_products, true)
         );
         // First drop post taxonomies
-        EverPsBlogTaxonomy::dropTaxonomy(
-            (int) $params['object']->id,
-            'category'
-        );
-        EverPsBlogTaxonomy::dropTaxonomy(
-            (int) $params['object']->id,
-            'tag'
-        );
-        EverPsBlogTaxonomy::dropTaxonomy(
-            (int) $params['object']->id,
-            'product'
-        );
+        $this->getBlogTaxonomyService()->dropPostTaxonomies((int) $params['object']->id);
         // Then insert taxonomies
         foreach ($post_categories as $id_post_category) {
-            EverPsBlogTaxonomy::insertTaxonomy(
+            $this->getBlogTaxonomyService()->insert(
                 (int) $id_post_category,
                 (int) $params['object']->id,
                 'category'
             );
         }
         foreach ($post_tags as $id_post_tag) {
-            EverPsBlogTaxonomy::insertTaxonomy(
+            $this->getBlogTaxonomyService()->insert(
                 (int) $id_post_tag,
                 (int) $params['object']->id,
                 'tag'
             );
         }
         foreach ($post_products as $id_post_product) {
-            EverPsBlogTaxonomy::insertTaxonomy(
+            $this->getBlogTaxonomyService()->insert(
                 (int) $id_post_product,
                 (int) $params['object']->id,
                 'product'
             );
         }
         // At least check root taxonomy
-        EverPsBlogTaxonomy::checkDefaultPostCategory(
+        $this->getBlogTaxonomyService()->checkDefaultPostCategory(
             $params['object']->id
         );
         // Drop temp img
@@ -2966,18 +2951,7 @@ class EverPsBlog extends Module
         if (Validate::isLoadedObject($image)) {
             $image->delete();
         }
-        EverPsBlogTaxonomy::dropTaxonomy(
-            (int) $params['object']->id,
-            'category'
-        );
-        EverPsBlogTaxonomy::dropTaxonomy(
-            (int) $params['object']->id,
-            'tag'
-        );
-        EverPsBlogTaxonomy::dropTaxonomy(
-            (int) $params['object']->id,
-            'product'
-        );
+        $this->getBlogTaxonomyService()->dropPostTaxonomies((int) $params['object']->id);
         // Sitemaps
         $this->generateBlogSitemap();
     }
@@ -2985,20 +2959,12 @@ class EverPsBlog extends Module
     public function hookActionObjectEverPsBlogCategoryDeleteAfter($params)
     {
         if ((int) $params['object']->id == (int) Configuration::get('EVERBLOG_UNCLASSED_ID')) {
-            // Unclassed
-            $unclassed_category = new EverPsBlogCategory();
-            $unclassed_category->id_parent_category = 0;
-            $unclassed_category->active = 1;
-            $unclassed_category->active = $root_category->id;
-            $unclassed_category->id_shop = (int) $shop['id_shop'];
-            $unclassed_category->id_shop_list = [(int) $shop['id_shop']];
-            foreach (Language::getLanguages(false) as $language) {
-                $unclassed_category->title[$language['id_lang']] = $this->l('Unclassed');
-                $unclassed_category->content[$language['id_lang']] = '';
-                $unclassed_category->link_rewrite[$language['id_lang']] = $this->l('Unclassed');
-            }
-            $unclassed_category->save();
-            Configuration::updateValue('EVERBLOG_UNCLASSED_ID', $unclassed_category->id);
+            $rootCategory = EverPsBlogCategory::getRootCategory();
+            $this->getBlogInstallService()->recreateUnclassedCategory(
+                $this,
+                (int) Context::getContext()->shop->id,
+                (int) $rootCategory->id
+            );
         }
         $old_img = _PS_MODULE_DIR_
         . 'everpsblog/views/img/categories/category_image_'
@@ -3022,7 +2988,7 @@ class EverPsBlog extends Module
         if (Validate::isLoadedObject($image)) {
             $image->delete();
         }
-        EverPsBlogTaxonomy::dropCategoryTaxonomy(
+        $this->getBlogTaxonomyService()->dropCategoryTaxonomy(
             (int) $params['object']->id
         );
         // Sitemaps
@@ -3035,7 +3001,7 @@ class EverPsBlog extends Module
         if (file_exists($old_img)) {
             unlink($old_img);
         }
-        EverPsBlogTaxonomy::dropTagTaxonomy(
+        $this->getBlogTaxonomyService()->dropTagTaxonomy(
             (int) $params['object']->id
         );
         // Sitemaps
@@ -3075,7 +3041,7 @@ class EverPsBlog extends Module
 
     public function hookActionObjectProductDeleteAfter($params)
     {
-        EverPsBlogTaxonomy::dropProductTaxonomy(
+        $this->getBlogTaxonomyService()->dropProductTaxonomy(
             (int) $params['object']->id
         );
     }
@@ -3085,17 +3051,7 @@ class EverPsBlog extends Module
         if (!$id_shop) {
             $id_shop = (int) $this->context->shop->id;
         }
-        $languages = Language::getLanguages(
-            true,
-            (int) $id_shop
-        );
-        $result = false;
-        foreach ($languages as $id_lang) {
-            $result &= $this->processSitemapAuthor((int) $id_shop, (int) $id_lang);
-            $result &= $this->processSitemapTag((int) $id_shop, (int) $id_lang);
-            $result &= $this->processSitemapCategory((int) $id_shop, (int) $id_lang);
-            $result &= $this->processSitemapPost((int) $id_shop, (int) $id_lang);
-        }
+        $result = (bool) $this->getBlogSitemapService()->generate($this->context, (int) $id_shop);
         $this->postSuccess[] = $this->l('All XML sitemaps have been generated');
         if ((bool) $cron === true) {
             return $result;
@@ -3444,7 +3400,9 @@ class EverPsBlog extends Module
                         (string) $wp_taxonomy['nicename']
                     );
                     if (!Validate::isLoadedObject($category)) {
-                        $category = new EverPsBlogCategory();
+                        $category = $this->getLegacyImportAdapter()->getOrCreateCategoryByLinkRewrite(
+                            (string) $wp_taxonomy['nicename']
+                        );
                 $id_lang = $this->getIdLangFromWpData($wp_taxonomy);
                 $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
                 foreach ($langs as $lang) {
@@ -3482,7 +3440,9 @@ class EverPsBlog extends Module
                         (string) $wp_taxonomy['nicename']
                     );
                     if (!Validate::isLoadedObject($tag)) {
-                        $tag = new EverPsBlogTag();
+                        $tag = $this->getLegacyImportAdapter()->getOrCreateTagByLinkRewrite(
+                            (string) $wp_taxonomy['nicename']
+                        );
                         $id_lang = $this->getIdLangFromWpData($wp_taxonomy);
                         $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
                         foreach ($langs as $lang) {
@@ -3521,8 +3481,9 @@ class EverPsBlog extends Module
             if (!Validate::isLoadedObject($author)
                 && (bool) Configuration::get('EVERBLOG_IMPORT_AUTHORS') === true
             ) {
-                $author = new EverPsBlogAuthor();
-                $author->nickhandle = (string) $el->creator;
+                $author = $this->getLegacyImportAdapter()->getOrCreateAuthorByNickhandle(
+                    (string) $el->creator
+                );
                 $id_lang = $this->getIdLangFromWpData($el);
                 $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
                 foreach ($langs as $lang) {
@@ -3629,7 +3590,7 @@ class EverPsBlog extends Module
                 $post_content = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $post_content);
                 $post_content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $post_content);
                 $post_content = $this->cleanWpShortcodes($post_content);
-                $post = new EverPsBlogPost();
+                $post = $this->getLegacyImportAdapter()->getOrCreatePostByLinkRewrite($post_link_rewrite);
                 // Multilingual fields
                 $id_lang = $this->getIdLangFromWpData($el);
                 $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
@@ -3680,7 +3641,10 @@ class EverPsBlog extends Module
                             'post'
                         );
                         if (!$image) {
-                            $image = new EverPsBlogImage();
+                            $image = $this->getLegacyImportAdapter()->getOrCreatePostImage(
+                                (int) $post->id,
+                                (int) Context::getContext()->shop->id
+                            );
                         }
                         $image->id_element = (int) $post->id;
                         $image->image_type = 'post';
@@ -3741,7 +3705,7 @@ class EverPsBlog extends Module
                 if (Validate::isLoadedObject($post)) {
                     continue;
                 }
-                $post = new EverPsBlogPost();
+                $post = $this->getLegacyImportAdapter()->getOrCreatePostByLinkRewrite($post_link_rewrite);
                 $id_lang = $this->getIdLangFromWpData($data);
                 $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
                 foreach ($langs as $language) {
@@ -3776,7 +3740,9 @@ class EverPsBlog extends Module
                         if ($catData && isset($catData->slug)) {
                             $category = EverPsBlogCategory::getCategoryByLinkRewrite($catData->slug);
                             if (!Validate::isLoadedObject($category)) {
-                                $category = new EverPsBlogCategory();
+                                $category = $this->getLegacyImportAdapter()->getOrCreateCategoryByLinkRewrite(
+                                    Tools::str2url($catData->slug)
+                                );
                                 $id_lang = $this->getIdLangFromWpData($catData);
                                 $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
                                 foreach ($langs as $langCat) {
@@ -3816,8 +3782,7 @@ class EverPsBlog extends Module
                     if ($authorData && isset($authorData->slug)) {
                         $author = EverPsBlogAuthor::getAuthorByNickhandle($authorData->slug);
                         if (!Validate::isLoadedObject($author)) {
-                            $author = new EverPsBlogAuthor();
-                            $author->nickhandle = $authorData->slug;
+                            $author = $this->getLegacyImportAdapter()->getOrCreateAuthorByNickhandle($authorData->slug);
                             $id_lang = $this->getIdLangFromWpData($authorData);
                             $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
                             foreach ($langs as $langAuthor) {
@@ -3856,7 +3821,9 @@ class EverPsBlog extends Module
                         if ($tagData && isset($tagData->name)) {
                             $tag = EverPsBlogTag::getTagByLinkRewrite(Tools::str2url($tagData->slug));
                             if (!Validate::isLoadedObject($tag)) {
-                            $tag = new EverPsBlogTag();
+                            $tag = $this->getLegacyImportAdapter()->getOrCreateTagByLinkRewrite(
+                                Tools::str2url($tagData->slug)
+                            );
                                 $id_lang = $this->getIdLangFromWpData($tagData);
                                 $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
                                 foreach ($langs as $languageTag) {
@@ -3915,7 +3882,10 @@ class EverPsBlog extends Module
                     if ($media && isset($media->source_url)) {
                         $local = $this->downloadImage($media->source_url);
                         if ($local) {
-                            $image = new EverPsBlogImage();
+                            $image = $this->getLegacyImportAdapter()->getOrCreatePostImage(
+                                (int) $post->id,
+                                (int) Context::getContext()->shop->id
+                            );
                             $image->id_element = (int) $post->id;
                             $image->image_type = 'post';
                             $image->image_link = ltrim(str_replace(Tools::getHttpHost(true) . __PS_BASE_URI__, '', $local), '/');
@@ -3972,7 +3942,7 @@ class EverPsBlog extends Module
                 $post_link_rewrite = Tools::str2url($data->slug);
                 $post = EverPsBlogPost::getPostByLinkRewrite($post_link_rewrite);
                 if (!Validate::isLoadedObject($post)) {
-                    $post = new EverPsBlogPost();
+                    $post = $this->getLegacyImportAdapter()->getOrCreatePostByLinkRewrite($post_link_rewrite);
                 }
                 $id_lang = $this->getIdLangFromWpData($data);
                 $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
@@ -4011,7 +3981,9 @@ class EverPsBlog extends Module
                         if ($catData && isset($catData->slug)) {
                             $category = EverPsBlogCategory::getCategoryByLinkRewrite($catData->slug);
                             if (!Validate::isLoadedObject($category)) {
-                                $category = new EverPsBlogCategory();
+                                $category = $this->getLegacyImportAdapter()->getOrCreateCategoryByLinkRewrite(
+                                    Tools::str2url($catData->slug)
+                                );
                                 $id_lang = $this->getIdLangFromWpData($catData);
                                 $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
                                 foreach ($langs as $langCat) {
@@ -4051,8 +4023,7 @@ class EverPsBlog extends Module
                     if ($authorData && isset($authorData->slug)) {
                         $author = EverPsBlogAuthor::getAuthorByNickhandle($authorData->slug);
                         if (!Validate::isLoadedObject($author)) {
-                            $author = new EverPsBlogAuthor();
-                            $author->nickhandle = $authorData->slug;
+                            $author = $this->getLegacyImportAdapter()->getOrCreateAuthorByNickhandle($authorData->slug);
                             $id_lang = $this->getIdLangFromWpData($authorData);
                             $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
                             foreach ($langs as $langAuthor) {
@@ -4091,7 +4062,9 @@ class EverPsBlog extends Module
                         if ($tagData && isset($tagData->name)) {
                             $tag = EverPsBlogTag::getTagByLinkRewrite(Tools::str2url($tagData->slug));
                             if (!Validate::isLoadedObject($tag)) {
-                                $tag = new EverPsBlogTag();
+                                $tag = $this->getLegacyImportAdapter()->getOrCreateTagByLinkRewrite(
+                                    Tools::str2url($tagData->slug)
+                                );
                                 $id_lang = $this->getIdLangFromWpData($tagData);
                                 $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
                                 foreach ($langs as $languageTag) {
@@ -4148,7 +4121,10 @@ class EverPsBlog extends Module
                     if ($media && isset($media->source_url)) {
                         $local = $this->downloadImage($media->source_url);
                         if ($local) {
-                            $image = new EverPsBlogImage();
+                            $image = $this->getLegacyImportAdapter()->getOrCreatePostImage(
+                                (int) $post->id,
+                                (int) Context::getContext()->shop->id
+                            );
                             $image->id_element = (int) $post->id;
                             $image->image_type = 'post';
                             $image->image_link = ltrim(str_replace(Tools::getHttpHost(true) . __PS_BASE_URI__, '', $local), '/');
