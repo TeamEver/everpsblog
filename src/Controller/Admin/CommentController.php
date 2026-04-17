@@ -66,10 +66,15 @@ class CommentController extends AbstractDomainController
                     $savedCommentId = $isEdit
                         ? $this->commandBus->handle($this->commandAssembler->assembleUpdate((int) $commentId, (array) $form->getData()))
                         : $this->commandBus->handle($this->commandAssembler->assembleCreate((array) $form->getData()));
+                    $submitAction = (string) $request->request->get('_submit_action', 'save');
 
                     $this->addFlash('success', $isEdit ? 'Commentaire mis à jour.' : 'Commentaire créé.');
 
-                    return $this->redirectToRoute('everpsblog_admin_comment_edit', ['commentId' => $savedCommentId]);
+                    if ('save_and_stay' === $submitAction) {
+                        return $this->redirectToRoute('everpsblog_admin_comment_edit', ['commentId' => $savedCommentId]);
+                    }
+
+                    return $this->redirectToRoute('everpsblog_admin_comment');
                 } catch (\Throwable $exception) {
                     $form->addError(new FormError('Impossible d\'enregistrer le commentaire.'));
                 }
@@ -82,6 +87,7 @@ class CommentController extends AbstractDomainController
             'csrfTokenId' => $csrfTokenId,
             'form' => $form->createView(),
             'currentResource' => 'comment',
+            'cancelUrl' => $this->generateUrl('everpsblog_admin_comment'),
             'createUrl' => $this->generateUrl('everpsblog_admin_comment_form'),
             'navigationLinks' => $this->getAdminNavigationLinks(),
         ]);

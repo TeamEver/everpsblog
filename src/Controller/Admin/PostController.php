@@ -79,10 +79,15 @@ class PostController extends AbstractDomainController
                     $savedPostId = $isEdit
                         ? $this->commandBus->handle($this->commandAssembler->assembleUpdate((int) $postId, $postData))
                         : $this->commandBus->handle($this->commandAssembler->assembleCreate($postData));
+                    $submitAction = (string) $request->request->get('_submit_action', 'save');
 
                     $this->addFlash('success', $isEdit ? 'Article mis à jour.' : 'Article créé.');
 
-                    return $this->redirectToRoute('everpsblog_admin_post_edit', ['postId' => $savedPostId]);
+                    if ('save_and_stay' === $submitAction) {
+                        return $this->redirectToRoute('everpsblog_admin_post_edit', ['postId' => $savedPostId]);
+                    }
+
+                    return $this->redirectToRoute('everpsblog_admin_post');
                 } catch (\Throwable $exception) {
                     $form->addError(new FormError('Impossible d\'enregistrer l\'article.'));
                     $this->addFlash('error', 'Impossible d\'enregistrer l\'article.');
@@ -96,6 +101,7 @@ class PostController extends AbstractDomainController
             'csrfTokenId' => $csrfTokenId,
             'form' => $form->createView(),
             'currentResource' => 'post',
+            'cancelUrl' => $this->generateUrl('everpsblog_admin_post'),
             'createUrl' => $this->generateUrl('everpsblog_admin_post_form'),
             'navigationLinks' => $this->getAdminNavigationLinks(),
         ]);

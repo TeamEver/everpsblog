@@ -66,10 +66,15 @@ class AuthorController extends AbstractDomainController
                     $savedAuthorId = $isEdit
                         ? $this->commandBus->handle($this->commandAssembler->assembleUpdate((int) $authorId, (array) $form->getData()))
                         : $this->commandBus->handle($this->commandAssembler->assembleCreate((array) $form->getData()));
+                    $submitAction = (string) $request->request->get('_submit_action', 'save');
 
                     $this->addFlash('success', $isEdit ? 'Auteur mis à jour.' : 'Auteur créé.');
 
-                    return $this->redirectToRoute('everpsblog_admin_author_edit', ['authorId' => $savedAuthorId]);
+                    if ('save_and_stay' === $submitAction) {
+                        return $this->redirectToRoute('everpsblog_admin_author_edit', ['authorId' => $savedAuthorId]);
+                    }
+
+                    return $this->redirectToRoute('everpsblog_admin_author');
                 } catch (\Throwable $exception) {
                     $form->addError(new FormError('Impossible d\'enregistrer l\'auteur.'));
                 }
@@ -82,6 +87,7 @@ class AuthorController extends AbstractDomainController
             'csrfTokenId' => $csrfTokenId,
             'form' => $form->createView(),
             'currentResource' => 'author',
+            'cancelUrl' => $this->generateUrl('everpsblog_admin_author'),
             'createUrl' => $this->generateUrl('everpsblog_admin_author_form'),
             'navigationLinks' => $this->getAdminNavigationLinks(),
         ]);
