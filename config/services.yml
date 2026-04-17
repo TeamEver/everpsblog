@@ -136,6 +136,10 @@ services:
     arguments:
       - 'PrestaShop\Module\Everpsblog\Entity\Author'
 
+
+  PrestaShop\Module\Everpsblog\Repository\AuthorRepository:
+    alias: prestashop.module.everpsblog.repository.author
+
   prestashop.module.everpsblog.repository.comment:
     class: PrestaShop\Module\Everpsblog\Repository\CommentRepository
     factory: ['@doctrine.orm.entity_manager', getRepository]
