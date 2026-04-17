@@ -1,31 +1,413 @@
 {% extends '@PrestaShop/Admin/layout.html.twig' %}
 
+{% block ever_blog_form_header %}
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <div class="btn-group mb-2" role="group" aria-label="Navigation Ever Blog">
+      {% for link in navigationLinks %}
+        <a class="btn {{ currentResource == link.key ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ link.url }}">{{ link.label }}</a>
+      {% endfor %}
+    </div>
+    {% if createUrl is defined and createUrl %}
+      <a class="btn btn-success mb-2" href="{{ createUrl }}">Ajouter un élément</a>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block ever_blog_form_tabs_nav %}
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item"><a class="nav-link active" id="ever-tab-content" data-toggle="tab" href="#ever-pane-content" role="tab">Contenu</a></li>
+    <li class="nav-item"><a class="nav-link" id="ever-tab-seo" data-toggle="tab" href="#ever-pane-seo" role="tab">SEO</a></li>
+    <li class="nav-item"><a class="nav-link" id="ever-tab-publication" data-toggle="tab" href="#ever-pane-publication" role="tab">Publication</a></li>
+    <li class="nav-item"><a class="nav-link" id="ever-tab-relations" data-toggle="tab" href="#ever-pane-relations" role="tab">Relations</a></li>
+  </ul>
+{% endblock %}
+
+{% block ever_blog_language_switch %}
+  {% if everBlogLanguages is not empty %}
+    <div class="d-flex flex-wrap align-items-center justify-content-between border rounded p-2 mb-3 bg-light">
+      <div class="small text-muted mr-2">Langue d’édition :</div>
+      <div class="btn-group btn-group-sm" role="group" aria-label="Sélecteur de langue">
+        {% for lang in everBlogLanguages %}
+          <button type="button" class="btn btn-outline-secondary ever-lang-switch {{ loop.first ? 'active' : '' }}" data-lang-id="{{ lang.id }}">{{ lang.label }}</button>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block ever_blog_multilang_errors %}
+  {% if everBlogLanguages is not empty %}
+    <div class="alert alert-warning p-2 mb-3" role="alert">
+      <strong>Validation par langue :</strong>
+      <ul class="mb-0 mt-1 pl-3">
+        {% for lang in everBlogLanguages %}
+          <li class="ever-lang-error-item" data-lang-id="{{ lang.id }}">
+            {{ lang.label }}
+            <span class="text-success ever-lang-valid">✓ aucune erreur</span>
+            <span class="text-danger ever-lang-invalid d-none">✗ erreurs détectées</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block ever_blog_post %}
+  {{ block('ever_blog_editorial_layout') }}
+{% endblock %}
+
+{% block ever_blog_category %}
+  {{ block('ever_blog_editorial_layout') }}
+{% endblock %}
+
+{% block ever_blog_tag %}
+  {{ block('ever_blog_editorial_layout') }}
+{% endblock %}
+
+{% block ever_blog_author %}
+  {{ block('ever_blog_editorial_layout') }}
+{% endblock %}
+
+{% block ever_blog_editorial_layout %}
+  {{ block('ever_blog_form_tabs_nav') }}
+  {{ block('ever_blog_language_switch') }}
+  {{ block('ever_blog_multilang_errors') }}
+
+  <div class="tab-content border border-top-0 rounded-bottom p-3 mb-3">
+    <div class="tab-pane fade show active" id="ever-pane-content" role="tabpanel">
+      {% for field in everBlogSections.content %}
+        {{ form_row(field) }}
+      {% endfor %}
+    </div>
+
+    <div class="tab-pane fade" id="ever-pane-seo" role="tabpanel">
+      {% for field in everBlogSections.seo %}
+        {% set fieldName = field.vars.name %}
+        <div class="ever-seo-field {% if fieldName starts with 'meta_title_' %}ever-meta-title{% elseif fieldName starts with 'meta_description_' %}ever-meta-description{% elseif fieldName starts with 'link_rewrite_' %}ever-slug-field{% endif %}">
+          {{ form_row(field) }}
+          {% if fieldName starts with 'meta_title_' %}
+            <small class="form-text text-muted">
+              <span data-counter-for="{{ field.vars.id }}">0</span>/70 caractères
+            </small>
+          {% elseif fieldName starts with 'meta_description_' %}
+            <small class="form-text text-muted">
+              <span data-counter-for="{{ field.vars.id }}">0</span>/160 caractères
+            </small>
+          {% elseif fieldName starts with 'link_rewrite_' %}
+            <div class="d-flex justify-content-end mb-2">
+              <button type="button" class="btn btn-sm btn-outline-secondary ever-generate-slug" data-target="{{ field.vars.id }}" data-lang-id="{{ fieldName|split('_')|last }}">
+                Auto-générer le slug
+              </button>
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="tab-pane fade" id="ever-pane-publication" role="tabpanel">
+      {% if everBlogSections.publication is empty %}
+        <p class="text-muted mb-0">Aucun paramètre de publication spécifique pour cette ressource.</p>
+      {% else %}
+        {% for field in everBlogSections.publication %}
+          {{ form_row(field) }}
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <div class="tab-pane fade" id="ever-pane-relations" role="tabpanel">
+      {% if everBlogSections.relations is empty %}
+        <p class="text-muted mb-0">Aucune relation configurable pour cette ressource.</p>
+      {% else %}
+        {% for field in everBlogSections.relations %}
+          {{ form_row(field) }}
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block ever_blog_form_actions %}
+  <div class="d-flex flex-wrap align-items-center">
+    <a class="btn btn-outline-secondary mr-2 mb-2" href="{{ cancelUrl }}">Annuler</a>
+    <button type="submit" class="btn btn-outline-dark mr-2 mb-2" name="_submit_action" value="save" data-ever-publication-action="draft">Enregistrer brouillon</button>
+    <button type="submit" class="btn btn-success mr-2 mb-2" name="_submit_action" value="save" data-ever-publication-action="publish">Publier</button>
+    <button type="submit" class="btn btn-warning mr-2 mb-2" name="_submit_action" value="save" data-ever-publication-action="schedule">Programmer</button>
+    <button type="submit" class="btn btn-primary mb-2" name="_submit_action" value="save_and_stay">Enregistrer et rester</button>
+  </div>
+{% endblock %}
+
 {% block content %}
-  <div class="card">
+  {% set contentFields = [] %}
+  {% set seoFields = [] %}
+  {% set publicationFields = [] %}
+  {% set relationFields = [] %}
+  {% set otherFields = [] %}
+  {% set langIds = [] %}
+
+  {% set hasPostTabs = form.content_tab is defined or form.seo_tab is defined or form.publication_tab is defined or form.taxonomy_tab is defined %}
+
+  {% if hasPostTabs %}
+    {% if form.content_tab is defined %}
+      {% for child in form.content_tab %}
+        {% set contentFields = contentFields|merge([child]) %}
+      {% endfor %}
+    {% endif %}
+    {% if form.seo_tab is defined %}
+      {% for child in form.seo_tab %}
+        {% set seoFields = seoFields|merge([child]) %}
+      {% endfor %}
+    {% endif %}
+    {% if form.publication_tab is defined %}
+      {% for child in form.publication_tab %}
+        {% set publicationFields = publicationFields|merge([child]) %}
+      {% endfor %}
+    {% endif %}
+    {% if form.taxonomy_tab is defined %}
+      {% for child in form.taxonomy_tab %}
+        {% set relationFields = relationFields|merge([child]) %}
+      {% endfor %}
+    {% endif %}
+  {% else %}
+    {% for child in form %}
+      {% set fieldName = child.vars.name %}
+      {% if fieldName starts with 'title_' or fieldName starts with 'content_' or fieldName starts with 'bottom_content_' or fieldName starts with 'excerpt_' %}
+        {% set contentFields = contentFields|merge([child]) %}
+      {% elseif fieldName starts with 'meta_title_' or fieldName starts with 'meta_description_' or fieldName starts with 'link_rewrite_' %}
+        {% set seoFields = seoFields|merge([child]) %}
+      {% elseif fieldName in ['post_status', 'date_add', 'id_author', 'starred', 'psswd'] %}
+        {% set publicationFields = publicationFields|merge([child]) %}
+      {% elseif fieldName in ['id_default_category', 'post_categories', 'post_tags', 'post_products', 'allowed_groups'] %}
+        {% set relationFields = relationFields|merge([child]) %}
+      {% else %}
+        {% set otherFields = otherFields|merge([child]) %}
+      {% endif %}
+    {% endfor %}
+
+    {% if otherFields is not empty %}
+      {% set contentFields = contentFields|merge(otherFields) %}
+    {% endif %}
+  {% endif %}
+
+  {% for field in contentFields|merge(seoFields)|merge(publicationFields)|merge(relationFields) %}
+    {% set matches = field.vars.name|split('_') %}
+    {% set maybeLangId = matches|last %}
+    {% if maybeLangId matches '/^\\d+$/' and maybeLangId not in langIds %}
+      {% set langIds = langIds|merge([maybeLangId]) %}
+    {% endif %}
+  {% endfor %}
+
+  {% set everBlogLanguages = [] %}
+  {% for langId in langIds %}
+    {% set everBlogLanguages = everBlogLanguages|merge([{ id: langId, label: 'Langue #' ~ langId }]) %}
+  {% endfor %}
+
+  {% set everBlogSections = {
+    content: contentFields,
+    seo: seoFields,
+    publication: publicationFields,
+    relations: relationFields
+  } %}
+
+  <div class="card ever-admin-form" id="ever-admin-form-root">
     <h3 class="card-header">{{ resource|capitalize }} #{{ entityId ?: 'new' }}</h3>
     <div class="card-body">
-      <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-        <div class="btn-group mb-2" role="group" aria-label="Navigation Ever Blog">
-          {% for link in navigationLinks %}
-            <a class="btn {{ currentResource == link.key ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ link.url }}">{{ link.label }}</a>
-          {% endfor %}
-        </div>
-        {% if createUrl is defined and createUrl %}
-          <a class="btn btn-success mb-2" href="{{ createUrl }}">Ajouter un élément</a>
-        {% endif %}
-      </div>
+      {{ block('ever_blog_form_header') }}
 
-      {{ form_start(form) }}
+      {{ form_start(form, {'attr': {'id': 'ever-modern-form'}}) }}
       {% if csrfTokenId is defined and csrfTokenId %}
         <input type="hidden" name="_csrf_token" value="{{ csrf_token(csrfTokenId) }}">
       {% endif %}
-      {{ form_widget(form) }}
-      <div class="d-flex flex-wrap">
-        <a class="btn btn-outline-secondary mr-2 mb-2" href="{{ cancelUrl }}">Annuler</a>
-        <button type="submit" class="btn btn-primary mr-2 mb-2" name="_submit_action" value="save">Enregistrer</button>
-        <button type="submit" class="btn btn-primary" name="_submit_action" value="save_and_stay">Enregistrer et rester</button>
-      </div>
-      {{ form_end(form) }}
+
+      {% if resource == 'post' %}
+        {{ block('ever_blog_post') }}
+      {% elseif resource == 'category' %}
+        {{ block('ever_blog_category') }}
+      {% elseif resource == 'tag' %}
+        {{ block('ever_blog_tag') }}
+      {% elseif resource == 'author' %}
+        {{ block('ever_blog_author') }}
+      {% else %}
+        {{ form_widget(form) }}
+      {% endif %}
+
+      {{ form_rest(form) }}
+      {{ block('ever_blog_form_actions') }}
+      {{ form_end(form, {'render_rest': false}) }}
     </div>
   </div>
+
+  <script>
+    (function () {
+      var root = document.getElementById('ever-admin-form-root');
+      if (!root) {
+        return;
+      }
+
+      function getInput(id) {
+        return document.getElementById(id);
+      }
+
+      function getInputBySelector(selector) {
+        return root.querySelector(selector);
+      }
+
+      function toSlug(value) {
+        if (!value) {
+          return '';
+        }
+
+        var from = 'àáäâèéëêìíïîòóöôùúüûñç·/_,:;';
+        var to = 'aaaaeeeeiiiioooouuuunc------';
+        value = value.toString().trim().toLowerCase();
+
+        for (var i = 0; i < from.length; i += 1) {
+          value = value.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+        }
+
+        return value
+          .replace(/[^a-z0-9 -]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-+/, '')
+          .replace(/-+$/, '');
+      }
+
+      function detectLangForField(fieldName) {
+        var match = fieldName.match(/_(\d+)$/);
+        return match ? match[1] : null;
+      }
+
+      function updateCounter(input, counter) {
+        if (!input || !counter) {
+          return;
+        }
+
+        counter.textContent = (input.value || '').length;
+      }
+
+      var counterNodes = root.querySelectorAll('[data-counter-for]');
+      Array.prototype.forEach.call(counterNodes, function (counter) {
+        var input = getInput(counter.getAttribute('data-counter-for'));
+        if (!input) {
+          return;
+        }
+
+        updateCounter(input, counter);
+        input.addEventListener('input', function () {
+          updateCounter(input, counter);
+        });
+      });
+
+      var slugButtons = root.querySelectorAll('.ever-generate-slug');
+      Array.prototype.forEach.call(slugButtons, function (btn) {
+        btn.addEventListener('click', function () {
+          var target = getInput(btn.getAttribute('data-target'));
+          var langId = btn.getAttribute('data-lang-id');
+          var titleInput = getInputBySelector('[id$=\"_title_' + langId + '\"]')
+            || getInputBySelector('[id$=\"_meta_title_' + langId + '\"]')
+            || getInputBySelector('[id$=\"_nickhandle\"]');
+          if (!target || !titleInput) {
+            return;
+          }
+
+          target.value = toSlug(titleInput.value || '');
+          target.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+      });
+
+      var richFields = root.querySelectorAll('textarea[id*="content_"]');
+      Array.prototype.forEach.call(richFields, function (field) {
+        field.classList.add('rte');
+        field.classList.add('autoload_rte');
+      });
+
+      function refreshLanguageView(langId) {
+        var allLangFields = root.querySelectorAll('[id^="form_"]');
+        Array.prototype.forEach.call(allLangFields, function (field) {
+          var current = detectLangForField(field.id.replace('form_', ''));
+          if (!current) {
+            return;
+          }
+
+          var wrapper = field.closest('.form-group, .form-control-wrapper, .ever-seo-field') || field.parentElement;
+          if (!wrapper) {
+            return;
+          }
+
+          wrapper.style.display = current === langId ? '' : 'none';
+        });
+
+        var switches = root.querySelectorAll('.ever-lang-switch');
+        Array.prototype.forEach.call(switches, function (switchBtn) {
+          switchBtn.classList.toggle('active', switchBtn.getAttribute('data-lang-id') === langId);
+        });
+      }
+
+      function refreshLanguageValidation() {
+        var items = root.querySelectorAll('.ever-lang-error-item');
+        Array.prototype.forEach.call(items, function (item) {
+          var langId = item.getAttribute('data-lang-id');
+          var invalid = root.querySelector('[id$="_' + langId + '"][aria-invalid="true"], [id$="_' + langId + '"].is-invalid');
+          var validNode = item.querySelector('.ever-lang-valid');
+          var invalidNode = item.querySelector('.ever-lang-invalid');
+          if (!validNode || !invalidNode) {
+            return;
+          }
+
+          validNode.classList.toggle('d-none', Boolean(invalid));
+          invalidNode.classList.toggle('d-none', !invalid);
+        });
+      }
+
+      var firstSwitch = root.querySelector('.ever-lang-switch');
+      if (firstSwitch) {
+        refreshLanguageView(firstSwitch.getAttribute('data-lang-id'));
+      }
+
+      var switches = root.querySelectorAll('.ever-lang-switch');
+      Array.prototype.forEach.call(switches, function (switchBtn) {
+        switchBtn.addEventListener('click', function () {
+          refreshLanguageView(switchBtn.getAttribute('data-lang-id'));
+        });
+      });
+
+      function setPublicationState(action) {
+        var statusInput = getInputBySelector('[id$=\"_post_status\"]');
+        var dateInput = getInputBySelector('[id$=\"_date_add\"]');
+        var now = new Date();
+
+        if (action === 'draft' && statusInput) {
+          statusInput.value = 'draft';
+        }
+
+        if (action === 'publish') {
+          if (statusInput) {
+            statusInput.value = 'published';
+          }
+          if (dateInput) {
+            dateInput.value = now.toISOString().slice(0, 19).replace('T', ' ');
+          }
+        }
+
+        if (action === 'schedule') {
+          if (statusInput) {
+            statusInput.value = 'published';
+          }
+          if (dateInput) {
+            var tomorrow = new Date(now.getTime() + (24 * 60 * 60 * 1000));
+            dateInput.value = tomorrow.toISOString().slice(0, 19).replace('T', ' ');
+          }
+        }
+      }
+
+      var actionButtons = root.querySelectorAll('[data-ever-publication-action]');
+      Array.prototype.forEach.call(actionButtons, function (button) {
+        button.addEventListener('click', function () {
+          setPublicationState(button.getAttribute('data-ever-publication-action'));
+        });
+      });
+
+      refreshLanguageValidation();
+    }());
+  </script>
 {% endblock %}
