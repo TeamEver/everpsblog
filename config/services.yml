@@ -238,6 +238,9 @@ services:
     arguments:
       - '@cache.app'
 
+  PrestaShop\Module\Everpsblog\Service\BlogImageService:
+    alias: prestashop.module.everpsblog.service.blog_image
+
   prestashop.module.everpsblog.service.blog_sitemap:
     class: PrestaShop\Module\Everpsblog\Service\BlogSitemapService
     public: true
