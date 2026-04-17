@@ -21,6 +21,13 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+PrestaShopLogger::addLog(
+    '[everpsblog][deprecated] Legacy class loaded: EverPsBlogCategory',
+    1,
+    null,
+    'EverPsBlog'
+);
+
 use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 class EverPsBlogCategory extends ObjectModel
 {

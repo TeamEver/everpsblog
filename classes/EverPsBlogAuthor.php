@@ -21,6 +21,13 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+PrestaShopLogger::addLog(
+    '[everpsblog][deprecated] Legacy class loaded: EverPsBlogAuthor',
+    1,
+    null,
+    'EverPsBlog'
+);
+
 class EverPsBlogAuthor extends ObjectModel
 {
     public $id_ever_author;

@@ -21,6 +21,13 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+PrestaShopLogger::addLog(
+    '[everpsblog][deprecated] Legacy class loaded: EverPsBlogPost',
+    1,
+    null,
+    'EverPsBlog'
+);
+
 use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Presenter\AbstractLazyArray;

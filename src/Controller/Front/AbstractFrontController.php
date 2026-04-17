@@ -77,6 +77,13 @@ abstract class AbstractFrontController extends \ModuleFrontController
     {
         parent::init();
 
+        \PrestaShopLogger::addLog(
+            sprintf('[everpsblog][deprecated] Legacy FO controller workflow in use: %s', static::class),
+            1,
+            null,
+            'EverPsBlog'
+        );
+
         $params = [];
         $controllerName = \Dispatcher::getInstance()->getController();
 

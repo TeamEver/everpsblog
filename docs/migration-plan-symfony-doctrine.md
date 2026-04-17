@@ -20,6 +20,15 @@ Ce plan propose une coexistence contrôlée entre le legacy (`ObjectModel`, cont
 ---
 
 
+## Date de bascule totale
+- **Bascule effective**: 17 avril 2026.
+- **Mode d’exploitation**: BO Symfony/Doctrine par défaut, contrôleurs legacy conservés temporairement en observation (logs de détection d’usage).
+
+## Composants supprimés / retirés du runtime actif
+- Templates BO Smarty legacy pour les écrans métier blog (posts, catégories, tags, auteurs, commentaires).
+- Logique métier BO dans les contrôleurs admin legacy (désormais uniquement redirection vers routes Symfony).
+- Feature flags de coexistence BO comme mécanisme de rollback actif (phase de coexistence clôturée).
+
 ## Décision appliquée (BO)
 - Les contrôleurs BO legacy ne portent plus de logique métier: ils servent uniquement de proxy de redirection vers les routes Symfony (`/src/Controller/Admin`).
 - Le BO n'utilise plus les templates Smarty legacy (`views/templates/admin/*.tpl`) pour les écrans métier Posts/Catégories/Tags/Auteurs/Commentaires ; les écrans actifs sont rendus via Twig (`views/templates/admin/modern/*.html.twig`).
@@ -82,8 +91,8 @@ Ce plan propose une coexistence contrôlée entre le legacy (`ObjectModel`, cont
 
 ### Implémentation
 1. **Nettoyage code**
-   - Déprécier puis retirer les classes `ObjectModel` non utilisées.
-   - Supprimer les contrôleurs admin legacy devenus inactifs.
+   - Étape A (réalisée): marquer legacy en déprécié + activer les logs de détection d'usage.
+   - Étape B (à clôturer): supprimer les classes `ObjectModel` non utilisées et les contrôleurs legacy inactifs.
 2. **Routage et tabs**
    - Pointer définitivement tabs/routage BO vers Symfony.
    - Garder une fenêtre de sécurité (release N+1) avant suppression définitive des fallbacks.

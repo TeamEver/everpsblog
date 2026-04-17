@@ -25,6 +25,12 @@ abstract class EverPsBlogAdminController extends ModuleAdminController
 
     private function redirectToSymfonyRoute(): void
     {
+        PrestaShopLogger::addLog(
+            sprintf('[everpsblog][deprecated] Legacy BO controller access detected: %s', static::class),
+            1,
+            null,
+            'EverPsBlog'
+        );
         $controllerName = (string) Tools::getValue('controller');
         if ($controllerName === '' || !isset($this->legacyToSymfonyRoutes[$controllerName])) {
             return;
