@@ -110,6 +110,18 @@ services:
     class: PrestaShop\Module\Everpsblog\Service\AdminRouteSigner
 
   # ─────────────────────────────────────────────
+  # DOCTRINE
+  # ─────────────────────────────────────────────
+
+  prestashop.module.everpsblog.doctrine.table_prefix_subscriber:
+    class: PrestaShop\Module\Everpsblog\Doctrine\TablePrefixSubscriber
+    arguments:
+      - '@=constant("_DB_PREFIX_")'
+      - 'PrestaShop\Module\Everpsblog\Entity\'
+    tags:
+      - { name: doctrine.event_subscriber }
+
+  # ─────────────────────────────────────────────
   # DOCTRINE REPOSITORIES (FIX WARNING FACTORY)
   # ─────────────────────────────────────────────
   prestashop.module.everpsblog.repository.post:
