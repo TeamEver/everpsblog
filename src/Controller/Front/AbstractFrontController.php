@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PrestaShop\Module\Everpsblog\Controller\Front;
 
 use PrestaShop\PrestaShop\Core\Product\Search\Pagination;
+use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 
 require_once dirname(__DIR__, 3) . '/everpsblog.php';
 
@@ -136,6 +137,25 @@ abstract class AbstractFrontController extends \ModuleFrontController
             $idColumn => (int) $row[$idColumn],
             'link_rewrite' => (string) $row['link_rewrite'],
         ];
+    }
+
+
+    protected function getModuleService(string $serviceId)
+    {
+        if (isset($this->module) && method_exists($this->module, 'get')) {
+            try {
+                return $this->module->get($serviceId);
+            } catch (\Throwable $exception) {
+                // Fallback to legacy Symfony container access below.
+            }
+        }
+
+        $container = SymfonyContainer::getInstance();
+        if (null === $container) {
+            throw new \RuntimeException(sprintf('Symfony container is unavailable for service "%s".', $serviceId));
+        }
+
+        return $container->get($serviceId);
     }
 
     protected function getTemplateVarPagination($total = 0)
