@@ -2,25 +2,42 @@
 
 namespace PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler;
 
-use EverPsBlogPost;
+use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\UpdatePostCommand;
+use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository\PostWriteRepository;
+use PrestaShop\Module\Everpsblog\Entity\Post;
 
 class UpdatePostHandler
 {
+    /** @var EntityManagerInterface */
+    private $entityManager;
     /** @var PostRulesApplier */
     private $rulesApplier;
+    /** @var PostWriteRepository */
+    private $postWriteRepository;
 
-    public function __construct(PostRulesApplier $rulesApplier)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        PostRulesApplier $rulesApplier,
+        PostWriteRepository $postWriteRepository
+    ) {
+        $this->entityManager = $entityManager;
         $this->rulesApplier = $rulesApplier;
+        $this->postWriteRepository = $postWriteRepository;
     }
 
     public function __invoke(UpdatePostCommand $command): int
     {
-        $post = new EverPsBlogPost($command->getPostId());
-        $this->rulesApplier->apply($post, $command->getData()->toArray());
-        $post->save();
+        /** @var Post|null $post */
+        $post = $this->entityManager->getRepository(Post::class)->find($command->getPostId());
+        if (null === $post) {
+            throw new InvalidArgumentException(sprintf('Post with id %d not found.', $command->getPostId()));
+        }
 
-        return (int) $post->id;
+        $relations = $this->rulesApplier->apply($post, $command->getData()->toArray());
+        $this->postWriteRepository->save($post, $relations);
+
+        return (int) $post->getId();
     }
 }

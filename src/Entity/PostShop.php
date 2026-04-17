@@ -15,4 +15,25 @@ class PostShop
 
     /** @ORM\Id @ORM\Column(name="id_shop", type="integer") */
     private $shopId;
+
+    public static function create(?int $postId, int $shopId): self
+    {
+        $postShop = new self();
+        $postShop->postId = $postId;
+        $postShop->shopId = $shopId;
+
+        return $postShop;
+    }
+
+    public function setPostId(int $postId): self
+    {
+        $this->postId = $postId;
+
+        return $this;
+    }
+
+    public function getPostId(): ?int
+    {
+        return $this->postId;
+    }
 }

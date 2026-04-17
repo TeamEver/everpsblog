@@ -33,4 +33,39 @@ class PostLang
 
     /** @ORM\Column(name="excerpt", type="string", length=255, nullable=true) */
     private $excerpt;
+
+    public static function create(
+        ?int $postId,
+        int $langId,
+        string $title,
+        string $content,
+        ?string $excerpt,
+        ?string $metaTitle,
+        ?string $metaDescription,
+        ?string $linkRewrite
+    ): self {
+        $postLang = new self();
+        $postLang->postId = $postId;
+        $postLang->langId = $langId;
+        $postLang->title = $title;
+        $postLang->content = $content;
+        $postLang->excerpt = $excerpt;
+        $postLang->metaTitle = $metaTitle;
+        $postLang->metaDescription = $metaDescription;
+        $postLang->linkRewrite = $linkRewrite;
+
+        return $postLang;
+    }
+
+    public function setPostId(int $postId): self
+    {
+        $this->postId = $postId;
+
+        return $this;
+    }
+
+    public function getPostId(): ?int
+    {
+        return $this->postId;
+    }
 }
