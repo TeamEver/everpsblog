@@ -25,6 +25,26 @@ services:
     arguments:
       - '@doctrine.orm.entity_manager'
 
+  prestashop.module.everpsblog.blog.repository.category_write:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository\CategoryWriteRepository
+    arguments:
+      - '@doctrine.orm.entity_manager'
+
+  prestashop.module.everpsblog.blog.repository.tag_write:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository\TagWriteRepository
+    arguments:
+      - '@doctrine.orm.entity_manager'
+
+  prestashop.module.everpsblog.blog.repository.author_write:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository\AuthorWriteRepository
+    arguments:
+      - '@doctrine.orm.entity_manager'
+
+  prestashop.module.everpsblog.blog.repository.comment_write:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository\CommentWriteRepository
+    arguments:
+      - '@doctrine.orm.entity_manager'
+
   # ─────────────────────────────────────────────
   # HANDLERS
   # ─────────────────────────────────────────────
@@ -50,6 +70,66 @@ services:
       - '@doctrine.orm.entity_manager'
       - '@prestashop.module.everpsblog.blog.repository.post_write'
 
+  prestashop.module.everpsblog.blog.create_category_handler:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\CreateCategoryHandler
+    arguments:
+      - '@prestashop.module.everpsblog.blog.repository.category_write'
+
+  prestashop.module.everpsblog.blog.update_category_handler:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\UpdateCategoryHandler
+    arguments:
+      - '@prestashop.module.everpsblog.blog.repository.category_write'
+
+  prestashop.module.everpsblog.blog.delete_category_handler:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\DeleteCategoryHandler
+    arguments:
+      - '@prestashop.module.everpsblog.blog.repository.category_write'
+
+  prestashop.module.everpsblog.blog.create_tag_handler:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\CreateTagHandler
+    arguments:
+      - '@prestashop.module.everpsblog.blog.repository.tag_write'
+
+  prestashop.module.everpsblog.blog.update_tag_handler:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\UpdateTagHandler
+    arguments:
+      - '@prestashop.module.everpsblog.blog.repository.tag_write'
+
+  prestashop.module.everpsblog.blog.delete_tag_handler:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\DeleteTagHandler
+    arguments:
+      - '@prestashop.module.everpsblog.blog.repository.tag_write'
+
+  prestashop.module.everpsblog.blog.create_author_handler:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\CreateAuthorHandler
+    arguments:
+      - '@prestashop.module.everpsblog.blog.repository.author_write'
+
+  prestashop.module.everpsblog.blog.update_author_handler:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\UpdateAuthorHandler
+    arguments:
+      - '@prestashop.module.everpsblog.blog.repository.author_write'
+
+  prestashop.module.everpsblog.blog.delete_author_handler:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\DeleteAuthorHandler
+    arguments:
+      - '@prestashop.module.everpsblog.blog.repository.author_write'
+
+  prestashop.module.everpsblog.blog.create_comment_handler:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\CreateCommentHandler
+    arguments:
+      - '@prestashop.module.everpsblog.blog.repository.comment_write'
+
+  prestashop.module.everpsblog.blog.update_comment_handler:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\UpdateCommentHandler
+    arguments:
+      - '@prestashop.module.everpsblog.blog.repository.comment_write'
+
+  prestashop.module.everpsblog.blog.delete_comment_handler:
+    class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\DeleteCommentHandler
+    arguments:
+      - '@prestashop.module.everpsblog.blog.repository.comment_write'
+
   # ─────────────────────────────────────────────
   # COMMAND BUS
   # ─────────────────────────────────────────────
@@ -60,6 +140,18 @@ services:
         PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\CreatePostCommand: '@prestashop.module.everpsblog.blog.create_post_handler'
         PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\UpdatePostCommand: '@prestashop.module.everpsblog.blog.update_post_handler'
         PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\DeletePostCommand: '@prestashop.module.everpsblog.blog.delete_post_handler'
+        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\CreateCategoryCommand: '@prestashop.module.everpsblog.blog.create_category_handler'
+        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\UpdateCategoryCommand: '@prestashop.module.everpsblog.blog.update_category_handler'
+        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\DeleteCategoryCommand: '@prestashop.module.everpsblog.blog.delete_category_handler'
+        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\CreateTagCommand: '@prestashop.module.everpsblog.blog.create_tag_handler'
+        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\UpdateTagCommand: '@prestashop.module.everpsblog.blog.update_tag_handler'
+        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\DeleteTagCommand: '@prestashop.module.everpsblog.blog.delete_tag_handler'
+        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\CreateAuthorCommand: '@prestashop.module.everpsblog.blog.create_author_handler'
+        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\UpdateAuthorCommand: '@prestashop.module.everpsblog.blog.update_author_handler'
+        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\DeleteAuthorCommand: '@prestashop.module.everpsblog.blog.delete_author_handler'
+        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\CreateCommentCommand: '@prestashop.module.everpsblog.blog.create_comment_handler'
+        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\UpdateCommentCommand: '@prestashop.module.everpsblog.blog.update_comment_handler'
+        PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\DeleteCommentCommand: '@prestashop.module.everpsblog.blog.delete_comment_handler'
 
   PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandBus\CommandBusInterface:
     alias: prestashop.module.everpsblog.blog.command_bus
@@ -69,6 +161,18 @@ services:
   # ─────────────────────────────────────────────
   prestashop.module.everpsblog.blog.validator.post_request:
     class: PrestaShop\Module\Everpsblog\Application\Blog\PostRequestValidator
+
+  prestashop.module.everpsblog.blog.validator.category_request:
+    class: PrestaShop\Module\Everpsblog\Application\Blog\CategoryRequestValidator
+
+  prestashop.module.everpsblog.blog.validator.tag_request:
+    class: PrestaShop\Module\Everpsblog\Application\Blog\TagRequestValidator
+
+  prestashop.module.everpsblog.blog.validator.author_request:
+    class: PrestaShop\Module\Everpsblog\Application\Blog\AuthorRequestValidator
+
+  prestashop.module.everpsblog.blog.validator.comment_request:
+    class: PrestaShop\Module\Everpsblog\Application\Blog\CommentRequestValidator
 
   prestashop.module.everpsblog.blog.post_data_builder:
     class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\PostCommandDataBuilder
@@ -84,6 +188,41 @@ services:
 
   PrestaShop\Module\Everpsblog\Application\Blog\PostCommandAssembler:
     alias: prestashop.module.everpsblog.blog.assembler.post_command
+
+  prestashop.module.everpsblog.blog.assembler.category_command:
+    class: PrestaShop\Module\Everpsblog\Application\Blog\CategoryCommandAssembler
+    arguments:
+      - '@prestashop.module.everpsblog.blog.validator.category_request'
+      - '@=service("prestashop.adapter.legacy.context").getContext().shop.id'
+
+  prestashop.module.everpsblog.blog.assembler.tag_command:
+    class: PrestaShop\Module\Everpsblog\Application\Blog\TagCommandAssembler
+    arguments:
+      - '@prestashop.module.everpsblog.blog.validator.tag_request'
+      - '@=service("prestashop.adapter.legacy.context").getContext().shop.id'
+
+  prestashop.module.everpsblog.blog.assembler.author_command:
+    class: PrestaShop\Module\Everpsblog\Application\Blog\AuthorCommandAssembler
+    arguments:
+      - '@prestashop.module.everpsblog.blog.validator.author_request'
+      - '@=service("prestashop.adapter.legacy.context").getContext().shop.id'
+
+  prestashop.module.everpsblog.blog.assembler.comment_command:
+    class: PrestaShop\Module\Everpsblog\Application\Blog\CommentCommandAssembler
+    arguments:
+      - '@prestashop.module.everpsblog.blog.validator.comment_request'
+
+  PrestaShop\Module\Everpsblog\Application\Blog\CategoryCommandAssembler:
+    alias: prestashop.module.everpsblog.blog.assembler.category_command
+
+  PrestaShop\Module\Everpsblog\Application\Blog\TagCommandAssembler:
+    alias: prestashop.module.everpsblog.blog.assembler.tag_command
+
+  PrestaShop\Module\Everpsblog\Application\Blog\AuthorCommandAssembler:
+    alias: prestashop.module.everpsblog.blog.assembler.author_command
+
+  PrestaShop\Module\Everpsblog\Application\Blog\CommentCommandAssembler:
+    alias: prestashop.module.everpsblog.blog.assembler.comment_command
 
   # ─────────────────────────────────────────────
   # SERVICES
