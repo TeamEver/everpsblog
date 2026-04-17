@@ -3,9 +3,10 @@
 namespace PrestaShop\Module\Everpsblog\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use PrestaShop\Module\Everpsblog\Repository\CommentRepository;
 
 /**
- * @ORM\Entity(repositoryClass="PrestaShop\\Module\\Everpsblog\\Repository\\CommentRepository")
+ * @ORM\Entity(repositoryClass=CommentRepository::class)
  * @ORM\Table(name="ever_blog_comments")
  */
 class Comment

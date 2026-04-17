@@ -4,9 +4,10 @@ namespace PrestaShop\Module\Everpsblog\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use PrestaShop\Module\Everpsblog\Repository\AuthorRepository;
 
 /**
- * @ORM\Entity(repositoryClass="PrestaShop\\Module\\Everpsblog\\Repository\\AuthorRepository")
+ * @ORM\Entity(repositoryClass=AuthorRepository::class)
  * @ORM\Table(name="ever_blog_author")
  */
 class Author
