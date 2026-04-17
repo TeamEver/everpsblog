@@ -199,7 +199,12 @@ class EverPsBlog extends Module
 
     private function getBlogInstallService()
     {
-        return $this->getModuleService('prestashop.module.everpsblog.service.blog_install');
+        try {
+            return $this->getModuleService('prestashop.module.everpsblog.service.blog_install');
+        } catch (\Throwable $exception) {
+            // During module install, module Symfony services can be unavailable.
+            return new \PrestaShop\Module\Everpsblog\Service\BlogInstallService();
+        }
     }
 
     private function getBlogTaxonomyService()
