@@ -67,6 +67,7 @@ class TagWriteRepository
             $title = (string) ($data['title_' . $langId] ?? $data['title']);
             $metaTitle = (string) ($data['meta_title_' . $langId] ?? $data['meta_title']);
             $metaDescription = (string) ($data['meta_description_' . $langId] ?? $data['meta_description']);
+            $slug = (string) ($data['link_rewrite_' . $langId] ?? '');
 
             $connection->insert('ever_blog_tag_lang', [
                 'id_ever_tag' => $tagId,
@@ -74,7 +75,7 @@ class TagWriteRepository
                 'title' => $title,
                 'meta_title' => $metaTitle,
                 'meta_description' => $metaDescription,
-                'link_rewrite' => Tools::str2url($title ?: $metaTitle),
+                'link_rewrite' => Tools::str2url($slug ?: ($title ?: $metaTitle)),
                 'content' => (string) ($data['content_' . $langId] ?? $data['content']),
                 'bottom_content' => (string) ($data['bottom_content_' . $langId] ?? $data['bottom_content']),
             ]);
