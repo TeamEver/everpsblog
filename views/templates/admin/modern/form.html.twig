@@ -319,6 +319,44 @@
       Array.prototype.forEach.call(richFields, function (field) {
         field.classList.add('rte');
         field.classList.add('autoload_rte');
+        field.classList.add('ever-richtext');
+      });
+
+      var excerptFields = root.querySelectorAll('textarea[id*="excerpt_"], textarea[id*="bottom_content_"]');
+      Array.prototype.forEach.call(excerptFields, function (field) {
+        field.classList.add('rte');
+        field.classList.add('autoload_rte');
+        field.classList.add('ever-richtext');
+      });
+
+      if (window.tinymce && typeof window.tinymce.init === 'function') {
+        window.tinymce.init({
+          selector: '#ever-admin-form-root textarea.ever-richtext',
+          menubar: false,
+          plugins: 'link lists code table autoresize',
+          toolbar: 'undo redo | bold italic underline | bullist numlist | link | code',
+          convert_urls: false,
+          relative_urls: false,
+          branding: false,
+          height: 320
+        });
+      }
+
+      var tagifyTargets = root.querySelectorAll('select[multiple][data-ever-tagify="1"]');
+      Array.prototype.forEach.call(tagifyTargets, function (selectNode) {
+        if (window.Tagify && typeof window.Tagify === 'function') {
+          try {
+            new window.Tagify(selectNode, {
+              enforceWhitelist: true,
+              dropdown: {
+                enabled: 0,
+                closeOnSelect: false
+              }
+            });
+          } catch (e) {
+            // fallback natif si Tagify n'est pas disponible
+          }
+        }
       });
 
       function refreshLanguageView(langId) {
