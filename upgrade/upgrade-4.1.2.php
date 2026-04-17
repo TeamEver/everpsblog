@@ -21,10 +21,11 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
+
 function upgrade_module_4_1_2()
 {
-    require_once _PS_MODULE_DIR_ . 'everpsblog/classes/EverPsBlogImage.php';
-    set_time_limit(0);
+        set_time_limit(0);
     $result = false;
     // Preparing new taxonomies
     $sql = [];
@@ -41,19 +42,20 @@ function upgrade_module_4_1_2()
     foreach ($sql as $s) {
         $result &= Db::getInstance()->execute($s);
     }
+    $service = SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_image');
     $shops = Db::getInstance()->executeS('SELECT id_shop FROM `' . _DB_PREFIX_ . 'shop`');
 
     foreach ($shops as $shop) {
-        $result &= EverPsBlogImage::migratePostsImages(
+        $result &= $service->migrateImagesByType('ever_blog_post', 'id_ever_post', 'post', 'posts/post_image_', 
             (int) $shop['id_shop']
         );
-        $result &= EverPsBlogImage::migrateCategoriesImages(
+        $result &= $service->migrateImagesByType('ever_blog_category', 'id_ever_category', 'category', 'categories/category_image_', 
             (int) $shop['id_shop']
         );
-        $result &= EverPsBlogImage::migrateTagsImages(
+        $result &= $service->migrateImagesByType('ever_blog_tag', 'id_ever_tag', 'tag', 'tags/tag_image_', 
             (int) $shop['id_shop']
         );
-        $result &= EverPsBlogImage::migrateAuthorsImages(
+        $result &= $service->migrateImagesByType('ever_blog_author', 'id_ever_author', 'author', 'authors/author_image_', 
             (int) $shop['id_shop']
         );
     }

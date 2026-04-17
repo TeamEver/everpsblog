@@ -21,6 +21,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 use PrestaShop\Module\Everpsblog\Controller\Front\AuthorController;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\TaxonomyViewModel;
@@ -148,7 +149,7 @@ class EverPsBlogauthorModuleFrontController extends AuthorController
                 'class' => 'twitter',
                 'url' => 'https://twitter.com/intent/tweet?text=' . $this->author->nickhandle . ' ' . $page['canonical'],
             ];
-            $file_url = EverPsBlogImage::getBlogImageUrl(
+            $file_url = $this->getBlogImageService()->getBlogImageUrl(
                 (int) $this->author->id,
                 (int) $this->context->shop->id,
                 'author'
@@ -251,4 +252,20 @@ class EverPsBlogauthorModuleFrontController extends AuthorController
         $page['body_classes']['page-everblog-' . Configuration::get('EVERPSBLOG_AUTHOR_LAYOUT')] = true;
         return $page;
     }
+
+    private function getBlogImageService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_image');
+    }
+
+    private function getBlogTaxonomyService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_taxonomy');
+    }
+
+    private function getBlogSortOrderService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_sort_order');
+    }
+
 }

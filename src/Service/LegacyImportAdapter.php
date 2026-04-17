@@ -4,10 +4,16 @@ namespace PrestaShop\Module\Everpsblog\Service;
 
 class LegacyImportAdapter
 {
+    private $blogImageService;
+
+    public function __construct(BlogImageService $blogImageService)
+    {
+        $this->blogImageService = $blogImageService;
+    }
+
     public function getOrCreateCategoryByLinkRewrite($linkRewrite)
     {
         $category = \EverPsBlogCategory::getCategoryByLinkRewrite((string) $linkRewrite);
-
         if (!\Validate::isLoadedObject($category)) {
             $category = new \EverPsBlogCategory();
         }
@@ -18,7 +24,6 @@ class LegacyImportAdapter
     public function getOrCreateTagByLinkRewrite($linkRewrite)
     {
         $tag = \EverPsBlogTag::getTagByLinkRewrite((string) $linkRewrite);
-
         if (!\Validate::isLoadedObject($tag)) {
             $tag = new \EverPsBlogTag();
         }
@@ -29,7 +34,6 @@ class LegacyImportAdapter
     public function getOrCreateAuthorByNickhandle($nickhandle)
     {
         $author = \EverPsBlogAuthor::getAuthorByNickhandle((string) $nickhandle);
-
         if (!\Validate::isLoadedObject($author)) {
             $author = new \EverPsBlogAuthor();
             $author->nickhandle = (string) $nickhandle;
@@ -41,7 +45,6 @@ class LegacyImportAdapter
     public function getOrCreatePostByLinkRewrite($linkRewrite)
     {
         $post = \EverPsBlogPost::getPostByLinkRewrite((string) $linkRewrite);
-
         if (!\Validate::isLoadedObject($post)) {
             $post = new \EverPsBlogPost();
         }
@@ -51,10 +54,9 @@ class LegacyImportAdapter
 
     public function getOrCreatePostImage($postId, $shopId)
     {
-        $image = \EverPsBlogImage::getBlogImage((int) $postId, (int) $shopId, 'post');
-
+        $image = $this->blogImageService->getBlogImage((int) $postId, (int) $shopId, 'post');
         if (!\Validate::isLoadedObject($image)) {
-            $image = new \EverPsBlogImage();
+            $image = $this->blogImageService->createImageModel();
         }
 
         return $image;

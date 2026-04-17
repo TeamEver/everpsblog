@@ -127,16 +127,34 @@ services:
   prestashop.module.everpsblog.service.blog_install:
     class: PrestaShop\Module\Everpsblog\Service\BlogInstallService
 
+  prestashop.module.everpsblog.service.blog_image:
+    class: PrestaShop\Module\Everpsblog\Service\BlogImageService
+    arguments:
+      - '@cache.app'
+
+  prestashop.module.everpsblog.service.blog_cleaner:
+    class: PrestaShop\Module\Everpsblog\Service\BlogCleanerService
+
+  prestashop.module.everpsblog.service.blog_sort_order:
+    class: PrestaShop\Module\Everpsblog\Service\BlogSortOrderService
+
   prestashop.module.everpsblog.service.blog_taxonomy:
     class: PrestaShop\Module\Everpsblog\Service\BlogTaxonomyService
+    arguments:
+      - '@cache.app'
 
   prestashop.module.everpsblog.service.blog_sitemap:
     class: PrestaShop\Module\Everpsblog\Service\BlogSitemapService
 
   prestashop.module.everpsblog.service.legacy_import_adapter:
     class: PrestaShop\Module\Everpsblog\Service\LegacyImportAdapter
+    arguments:
+      - '@prestashop.module.everpsblog.service.blog_image'
 
   PrestaShop\Module\Everpsblog\Service\BlogInstallService: '@prestashop.module.everpsblog.service.blog_install'
+  PrestaShop\Module\Everpsblog\Service\BlogImageService: '@prestashop.module.everpsblog.service.blog_image'
+  PrestaShop\Module\Everpsblog\Service\BlogCleanerService: '@prestashop.module.everpsblog.service.blog_cleaner'
+  PrestaShop\Module\Everpsblog\Service\BlogSortOrderService: '@prestashop.module.everpsblog.service.blog_sort_order'
   PrestaShop\Module\Everpsblog\Service\BlogTaxonomyService: '@prestashop.module.everpsblog.service.blog_taxonomy'
   PrestaShop\Module\Everpsblog\Service\BlogSitemapService: '@prestashop.module.everpsblog.service.blog_sitemap'
   PrestaShop\Module\Everpsblog\Service\LegacyImportAdapter: '@prestashop.module.everpsblog.service.legacy_import_adapter'

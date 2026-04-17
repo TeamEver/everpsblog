@@ -21,6 +21,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 use PrestaShop\Module\Everpsblog\Controller\Front\TagController;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\TaxonomyViewModel;
@@ -130,7 +131,7 @@ class EverPsBlogtagModuleFrontController extends TagController
                 'blog_tag' => $this->tag,
                 'blog_posts' => $posts,
             ]);
-            $file_url = EverPsBlogImage::getBlogImageUrl(
+            $file_url = $this->getBlogImageService()->getBlogImageUrl(
                 (int) $this->tag->id,
                 (int) $this->context->shop->id,
                 'tag'
@@ -235,4 +236,20 @@ class EverPsBlogtagModuleFrontController extends TagController
         $page['body_classes']['page-everblog-' . Configuration::get('EVERPSBLOG_TAG_LAYOUT')] = true;
         return $page;
     }
+
+    private function getBlogImageService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_image');
+    }
+
+    private function getBlogTaxonomyService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_taxonomy');
+    }
+
+    private function getBlogSortOrderService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_sort_order');
+    }
+
 }

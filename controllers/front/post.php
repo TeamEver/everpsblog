@@ -21,6 +21,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 use PrestaShop\Module\Everpsblog\Controller\Front\PostController;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 
@@ -145,18 +146,18 @@ class EverPsBlogpostModuleFrontController extends PostController
             );
         }
         // Get author cover if exists, else get shop logo
-        $this->author_cover = EverPsBlogImage::getBlogImageUrl(
+        $this->author_cover = $this->getBlogImageService()->getBlogImageUrl(
             (int) $this->author->id,
             (int) $this->context->shop->id,
             'author'
         );
-        $this->post_tags = EverPsBlogTaxonomy::getPostTagsTaxonomies(
+        $this->post_tags = $this->getBlogTaxonomyService()->getPostTagsTaxonomies(
             (int) $this->post->id
         );
-        $this->post_categories = EverPsBlogTaxonomy::getPostCategoriesTaxonomies(
+        $this->post_categories = $this->getBlogTaxonomyService()->getPostCategoriesTaxonomies(
             (int) $this->post->id
         );
-        $this->post_products = EverPsBlogTaxonomy::getPostProductsTaxonomies(
+        $this->post_products = $this->getBlogTaxonomyService()->getPostProductsTaxonomies(
             (int) $this->post->id
         );
         parent::init();
@@ -437,7 +438,7 @@ class EverPsBlogpostModuleFrontController extends PostController
                 'class' => 'twitter',
                 'url' => 'https://twitter.com/intent/tweet?text=' . $this->post->title . ' ' . $page['canonical'],
             ];
-            $file_url = EverPsBlogImage::getBlogImageUrl(
+            $file_url = $this->getBlogImageService()->getBlogImageUrl(
                 (int) $this->post->id,
                 (int) $this->context->shop->id,
                 'post'
@@ -629,4 +630,20 @@ class EverPsBlogpostModuleFrontController extends PostController
         $page['body_classes']['page-everblog-' . Configuration::get('EVERPSBLOG_POST_LAYOUT')] = true;
         return $page;
     }
+
+    private function getBlogImageService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_image');
+    }
+
+    private function getBlogTaxonomyService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_taxonomy');
+    }
+
+    private function getBlogSortOrderService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_sort_order');
+    }
+
 }

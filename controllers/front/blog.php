@@ -21,6 +21,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 use PrestaShop\Module\Everpsblog\Controller\Front\BlogController;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 
@@ -133,7 +134,7 @@ class EverPsBlogblogModuleFrontController extends BlogController
             ]);
         }    
 
-        $sortOrders = EverPsBlogSortOrders::getSortOrders();
+        $sortOrders = $this->getBlogSortOrderService()->getSortOrders();
         $sortSelected = array_filter($sortOrders, function ($sortOrder) { return $sortOrder['current']; });
         $sortSelected = $sortSelected ? $sortSelected[array_key_first($sortSelected)] : null;
         
@@ -294,4 +295,20 @@ class EverPsBlogblogModuleFrontController extends BlogController
         $page['body_classes']['page-everblog-' . Configuration::get('EVERPSBLOG_BLOG_LAYOUT')] = true;
         return $page;
     }
+
+    private function getBlogImageService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_image');
+    }
+
+    private function getBlogTaxonomyService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_taxonomy');
+    }
+
+    private function getBlogSortOrderService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_sort_order');
+    }
+
 }

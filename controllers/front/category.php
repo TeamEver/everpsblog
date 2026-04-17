@@ -21,6 +21,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 use PrestaShop\Module\Everpsblog\Controller\Front\CategoryController;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\TaxonomyViewModel;
@@ -66,7 +67,7 @@ class EverPsBlogcategoryModuleFrontController extends CategoryController
         $this->category->count = $this->category->count + 1;
         $this->category->save();
         parent::init();
-        $this->parent_categories = EverPsBlogTaxonomy::getCategoryParentsTaxonomy(
+        $this->parent_categories = $this->getBlogTaxonomyService()->getCategoryParentsTaxonomy(
             (int) $this->category->id
         ) ?: [];
         // if inactive category or unexists, redirect
@@ -96,7 +97,7 @@ class EverPsBlogcategoryModuleFrontController extends CategoryController
                 (int) $this->context->shop->id
             );
 
-            $sortOrders = EverPsBlogSortOrders::getSortOrders();
+            $sortOrders = $this->getBlogSortOrderService()->getSortOrders();
             $sortSelected = array_filter($sortOrders, function ($sortOrder) { return $sortOrder['current']; });
             $sortSelected = $sortSelected ? $sortSelected[array_key_first($sortSelected)] : null;
             
@@ -156,7 +157,7 @@ class EverPsBlogcategoryModuleFrontController extends CategoryController
                 'blog_category' => $this->category,
                 'blog_posts' => $posts,
             ]);
-            $file_url = EverPsBlogImage::getBlogImageUrl(
+            $file_url = $this->getBlogImageService()->getBlogImageUrl(
                 (int) $this->category->id,
                 (int) $this->context->shop->id,
                 'category'
@@ -288,4 +289,20 @@ class EverPsBlogcategoryModuleFrontController extends CategoryController
         $page['body_classes']['page-everblog-' . Configuration::get('EVERPSBLOG_CAT_LAYOUT')] = true;
         return $page;
     }
+
+    private function getBlogImageService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_image');
+    }
+
+    private function getBlogTaxonomyService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_taxonomy');
+    }
+
+    private function getBlogSortOrderService()
+    {
+        return SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_sort_order');
+    }
+
 }
