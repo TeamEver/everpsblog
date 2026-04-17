@@ -45,6 +45,9 @@ final class TagFormDataProvider
             'indexable' => (bool) ($tag['indexable'] ?? 0),
             'follow' => (bool) ($tag['follow'] ?? 0),
             'sitemap' => (bool) ($tag['sitemap'] ?? 0),
+            'count' => (int) ($tag['count'] ?? 0),
+            'allowed_groups' => $this->normalizeIntCollection($tag['allowed_groups'] ?? null),
+            'tag_products' => $this->normalizeIntCollection($tag['tag_products'] ?? null),
             'title' => '',
             'meta_title' => '',
             'meta_description' => '',
@@ -102,6 +105,9 @@ final class TagFormDataProvider
             'indexable' => true,
             'follow' => true,
             'sitemap' => true,
+            'count' => 0,
+            'allowed_groups' => [],
+            'tag_products' => [],
             'title' => '',
             'meta_title' => '',
             'meta_description' => '',
@@ -121,5 +127,32 @@ final class TagFormDataProvider
         }
 
         return $data;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return int[]
+     */
+    private function normalizeIntCollection($value): array
+    {
+        if (null === $value || '' === $value) {
+            return [];
+        }
+
+        if (is_array($value)) {
+            return array_values(array_map('intval', $value));
+        }
+
+        $decoded = json_decode((string) $value, true);
+        if (is_array($decoded)) {
+            return array_values(array_map('intval', $decoded));
+        }
+
+        $items = array_filter(array_map('trim', explode(',', (string) $value)), static function ($item) {
+            return '' !== $item;
+        });
+
+        return array_values(array_map('intval', $items));
     }
 }

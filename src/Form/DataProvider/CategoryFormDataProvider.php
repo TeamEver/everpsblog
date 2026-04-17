@@ -48,6 +48,9 @@ final class CategoryFormDataProvider
             'follow' => (bool) ($category['follow'] ?? 0),
             'sitemap' => (bool) ($category['sitemap'] ?? 0),
             'is_root_category' => (bool) ($category['is_root_category'] ?? 0),
+            'count' => (int) ($category['count'] ?? 0),
+            'allowed_groups' => $this->normalizeIntCollection($category['allowed_groups'] ?? null),
+            'category_products' => $this->normalizeIntCollection($category['category_products'] ?? null),
             'title' => '',
             'meta_title' => '',
             'meta_description' => '',
@@ -107,6 +110,9 @@ final class CategoryFormDataProvider
             'follow' => true,
             'sitemap' => true,
             'is_root_category' => false,
+            'count' => 0,
+            'allowed_groups' => [],
+            'category_products' => [],
             'title' => '',
             'meta_title' => '',
             'meta_description' => '',
@@ -126,5 +132,32 @@ final class CategoryFormDataProvider
         }
 
         return $data;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return int[]
+     */
+    private function normalizeIntCollection($value): array
+    {
+        if (null === $value || '' === $value) {
+            return [];
+        }
+
+        if (is_array($value)) {
+            return array_values(array_map('intval', $value));
+        }
+
+        $decoded = json_decode((string) $value, true);
+        if (is_array($decoded)) {
+            return array_values(array_map('intval', $decoded));
+        }
+
+        $items = array_filter(array_map('trim', explode(',', (string) $value)), static function ($item) {
+            return '' !== $item;
+        });
+
+        return array_values(array_map('intval', $items));
     }
 }

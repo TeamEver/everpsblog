@@ -48,6 +48,12 @@ final class AuthorFormDataProvider
             'indexable' => (bool) ($author['indexable'] ?? 0),
             'follow' => (bool) ($author['follow'] ?? 0),
             'sitemap' => (bool) ($author['sitemap'] ?? 0),
+            'twitter' => (string) ($author['twitter'] ?? ''),
+            'facebook' => (string) ($author['facebook'] ?? ''),
+            'linkedin' => (string) ($author['linkedin'] ?? ''),
+            'count' => (int) ($author['count'] ?? 0),
+            'allowed_groups' => $this->normalizeIntCollection($author['allowed_groups'] ?? null),
+            'author_products' => $this->normalizeIntCollection($author['author_products'] ?? null),
             'bio' => '',
             'meta_title' => '',
             'meta_description' => '',
@@ -107,6 +113,12 @@ final class AuthorFormDataProvider
             'indexable' => true,
             'follow' => true,
             'sitemap' => true,
+            'twitter' => '',
+            'facebook' => '',
+            'linkedin' => '',
+            'count' => 0,
+            'allowed_groups' => [],
+            'author_products' => [],
             'bio' => '',
             'meta_title' => '',
             'meta_description' => '',
@@ -126,5 +138,32 @@ final class AuthorFormDataProvider
         }
 
         return $data;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return int[]
+     */
+    private function normalizeIntCollection($value): array
+    {
+        if (null === $value || '' === $value) {
+            return [];
+        }
+
+        if (is_array($value)) {
+            return array_values(array_map('intval', $value));
+        }
+
+        $decoded = json_decode((string) $value, true);
+        if (is_array($decoded)) {
+            return array_values(array_map('intval', $decoded));
+        }
+
+        $items = array_filter(array_map('trim', explode(',', (string) $value)), static function ($item) {
+            return '' !== $item;
+        });
+
+        return array_values(array_map('intval', $items));
     }
 }

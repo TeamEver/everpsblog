@@ -3,6 +3,9 @@
 namespace PrestaShop\Module\Everpsblog\Form\Type\Admin;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -17,11 +20,70 @@ final class AuthorType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('nickhandle', TextType::class, [
-            'required' => false,
-            'label' => 'Pseudo',
-            'constraints' => [new Length(['max' => 255])],
-        ]);
+        $builder
+            ->add('id_employee', ChoiceType::class, [
+                'required' => false,
+                'label' => 'Employé lié',
+                'placeholder' => 'Aucun employé lié',
+                'choices' => $this->getEmployeeChoices(),
+            ])
+            ->add('nickhandle', TextType::class, [
+                'required' => false,
+                'label' => 'Pseudo',
+                'constraints' => [new Length(['max' => 255])],
+            ])
+            ->add('twitter', TextType::class, [
+                'required' => false,
+                'label' => 'Twitter',
+                'constraints' => [new Length(['max' => 255])],
+            ])
+            ->add('facebook', TextType::class, [
+                'required' => false,
+                'label' => 'Facebook',
+                'constraints' => [new Length(['max' => 255])],
+            ])
+            ->add('linkedin', TextType::class, [
+                'required' => false,
+                'label' => 'LinkedIn',
+                'constraints' => [new Length(['max' => 255])],
+            ])
+            ->add('active', CheckboxType::class, [
+                'required' => false,
+                'label' => 'Actif',
+            ])
+            ->add('indexable', CheckboxType::class, [
+                'required' => false,
+                'label' => 'Indexable',
+            ])
+            ->add('follow', CheckboxType::class, [
+                'required' => false,
+                'label' => 'Follow',
+            ])
+            ->add('sitemap', CheckboxType::class, [
+                'required' => false,
+                'label' => 'Inclure dans le sitemap',
+            ])
+            ->add('count', IntegerType::class, [
+                'required' => false,
+                'label' => 'Compteur',
+                'disabled' => true,
+            ])
+            ->add('allowed_groups', ChoiceType::class, [
+                'required' => false,
+                'label' => 'Groupes autorisés',
+                'choices' => $this->getGroupChoices(),
+                'multiple' => true,
+                'expanded' => true,
+            ])
+            ->add('author_products', ChoiceType::class, [
+                'required' => false,
+                'label' => 'Produits liés',
+                'choices' => $this->getProductChoices(),
+                'multiple' => true,
+                'expanded' => false,
+                'attr' => ['data-ever-tagify' => '1'],
+            ])
+        ;
 
         foreach (\Language::getLanguages(false) as $lang) {
             $idLang = (int) $lang['id_lang'];
@@ -60,5 +122,78 @@ final class AuthorType extends AbstractType
                 ])
             ;
         }
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function getEmployeeChoices(): array
+    {
+        $rows = \Db::getInstance()->executeS(
+            'SELECT e.id_employee, CONCAT(COALESCE(e.firstname, \'\'), \' \', COALESCE(e.lastname, \'\')) AS fullname
+            FROM `' . _DB_PREFIX_ . 'employee` e
+            ORDER BY e.id_employee DESC'
+        ) ?: [];
+
+        $choices = [];
+        foreach ($rows as $row) {
+            $id = (int) ($row['id_employee'] ?? 0);
+            if ($id <= 0) {
+                continue;
+            }
+
+            $label = trim((string) ($row['fullname'] ?? ''));
+            $choices[$label ?: sprintf('Employé #%d', $id)] = $id;
+        }
+
+        return $choices;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function getProductChoices(): array
+    {
+        $rows = \Db::getInstance()->executeS(
+            'SELECT p.id_product, pl.name
+            FROM `' . _DB_PREFIX_ . 'product` p
+            LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl ON (pl.id_product = p.id_product AND pl.id_lang = ' . (int) \Context::getContext()->language->id . ' AND pl.id_shop = ' . (int) \Context::getContext()->shop->id . ')
+            ORDER BY p.id_product DESC
+            LIMIT 500'
+        ) ?: [];
+
+        $choices = [];
+        foreach ($rows as $row) {
+            $id = (int) ($row['id_product'] ?? 0);
+            if ($id <= 0) {
+                continue;
+            }
+
+            $label = trim((string) ($row['name'] ?? ''));
+            $choices[$label ?: sprintf('Produit #%d', $id)] = $id;
+        }
+
+        return $choices;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function getGroupChoices(): array
+    {
+        $groups = \Group::getGroups((int) \Context::getContext()->language->id) ?: [];
+        $choices = [];
+
+        foreach ($groups as $group) {
+            $id = (int) ($group['id_group'] ?? 0);
+            if ($id <= 0) {
+                continue;
+            }
+
+            $label = trim((string) ($group['name'] ?? ''));
+            $choices[$label ?: sprintf('Groupe #%d', $id)] = $id;
+        }
+
+        return $choices;
     }
 }

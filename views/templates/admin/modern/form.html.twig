@@ -301,9 +301,9 @@
         {% set contentFields = contentFields|merge([child]) %}
       {% elseif fieldName starts with 'meta_title_' or fieldName starts with 'meta_description_' or fieldName starts with 'link_rewrite_' %}
         {% set seoFields = seoFields|merge([child]) %}
-      {% elseif fieldName in ['post_status', 'date_add', 'id_author', 'starred', 'psswd'] %}
+      {% elseif fieldName in ['post_status', 'date_add', 'id_author', 'starred', 'psswd', 'active', 'indexable', 'follow', 'sitemap', 'id_parent_category', 'is_root_category', 'id_employee', 'twitter', 'facebook', 'linkedin', 'count'] %}
         {% set publicationFields = publicationFields|merge([child]) %}
-      {% elseif fieldName in ['id_default_category', 'post_categories', 'post_tags', 'post_products', 'allowed_groups'] %}
+      {% elseif fieldName in ['id_default_category', 'post_categories', 'post_tags', 'post_products', 'allowed_groups', 'category_products', 'tag_products', 'author_products'] %}
         {% set relationFields = relationFields|merge([child]) %}
       {% else %}
         {% set otherFields = otherFields|merge([child]) %}

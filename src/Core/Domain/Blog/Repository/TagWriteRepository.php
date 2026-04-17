@@ -24,7 +24,8 @@ class TagWriteRepository
             'indexable' => (int) $data['indexable'],
             'follow' => (int) $data['follow'],
             'sitemap' => (int) $data['sitemap'],
-            'allowed_groups' => null,
+            'allowed_groups' => $this->encodeArray($data['allowed_groups'] ?? null),
+            'tag_products' => $this->encodeArray($data['tag_products'] ?? null),
             'count' => 0,
         ]);
 
@@ -42,6 +43,8 @@ class TagWriteRepository
             'indexable' => (int) $data['indexable'],
             'follow' => (int) $data['follow'],
             'sitemap' => (int) $data['sitemap'],
+            'allowed_groups' => $this->encodeArray($data['allowed_groups'] ?? null),
+            'tag_products' => $this->encodeArray($data['tag_products'] ?? null),
         ], ['id_ever_tag' => $tagId]);
 
         $this->replaceRelations($tagId, $data);
@@ -80,5 +83,17 @@ class TagWriteRepository
                 'bottom_content' => (string) ($data['bottom_content_' . $langId] ?? $data['bottom_content']),
             ]);
         }
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function encodeArray($value): ?string
+    {
+        if (!is_array($value) || empty($value)) {
+            return null;
+        }
+
+        return json_encode(array_values(array_map('intval', $value)));
     }
 }
