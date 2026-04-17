@@ -25,39 +25,9 @@ use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 
 function upgrade_module_4_1_2()
 {
-        set_time_limit(0);
-    $result = false;
-    // Preparing new taxonomies
-    $sql = [];
-    $sql[] =
-        'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_image` (
-            `id_ever_image` int(10) unsigned NOT NULL auto_increment,
-            `image_type` varchar(255) DEFAULT NULL,
-            `image_link` varchar(255) DEFAULT NULL,
-            `id_element` int(10) unsigned NOT NULL,
-            `id_shop` int(10) unsigned NOT NULL,
-            PRIMARY KEY (`id_ever_image`)
-        ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
+    set_time_limit(0);
 
-    foreach ($sql as $s) {
-        $result &= Db::getInstance()->execute($s);
-    }
-    $service = SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.blog_image');
-    $shops = Db::getInstance()->executeS('SELECT id_shop FROM `' . _DB_PREFIX_ . 'shop`');
+    $service = SymfonyContainer::getInstance()->get('prestashop.module.everpsblog.service.upgrade.image_table_migration');
 
-    foreach ($shops as $shop) {
-        $result &= $service->migrateImagesByType('ever_blog_post', 'id_ever_post', 'post', 'posts/post_image_', 
-            (int) $shop['id_shop']
-        );
-        $result &= $service->migrateImagesByType('ever_blog_category', 'id_ever_category', 'category', 'categories/category_image_', 
-            (int) $shop['id_shop']
-        );
-        $result &= $service->migrateImagesByType('ever_blog_tag', 'id_ever_tag', 'tag', 'tags/tag_image_', 
-            (int) $shop['id_shop']
-        );
-        $result &= $service->migrateImagesByType('ever_blog_author', 'id_ever_author', 'author', 'authors/author_image_', 
-            (int) $shop['id_shop']
-        );
-    }
-    return $result;
+    return (bool) $service->migrate();
 }

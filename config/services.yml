@@ -146,6 +146,19 @@ services:
   prestashop.module.everpsblog.service.blog_sitemap:
     class: PrestaShop\Module\Everpsblog\Service\BlogSitemapService
 
+
+  prestashop.module.everpsblog.service.upgrade.image_table_migration:
+    class: PrestaShop\Module\Everpsblog\Service\Upgrade\UpgradeImageTableMigrationService
+
+  prestashop.module.everpsblog.service.upgrade.image_filesystem_migration:
+    class: PrestaShop\Module\Everpsblog\Service\Upgrade\UpgradeImageFilesystemMigrationService
+
+  prestashop.module.everpsblog.service.upgrade.v301_migration:
+    class: PrestaShop\Module\Everpsblog\Service\Upgrade\Upgrade301MigrationService
+
+  PrestaShop\Module\Everpsblog\Service\Upgrade\UpgradeImageTableMigrationService: '@prestashop.module.everpsblog.service.upgrade.image_table_migration'
+  PrestaShop\Module\Everpsblog\Service\Upgrade\UpgradeImageFilesystemMigrationService: '@prestashop.module.everpsblog.service.upgrade.image_filesystem_migration'
+  PrestaShop\Module\Everpsblog\Service\Upgrade\Upgrade301MigrationService: '@prestashop.module.everpsblog.service.upgrade.v301_migration'
   prestashop.module.everpsblog.service.legacy_import_adapter:
     class: PrestaShop\Module\Everpsblog\Service\LegacyImportAdapter
     arguments:
