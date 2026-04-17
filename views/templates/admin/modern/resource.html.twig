@@ -1,70 +1,184 @@
 {% extends '@PrestaShop/Admin/layout.html.twig' %}
 
+{% block stylesheets %}
+  {{ parent() }}
+  <style>
+    .ever-admin-shell {
+      --ever-primary: #5b6cff;
+      --ever-primary-dark: #3647d1;
+      --ever-surface: #ffffff;
+      --ever-bg: #f5f7ff;
+      --ever-border: #e2e8ff;
+      --ever-text-soft: #667085;
+      --ever-success: #12b76a;
+      background: linear-gradient(180deg, #f3f6ff 0%, #f8f9fc 35%, #f7f8fb 100%);
+      padding: 1.25rem;
+      border-radius: .85rem;
+      border: 1px solid #edf0ff;
+    }
+
+    .ever-admin-hero {
+      background: radial-gradient(circle at top right, #dbe4ff, #f8faff 45%, #ffffff 100%);
+      border: 1px solid var(--ever-border);
+      border-radius: .85rem;
+      padding: 1rem 1.15rem;
+      box-shadow: 0 14px 40px -28px rgba(54, 71, 209, .5);
+      margin-bottom: 1rem;
+    }
+
+    .ever-admin-hero__title { margin: 0; font-weight: 700; }
+    .ever-admin-hero__subtitle { color: var(--ever-text-soft); margin: .25rem 0 0; }
+
+    .ever-admin-nav .btn {
+      border-radius: 999px;
+      font-weight: 600;
+      padding-inline: .85rem;
+    }
+
+    .ever-admin-nav .btn-primary {
+      background-color: var(--ever-primary);
+      border-color: var(--ever-primary);
+    }
+
+    .ever-admin-card {
+      border: 1px solid var(--ever-border);
+      border-radius: .85rem;
+      background: var(--ever-surface);
+      box-shadow: 0 14px 38px -30px rgba(16, 24, 40, .45);
+      overflow: hidden;
+    }
+
+    .ever-admin-card .card-header {
+      background: #fff;
+      border-bottom: 1px solid #eef2ff;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .ever-filter-box {
+      border: 1px solid #ecf0ff;
+      border-radius: .75rem;
+      background: var(--ever-bg);
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .ever-resource-table {
+      border: 1px solid #eef2ff;
+      border-radius: .8rem;
+      overflow: hidden;
+    }
+
+    .ever-resource-table .table { margin: 0; }
+    .ever-resource-table thead th {
+      background: #f8faff;
+      color: #344054;
+      border-bottom: 1px solid #e9edff;
+      font-size: .82rem;
+      text-transform: uppercase;
+      letter-spacing: .02em;
+      font-weight: 700;
+      vertical-align: middle;
+    }
+
+    .ever-resource-table tbody td { vertical-align: middle; border-top: 1px solid #f1f3ff; }
+    .ever-resource-table tbody tr:hover { background: #f9faff; }
+
+    .ever-bulk {
+      border: 1px solid #ecf0ff;
+      border-radius: .75rem;
+      background: #f8faff;
+      padding: .75rem;
+      margin-top: .9rem;
+    }
+
+    .ever-empty {
+      color: #475467;
+      text-align: center;
+      padding: 1.2rem;
+      background: #fbfcff;
+      border: 1px dashed #d7dfff;
+      border-radius: .65rem;
+    }
+  </style>
+{% endblock %}
+
 {% block content %}
-  <div class="card">
-    <h3 class="card-header">{{ definition.title }}</h3>
-    <div class="card-body">
-      <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-        <div class="btn-group mb-2" role="group" aria-label="Navigation Ever Blog">
-          {% for link in navigationLinks %}
-            <a class="btn {{ currentResource == link.key ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ link.url }}">{{ link.label }}</a>
-          {% endfor %}
-        </div>
-        {% if createUrl is defined and createUrl %}
-          <a class="btn btn-success mb-2" href="{{ createUrl }}">Ajouter un élément</a>
-        {% endif %}
+  <div class="ever-admin-shell">
+    <section class="ever-admin-hero d-flex flex-wrap justify-content-between align-items-center">
+      <div class="mb-2 mb-md-0">
+        <h2 class="ever-admin-hero__title">{{ definition.title }}</h2>
+        <p class="ever-admin-hero__subtitle">Gestion moderne des contenus avec actions rapides, filtres avancés et traitement en lot.</p>
       </div>
+      {% if createUrl is defined and createUrl %}
+        <a class="btn btn-success" href="{{ createUrl }}">+ Ajouter un élément</a>
+      {% endif %}
+    </section>
 
-      <form method="get" class="mb-3">
-        <div class="row">
-          {% for id, label in definition.filters %}
-            <div class="col-md-3">
-              <label class="form-control-label" for="{{ id }}">{{ label }}</label>
-              <input class="form-control" type="text" id="{{ id }}" name="{{ id }}" value="{{ app.request.get(id) }}">
+    <div class="ever-admin-nav btn-group mb-3" role="group" aria-label="Navigation Ever Blog">
+      {% for link in navigationLinks %}
+        <a class="btn {{ currentResource == link.key ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ link.url }}">{{ link.label }}</a>
+      {% endfor %}
+    </div>
+
+    <div class="card ever-admin-card">
+      <h3 class="card-header">Liste des enregistrements</h3>
+      <div class="card-body">
+        <form method="get" class="ever-filter-box">
+          <div class="row">
+            {% for id, label in definition.filters %}
+              <div class="col-md-3 mb-2">
+                <label class="form-control-label font-weight-semibold" for="{{ id }}">{{ label }}</label>
+                <input class="form-control" type="text" id="{{ id }}" name="{{ id }}" value="{{ app.request.get(id) }}" placeholder="Rechercher...">
+              </div>
+            {% endfor %}
+          </div>
+          <button class="btn btn-primary mt-2" type="submit">Filtrer</button>
+        </form>
+
+        <form method="post">
+          {% if data.records is empty %}
+            <div class="ever-empty">Aucune donnée disponible pour le moment.</div>
+          {% else %}
+            <div class="ever-resource-table">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width:42px"></th>
+                    {% for column in definition.columns %}
+                      <th>{{ column.name }}</th>
+                    {% endfor %}
+                    <th style="min-width:160px;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in data.records %}
+                    <tr>
+                      <td><input type="checkbox" name="bulk_ids[]" value="{{ attribute(row, definition.columns|first.id) }}"></td>
+                      {% for column in definition.columns %}
+                        <td>{{ attribute(row, column.id) }}</td>
+                      {% endfor %}
+                      <td>
+                        <a class="btn btn-sm btn-outline-primary" href="{{ row._actions.edit }}">Éditer</a>
+                        <a class="btn btn-sm btn-outline-danger" href="{{ row._actions.delete }}">Supprimer</a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
-          {% endfor %}
-        </div>
-        <button class="btn btn-primary mt-2" type="submit">Filtrer</button>
-      </form>
+          {% endif %}
 
-      <form method="post">
-        <table class="table">
-          <thead>
-            <tr>
-              <th></th>
-              {% for column in definition.columns %}
-                <th>{{ column.name }}</th>
+          <div class="ever-bulk form-inline">
+            <select class="custom-select" name="bulk_action">
+              {% for action in definition.bulkActions %}
+                <option value="{{ action.id }}">{{ action.name }}</option>
               {% endfor %}
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for row in data.records %}
-              <tr>
-                <td><input type="checkbox" name="bulk_ids[]" value="{{ attribute(row, definition.columns|first.id) }}"></td>
-                {% for column in definition.columns %}
-                  <td>{{ attribute(row, column.id) }}</td>
-                {% endfor %}
-                <td>
-                  <a class="btn btn-sm btn-outline-primary" href="{{ row._actions.edit }}">Éditer</a>
-                  <a class="btn btn-sm btn-outline-danger" href="{{ row._actions.delete }}">Supprimer</a>
-                </td>
-              </tr>
-            {% else %}
-              <tr><td colspan="{{ definition.columns|length + 2 }}">Aucune donnée</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
-
-        <div class="form-inline">
-          <select class="custom-select" name="bulk_action">
-            {% for action in definition.bulkActions %}
-              <option value="{{ action.id }}">{{ action.name }}</option>
-            {% endfor %}
-          </select>
-          <button class="btn btn-outline-secondary ml-2" type="submit">Appliquer</button>
-        </div>
-      </form>
+            </select>
+            <button class="btn btn-outline-secondary ml-2" type="submit">Appliquer</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 {% endblock %}
