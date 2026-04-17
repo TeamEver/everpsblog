@@ -3,6 +3,8 @@
 namespace PrestaShop\Module\Everpsblog\Entity;
 
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -14,26 +16,29 @@ class Post
     /** @ORM\Id @ORM\GeneratedValue @ORM\Column(name="id_ever_post", type="integer") */
     private $id;
 
-    /** @ORM\Column(name="id_author", type="integer") */
-    private $authorId;
+    /** @ORM\Column(name="id_shop", type="integer") */
+    private $shopId;
 
-    /** @ORM\Column(name="id_default_category", type="integer") */
-    private $defaultCategoryId;
+    /** @ORM\ManyToOne(targetEntity="Author", inversedBy="posts") @ORM\JoinColumn(name="id_author", referencedColumnName="id_ever_author", nullable=false) */
+    private $author;
+
+    /** @ORM\ManyToOne(targetEntity="Category", inversedBy="defaultPosts") @ORM\JoinColumn(name="id_default_category", referencedColumnName="id_ever_category", nullable=false) */
+    private $defaultCategory;
 
     /** @ORM\Column(name="post_status", type="string", length=255) */
     private $status;
 
-    /** @ORM\Column(name="active", type="boolean", nullable=true) */
+    /** @ORM\Column(name="active", type="integer", nullable=true) */
     private $active;
 
-    /** @ORM\Column(name="indexable", type="boolean", nullable=true) */
+    /** @ORM\Column(name="indexable", type="integer", nullable=true) */
     private $indexable;
 
-    /** @ORM\Column(name="follow", type="boolean", nullable=true) */
+    /** @ORM\Column(name="follow", type="integer", nullable=true) */
     private $follow;
 
-    /** @ORM\Column(name="sitemap", type="boolean", options={"default": 1}) */
-    private $sitemap = true;
+    /** @ORM\Column(name="sitemap", type="integer", options={"default": 1}) */
+    private $sitemap = 1;
 
     /** @ORM\Column(name="psswd", type="string", length=255, nullable=true) */
     private $password;
@@ -56,85 +61,47 @@ class Post
     /** @ORM\Column(name="date_upd", type="datetime", nullable=true) */
     private $updatedAt;
 
+    /** @ORM\OneToMany(targetEntity="PostLang", mappedBy="post", cascade={"persist", "remove"}, orphanRemoval=true) */
+    private $translations;
+
+    /** @ORM\OneToMany(targetEntity="PostShop", mappedBy="post", cascade={"persist", "remove"}, orphanRemoval=true) */
+    private $shops;
+
+    /** @ORM\OneToMany(targetEntity="PostCategory", mappedBy="post", cascade={"persist", "remove"}, orphanRemoval=true) */
+    private $postCategories;
+
+    /** @ORM\OneToMany(targetEntity="PostTag", mappedBy="post", cascade={"persist", "remove"}, orphanRemoval=true) */
+    private $postTags;
+
+    /** @ORM\OneToMany(targetEntity="PostProduct", mappedBy="post", cascade={"persist", "remove"}, orphanRemoval=true) */
+    private $postProducts;
+
+    /** @ORM\OneToMany(targetEntity="Comment", mappedBy="post") */
+    private $comments;
+
+    public function __construct()
+    {
+        $this->translations = new ArrayCollection();
+        $this->shops = new ArrayCollection();
+        $this->postCategories = new ArrayCollection();
+        $this->postTags = new ArrayCollection();
+        $this->postProducts = new ArrayCollection();
+        $this->comments = new ArrayCollection();
+    }
+
     public function getId()
     {
         return $this->id;
     }
 
-    public function getAuthorId()
+    public function getViewCount()
     {
-        return $this->authorId;
+        return (int) $this->viewCount;
     }
 
-    public function setAuthorId($authorId)
+    public function setViewCount($viewCount)
     {
-        $this->authorId = $authorId;
-
-        return $this;
-    }
-
-    public function getDefaultCategoryId()
-    {
-        return $this->defaultCategoryId;
-    }
-
-    public function setDefaultCategoryId($defaultCategoryId)
-    {
-        $this->defaultCategoryId = $defaultCategoryId;
-
-        return $this;
-    }
-
-    public function getStatus()
-    {
-        return $this->status;
-    }
-
-    public function setStatus($status)
-    {
-        $this->status = $status;
-
-        return $this;
-    }
-
-    public function setIndexable($indexable)
-    {
-        $this->indexable = $indexable;
-
-        return $this;
-    }
-
-    public function setFollow($follow)
-    {
-        $this->follow = $follow;
-
-        return $this;
-    }
-
-    public function setSitemap($sitemap)
-    {
-        $this->sitemap = $sitemap;
-
-        return $this;
-    }
-
-    public function setPassword($password)
-    {
-        $this->password = $password;
-
-        return $this;
-    }
-
-    public function setStarred($starred)
-    {
-        $this->starred = $starred;
-
-        return $this;
-    }
-
-    public function setAllowedGroups($allowedGroups)
-    {
-        $this->allowedGroups = $allowedGroups;
+        $this->viewCount = (int) $viewCount;
 
         return $this;
     }
@@ -151,5 +118,13 @@ class Post
         $this->updatedAt = $updatedAt;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, PostLang>
+     */
+    public function getTranslations()
+    {
+        return $this->translations;
     }
 }

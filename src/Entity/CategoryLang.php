@@ -7,8 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 /** @ORM\Entity @ORM\Table(name="ever_blog_category_lang") */
 class CategoryLang
 {
-    /** @ORM\Id @ORM\Column(name="id_ever_category", type="integer") */
-    private $categoryId;
+    /** @ORM\Id @ORM\ManyToOne(targetEntity="Category", inversedBy="translations") @ORM\JoinColumn(name="id_ever_category", referencedColumnName="id_ever_category", nullable=false, onDelete="CASCADE") */
+    private $category;
 
     /** @ORM\Id @ORM\Column(name="id_lang", type="integer") */
     private $langId;

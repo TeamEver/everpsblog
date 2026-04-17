@@ -4,14 +4,11 @@ namespace PrestaShop\Module\Everpsblog\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="ever_blog_post_lang")
- */
+/** @ORM\Entity @ORM\Table(name="ever_blog_post_lang") */
 class PostLang
 {
-    /** @ORM\Id @ORM\Column(name="id_ever_post", type="integer") */
-    private $postId;
+    /** @ORM\Id @ORM\ManyToOne(targetEntity="Post", inversedBy="translations") @ORM\JoinColumn(name="id_ever_post", referencedColumnName="id_ever_post", nullable=false, onDelete="CASCADE") */
+    private $post;
 
     /** @ORM\Id @ORM\Column(name="id_lang", type="integer") */
     private $langId;
@@ -33,39 +30,4 @@ class PostLang
 
     /** @ORM\Column(name="excerpt", type="string", length=255, nullable=true) */
     private $excerpt;
-
-    public static function create(
-        ?int $postId,
-        int $langId,
-        string $title,
-        string $content,
-        ?string $excerpt,
-        ?string $metaTitle,
-        ?string $metaDescription,
-        ?string $linkRewrite
-    ): self {
-        $postLang = new self();
-        $postLang->postId = $postId;
-        $postLang->langId = $langId;
-        $postLang->title = $title;
-        $postLang->content = $content;
-        $postLang->excerpt = $excerpt;
-        $postLang->metaTitle = $metaTitle;
-        $postLang->metaDescription = $metaDescription;
-        $postLang->linkRewrite = $linkRewrite;
-
-        return $postLang;
-    }
-
-    public function setPostId(int $postId): self
-    {
-        $this->postId = $postId;
-
-        return $this;
-    }
-
-    public function getPostId(): ?int
-    {
-        return $this->postId;
-    }
 }

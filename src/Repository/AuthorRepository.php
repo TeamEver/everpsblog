@@ -8,17 +8,37 @@ class AuthorRepository extends EntityRepository
 {
     public function findByShopAndLanguage($shopId, $langId)
     {
-        $qb = $this->getEntityManager()->createQueryBuilder();
+        return $this->createLocalizedQb($shopId, $langId)->getQuery()->getArrayResult();
+    }
 
-        return $qb->select('a, al')
-            ->from('PrestaShop\\Module\\Everpsblog\\Entity\\Author', 'a')
-            ->innerJoin('PrestaShop\\Module\\Everpsblog\\Entity\\AuthorLang', 'al', 'WITH', 'al.authorId = a.id')
-            ->innerJoin('PrestaShop\\Module\\Everpsblog\\Entity\\AuthorShop', 'ash', 'WITH', 'ash.authorId = a.id')
-            ->where('al.langId = :langId')
-            ->andWhere('ash.shopId = :shopId')
-            ->setParameter('langId', (int) $langId)
-            ->setParameter('shopId', (int) $shopId)
+    public function findAllAuthors($langId, $shopId, $active = 1)
+    {
+        return $this->createLocalizedQb($shopId, $langId)
+            ->andWhere('a.active = :active')
+            ->setParameter('active', (int) $active)
+            ->orderBy('a.nickhandle', 'ASC')
             ->getQuery()
             ->getArrayResult();
+    }
+
+    public function findAuthorByNickhandle($nickhandle, $langId, $shopId)
+    {
+        return $this->createLocalizedQb($shopId, $langId)
+            ->andWhere('a.nickhandle = :nickhandle')
+            ->setParameter('nickhandle', (string) $nickhandle)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    private function createLocalizedQb($shopId, $langId)
+    {
+        return $this->createQueryBuilder('a')
+            ->innerJoin('a.translations', 'al')
+            ->innerJoin('a.shops', 'ash')
+            ->andWhere('al.langId = :langId')
+            ->andWhere('ash.shopId = :shopId')
+            ->setParameter('langId', (int) $langId)
+            ->setParameter('shopId', (int) $shopId);
     }
 }
