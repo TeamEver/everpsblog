@@ -21,9 +21,10 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(dirname(__FILE__).'/../../classes/controller/FrontController.php');
+use PrestaShop\Module\Everpsblog\Controller\Front\SearchController;
+use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 
-class EverPsBlogsearchModuleFrontController extends EverPsBlogModuleFrontController
+class EverPsBlogsearchModuleFrontController extends SearchController
 {
     protected $query;
     public $post_number;
@@ -96,6 +97,7 @@ class EverPsBlogsearchModuleFrontController extends EverPsBlogModuleFrontControl
             (int) Configuration::get('EVERPSBLOG_PAGINATION')
         );
         $posts = $this->getPostObjects($searchPosts);
+        $postsViewModel = PostViewModel::listFromLegacy($posts);
         $page = $this->context->controller->getTemplateVarPage();
         $page['meta']['title'] = $this->l('Search results for') . ' ' . $this->query;
         $page['meta']['description'] = $page['meta']['title'];
@@ -107,7 +109,8 @@ class EverPsBlogsearchModuleFrontController extends EverPsBlogModuleFrontControl
             'paginated' => Tools::getValue('page'),
             'post_number' => (int) $this->post_number,
             'pagination' => $pagination,
-            'posts' => $posts,
+            'posts' => $postsViewModel,
+            'posts_legacy' => $posts,
             'query' => $this->query,
             'default_lang' => (int) $this->context->language->id,
             'id_lang' => $this->context->language->id,

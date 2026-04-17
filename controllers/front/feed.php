@@ -21,9 +21,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-include_once dirname(__FILE__).'/../../classes/controller/FrontController.php';
+use PrestaShop\Module\Everpsblog\Controller\Front\FeedController;
 
-class EverPsBlogfeedModuleFrontController extends EverPsBlogModuleFrontController
+class EverPsBlogfeedModuleFrontController extends FeedController
 {
     protected $feed;
     protected $category;

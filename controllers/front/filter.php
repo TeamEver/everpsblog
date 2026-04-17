@@ -3,9 +3,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(dirname(__FILE__).'/../../classes/controller/FrontController.php');
+use PrestaShop\Module\Everpsblog\Controller\Front\FilterController;
 
-class EverPsBlogfilterModuleFrontController extends EverPsBlogModuleFrontController
+class EverPsBlogfilterModuleFrontController extends FilterController
 {
     public function displayAjax()
     {

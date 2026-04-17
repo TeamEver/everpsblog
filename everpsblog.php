@@ -247,6 +247,7 @@ class EverPsBlog extends Module
                 'params' => [
                     'fc' => 'module',
                     'module' => 'everpsblog',
+                    'controller' => 'search',
                 ],
             ],
             'module-everpsblog-category' => [
@@ -259,6 +260,7 @@ class EverPsBlog extends Module
                 'params' => [
                     'fc' => 'module',
                     'module' => 'everpsblog',
+                    'controller' => 'category',
                 ],
             ],
             'module-everpsblog-post' => [
@@ -271,6 +273,7 @@ class EverPsBlog extends Module
                 'params' => [
                     'fc' => 'module',
                     'module' => 'everpsblog',
+                    'controller' => 'post',
                 ],
             ],
             'module-everpsblog-tag' => [
@@ -283,6 +286,7 @@ class EverPsBlog extends Module
                 'params' => [
                     'fc' => 'module',
                     'module' => 'everpsblog',
+                    'controller' => 'tag',
                 ],
             ],
             'module-everpsblog-author' => [
@@ -295,6 +299,37 @@ class EverPsBlog extends Module
                 'params' => [
                     'fc' => 'module',
                     'module' => 'everpsblog',
+                    'controller' => 'author',
+                ],
+            ],
+            'module-everpsblog-feed' => [
+                'controller' => 'feed',
+                'rule' => $base_route . '/feed',
+                'keywords' => [],
+                'params' => [
+                    'fc' => 'module',
+                    'module' => 'everpsblog',
+                    'controller' => 'feed',
+                ],
+            ],
+            'module-everpsblog-filter' => [
+                'controller' => 'filter',
+                'rule' => $base_route . '/filter',
+                'keywords' => [],
+                'params' => [
+                    'fc' => 'module',
+                    'module' => 'everpsblog',
+                    'controller' => 'filter',
+                ],
+            ],
+            'module-everpsblog-customercomments' => [
+                'controller' => 'customercomments',
+                'rule' => $base_route . '/customercomments',
+                'keywords' => [],
+                'params' => [
+                    'fc' => 'module',
+                    'module' => 'everpsblog',
+                    'controller' => 'customercomments',
                 ],
             ],
         ];
