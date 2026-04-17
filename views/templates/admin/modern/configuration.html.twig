@@ -6,11 +6,9 @@
     <div class="card-body">
       <p class="mb-3">Le back-office Ever Blog utilise désormais des contrôleurs Symfony.</p>
       <div class="btn-group" role="group" aria-label="Ever Blog links">
-        <a class="btn btn-primary" href="{{ postUrl }}">Articles</a>
-        <a class="btn btn-outline-primary" href="{{ categoryUrl }}">Catégories</a>
-        <a class="btn btn-outline-primary" href="{{ tagUrl }}">Tags</a>
-        <a class="btn btn-outline-primary" href="{{ authorUrl }}">Auteurs</a>
-        <a class="btn btn-outline-primary" href="{{ commentUrl }}">Commentaires</a>
+        {% for link in navigationLinks %}
+          <a class="btn {{ currentResource == link.key ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ link.url }}">{{ link.label }}</a>
+        {% endfor %}
       </div>
     </div>
   </div>

@@ -25,4 +25,16 @@ abstract class AbstractDomainController extends FrameworkBundleAdminController
         return $this->contextStateService->getLanguageId();
     }
 
+    protected function getAdminNavigationLinks(): array
+    {
+        return [
+            ['key' => 'post', 'label' => 'Articles', 'url' => $this->generateUrl('everpsblog_admin_post')],
+            ['key' => 'category', 'label' => 'Catégories', 'url' => $this->generateUrl('everpsblog_admin_category')],
+            ['key' => 'tag', 'label' => 'Tags', 'url' => $this->generateUrl('everpsblog_admin_tag')],
+            ['key' => 'author', 'label' => 'Auteurs', 'url' => $this->generateUrl('everpsblog_admin_author')],
+            ['key' => 'comment', 'label' => 'Commentaires', 'url' => $this->generateUrl('everpsblog_admin_comment')],
+            ['key' => 'configuration', 'label' => 'Configuration', 'url' => $this->generateUrl('everpsblog_admin_dashboard')],
+        ];
+    }
+
 }

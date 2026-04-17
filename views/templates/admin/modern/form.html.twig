@@ -4,6 +4,17 @@
   <div class="card">
     <h3 class="card-header">{{ resource|capitalize }} #{{ entityId ?: 'new' }}</h3>
     <div class="card-body">
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+        <div class="btn-group mb-2" role="group" aria-label="Navigation Ever Blog">
+          {% for link in navigationLinks %}
+            <a class="btn {{ currentResource == link.key ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ link.url }}">{{ link.label }}</a>
+          {% endfor %}
+        </div>
+        {% if createUrl is defined and createUrl %}
+          <a class="btn btn-success mb-2" href="{{ createUrl }}">Ajouter un élément</a>
+        {% endif %}
+      </div>
+
       {{ form_start(form) }}
       {{ form_widget(form) }}
       <button type="submit" class="btn btn-primary">Enregistrer</button>
