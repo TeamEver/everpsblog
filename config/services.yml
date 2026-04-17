@@ -130,6 +130,16 @@ services:
     arguments:
       - 'PrestaShop\Module\Everpsblog\Entity\Tag'
 
+
+  PrestaShop\Module\Everpsblog\Repository\PostRepository:
+    alias: prestashop.module.everpsblog.repository.post
+
+  PrestaShop\Module\Everpsblog\Repository\CategoryRepository:
+    alias: prestashop.module.everpsblog.repository.category
+
+  PrestaShop\Module\Everpsblog\Repository\TagRepository:
+    alias: prestashop.module.everpsblog.repository.tag
+
   prestashop.module.everpsblog.repository.author:
     class: PrestaShop\Module\Everpsblog\Repository\AuthorRepository
     factory: ['@doctrine.orm.entity_manager', getRepository]
@@ -146,11 +156,17 @@ services:
     arguments:
       - 'PrestaShop\Module\Everpsblog\Entity\Comment'
 
+  PrestaShop\Module\Everpsblog\Repository\CommentRepository:
+    alias: prestashop.module.everpsblog.repository.comment
+
   prestashop.module.everpsblog.repository.image:
     class: PrestaShop\Module\Everpsblog\Repository\ImageRepository
     factory: ['@doctrine.orm.entity_manager', getRepository]
     arguments:
       - 'PrestaShop\Module\Everpsblog\Entity\Image'
+
+  PrestaShop\Module\Everpsblog\Repository\ImageRepository:
+    alias: prestashop.module.everpsblog.repository.image
 
   PrestaShop\Module\Everpsblog\Form\DataProvider\:
     resource: '../src/Form/DataProvider/*'
