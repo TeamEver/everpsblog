@@ -20,6 +20,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/everpsblogpost.php';
+require_once __DIR__ . '/everpsblogcategory.php';
+require_once __DIR__ . '/everpsblogtag.php';
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
@@ -252,7 +255,7 @@ class EverPsBlog extends Module
         $sql->innerJoin('ever_blog_post_lang', 'pl', 'pl.id_ever_post = p.id_ever_post AND pl.id_lang = ' . (int) $idLang);
         $sql->innerJoin('ever_blog_post_shop', 'ps', 'ps.id_ever_post = p.id_ever_post AND ps.id_shop = ' . (int) $idShop);
         $sql->leftJoin('ever_blog_category_lang', 'dcl', 'dcl.id_ever_category = p.id_default_category AND dcl.id_lang = ' . (int) $idLang);
-        $sql->where('p.status = "published"');
+        $sql->where('p.post_status = "published"');
         $sql->where('p.starred = 1');
         $sql->orderBy('p.created_at DESC, p.id_ever_post DESC');
         $sql->limit((int) $limit);
