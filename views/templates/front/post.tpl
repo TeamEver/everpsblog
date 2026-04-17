@@ -92,7 +92,7 @@
                         <div class="social-sharing social-sharing-hero">
                             <ul>
                             {foreach from=$social_share_links item='social_share_link'}
-                                <li class="{$social_share_link.class|escape:'htmlall':'UTF-8'} icon-gray"><a href="{$social_share_link.url|escape:'htmlall':'UTF-8'}" class="text-hide" title="{$social_share_link.label|escape:'htmlall':'UTF-8'}" target="_blank">{$social_share_link.label|escape:'htmlall':'UTF-8'}</a></li>
+                                <li class="{$social_share_link.class|escape:'htmlall':'UTF-8'} icon-gray"><a href="{$social_share_link.url|escape:'htmlall':'UTF-8'}" class="visually-hidden" title="{$social_share_link.label|escape:'htmlall':'UTF-8'}" target="_blank">{$social_share_link.label|escape:'htmlall':'UTF-8'}</a></li>
                             {/foreach}
                             </ul>
                         </div>
@@ -187,7 +187,7 @@
             {if isset($show_post_tags) && $show_post_tags && isset($tags) && $tags}
             <div class="post-tags">
             {foreach from=$tags item=tag}
-                <a href="{$link->getModuleLink('everpsblog', 'tag', ['id_ever_tag'=>$tag->id, 'link_rewrite'=>$tag->link_rewrite])|escape:'htmlall':'UTF-8'}" class="badge badge-info bg-info m-1" title="{$tag->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{$tag->title|escape:'htmlall':'UTF-8'}</a>
+                <a href="{$link->getModuleLink('everpsblog', 'tag', ['id_ever_tag'=>$tag->id, 'link_rewrite'=>$tag->link_rewrite])|escape:'htmlall':'UTF-8'}" class="badge bg-info m-1" title="{$tag->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{$tag->title|escape:'htmlall':'UTF-8'}</a>
             {/foreach}
             </div>
             {/if}

@@ -63,11 +63,11 @@
                 </div>
                 <a class="carousel-control-prev" role="button" data-bs-target="#{$carousel_id|escape:'htmlall':'UTF-8'}" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="sr-only visually-hidden">{l s='Previous' mod='everpsblog'}</span>
+                    <span class="visually-hidden">{l s='Previous' mod='everpsblog'}</span>
                 </a>
                 <a class="carousel-control-next" role="button" data-bs-target="#{$carousel_id|escape:'htmlall':'UTF-8'}" data-bs-slide="next">
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="sr-only visually-hidden">{l s='Next' mod='everpsblog'}</span>
+                    <span class="visually-hidden">{l s='Next' mod='everpsblog'}</span>
                 </a>
             </div>
         {else}
