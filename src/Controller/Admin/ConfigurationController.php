@@ -9,7 +9,7 @@ class ConfigurationController extends AbstractDomainController
 {
     public function indexAction(): Response
     {
-        $this->denyBlogAccess(BlogPermission::READ, BlogPermission::RES_POST);
+        $this->denyAccessUnlessGranted(BlogPermission::READ, BlogPermission::RES_POST);
 
         return $this->render('@Modules/everpsblog/views/templates/admin/modern/configuration.html.twig', [
             'postUrl' => $this->generateUrl('everpsblog_admin_post'),

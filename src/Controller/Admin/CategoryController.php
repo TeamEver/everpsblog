@@ -27,7 +27,7 @@ class CategoryController extends AbstractDomainController
 
     public function indexAction(Request $request): Response
     {
-        $this->denyBlogAccess(BlogPermission::READ, BlogPermission::RES_CATEGORY);
+        $this->denyAccessUnlessGranted(BlogPermission::READ, BlogPermission::RES_CATEGORY);
         return $this->render('@Modules/everpsblog/views/templates/admin/modern/resource.html.twig', [
             'definition' => $this->definitionFactory->build(),
             'data' => $this->dataFactory->build($this->getContextShopId(), $this->getContextLangId(), $request->query->all()),
@@ -37,7 +37,7 @@ class CategoryController extends AbstractDomainController
 
     public function formAction(Request $request, ?int $categoryId = null): Response
     {
-        $this->denyBlogAccess($categoryId ? BlogPermission::UPDATE : BlogPermission::CREATE, BlogPermission::RES_CATEGORY);
+        $this->denyAccessUnlessGranted($categoryId ? BlogPermission::UPDATE : BlogPermission::CREATE, BlogPermission::RES_CATEGORY);
 
         $form = $this->createForm(CategoryType::class, $this->formDataProvider->getData($categoryId));
         $form->handleRequest($request);
