@@ -45,14 +45,10 @@ class Tag
     /** @ORM\OneToMany(targetEntity="TagProduct", mappedBy="tag", cascade={"persist", "remove"}, orphanRemoval=true) */
     private $products;
 
-    /** @ORM\OneToMany(targetEntity="PostTag", mappedBy="tag") */
-    private $postTags;
-
     public function __construct()
     {
         $this->translations = new ArrayCollection();
         $this->shops = new ArrayCollection();
         $this->products = new ArrayCollection();
-        $this->postTags = new ArrayCollection();
     }
 }

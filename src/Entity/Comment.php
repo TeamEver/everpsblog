@@ -14,8 +14,8 @@ class Comment
     /** @ORM\Id @ORM\GeneratedValue @ORM\Column(name="id_ever_comment", type="integer") */
     private $id;
 
-    /** @ORM\ManyToOne(targetEntity="Post", inversedBy="comments") @ORM\JoinColumn(name="id_ever_post", referencedColumnName="id_ever_post", nullable=false) */
-    private $post;
+    /** @ORM\Column(name="id_ever_post", type="integer") */
+    private $postId = 0;
 
     /** @ORM\Column(name="id_lang", type="integer") */
     private $langId;

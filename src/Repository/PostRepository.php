@@ -3,6 +3,15 @@
 namespace PrestaShop\Module\Everpsblog\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
+use PrestaShop\Module\Everpsblog\Entity\Category;
+use PrestaShop\Module\Everpsblog\Entity\Post;
+use PrestaShop\Module\Everpsblog\Entity\PostCategory;
+use PrestaShop\Module\Everpsblog\Entity\PostLang;
+use PrestaShop\Module\Everpsblog\Entity\PostProduct;
+use PrestaShop\Module\Everpsblog\Entity\PostShop;
+use PrestaShop\Module\Everpsblog\Entity\PostTag;
+use PrestaShop\Module\Everpsblog\Entity\Tag;
 
 class PostRepository extends EntityRepository
 {
@@ -51,8 +60,8 @@ class PostRepository extends EntityRepository
     public function findPostsByTag($tagId, $langId, $shopId, $start = 0, $limit = 10, $status = 'published')
     {
         return $this->createBasePublishedQb($langId, $shopId, $status)
-            ->innerJoin('p.postTags', 'pt')
-            ->innerJoin('pt.tag', 't')
+            ->innerJoin(PostTag::class, 'pt', Join::WITH, 'pt.postId = p.id')
+            ->innerJoin(Tag::class, 't', Join::WITH, 't.id = pt.tagId')
             ->andWhere('t.id = :tagId')
             ->setParameter('tagId', (int) $tagId)
             ->setFirstResult((int) $start)
@@ -65,8 +74,8 @@ class PostRepository extends EntityRepository
     public function findPostsByCategory($categoryId, $langId, $shopId, $start = 0, $limit = 10, $status = 'published')
     {
         return $this->createBasePublishedQb($langId, $shopId, $status)
-            ->innerJoin('p.postCategories', 'pc')
-            ->innerJoin('pc.category', 'c')
+            ->innerJoin(PostCategory::class, 'pc', Join::WITH, 'pc.postId = p.id')
+            ->innerJoin(Category::class, 'c', Join::WITH, 'c.id = pc.categoryId')
             ->andWhere('c.id = :categoryId')
             ->setParameter('categoryId', (int) $categoryId)
             ->setFirstResult((int) $start)
@@ -79,8 +88,7 @@ class PostRepository extends EntityRepository
     public function findPostsByAuthor($authorId, $langId, $shopId, $start = 0, $limit = 10, $status = 'published')
     {
         return $this->createBasePublishedQb($langId, $shopId, $status)
-            ->innerJoin('p.author', 'a')
-            ->andWhere('a.id = :authorId')
+            ->andWhere('p.authorId = :authorId')
             ->setParameter('authorId', (int) $authorId)
             ->setFirstResult((int) $start)
             ->setMaxResults((int) $limit)
@@ -92,7 +100,7 @@ class PostRepository extends EntityRepository
     public function findPostsByProduct($productId, $langId, $shopId, $start = 0, $limit = 10, $status = 'published')
     {
         return $this->createBasePublishedQb($langId, $shopId, $status)
-            ->innerJoin('p.postProducts', 'pp')
+            ->innerJoin(PostProduct::class, 'pp', Join::WITH, 'pp.postId = p.id')
             ->andWhere('pp.productId = :productId')
             ->setParameter('productId', (int) $productId)
             ->setFirstResult((int) $start)
@@ -136,8 +144,8 @@ class PostRepository extends EntityRepository
     {
         return (int) $this->createBasePublishedQb($langId, $shopId, $status)
             ->select('COUNT(DISTINCT p.id)')
-            ->innerJoin('p.postTags', 'pt')
-            ->innerJoin('pt.tag', 't')
+            ->innerJoin(PostTag::class, 'pt', Join::WITH, 'pt.postId = p.id')
+            ->innerJoin(Tag::class, 't', Join::WITH, 't.id = pt.tagId')
             ->andWhere('t.id = :tagId')
             ->setParameter('tagId', (int) $tagId)
             ->getQuery()
@@ -148,8 +156,8 @@ class PostRepository extends EntityRepository
     {
         return (int) $this->createBasePublishedQb($langId, $shopId, $status)
             ->select('COUNT(DISTINCT p.id)')
-            ->innerJoin('p.postCategories', 'pc')
-            ->innerJoin('pc.category', 'c')
+            ->innerJoin(PostCategory::class, 'pc', Join::WITH, 'pc.postId = p.id')
+            ->innerJoin(Category::class, 'c', Join::WITH, 'c.id = pc.categoryId')
             ->andWhere('c.id = :categoryId')
             ->setParameter('categoryId', (int) $categoryId)
             ->getQuery()
@@ -160,8 +168,7 @@ class PostRepository extends EntityRepository
     {
         return (int) $this->createBasePublishedQb($langId, $shopId, $status)
             ->select('COUNT(DISTINCT p.id)')
-            ->innerJoin('p.author', 'a')
-            ->andWhere('a.id = :authorId')
+            ->andWhere('p.authorId = :authorId')
             ->setParameter('authorId', (int) $authorId)
             ->getQuery()
             ->getSingleScalarResult();
@@ -180,7 +187,7 @@ class PostRepository extends EntityRepository
     public function incrementPostViewCount($postId)
     {
         return $this->_em->createQueryBuilder()
-            ->update('PrestaShop\\Module\\Everpsblog\\Entity\\Post', 'p')
+            ->update(Post::class, 'p')
             ->set('p.viewCount', 'p.viewCount + 1')
             ->where('p.id = :postId')
             ->setParameter('postId', (int) $postId)
@@ -191,8 +198,8 @@ class PostRepository extends EntityRepository
     private function createBasePublishedQb($langId, $shopId, $status)
     {
         $qb = $this->createQueryBuilder('p')
-            ->innerJoin('p.translations', 'pl')
-            ->innerJoin('p.shops', 'ps')
+            ->innerJoin(PostLang::class, 'pl', Join::WITH, 'pl.postId = p.id')
+            ->innerJoin(PostShop::class, 'ps', Join::WITH, 'ps.postId = p.id')
             ->andWhere('pl.langId = :langId')
             ->andWhere('ps.shopId = :shopId')
             ->setParameter('langId', (int) $langId)

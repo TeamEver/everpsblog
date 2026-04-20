@@ -21,7 +21,10 @@ class ConfigurationController extends AbstractDomainController
             'title_length' => (int) \Configuration::get('EVERPSBLOG_TITLE_LENGTH'),
         ];
 
-        $form = $this->createForm(ConfigurationType::class, $configurationData);
+        $form = $this->createForm(ConfigurationType::class, $configurationData, [
+            'method' => Request::METHOD_POST,
+            'action' => $this->generateUrl('everpsblog_admin_dashboard'),
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

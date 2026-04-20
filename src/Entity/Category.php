@@ -60,14 +60,10 @@ class Category
     /** @ORM\OneToMany(targetEntity="CategoryProduct", mappedBy="category", cascade={"persist", "remove"}, orphanRemoval=true) */
     private $products;
 
-    /** @ORM\OneToMany(targetEntity="PostCategory", mappedBy="category") */
-    private $postCategories;
-
     public function __construct()
     {
         $this->translations = new ArrayCollection();
         $this->shops = new ArrayCollection();
         $this->products = new ArrayCollection();
-        $this->postCategories = new ArrayCollection();
     }
 }

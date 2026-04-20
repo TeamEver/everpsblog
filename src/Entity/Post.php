@@ -3,8 +3,6 @@
 namespace PrestaShop\Module\Everpsblog\Entity;
 
 use DateTimeInterface;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use PrestaShop\Module\Everpsblog\Repository\PostRepository;
 
@@ -20,7 +18,7 @@ class Post
     /** @ORM\Column(name="id_shop", type="integer") */
     private $shopId = 0;
 
-    /** @ORM\Column(name="id_author", type="integer", nullable=true, options={"default": 0}) */
+    /** @ORM\Column(name="id_author", type="integer", options={"default": 0}) */
     private $authorId = 0;
 
     /** @ORM\Column(name="id_default_category", type="integer", options={"default": 0}) */
@@ -62,32 +60,8 @@ class Post
     /** @ORM\Column(name="date_upd", type="datetime", nullable=true) */
     private $updatedAt;
 
-    /** @ORM\OneToMany(targetEntity="PostLang", mappedBy="post", cascade={"persist", "remove"}, orphanRemoval=true) */
-    private $translations;
-
-    /** @ORM\OneToMany(targetEntity="PostShop", mappedBy="post", cascade={"persist", "remove"}, orphanRemoval=true) */
-    private $shops;
-
-    /** @ORM\OneToMany(targetEntity="PostCategory", mappedBy="post", cascade={"persist", "remove"}, orphanRemoval=true) */
-    private $postCategories;
-
-    /** @ORM\OneToMany(targetEntity="PostTag", mappedBy="post", cascade={"persist", "remove"}, orphanRemoval=true) */
-    private $postTags;
-
-    /** @ORM\OneToMany(targetEntity="PostProduct", mappedBy="post", cascade={"persist", "remove"}, orphanRemoval=true) */
-    private $postProducts;
-
-    /** @ORM\OneToMany(targetEntity="Comment", mappedBy="post") */
-    private $comments;
-
     public function __construct()
     {
-        $this->translations = new ArrayCollection();
-        $this->shops = new ArrayCollection();
-        $this->postCategories = new ArrayCollection();
-        $this->postTags = new ArrayCollection();
-        $this->postProducts = new ArrayCollection();
-        $this->comments = new ArrayCollection();
     }
 
     public function getId()
@@ -115,7 +89,7 @@ class Post
     public function setAuthorId($authorId): self
     {
         $authorId = (int) $authorId;
-        $this->authorId = $authorId > 0 ? $authorId : null;
+        $this->authorId = $authorId > 0 ? $authorId : 0;
 
         return $this;
     }
@@ -276,11 +250,4 @@ class Post
         return $this;
     }
 
-    /**
-     * @return Collection<int, PostLang>
-     */
-    public function getTranslations(): Collection
-    {
-        return $this->translations;
-    }
 }

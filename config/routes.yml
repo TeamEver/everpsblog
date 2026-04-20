@@ -1,6 +1,6 @@
 everpsblog_admin_dashboard:
   path: /everpsblog
-  methods: [GET]
+  methods: [GET, POST]
   defaults:
     _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\ConfigurationController::indexAction'
     _legacy_controller: AdminEverPsBlog
