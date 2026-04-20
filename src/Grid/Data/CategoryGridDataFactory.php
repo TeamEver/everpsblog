@@ -44,9 +44,11 @@ final class CategoryGridDataFactory
         $records = [];
 
         foreach ($rows as $row) {
+            $translation = $row['cl'] ?? [];
+            $title = is_array($translation) ? (string) ($translation['title'] ?? '') : '';
             $records[] = [
                 'id_ever_category' => $row['id'] ?? $row['id'.substr('id_ever_category',3)] ?? 0,
-                'title' => $row['cl']['title'] ?? '',
+                'title' => $title,
                 'active' => (string) ($row['active'] ?? 0)
             ];
         }
