@@ -30,6 +30,14 @@ class EverPsBlog extends Module
     private $html;
     private $postErrors = [];
     private $postSuccess = [];
+    private $blogInstallService;
+    private $blogTaxonomyService;
+    private $blogImageService;
+    private $blogCleanerService;
+    private $blogSortOrderService;
+    private $blogSitemapService;
+    private $legacyImportAdapter;
+    private $serviceCachePool;
     public static $route = [];
 
     public function __construct()
@@ -188,33 +196,35 @@ class EverPsBlog extends Module
         return $tab->delete();
     }
 
-    private function getModuleService($serviceId)
-    {
-        if (method_exists($this, 'get')) {
-            return $this->get($serviceId);
-        }
-
-        return \PrestaShop\PrestaShop\Adapter\SymfonyContainer::getInstance()->get($serviceId);
-    }
-
     private function getBlogInstallService()
     {
-        try {
-            return $this->getModuleService('prestashop.module.everpsblog.service.blog_install');
-        } catch (\Throwable $exception) {
-            // During module install, module Symfony services can be unavailable.
-            return new \PrestaShop\Module\Everpsblog\Service\BlogInstallService();
+        if (!$this->blogInstallService) {
+            $this->blogInstallService = new \PrestaShop\Module\Everpsblog\Service\BlogInstallService();
         }
+
+        return $this->blogInstallService;
     }
 
     private function getBlogTaxonomyService()
     {
-        return $this->getModuleService('prestashop.module.everpsblog.service.blog_taxonomy');
+        if (!$this->blogTaxonomyService) {
+            $this->blogTaxonomyService = new \PrestaShop\Module\Everpsblog\Service\BlogTaxonomyService(
+                $this->getServiceCachePool()
+            );
+        }
+
+        return $this->blogTaxonomyService;
     }
 
     private function getBlogImageService()
     {
-        return $this->getModuleService('prestashop.module.everpsblog.service.blog_image');
+        if (!$this->blogImageService) {
+            $this->blogImageService = new \PrestaShop\Module\Everpsblog\Service\BlogImageService(
+                $this->getServiceCachePool()
+            );
+        }
+
+        return $this->blogImageService;
     }
 
 
@@ -278,22 +288,49 @@ class EverPsBlog extends Module
 
     private function getBlogCleanerService()
     {
-        return $this->getModuleService('prestashop.module.everpsblog.service.blog_cleaner');
+        if (!$this->blogCleanerService) {
+            $this->blogCleanerService = new \PrestaShop\Module\Everpsblog\Service\BlogCleanerService();
+        }
+
+        return $this->blogCleanerService;
     }
 
     private function getBlogSortOrderService()
     {
-        return $this->getModuleService('prestashop.module.everpsblog.service.blog_sort_order');
+        if (!$this->blogSortOrderService) {
+            $this->blogSortOrderService = new \PrestaShop\Module\Everpsblog\Service\BlogSortOrderService();
+        }
+
+        return $this->blogSortOrderService;
     }
 
     private function getBlogSitemapService()
     {
-        return $this->getModuleService('prestashop.module.everpsblog.service.blog_sitemap');
+        if (!$this->blogSitemapService) {
+            $this->blogSitemapService = new \PrestaShop\Module\Everpsblog\Service\BlogSitemapService();
+        }
+
+        return $this->blogSitemapService;
     }
 
     private function getLegacyImportAdapter()
     {
-        return $this->getModuleService('prestashop.module.everpsblog.service.legacy_import_adapter');
+        if (!$this->legacyImportAdapter) {
+            $this->legacyImportAdapter = new \PrestaShop\Module\Everpsblog\Service\LegacyImportAdapter(
+                $this->getBlogImageService()
+            );
+        }
+
+        return $this->legacyImportAdapter;
+    }
+
+    private function getServiceCachePool()
+    {
+        if (!$this->serviceCachePool) {
+            $this->serviceCachePool = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
+        }
+
+        return $this->serviceCachePool;
     }
 
     /**
