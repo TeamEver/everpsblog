@@ -205,4 +205,25 @@ class PostRepository extends EntityRepository
 
         return $qb;
     }
+
+    public function getPosts($idLang, $idShop, $offset = 0, $limit = null, $status = null)
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->andWhere('p.shopId = :shop')
+            ->setParameter('shop', $idShop);
+
+        if ($status) {
+            $qb->andWhere('p.status = :status')
+               ->setParameter('status', $status);
+        }
+
+        $qb->orderBy('p.createdAt', 'DESC');
+
+        if ($limit !== null) {
+            $qb->setMaxResults($limit)
+               ->setFirstResult($offset);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

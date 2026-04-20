@@ -2643,91 +2643,122 @@ class EverPsBlog extends Module
         }
     }
 
-
-    public function emptyTrash($id_shop)
+    private function getPostRepository()
     {
-        $return = false;
-        $days = (int) Configuration::get('EVERBLOG_EMPTY_TRASH');
-        foreach (Language::getLanguages(false) as $language) {
-            $posts = EverPsBlogPost::getPosts(
-                (int) $language['id_lang'],
-                (int) $id_shop,
-                0,
-                null,
-                'trash'
-            );
-            if (!$posts) {
-                return true;
-            }
-            foreach ($posts as $trash_post) {
-                if ((strtotime($trash_post['date_upd']) >= strtotime('-' . $days . ' days'))) {
-                    $post = new EverPsBlogPost(
-                        (int) $trash_post['id_ever_post']
-                    );
-                    if ($post->delete()) {
-                        $return = true;
-                    }
-                }
-            }
+        if (!isset($this->context->controller) || !method_exists($this->context->controller, 'getContainer')) {
+            return null;
         }
-        return $return;
+
+        return $this->context->controller
+            ->getContainer()
+            ->get('doctrine.orm.entity_manager')
+            ->getRepository(\PrestaShop\Module\Everpsblog\Entity\Post::class);
     }
 
     public function sendPendingNotification($id_shop)
     {
-        $employee = new Employee(
-            (int) Configuration::get('EVERBLOG_ADMIN_EMAIL')
-        );
-        $posts = EverPsBlogPost::getPosts(
+        $repo = $this->getPostRepository();
+        if (!$repo) {
+            return false;
+        }
+
+        $email = Configuration::get('EVERBLOG_ADMIN_EMAIL');
+
+        $employeeId = (int) Db::getInstance()->getValue('
+            SELECT id_employee 
+            FROM '._DB_PREFIX_.'employee 
+            WHERE email = "'.pSQL($email).'"
+        ');
+
+        if (!$employeeId) {
+            return false;
+        }
+
+        $employee = new Employee($employeeId);
+
+        $posts = $repo->getPosts(
             (int) $employee->id_lang,
             (int) $id_shop,
             0,
-            0,
+            null,
             'pending'
         );
-        if (!count($posts)) {
+
+        if (!$posts) {
             return true;
         }
+
         $post_list = '';
-        foreach ($posts as $pending) {
-            $post = new EverPsBlogPost(
-                (int) $pending['id_ever_post'],
-                (int) $employee->id_lang,
-                (int) $id_shop
-            );
-            $post_list .= '<br/><p>' . $post->title . '</p>';
+
+        foreach ($posts as $post) {
+            $title = '';
+
+            foreach ($post->getTranslations() as $translation) {
+                if ($translation->getLangId() == $employee->id_lang) {
+                    $title = $translation->getTitle();
+                    break;
+                }
+            }
+
+            $post_list .= '<p>' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '</p>';
         }
+
         $mailDir = $this->module_folder . '/mails/';
-        $everShopEmail = Configuration::get('PS_SHOP_EMAIL');
-        $sent = Mail::send(
+        $shopEmail = Configuration::get('PS_SHOP_EMAIL');
+
+        return Mail::send(
             (int) $this->context->language->id,
             'pending',
             $this->l('Review on pending posts'),
             [
-                '{shop_name}'=> Configuration::get('PS_SHOP_NAME'),
-                '{shop_logo}'=> _PS_IMG_DIR_ . Configuration::get(
-                    'PS_LOGO',
-                    null,
-                    null,
-                    (int) $this->context->shop->id
-                ),
+                '{shop_name}' => Configuration::get('PS_SHOP_NAME'),
+                '{shop_logo}' => _PS_IMG_DIR_ . Configuration::get('PS_LOGO'),
                 '{posts}' => $post_list,
             ],
             $employee->email,
             null,
-            $everShopEmail,
+            $shopEmail,
             Configuration::get('PS_SHOP_NAME'),
             null,
             null,
-            $mailDir,
-            false,
-            null,
-            $everShopEmail,
-            $everShopEmail,
-            Configuration::get('PS_SHOP_NAME')
+            $mailDir
         );
-        return $sent;
     }
+
+public function emptyTrash($id_shop)
+{
+    $repo = $this->getPostRepository();
+    if (!$repo) {
+        return false;
+    }
+
+    $days = (int) Configuration::get('EVERBLOG_EMPTY_TRASH');
+    $limitDate = new \DateTime('-' . $days . ' days');
+
+    $posts = $repo->createQueryBuilder('p')
+        ->andWhere('p.shopId = :shop')
+        ->andWhere('p.status = :status')
+        ->andWhere('p.updatedAt <= :limit')
+        ->setParameter('shop', (int) $id_shop)
+        ->setParameter('status', 'trash')
+        ->setParameter('limit', $limitDate)
+        ->getQuery()
+        ->getResult();
+
+    if (!$posts) {
+        return true;
+    }
+
+    $em = $this->context->controller->getContainer()->get('doctrine.orm.entity_manager');
+
+    foreach ($posts as $post) {
+        $em->remove($post);
+    }
+
+    $em->flush();
+
+    return true;
+}
 
     public function publishPlannedPosts($id_shop)
     {
