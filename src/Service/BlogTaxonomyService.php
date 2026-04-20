@@ -119,7 +119,11 @@ class BlogTaxonomyService
         }
 
         $taxonomies = [];
-        $rootCategory = \EverPsBlogCategory::getRootCategory();
+        $rootCategoryId = (int) \Db::getInstance()->getValue(
+            'SELECT id_ever_category FROM `' . _DB_PREFIX_ . 'ever_blog_category`
+             WHERE is_root_category = 1'
+        );
+
         $sql = new \DbQuery();
         $sql->select('id_parent_category');
         $sql->from('ever_blog_category');
@@ -129,9 +133,13 @@ class BlogTaxonomyService
 
         if ($taxonomy > 0) {
             $taxonomies[] = $taxonomy;
-            $category = new \EverPsBlogCategory($taxonomy);
-            if ((int) $category->id_parent_category > 0 && (int) $rootCategory->id !== (int) $category->id_parent_category) {
-                $taxonomies[] = (int) $category->id_parent_category;
+            $parentSql = new \DbQuery();
+            $parentSql->select('id_parent_category');
+            $parentSql->from('ever_blog_category');
+            $parentSql->where('id_ever_category = ' . (int) $taxonomy);
+            $parentOfTaxonomy = (int) \Db::getInstance()->getValue($parentSql);
+            if ($parentOfTaxonomy > 0 && $rootCategoryId !== $parentOfTaxonomy) {
+                $taxonomies[] = $parentOfTaxonomy;
             }
         }
 
@@ -145,8 +153,13 @@ class BlogTaxonomyService
     {
         $taxonomies = $this->getPostCategoriesTaxonomies((int) $postId);
         if (empty($taxonomies)) {
-            $rootCategory = \EverPsBlogCategory::getRootCategory();
-            $this->insert((int) $rootCategory->id, (int) $postId, 'category');
+            $rootCategoryId = (int) \Db::getInstance()->getValue(
+                'SELECT id_ever_category FROM `' . _DB_PREFIX_ . 'ever_blog_category`
+                 WHERE is_root_category = 1'
+            );
+            if ($rootCategoryId > 0) {
+                $this->insert($rootCategoryId, (int) $postId, 'category');
+            }
         }
     }
 

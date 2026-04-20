@@ -78,7 +78,14 @@ class CategoryController extends AbstractDomainController
 
                     return $this->redirectToRoute('everpsblog_admin_category');
                 } catch (\Throwable $exception) {
-                    $form->addError(new FormError('Impossible d\'enregistrer la catégorie.'));
+                    $message = sprintf('Impossible d\'enregistrer la catégorie : %s', $this->describeException($exception));
+                    $form->addError(new FormError($message));
+                    $this->addFlash('error', $message);
+                    \PrestaShopLogger::addLog(
+                        '[everpsblog][CategoryController::formAction] ' . $exception->getMessage()
+                            . ' @ ' . $exception->getFile() . ':' . $exception->getLine(),
+                        3
+                    );
                 }
             }
         }

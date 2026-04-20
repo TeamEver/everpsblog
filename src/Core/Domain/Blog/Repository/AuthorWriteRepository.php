@@ -18,7 +18,7 @@ class AuthorWriteRepository
     public function create(array $data): int
     {
         $connection = $this->entityManager->getConnection();
-        $connection->insert('ever_blog_author', [
+        $connection->insert(_DB_PREFIX_ . 'ever_blog_author', [
             'id_employee' => (int) $data['id_employee'],
             'id_shop' => (int) $data['id_shop'],
             'nickhandle' => (string) $data['nickhandle'],
@@ -43,7 +43,7 @@ class AuthorWriteRepository
     public function update(int $authorId, array $data): void
     {
         $connection = $this->entityManager->getConnection();
-        $connection->update('ever_blog_author', [
+        $connection->update(_DB_PREFIX_ . 'ever_blog_author', [
             'id_employee' => (int) $data['id_employee'],
             'nickhandle' => (string) $data['nickhandle'],
             'twitter' => (string) ($data['twitter'] ?? ''),
@@ -63,17 +63,17 @@ class AuthorWriteRepository
     public function delete(int $authorId): void
     {
         $connection = $this->entityManager->getConnection();
-        $connection->delete('ever_blog_author_lang', ['id_ever_author' => $authorId]);
-        $connection->delete('ever_blog_author_shop', ['id_ever_author' => $authorId]);
-        $connection->delete('ever_blog_author', ['id_ever_author' => $authorId]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_author_lang', ['id_ever_author' => $authorId]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_author_shop', ['id_ever_author' => $authorId]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_author', ['id_ever_author' => $authorId]);
     }
 
     private function replaceRelations(int $authorId, array $data): void
     {
         $connection = $this->entityManager->getConnection();
-        $connection->delete('ever_blog_author_lang', ['id_ever_author' => $authorId]);
-        $connection->delete('ever_blog_author_shop', ['id_ever_author' => $authorId]);
-        $connection->insert('ever_blog_author_shop', ['id_ever_author' => $authorId, 'id_shop' => (int) $data['id_shop']]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_author_lang', ['id_ever_author' => $authorId]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_author_shop', ['id_ever_author' => $authorId]);
+        $connection->insert(_DB_PREFIX_ . 'ever_blog_author_shop', ['id_ever_author' => $authorId, 'id_shop' => (int) $data['id_shop']]);
 
         foreach (\Language::getLanguages(false) as $language) {
             $langId = (int) $language['id_lang'];
@@ -82,7 +82,7 @@ class AuthorWriteRepository
             $content = (string) ($data['content_' . $langId] ?? ($data['bio_' . $langId] ?? $data['bio']));
             $slug = (string) ($data['link_rewrite_' . $langId] ?? '');
 
-            $connection->insert('ever_blog_author_lang', [
+            $connection->insert(_DB_PREFIX_ . 'ever_blog_author_lang', [
                 'id_ever_author' => $authorId,
                 'id_lang' => $langId,
                 'meta_title' => $metaTitle,

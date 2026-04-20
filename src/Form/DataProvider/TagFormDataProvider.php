@@ -2,6 +2,7 @@
 
 namespace PrestaShop\Module\Everpsblog\Form\DataProvider;
 
+use Doctrine\ORM\EntityManagerInterface;
 use PrestaShop\Module\Everpsblog\Repository\TagRepository;
 use Tools;
 
@@ -10,9 +11,13 @@ final class TagFormDataProvider
     /** @var TagRepository */
     private $tagRepository;
 
-    public function __construct(TagRepository $tagRepository)
+    /** @var EntityManagerInterface */
+    private $entityManager;
+
+    public function __construct(TagRepository $tagRepository, EntityManagerInterface $entityManager)
     {
         $this->tagRepository = $tagRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -29,10 +34,10 @@ final class TagFormDataProvider
             return $this->getCreationData($id);
         }
 
-        $connection = $this->tagRepository->getEntityManager()->getConnection();
+        $connection = $this->entityManager->getConnection();
         /** @var array<string, mixed>|false $tag */
         $tag = $connection->fetchAssociative(
-            'SELECT * FROM ever_blog_tag WHERE id_ever_tag = :id',
+            'SELECT * FROM `' . _DB_PREFIX_ . 'ever_blog_tag` WHERE id_ever_tag = :id',
             ['id' => $id]
         );
         if (!$tag) {
@@ -58,7 +63,7 @@ final class TagFormDataProvider
 
         $translations = $connection->fetchAllAssociative(
             'SELECT id_lang, title, meta_title, meta_description, link_rewrite, content, bottom_content
-             FROM ever_blog_tag_lang
+             FROM `' . _DB_PREFIX_ . 'ever_blog_tag_lang`
              WHERE id_ever_tag = :id',
             ['id' => $id]
         );

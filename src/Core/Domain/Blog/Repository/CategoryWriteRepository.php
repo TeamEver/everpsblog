@@ -19,7 +19,7 @@ class CategoryWriteRepository
     {
         $connection = $this->entityManager->getConnection();
         $now = date('Y-m-d H:i:s');
-        $connection->insert('ever_blog_category', [
+        $connection->insert(_DB_PREFIX_ . 'ever_blog_category', [
             'id_parent_category' => $data['id_parent_category'],
             'id_shop' => (int) $data['id_shop'],
             'active' => (int) $data['active'],
@@ -44,7 +44,7 @@ class CategoryWriteRepository
     public function update(int $categoryId, array $data): void
     {
         $connection = $this->entityManager->getConnection();
-        $connection->update('ever_blog_category', [
+        $connection->update(_DB_PREFIX_ . 'ever_blog_category', [
             'id_parent_category' => $data['id_parent_category'],
             'active' => (int) $data['active'],
             'indexable' => (int) $data['indexable'],
@@ -63,17 +63,17 @@ class CategoryWriteRepository
     public function delete(int $categoryId): void
     {
         $connection = $this->entityManager->getConnection();
-        $connection->delete('ever_blog_category_lang', ['id_ever_category' => $categoryId]);
-        $connection->delete('ever_blog_category_shop', ['id_ever_category' => $categoryId]);
-        $connection->delete('ever_blog_category', ['id_ever_category' => $categoryId]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_category_lang', ['id_ever_category' => $categoryId]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_category_shop', ['id_ever_category' => $categoryId]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_category', ['id_ever_category' => $categoryId]);
     }
 
     private function replaceRelations(int $categoryId, array $data): void
     {
         $connection = $this->entityManager->getConnection();
-        $connection->delete('ever_blog_category_lang', ['id_ever_category' => $categoryId]);
-        $connection->delete('ever_blog_category_shop', ['id_ever_category' => $categoryId]);
-        $connection->insert('ever_blog_category_shop', ['id_ever_category' => $categoryId, 'id_shop' => (int) $data['id_shop']]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_category_lang', ['id_ever_category' => $categoryId]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_category_shop', ['id_ever_category' => $categoryId]);
+        $connection->insert(_DB_PREFIX_ . 'ever_blog_category_shop', ['id_ever_category' => $categoryId, 'id_shop' => (int) $data['id_shop']]);
 
         foreach (\Language::getLanguages(false) as $language) {
             $langId = (int) $language['id_lang'];
@@ -82,7 +82,7 @@ class CategoryWriteRepository
             $metaDescription = (string) ($data['meta_description_' . $langId] ?? $data['meta_description']);
             $slug = (string) ($data['link_rewrite_' . $langId] ?? '');
 
-            $connection->insert('ever_blog_category_lang', [
+            $connection->insert(_DB_PREFIX_ . 'ever_blog_category_lang', [
                 'id_ever_category' => $categoryId,
                 'id_lang' => $langId,
                 'title' => $title,

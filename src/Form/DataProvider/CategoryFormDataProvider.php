@@ -2,6 +2,7 @@
 
 namespace PrestaShop\Module\Everpsblog\Form\DataProvider;
 
+use Doctrine\ORM\EntityManagerInterface;
 use PrestaShop\Module\Everpsblog\Repository\CategoryRepository;
 use Tools;
 
@@ -10,9 +11,13 @@ final class CategoryFormDataProvider
     /** @var CategoryRepository */
     private $categoryRepository;
 
-    public function __construct(CategoryRepository $categoryRepository)
+    /** @var EntityManagerInterface */
+    private $entityManager;
+
+    public function __construct(CategoryRepository $categoryRepository, EntityManagerInterface $entityManager)
     {
         $this->categoryRepository = $categoryRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -29,10 +34,10 @@ final class CategoryFormDataProvider
             return $this->getCreationData($id);
         }
 
-        $connection = $this->categoryRepository->getEntityManager()->getConnection();
+        $connection = $this->entityManager->getConnection();
         /** @var array<string, mixed>|false $category */
         $category = $connection->fetchAssociative(
-            'SELECT * FROM ever_blog_category WHERE id_ever_category = :id',
+            'SELECT * FROM `' . _DB_PREFIX_ . 'ever_blog_category` WHERE id_ever_category = :id',
             ['id' => $id]
         );
 
@@ -61,7 +66,7 @@ final class CategoryFormDataProvider
 
         $translations = $connection->fetchAllAssociative(
             'SELECT id_lang, title, meta_title, meta_description, link_rewrite, content, bottom_content
-             FROM ever_blog_category_lang
+             FROM `' . _DB_PREFIX_ . 'ever_blog_category_lang`
              WHERE id_ever_category = :id',
             ['id' => $id]
         );

@@ -2,6 +2,17 @@
 
 namespace PrestaShop\Module\Everpsblog\Service;
 
+/**
+ * LEGACY import adapter.
+ *
+ * TODO PrestaShop 9: rewrite import pipelines (RSS/JSON/WordPress) to use the
+ *      new Doctrine-backed services instead of the removed ObjectModel classes
+ *      (EverPsBlogCategory, EverPsBlogTag, EverPsBlogAuthor, EverPsBlogPost).
+ *
+ * @deprecated Only used by the legacy import handlers in everpsblog.php. Calling
+ *             any method here triggers a "Class not found" error because the
+ *             legacy ObjectModel classes have been removed during refactoring.
+ */
 class LegacyImportAdapter
 {
     private $blogImageService;
@@ -13,43 +24,22 @@ class LegacyImportAdapter
 
     public function getOrCreateCategoryByLinkRewrite($linkRewrite)
     {
-        $category = \EverPsBlogCategory::getCategoryByLinkRewrite((string) $linkRewrite);
-        if (!\Validate::isLoadedObject($category)) {
-            $category = new \EverPsBlogCategory();
-        }
-
-        return $category;
+        $this->throwMigrationRequired('getOrCreateCategoryByLinkRewrite');
     }
 
     public function getOrCreateTagByLinkRewrite($linkRewrite)
     {
-        $tag = \EverPsBlogTag::getTagByLinkRewrite((string) $linkRewrite);
-        if (!\Validate::isLoadedObject($tag)) {
-            $tag = new \EverPsBlogTag();
-        }
-
-        return $tag;
+        $this->throwMigrationRequired('getOrCreateTagByLinkRewrite');
     }
 
     public function getOrCreateAuthorByNickhandle($nickhandle)
     {
-        $author = \EverPsBlogAuthor::getAuthorByNickhandle((string) $nickhandle);
-        if (!\Validate::isLoadedObject($author)) {
-            $author = new \EverPsBlogAuthor();
-            $author->nickhandle = (string) $nickhandle;
-        }
-
-        return $author;
+        $this->throwMigrationRequired('getOrCreateAuthorByNickhandle');
     }
 
     public function getOrCreatePostByLinkRewrite($linkRewrite)
     {
-        $post = \EverPsBlogPost::getPostByLinkRewrite((string) $linkRewrite);
-        if (!\Validate::isLoadedObject($post)) {
-            $post = new \EverPsBlogPost();
-        }
-
-        return $post;
+        $this->throwMigrationRequired('getOrCreatePostByLinkRewrite');
     }
 
     public function getOrCreatePostImage($postId, $shopId)
@@ -60,5 +50,19 @@ class LegacyImportAdapter
         }
 
         return $image;
+    }
+
+    /**
+     * @throws \RuntimeException
+     */
+    private function throwMigrationRequired(string $method): void
+    {
+        throw new \RuntimeException(sprintf(
+            'LegacyImportAdapter::%s() is not available anymore. The ObjectModel classes '
+            . '(EverPsBlogCategory, EverPsBlogTag, EverPsBlogAuthor, EverPsBlogPost) were '
+            . 'removed during the PrestaShop 9 refactor. Import features need to be '
+            . 'reimplemented on top of the new Doctrine-based repositories.',
+            $method
+        ));
     }
 }

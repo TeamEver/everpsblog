@@ -162,7 +162,7 @@ abstract class AbstractRequestValidator
 
         /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
-        $sql = sprintf('SELECT 1 FROM %s WHERE %s = :id LIMIT 1', $table, $idColumn);
+        $sql = sprintf('SELECT 1 FROM `%s%s` WHERE `%s` = :id LIMIT 1', _DB_PREFIX_, $table, $idColumn);
 
         return false !== $connection->fetchOne($sql, ['id' => $id]);
     }

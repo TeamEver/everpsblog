@@ -25,6 +25,29 @@ abstract class AbstractDomainController extends FrameworkBundleAdminController
         return $this->contextStateService->getLanguageId();
     }
 
+    /**
+     * Build a debug-friendly description of a caught exception.
+     * Always safe to display in the BO; includes class + message + root cause
+     * so the operator can act on the error without grep-ing the PS logs.
+     */
+    protected function describeException(\Throwable $exception): string
+    {
+        $parts = [];
+        $current = $exception;
+        while (null !== $current) {
+            $parts[] = sprintf(
+                '%s: %s (@%s:%d)',
+                (new \ReflectionClass($current))->getShortName(),
+                $current->getMessage(),
+                basename($current->getFile()),
+                $current->getLine()
+            );
+            $current = $current->getPrevious();
+        }
+
+        return implode(' <= ', $parts);
+    }
+
     protected function getAdminNavigationLinks(): array
     {
         return [

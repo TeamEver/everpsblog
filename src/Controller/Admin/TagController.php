@@ -76,7 +76,14 @@ class TagController extends AbstractDomainController
 
                     return $this->redirectToRoute('everpsblog_admin_tag');
                 } catch (\Throwable $exception) {
-                    $form->addError(new FormError('Impossible d\'enregistrer le tag.'));
+                    $message = sprintf('Impossible d\'enregistrer le tag : %s', $this->describeException($exception));
+                    $form->addError(new FormError($message));
+                    $this->addFlash('error', $message);
+                    \PrestaShopLogger::addLog(
+                        '[everpsblog][TagController::formAction] ' . $exception->getMessage()
+                            . ' @ ' . $exception->getFile() . ':' . $exception->getLine(),
+                        3
+                    );
                 }
             }
         }

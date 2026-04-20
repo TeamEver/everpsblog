@@ -18,25 +18,25 @@ class Post
     private $id;
 
     /** @ORM\Column(name="id_shop", type="integer") */
-    private $shopId;
+    private $shopId = 0;
 
-    /** @ORM\ManyToOne(targetEntity="Author", inversedBy="posts") @ORM\JoinColumn(name="id_author", referencedColumnName="id_ever_author", nullable=false) */
-    private $author;
+    /** @ORM\Column(name="id_author", type="integer", nullable=true, options={"default": 0}) */
+    private $authorId = 0;
 
-    /** @ORM\ManyToOne(targetEntity="Category", inversedBy="defaultPosts") @ORM\JoinColumn(name="id_default_category", referencedColumnName="id_ever_category", nullable=false) */
-    private $defaultCategory;
+    /** @ORM\Column(name="id_default_category", type="integer", options={"default": 0}) */
+    private $defaultCategoryId = 0;
 
     /** @ORM\Column(name="post_status", type="string", length=255) */
-    private $status;
+    private $status = 'draft';
 
     /** @ORM\Column(name="active", type="integer", nullable=true) */
-    private $active;
+    private $active = 1;
 
     /** @ORM\Column(name="indexable", type="integer", nullable=true) */
-    private $indexable;
+    private $indexable = 0;
 
     /** @ORM\Column(name="follow", type="integer", nullable=true) */
-    private $follow;
+    private $follow = 0;
 
     /** @ORM\Column(name="sitemap", type="integer", options={"default": 1}) */
     private $sitemap = 1;
@@ -95,26 +95,181 @@ class Post
         return $this->id;
     }
 
-    public function getViewCount()
+    public function getShopId(): int
+    {
+        return (int) $this->shopId;
+    }
+
+    public function setShopId($shopId): self
+    {
+        $this->shopId = (int) $shopId;
+
+        return $this;
+    }
+
+    public function getAuthorId(): int
+    {
+        return (int) $this->authorId;
+    }
+
+    public function setAuthorId($authorId): self
+    {
+        $authorId = (int) $authorId;
+        $this->authorId = $authorId > 0 ? $authorId : null;
+
+        return $this;
+    }
+
+    public function getDefaultCategoryId(): int
+    {
+        return (int) $this->defaultCategoryId;
+    }
+
+    public function setDefaultCategoryId($defaultCategoryId): self
+    {
+        $this->defaultCategoryId = (int) $defaultCategoryId;
+
+        return $this;
+    }
+
+    public function getStatus(): string
+    {
+        return (string) $this->status;
+    }
+
+    public function setStatus($status): self
+    {
+        $this->status = (string) $status;
+
+        return $this;
+    }
+
+    public function getActive(): int
+    {
+        return (int) $this->active;
+    }
+
+    public function setActive($active): self
+    {
+        $this->active = (int) $active;
+
+        return $this;
+    }
+
+    public function getIndexable(): int
+    {
+        return (int) $this->indexable;
+    }
+
+    public function setIndexable($indexable): self
+    {
+        $this->indexable = (int) ((bool) $indexable);
+
+        return $this;
+    }
+
+    public function getFollow(): int
+    {
+        return (int) $this->follow;
+    }
+
+    public function setFollow($follow): self
+    {
+        $this->follow = (int) ((bool) $follow);
+
+        return $this;
+    }
+
+    public function getSitemap(): int
+    {
+        return (int) $this->sitemap;
+    }
+
+    public function setSitemap($sitemap): self
+    {
+        $this->sitemap = (int) ((bool) $sitemap);
+
+        return $this;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword($password): self
+    {
+        $this->password = (null === $password || '' === $password) ? null : (string) $password;
+
+        return $this;
+    }
+
+    public function getStarred(): int
+    {
+        return (int) $this->starred;
+    }
+
+    public function setStarred($starred): self
+    {
+        $this->starred = (int) $starred;
+
+        return $this;
+    }
+
+    public function getViewCount(): int
     {
         return (int) $this->viewCount;
     }
 
-    public function setViewCount($viewCount)
+    public function setViewCount($viewCount): self
     {
         $this->viewCount = (int) $viewCount;
 
         return $this;
     }
 
-    public function setCreatedAt(DateTimeInterface $createdAt)
+    public function getAllowedGroups(): ?string
+    {
+        return $this->allowedGroups;
+    }
+
+    public function setAllowedGroups($allowedGroups): self
+    {
+        $this->allowedGroups = (null === $allowedGroups || '' === $allowedGroups) ? null : (string) $allowedGroups;
+
+        return $this;
+    }
+
+    public function getGroups(): ?string
+    {
+        return $this->groups;
+    }
+
+    public function setGroups($groups): self
+    {
+        $this->groups = (null === $groups || '' === $groups) ? null : (string) $groups;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function setUpdatedAt(DateTimeInterface $updatedAt)
+    public function getUpdatedAt(): ?DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 
@@ -124,7 +279,7 @@ class Post
     /**
      * @return Collection<int, PostLang>
      */
-    public function getTranslations()
+    public function getTranslations(): Collection
     {
         return $this->translations;
     }

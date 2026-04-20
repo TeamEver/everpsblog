@@ -45,9 +45,9 @@ final class AuthorGridDataFactory
 
         foreach ($rows as $row) {
             $records[] = [
-                'id_ever_author' => $row['id'] ?? $row['id'.substr('id_ever_author',3)] ?? 0,
-                'nickhandle' => $row['nickhandle'] ?? '',
-                'active' => (string) ($row['active'] ?? 0)
+                'id_ever_author' => (int) ($row['id'] ?? 0),
+                'nickhandle' => (string) ($row['nickhandle'] ?? ''),
+                'active' => (string) ($row['active'] ?? 0),
             ];
         }
 

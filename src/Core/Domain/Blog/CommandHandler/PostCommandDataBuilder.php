@@ -2,8 +2,8 @@
 
 namespace PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler;
 
-use EverPsBlogCategory;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\ValueObject\PostCommandData;
+use PrestaShop\Module\Everpsblog\Service\BlogInstallService;
 use Tools;
 
 class PostCommandDataBuilder
@@ -12,16 +12,19 @@ class PostCommandDataBuilder
     private $shopId;
     /** @var int */
     private $unclassedCategoryId;
+    /** @var BlogInstallService|null */
+    private $blogInstallService;
 
-    public function __construct(int $shopId, int $unclassedCategoryId)
+    public function __construct(int $shopId, int $unclassedCategoryId, ?BlogInstallService $blogInstallService = null)
     {
         $this->shopId = $shopId;
         $this->unclassedCategoryId = $unclassedCategoryId;
+        $this->blogInstallService = $blogInstallService;
     }
 
     public function buildFromRequestData(array $data): PostCommandData
     {
-        $rootCategory = EverPsBlogCategory::getRootCategory();
+        $rootCategoryId = $this->resolveRootCategoryId();
         $dateAdd = isset($data['date_add']) && $data['date_add'] ? (string) $data['date_add'] : date('Y-m-d H:i:s');
 
         return new PostCommandData(
@@ -29,7 +32,7 @@ class PostCommandDataBuilder
             (int) ($data['id_author'] ?? 0),
             (int) ($data['id_default_category'] ?? 0),
             $this->unclassedCategoryId,
-            (int) $rootCategory->id,
+            $rootCategoryId,
             (string) ($data['post_status'] ?? 'draft'),
             isset($data['psswd']) ? (string) $data['psswd'] : null,
             $dateAdd,
@@ -43,6 +46,24 @@ class PostCommandDataBuilder
             $this->toArray($data['post_products'] ?? []),
             $this->buildTranslations($data)
         );
+    }
+
+    private function resolveRootCategoryId(): int
+    {
+        if (null !== $this->blogInstallService) {
+            $rootId = $this->blogInstallService->getRootCategoryId($this->shopId);
+            if ($rootId > 0) {
+                return $rootId;
+            }
+        }
+
+        $db = \Db::getInstance();
+        $rootId = (int) $db->getValue(
+            'SELECT id_ever_category FROM `' . _DB_PREFIX_ . 'ever_blog_category`
+             WHERE is_root_category = 1 AND id_shop = ' . (int) $this->shopId
+        );
+
+        return $rootId > 0 ? $rootId : 0;
     }
 
     private function buildTranslations(array $data): array

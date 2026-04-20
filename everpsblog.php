@@ -2966,12 +2966,15 @@ public function emptyTrash($id_shop)
     public function hookActionObjectEverPsBlogCategoryDeleteAfter($params)
     {
         if ((int) $params['object']->id == (int) Configuration::get('EVERBLOG_UNCLASSED_ID')) {
-            $rootCategory = EverPsBlogCategory::getRootCategory();
-            $this->getBlogInstallService()->recreateUnclassedCategory(
-                $this,
-                (int) Context::getContext()->shop->id,
-                (int) $rootCategory->id
-            );
+            $shopId = (int) Context::getContext()->shop->id;
+            $rootCategoryId = $this->getBlogInstallService()->getRootCategoryId($shopId);
+            if ($rootCategoryId > 0) {
+                $this->getBlogInstallService()->recreateUnclassedCategory(
+                    $this,
+                    $shopId,
+                    $rootCategoryId
+                );
+            }
         }
         $old_img = _PS_MODULE_DIR_
         . 'everpsblog/views/img/categories/category_image_'

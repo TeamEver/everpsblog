@@ -44,12 +44,16 @@ class PostWriteRepository
 
     private function clearRelations(int $postId): void
     {
+        if ($postId <= 0) {
+            return;
+        }
+
         $connection = $this->entityManager->getConnection();
-        $connection->delete('ever_blog_post_lang', ['id_ever_post' => $postId]);
-        $connection->delete('ever_blog_post_shop', ['id_ever_post' => $postId]);
-        $connection->delete('ever_blog_post_category', ['id_ever_post' => $postId]);
-        $connection->delete('ever_blog_post_tag', ['id_ever_post' => $postId]);
-        $connection->delete('ever_blog_post_product', ['id_ever_post' => $postId]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_post_lang', ['id_ever_post' => $postId]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_post_shop', ['id_ever_post' => $postId]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_post_category', ['id_ever_post' => $postId]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_post_tag', ['id_ever_post' => $postId]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_post_product', ['id_ever_post' => $postId]);
     }
 
     /**

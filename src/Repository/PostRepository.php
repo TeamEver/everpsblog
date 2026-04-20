@@ -179,7 +179,7 @@ class PostRepository extends EntityRepository
 
     public function incrementPostViewCount($postId)
     {
-        return $this->getEntityManager()->createQueryBuilder()
+        return $this->_em->createQueryBuilder()
             ->update('PrestaShop\\Module\\Everpsblog\\Entity\\Post', 'p')
             ->set('p.viewCount', 'p.viewCount + 1')
             ->where('p.id = :postId')

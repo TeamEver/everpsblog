@@ -44,10 +44,17 @@ final class TagGridDataFactory
         $records = [];
 
         foreach ($rows as $row) {
+            $translations = $row['translations'] ?? ($row['tl'] ?? []);
+            if (is_array($translations) && isset($translations[0])) {
+                $translation = $translations[0];
+            } else {
+                $translation = is_array($translations) ? $translations : [];
+            }
+            $title = is_array($translation) ? (string) ($translation['title'] ?? '') : '';
             $records[] = [
-                'id_ever_tag' => $row['id'] ?? $row['id'.substr('id_ever_tag',3)] ?? 0,
-                'title' => $row['tl']['title'] ?? '',
-                'active' => (string) ($row['active'] ?? 0)
+                'id_ever_tag' => (int) ($row['id'] ?? 0),
+                'title' => $title,
+                'active' => (string) ($row['active'] ?? 0),
             ];
         }
 

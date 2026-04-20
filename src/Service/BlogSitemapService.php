@@ -36,7 +36,11 @@ class BlogSitemapService
     private function processSitemapPost($shopId, $idLang)
     {
         $filename = 'blogpost_' . (int) $shopId . '_lang_' . \Language::getIsoById((int) $idLang);
-        $sql = 'SELECT id_ever_post FROM ' . _DB_PREFIX_ . 'ever_blog_post WHERE sitemap = 1 AND post_status = "published"';
+        $sql = 'SELECT p.id_ever_post, p.date_upd, p.allowed_groups, pl.link_rewrite
+                FROM `' . _DB_PREFIX_ . 'ever_blog_post` p
+                INNER JOIN `' . _DB_PREFIX_ . 'ever_blog_post_lang` pl
+                    ON pl.id_ever_post = p.id_ever_post AND pl.id_lang = ' . (int) $idLang . '
+                WHERE p.sitemap = 1 AND p.post_status = "published"';
         $rows = \Db::getInstance()->executeS($sql) ?: [];
         if (!$rows) {
             return true;
@@ -45,13 +49,15 @@ class BlogSitemapService
         $items = [];
         $link = new \Link();
         foreach ($rows as $row) {
-            $post = new \EverPsBlogPost((int) $row['id_ever_post'], (int) $idLang, (int) $shopId);
-            if ($this->isRestrictedFromSitemap($post)) {
+            if ($this->isRestrictedFromSitemap($row['allowed_groups'] ?? null)) {
                 continue;
             }
             $items[] = [
-                'url' => $link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $post->id, 'link_rewrite' => $post->link_rewrite]),
-                'date' => $post->date_upd,
+                'url' => $link->getModuleLink('everpsblog', 'post', [
+                    'id_ever_post' => (int) $row['id_ever_post'],
+                    'link_rewrite' => (string) $row['link_rewrite'],
+                ]),
+                'date' => (string) $row['date_upd'],
             ];
         }
 
@@ -61,7 +67,11 @@ class BlogSitemapService
     private function processSitemapAuthor($shopId, $idLang)
     {
         $filename = 'blogauthor_' . (int) $shopId . '_lang_' . \Language::getIsoById((int) $idLang);
-        $sql = 'SELECT id_ever_author FROM ' . _DB_PREFIX_ . 'ever_blog_author WHERE sitemap = 1 AND active = 1';
+        $sql = 'SELECT a.id_ever_author, a.date_upd, a.allowed_groups, a.active, al.link_rewrite
+                FROM `' . _DB_PREFIX_ . 'ever_blog_author` a
+                INNER JOIN `' . _DB_PREFIX_ . 'ever_blog_author_lang` al
+                    ON al.id_ever_author = a.id_ever_author AND al.id_lang = ' . (int) $idLang . '
+                WHERE a.sitemap = 1 AND a.active = 1';
         $rows = \Db::getInstance()->executeS($sql) ?: [];
         if (!$rows) {
             return true;
@@ -70,13 +80,15 @@ class BlogSitemapService
         $items = [];
         $link = new \Link();
         foreach ($rows as $row) {
-            $author = new \EverPsBlogAuthor((int) $row['id_ever_author'], (int) $idLang, (int) $shopId);
-            if ($this->isRestrictedFromSitemap($author) || !(bool) $author->active) {
+            if ($this->isRestrictedFromSitemap($row['allowed_groups'] ?? null) || !(int) $row['active']) {
                 continue;
             }
             $items[] = [
-                'url' => $link->getModuleLink('everpsblog', 'author', ['id_ever_author' => $author->id, 'link_rewrite' => $author->link_rewrite]),
-                'date' => $author->date_upd,
+                'url' => $link->getModuleLink('everpsblog', 'author', [
+                    'id_ever_author' => (int) $row['id_ever_author'],
+                    'link_rewrite' => (string) $row['link_rewrite'],
+                ]),
+                'date' => (string) $row['date_upd'],
             ];
         }
 
@@ -86,7 +98,11 @@ class BlogSitemapService
     private function processSitemapTag($shopId, $idLang)
     {
         $filename = 'blogtag_' . (int) $shopId . '_lang_' . \Language::getIsoById((int) $idLang);
-        $sql = 'SELECT id_ever_tag FROM ' . _DB_PREFIX_ . 'ever_blog_tag WHERE sitemap = 1 AND active = 1';
+        $sql = 'SELECT t.id_ever_tag, t.date_upd, t.allowed_groups, t.active, tl.link_rewrite
+                FROM `' . _DB_PREFIX_ . 'ever_blog_tag` t
+                INNER JOIN `' . _DB_PREFIX_ . 'ever_blog_tag_lang` tl
+                    ON tl.id_ever_tag = t.id_ever_tag AND tl.id_lang = ' . (int) $idLang . '
+                WHERE t.sitemap = 1 AND t.active = 1';
         $rows = \Db::getInstance()->executeS($sql) ?: [];
         if (!$rows) {
             return true;
@@ -95,13 +111,15 @@ class BlogSitemapService
         $items = [];
         $link = new \Link();
         foreach ($rows as $row) {
-            $tag = new \EverPsBlogTag((int) $row['id_ever_tag'], (int) $idLang, (int) $shopId);
-            if ($this->isRestrictedFromSitemap($tag) || !(bool) $tag->active) {
+            if ($this->isRestrictedFromSitemap($row['allowed_groups'] ?? null) || !(int) $row['active']) {
                 continue;
             }
             $items[] = [
-                'url' => $link->getModuleLink('everpsblog', 'tag', ['id_ever_tag' => $tag->id, 'link_rewrite' => $tag->link_rewrite]),
-                'date' => $tag->date_upd,
+                'url' => $link->getModuleLink('everpsblog', 'tag', [
+                    'id_ever_tag' => (int) $row['id_ever_tag'],
+                    'link_rewrite' => (string) $row['link_rewrite'],
+                ]),
+                'date' => (string) $row['date_upd'],
             ];
         }
 
@@ -111,7 +129,11 @@ class BlogSitemapService
     private function processSitemapCategory($shopId, $idLang)
     {
         $filename = 'blogcategory_' . (int) $shopId . '_lang_' . \Language::getIsoById((int) $idLang);
-        $sql = 'SELECT id_ever_category FROM ' . _DB_PREFIX_ . 'ever_blog_category WHERE sitemap = 1 AND active = 1';
+        $sql = 'SELECT c.id_ever_category, c.date_upd, c.allowed_groups, c.active, c.is_root_category, cl.link_rewrite
+                FROM `' . _DB_PREFIX_ . 'ever_blog_category` c
+                INNER JOIN `' . _DB_PREFIX_ . 'ever_blog_category_lang` cl
+                    ON cl.id_ever_category = c.id_ever_category AND cl.id_lang = ' . (int) $idLang . '
+                WHERE c.sitemap = 1 AND c.active = 1';
         $rows = \Db::getInstance()->executeS($sql) ?: [];
         if (!$rows) {
             return true;
@@ -120,13 +142,15 @@ class BlogSitemapService
         $items = [];
         $link = new \Link();
         foreach ($rows as $row) {
-            $category = new \EverPsBlogCategory((int) $row['id_ever_category'], (int) $idLang, (int) $shopId);
-            if ($this->isRestrictedFromSitemap($category) || !(bool) $category->active || (bool) $category->is_root_category) {
+            if ($this->isRestrictedFromSitemap($row['allowed_groups'] ?? null) || !(int) $row['active'] || (int) $row['is_root_category']) {
                 continue;
             }
             $items[] = [
-                'url' => $link->getModuleLink('everpsblog', 'category', ['id_ever_category' => $category->id, 'link_rewrite' => $category->link_rewrite]),
-                'date' => $category->date_upd,
+                'url' => $link->getModuleLink('everpsblog', 'category', [
+                    'id_ever_category' => (int) $row['id_ever_category'],
+                    'link_rewrite' => (string) $row['link_rewrite'],
+                ]),
+                'date' => (string) $row['date_upd'],
             ];
         }
 
@@ -180,12 +204,15 @@ class BlogSitemapService
         return true;
     }
 
-    private function isRestrictedFromSitemap($entity)
+    /**
+     * @param mixed $allowedGroups
+     */
+    private function isRestrictedFromSitemap($allowedGroups)
     {
-        if (!isset($entity->allowed_groups) || !$entity->allowed_groups) {
+        if (!$allowedGroups) {
             return false;
         }
-        $allowedGroups = json_decode($entity->allowed_groups, true);
+        $allowedGroups = json_decode((string) $allowedGroups, true);
 
         return is_array($allowedGroups) && !in_array('1', $allowedGroups, true) && !in_array(1, $allowedGroups, true);
     }

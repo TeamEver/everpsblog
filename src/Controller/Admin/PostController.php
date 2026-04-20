@@ -101,8 +101,15 @@ class PostController extends AbstractDomainController
 
                     return $this->redirectToRoute('everpsblog_admin_post');
                 } catch (\Throwable $exception) {
-                    $form->addError(new FormError('Impossible d\'enregistrer l\'article.'));
-                    $this->addFlash('error', 'Impossible d\'enregistrer l\'article.');
+                    $debug = (string) $this->describeException($exception);
+                    $message = sprintf('Impossible d\'enregistrer l\'article : %s', $debug);
+                    $form->addError(new FormError($message));
+                    $this->addFlash('error', $message);
+                    \PrestaShopLogger::addLog(
+                        '[everpsblog][PostController::formAction] ' . $exception->getMessage()
+                            . ' @ ' . $exception->getFile() . ':' . $exception->getLine(),
+                        3
+                    );
                 }
             }
         }

@@ -2,6 +2,7 @@
 
 namespace PrestaShop\Module\Everpsblog\Form\DataProvider;
 
+use Doctrine\ORM\EntityManagerInterface;
 use PrestaShop\Module\Everpsblog\Repository\CommentRepository;
 
 final class CommentFormDataProvider
@@ -9,9 +10,13 @@ final class CommentFormDataProvider
     /** @var CommentRepository */
     private $commentRepository;
 
-    public function __construct(CommentRepository $commentRepository)
+    /** @var EntityManagerInterface */
+    private $entityManager;
+
+    public function __construct(CommentRepository $commentRepository, EntityManagerInterface $entityManager)
     {
         $this->commentRepository = $commentRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -28,10 +33,10 @@ final class CommentFormDataProvider
             return $this->getCreationData($id);
         }
 
-        $connection = $this->commentRepository->getEntityManager()->getConnection();
+        $connection = $this->entityManager->getConnection();
         /** @var array<string, mixed>|false $comment */
         $comment = $connection->fetchAssociative(
-            'SELECT * FROM ever_blog_comments WHERE id_ever_comment = :id',
+            'SELECT * FROM `' . _DB_PREFIX_ . 'ever_blog_comments` WHERE id_ever_comment = :id',
             ['id' => $id]
         );
 

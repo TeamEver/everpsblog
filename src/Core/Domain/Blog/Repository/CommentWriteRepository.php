@@ -19,7 +19,7 @@ class CommentWriteRepository
         $connection = $this->entityManager->getConnection();
         $now = date('Y-m-d H:i:s');
 
-        $connection->insert('ever_blog_comments', [
+        $connection->insert(_DB_PREFIX_ . 'ever_blog_comments', [
             'id_ever_post' => (int) $data['id_ever_post'],
             'id_lang' => (int) $data['id_lang'],
             'comment' => (string) $data['comment'],
@@ -36,7 +36,7 @@ class CommentWriteRepository
     public function update(int $commentId, array $data): void
     {
         $connection = $this->entityManager->getConnection();
-        $connection->update('ever_blog_comments', [
+        $connection->update(_DB_PREFIX_ . 'ever_blog_comments', [
             'id_ever_post' => (int) $data['id_ever_post'],
             'id_lang' => (int) $data['id_lang'],
             'comment' => (string) $data['comment'],
@@ -49,6 +49,6 @@ class CommentWriteRepository
 
     public function delete(int $commentId): void
     {
-        $this->entityManager->getConnection()->delete('ever_blog_comments', ['id_ever_comment' => $commentId]);
+        $this->entityManager->getConnection()->delete(_DB_PREFIX_ . 'ever_blog_comments', ['id_ever_comment' => $commentId]);
     }
 }

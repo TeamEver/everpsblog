@@ -76,7 +76,14 @@ class AuthorController extends AbstractDomainController
 
                     return $this->redirectToRoute('everpsblog_admin_author');
                 } catch (\Throwable $exception) {
-                    $form->addError(new FormError('Impossible d\'enregistrer l\'auteur.'));
+                    $message = sprintf('Impossible d\'enregistrer l\'auteur : %s', $this->describeException($exception));
+                    $form->addError(new FormError($message));
+                    $this->addFlash('error', $message);
+                    \PrestaShopLogger::addLog(
+                        '[everpsblog][AuthorController::formAction] ' . $exception->getMessage()
+                            . ' @ ' . $exception->getFile() . ':' . $exception->getLine(),
+                        3
+                    );
                 }
             }
         }

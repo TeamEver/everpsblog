@@ -18,7 +18,7 @@ class TagWriteRepository
     public function create(array $data): int
     {
         $connection = $this->entityManager->getConnection();
-        $connection->insert('ever_blog_tag', [
+        $connection->insert(_DB_PREFIX_ . 'ever_blog_tag', [
             'id_shop' => (int) $data['id_shop'],
             'active' => (int) $data['active'],
             'indexable' => (int) $data['indexable'],
@@ -38,7 +38,7 @@ class TagWriteRepository
     public function update(int $tagId, array $data): void
     {
         $connection = $this->entityManager->getConnection();
-        $connection->update('ever_blog_tag', [
+        $connection->update(_DB_PREFIX_ . 'ever_blog_tag', [
             'active' => (int) $data['active'],
             'indexable' => (int) $data['indexable'],
             'follow' => (int) $data['follow'],
@@ -53,17 +53,17 @@ class TagWriteRepository
     public function delete(int $tagId): void
     {
         $connection = $this->entityManager->getConnection();
-        $connection->delete('ever_blog_tag_lang', ['id_ever_tag' => $tagId]);
-        $connection->delete('ever_blog_tag_shop', ['id_ever_tag' => $tagId]);
-        $connection->delete('ever_blog_tag', ['id_ever_tag' => $tagId]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_tag_lang', ['id_ever_tag' => $tagId]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_tag_shop', ['id_ever_tag' => $tagId]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_tag', ['id_ever_tag' => $tagId]);
     }
 
     private function replaceRelations(int $tagId, array $data): void
     {
         $connection = $this->entityManager->getConnection();
-        $connection->delete('ever_blog_tag_lang', ['id_ever_tag' => $tagId]);
-        $connection->delete('ever_blog_tag_shop', ['id_ever_tag' => $tagId]);
-        $connection->insert('ever_blog_tag_shop', ['id_ever_tag' => $tagId, 'id_shop' => (int) $data['id_shop']]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_tag_lang', ['id_ever_tag' => $tagId]);
+        $connection->delete(_DB_PREFIX_ . 'ever_blog_tag_shop', ['id_ever_tag' => $tagId]);
+        $connection->insert(_DB_PREFIX_ . 'ever_blog_tag_shop', ['id_ever_tag' => $tagId, 'id_shop' => (int) $data['id_shop']]);
 
         foreach (\Language::getLanguages(false) as $language) {
             $langId = (int) $language['id_lang'];
@@ -72,7 +72,7 @@ class TagWriteRepository
             $metaDescription = (string) ($data['meta_description_' . $langId] ?? $data['meta_description']);
             $slug = (string) ($data['link_rewrite_' . $langId] ?? '');
 
-            $connection->insert('ever_blog_tag_lang', [
+            $connection->insert(_DB_PREFIX_ . 'ever_blog_tag_lang', [
                 'id_ever_tag' => $tagId,
                 'id_lang' => $langId,
                 'title' => $title,

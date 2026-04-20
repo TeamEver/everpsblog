@@ -2,6 +2,7 @@
 
 namespace PrestaShop\Module\Everpsblog\Form\DataProvider;
 
+use Doctrine\ORM\EntityManagerInterface;
 use PrestaShop\Module\Everpsblog\Repository\PostRepository;
 use Tools;
 
@@ -10,9 +11,13 @@ final class PostFormDataProvider
     /** @var PostRepository */
     private $postRepository;
 
-    public function __construct(PostRepository $postRepository)
+    /** @var EntityManagerInterface */
+    private $entityManager;
+
+    public function __construct(PostRepository $postRepository, EntityManagerInterface $entityManager)
     {
         $this->postRepository = $postRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -29,10 +34,10 @@ final class PostFormDataProvider
             return $this->getCreationData($id);
         }
 
-        $connection = $this->postRepository->getEntityManager()->getConnection();
+        $connection = $this->entityManager->getConnection();
         /** @var array<string, mixed>|false $post */
         $post = $connection->fetchAssociative(
-            'SELECT * FROM ever_blog_post WHERE id_ever_post = :id',
+            'SELECT * FROM `' . _DB_PREFIX_ . 'ever_blog_post` WHERE id_ever_post = :id',
             ['id' => $id]
         );
 
@@ -64,21 +69,21 @@ final class PostFormDataProvider
         ];
 
         $data['post_categories'] = array_values(array_map('intval', array_column($connection->fetchAllAssociative(
-            'SELECT id_ever_post_category FROM ever_blog_post_category WHERE id_ever_post = :id',
+            'SELECT id_ever_post_category FROM `' . _DB_PREFIX_ . 'ever_blog_post_category` WHERE id_ever_post = :id',
             ['id' => $id]
         ), 'id_ever_post_category')));
         $data['post_tags'] = array_values(array_map('intval', array_column($connection->fetchAllAssociative(
-            'SELECT id_ever_post_tag FROM ever_blog_post_tag WHERE id_ever_post = :id',
+            'SELECT id_ever_post_tag FROM `' . _DB_PREFIX_ . 'ever_blog_post_tag` WHERE id_ever_post = :id',
             ['id' => $id]
         ), 'id_ever_post_tag')));
         $data['post_products'] = array_values(array_map('intval', array_column($connection->fetchAllAssociative(
-            'SELECT id_ever_post_product FROM ever_blog_post_product WHERE id_ever_post = :id',
+            'SELECT id_ever_post_product FROM `' . _DB_PREFIX_ . 'ever_blog_post_product` WHERE id_ever_post = :id',
             ['id' => $id]
         ), 'id_ever_post_product')));
 
         $translations = $connection->fetchAllAssociative(
             'SELECT id_lang, title, content, excerpt, meta_title, meta_description, link_rewrite
-             FROM ever_blog_post_lang
+             FROM `' . _DB_PREFIX_ . 'ever_blog_post_lang`
              WHERE id_ever_post = :id',
             ['id' => $id]
         );

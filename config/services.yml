@@ -174,11 +174,16 @@ services:
   prestashop.module.everpsblog.blog.validator.comment_request:
     class: PrestaShop\Module\Everpsblog\Application\Blog\CommentRequestValidator
 
+  prestashop.module.everpsblog.blog.install_service:
+    class: PrestaShop\Module\Everpsblog\Service\BlogInstallService
+    public: true
+
   prestashop.module.everpsblog.blog.post_data_builder:
     class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\PostCommandDataBuilder
     arguments:
       - '@=service("prestashop.adapter.legacy.context").getContext().shop.id'
       - '@=service("prestashop.adapter.legacy.configuration").get("EVERBLOG_UNCLASSED_ID")'
+      - '@prestashop.module.everpsblog.blog.install_service'
 
   prestashop.module.everpsblog.blog.assembler.post_command:
     class: PrestaShop\Module\Everpsblog\Application\Blog\PostCommandAssembler

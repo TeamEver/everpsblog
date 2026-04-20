@@ -2,6 +2,7 @@
 
 namespace PrestaShop\Module\Everpsblog\Form\DataProvider;
 
+use Doctrine\ORM\EntityManagerInterface;
 use PrestaShop\Module\Everpsblog\Repository\AuthorRepository;
 use Tools;
 
@@ -10,9 +11,13 @@ final class AuthorFormDataProvider
     /** @var AuthorRepository */
     private $authorRepository;
 
-    public function __construct(AuthorRepository $authorRepository)
+    /** @var EntityManagerInterface */
+    private $entityManager;
+
+    public function __construct(AuthorRepository $authorRepository, EntityManagerInterface $entityManager)
     {
         $this->authorRepository = $authorRepository;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -29,10 +34,10 @@ final class AuthorFormDataProvider
             return $this->getCreationData($id);
         }
 
-        $connection = $this->authorRepository->getEntityManager()->getConnection();
+        $connection = $this->entityManager->getConnection();
         /** @var array<string, mixed>|false $author */
         $author = $connection->fetchAssociative(
-            'SELECT * FROM ever_blog_author WHERE id_ever_author = :id',
+            'SELECT * FROM `' . _DB_PREFIX_ . 'ever_blog_author` WHERE id_ever_author = :id',
             ['id' => $id]
         );
 
@@ -64,7 +69,7 @@ final class AuthorFormDataProvider
 
         $translations = $connection->fetchAllAssociative(
             'SELECT id_lang, meta_title, meta_description, link_rewrite, content, bottom_content
-             FROM ever_blog_author_lang
+             FROM `' . _DB_PREFIX_ . 'ever_blog_author_lang`
              WHERE id_ever_author = :id',
             ['id' => $id]
         );
