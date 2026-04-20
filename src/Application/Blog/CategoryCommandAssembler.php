@@ -21,6 +21,7 @@ class CategoryCommandAssembler
 
     public function assembleCreate(array $requestData): CreateCategoryCommand
     {
+        $requestData = $this->extractPayload($requestData);
         $validatedData = $this->validator->validate($requestData);
 
         return new CreateCategoryCommand($this->mergeDefaults($validatedData));
@@ -28,6 +29,7 @@ class CategoryCommandAssembler
 
     public function assembleUpdate(int $categoryId, array $requestData): UpdateCategoryCommand
     {
+        $requestData = $this->extractPayload($requestData);
         $validatedData = $this->validator->validate($requestData);
 
         return new UpdateCategoryCommand($categoryId, $this->mergeDefaults($validatedData));
@@ -35,7 +37,7 @@ class CategoryCommandAssembler
 
     private function mergeDefaults(array $data): array
     {
-        return array_merge([
+        $normalizedData = array_merge([
             'id_shop' => $this->shopId,
             'title' => '',
             'meta_title' => '',
@@ -51,5 +53,23 @@ class CategoryCommandAssembler
             'allowed_groups' => [],
             'category_products' => [],
         ], $data);
+
+        if ('' === ($normalizedData['id_parent_category'] ?? null)) {
+            $normalizedData['id_parent_category'] = null;
+        }
+
+        return $normalizedData;
+    }
+
+    private function extractPayload(array $requestData): array
+    {
+        if (isset($requestData['category']) && is_array($requestData['category'])) {
+            /** @var array<string, mixed> $categoryPayload */
+            $categoryPayload = $requestData['category'];
+
+            return $categoryPayload;
+        }
+
+        return $requestData;
     }
 }
