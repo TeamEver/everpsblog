@@ -22,6 +22,11 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use PrestaShop\Module\Everpsblog\Controller\Front\AbstractFrontController;
+use PrestaShop\Module\Everpsblog\Entity\Author as EverPsBlogAuthor;
+use PrestaShop\Module\Everpsblog\Entity\Category as EverPsBlogCategory;
+use PrestaShop\Module\Everpsblog\Entity\Comment as EverPsBlogComment;
+use PrestaShop\Module\Everpsblog\Entity\Post as EverPsBlogPost;
+use PrestaShop\Module\Everpsblog\Entity\Tag as EverPsBlogTag;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;

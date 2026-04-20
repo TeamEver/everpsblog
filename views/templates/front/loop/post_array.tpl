@@ -15,11 +15,13 @@
  *  @copyright 2019-2025 Team Ever
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
+{$item|var_dump}
 <article class="col-12 mb-4" id="everpsblog-{$item.id|escape:'htmlall':'UTF-8'}">
     <div class="card h-100 shadow-sm border-0 everpsblog everpsblog-listing-card overflow-hidden">
         <div class="row g-0 h-100 align-items-stretch">
             <div class="col-12 col-lg-6">
                 {assign var='post_link' value=$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item.id , 'link_rewrite' => $item.link_rewrite])}
+{$post_link|var_dump}
                 <div class="article-img text-center mb-0 h-100">
                     <div class="everpsblog-image-wrapper position-relative overflow-hidden h-100" style="aspect-ratio: 16 / 9;">
                 {if isset($show_featured_post) && $show_featured_post && isset($item.featured_thumb) && $item.featured_thumb}
