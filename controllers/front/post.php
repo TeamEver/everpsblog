@@ -21,7 +21,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use PrestaShop\Module\Everpsblog\Controller\Front\PostController;
+use PrestaShop\Module\Everpsblog\Controller\Front\AbstractFrontController;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
@@ -29,7 +29,7 @@ use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
 use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 
-class EverPsBlogpostModuleFrontController extends PostController
+class EverPsBlogpostModuleFrontController extends AbstractFrontController
 {
     protected $category;
     protected $tag;
@@ -628,17 +628,17 @@ class EverPsBlogpostModuleFrontController extends PostController
         return $page;
     }
 
-    private function getBlogImageService()
+    protected function getBlogImageService()
     {
         return parent::getBlogImageService();
     }
 
-    private function getBlogTaxonomyService()
+    protected function getBlogTaxonomyService()
     {
         return parent::getBlogTaxonomyService();
     }
 
-    private function getBlogSortOrderService()
+    protected function getBlogSortOrderService()
     {
         return parent::getBlogSortOrderService();
     }
