@@ -66,6 +66,7 @@ class CategoryRepository extends EntityRepository
     private function createLocalizedQb($shopId, $langId)
     {
         return $this->createQueryBuilder('c')
+            ->addSelect('cl')
             ->innerJoin('c.translations', 'cl')
             ->innerJoin('c.shops', 'cs')
             ->andWhere('cl.langId = :langId')
