@@ -337,17 +337,17 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
 
     private function getBlogImageService()
     {
-        return $this->getModuleService('prestashop.module.everpsblog.service.blog_image');
+        return parent::getBlogImageService();
     }
 
     private function getBlogTaxonomyService()
     {
-        return $this->getModuleService('prestashop.module.everpsblog.service.blog_taxonomy');
+        return parent::getBlogTaxonomyService();
     }
 
     private function getBlogSortOrderService()
     {
-        return $this->getModuleService('prestashop.module.everpsblog.service.blog_sort_order');
+        return parent::getBlogSortOrderService();
     }
 
 }

@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace PrestaShop\Module\Everpsblog\Controller\Front;
 
 use PrestaShop\PrestaShop\Core\Product\Search\Pagination;
-use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 
 require_once dirname(__DIR__, 3) . '/everpsblog.php';
 
 abstract class AbstractFrontController extends \ModuleFrontController
 {
     protected $page = 1;
+    private $blogImageService;
+    private $blogTaxonomyService;
+    private $blogSortOrderService;
+    private $serviceCachePool;
 
     public function getTemplateVarPage()
     {
@@ -139,24 +142,6 @@ abstract class AbstractFrontController extends \ModuleFrontController
         ];
     }
 
-
-    protected function getModuleService(string $serviceId)
-    {
-        if (isset($this->module) && method_exists($this->module, 'get')) {
-            try {
-                return $this->module->get($serviceId);
-            } catch (\Throwable $exception) {
-                // Fallback to legacy Symfony container access below.
-            }
-        }
-
-        $container = SymfonyContainer::getInstance();
-        if (null === $container) {
-            throw new \RuntimeException(sprintf('Symfony container is unavailable for service "%s".', $serviceId));
-        }
-
-        return $container->get($serviceId);
-    }
 
     protected function getTemplateVarPagination($total = 0)
     {
@@ -357,5 +342,45 @@ abstract class AbstractFrontController extends \ModuleFrontController
         }
 
         return $code;
+    }
+
+    protected function getBlogImageService()
+    {
+        if (!$this->blogImageService) {
+            $this->blogImageService = new \PrestaShop\Module\Everpsblog\Service\BlogImageService(
+                $this->getServiceCachePool()
+            );
+        }
+
+        return $this->blogImageService;
+    }
+
+    protected function getBlogTaxonomyService()
+    {
+        if (!$this->blogTaxonomyService) {
+            $this->blogTaxonomyService = new \PrestaShop\Module\Everpsblog\Service\BlogTaxonomyService(
+                $this->getServiceCachePool()
+            );
+        }
+
+        return $this->blogTaxonomyService;
+    }
+
+    protected function getBlogSortOrderService()
+    {
+        if (!$this->blogSortOrderService) {
+            $this->blogSortOrderService = new \PrestaShop\Module\Everpsblog\Service\BlogSortOrderService();
+        }
+
+        return $this->blogSortOrderService;
+    }
+
+    private function getServiceCachePool()
+    {
+        if (!$this->serviceCachePool) {
+            $this->serviceCachePool = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
+        }
+
+        return $this->serviceCachePool;
     }
 }
