@@ -2,183 +2,440 @@
 
 {% block stylesheets %}
   {{ parent() }}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
   <style>
-    .ever-admin-shell {
-      --ever-primary: #5b6cff;
-      --ever-primary-dark: #3647d1;
+    .ever-admin {
+      --ever-primary: #4f46e5;
+      --ever-primary-600: #4338ca;
+      --ever-primary-50: #eef2ff;
+      --ever-accent: #0ea5e9;
+      --ever-success: #16a34a;
+      --ever-warning: #f59e0b;
+      --ever-danger: #dc2626;
+      --ever-muted: #6b7280;
+      --ever-border: #e5e7eb;
       --ever-surface: #ffffff;
-      --ever-bg: #f5f7ff;
-      --ever-border: #e2e8ff;
-      --ever-text-soft: #667085;
-      --ever-success: #12b76a;
-      background: linear-gradient(180deg, #f3f6ff 0%, #f8f9fc 35%, #f7f8fb 100%);
-      padding: 1.25rem;
-      border-radius: .85rem;
-      border: 1px solid #edf0ff;
+      --ever-bg: #f8fafc;
+      color: #111827;
     }
-
-    .ever-admin-hero {
-      background: radial-gradient(circle at top right, #dbe4ff, #f8faff 45%, #ffffff 100%);
-      border: 1px solid var(--ever-border);
-      border-radius: .85rem;
-      padding: 1rem 1.15rem;
-      box-shadow: 0 14px 40px -28px rgba(54, 71, 209, .5);
-      margin-bottom: 1rem;
-    }
-
-    .ever-admin-hero__title { margin: 0; font-weight: 700; }
-    .ever-admin-hero__subtitle { color: var(--ever-text-soft); margin: .25rem 0 0; }
-
-    .ever-admin-nav .btn {
-      border-radius: 999px;
-      font-weight: 600;
-      padding-inline: .85rem;
-    }
-
-    .ever-admin-nav .btn-primary {
-      background-color: var(--ever-primary);
-      border-color: var(--ever-primary);
-    }
-
-    .ever-admin-card {
-      border: 1px solid var(--ever-border);
-      border-radius: .85rem;
-      background: var(--ever-surface);
-      box-shadow: 0 14px 38px -30px rgba(16, 24, 40, .45);
-      overflow: hidden;
-    }
-
-    .ever-admin-card .card-header {
-      background: #fff;
-      border-bottom: 1px solid #eef2ff;
-      font-weight: 700;
-      font-size: 1rem;
-    }
-
-    .ever-filter-box {
-      border: 1px solid #ecf0ff;
-      border-radius: .75rem;
+    .ever-admin .ever-shell {
       background: var(--ever-bg);
-      padding: 1rem;
-      margin-bottom: 1rem;
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 1px solid var(--ever-border);
     }
-
-    .ever-resource-table {
-      border: 1px solid #eef2ff;
-      border-radius: .8rem;
+    .ever-admin .ever-hero {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 60%, #0ea5e9 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 1.5rem 1.75rem;
+      box-shadow: 0 20px 55px -30px rgba(79, 70, 229, .55);
+      margin-bottom: 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .ever-admin .ever-hero h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .ever-admin .ever-hero p {
+      margin: .35rem 0 0;
+      opacity: .9;
+      font-size: .92rem;
+    }
+    .ever-admin .ever-hero .btn-create {
+      background: #fff;
+      color: var(--ever-primary-600);
+      border: none;
+      border-radius: 999px;
+      padding: .55rem 1.25rem;
+      font-weight: 700;
+      box-shadow: 0 8px 20px -8px rgba(0,0,0,.25);
+      text-decoration: none;
+      transition: transform .15s ease;
+    }
+    .ever-admin .ever-hero .btn-create:hover {
+      transform: translateY(-1px);
+      color: var(--ever-primary-600);
+    }
+    .ever-admin .ever-tabs {
+      display: flex;
+      gap: .35rem;
+      background: #fff;
+      border: 1px solid var(--ever-border);
+      border-radius: 999px;
+      padding: .35rem;
+      margin-bottom: 1.25rem;
+      overflow-x: auto;
+      width: fit-content;
+      max-width: 100%;
+    }
+    .ever-admin .ever-tabs a {
+      padding: .5rem 1.1rem;
+      font-weight: 600;
+      color: #374151;
+      text-decoration: none;
+      border-radius: 999px;
+      white-space: nowrap;
+      transition: all .15s ease;
+    }
+    .ever-admin .ever-tabs a:hover {
+      background: var(--ever-primary-50);
+      color: var(--ever-primary-600);
+    }
+    .ever-admin .ever-tabs a.active {
+      background: linear-gradient(120deg, var(--ever-primary), var(--ever-accent));
+      color: #fff;
+    }
+    .ever-admin .ever-card {
+      background: var(--ever-surface);
+      border: 1px solid var(--ever-border);
+      border-radius: 14px;
+      box-shadow: 0 20px 45px -35px rgba(15, 23, 42, .3);
       overflow: hidden;
     }
-
-    .ever-resource-table .table { margin: 0; }
-    .ever-resource-table thead th {
-      background: #f8faff;
-      color: #344054;
-      border-bottom: 1px solid #e9edff;
-      font-size: .82rem;
-      text-transform: uppercase;
-      letter-spacing: .02em;
+    .ever-admin .ever-card-head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .75rem;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--ever-border);
+      background: #fff;
+    }
+    .ever-admin .ever-card-head h2 {
+      margin: 0;
+      font-size: 1.05rem;
       font-weight: 700;
+      color: #111827;
+    }
+    .ever-admin .ever-filter {
+      background: #f9fafb;
+      border-bottom: 1px solid var(--ever-border);
+      padding: 1rem 1.25rem;
+    }
+    .ever-admin .ever-filter label {
+      display: block;
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--ever-muted);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-bottom: .25rem;
+    }
+    .ever-admin .ever-filter input {
+      width: 100%;
+      border: 1px solid var(--ever-border);
+      border-radius: 8px;
+      padding: .5rem .75rem;
+      font-size: .92rem;
+      background: #fff;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .ever-admin .ever-filter input:focus {
+      outline: none;
+      border-color: var(--ever-primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, .15);
+    }
+    .ever-admin .ever-filter .ever-filter-actions {
+      display: flex;
+      gap: .5rem;
+      margin-top: .75rem;
+    }
+    .ever-admin .ever-table-wrap {
+      overflow-x: auto;
+    }
+    .ever-admin table.ever-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 0;
+    }
+    .ever-admin table.ever-table thead th {
+      background: #f9fafb;
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #374151;
+      padding: .85rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--ever-border);
+      white-space: nowrap;
+    }
+    .ever-admin table.ever-table tbody td {
+      padding: .85rem 1rem;
+      font-size: .92rem;
+      border-bottom: 1px solid #f1f5f9;
       vertical-align: middle;
     }
-
-    .ever-resource-table tbody td { vertical-align: middle; border-top: 1px solid #f1f3ff; }
-    .ever-resource-table tbody tr:hover { background: #f9faff; }
-
-    .ever-bulk {
-      border: 1px solid #ecf0ff;
-      border-radius: .75rem;
-      background: #f8faff;
-      padding: .75rem;
-      margin-top: .9rem;
+    .ever-admin table.ever-table tbody tr:hover {
+      background: #f9fafb;
     }
-
-    .ever-empty {
-      color: #475467;
+    .ever-admin table.ever-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .ever-admin .ever-col-check {
+      width: 42px;
       text-align: center;
-      padding: 1.2rem;
-      background: #fbfcff;
-      border: 1px dashed #d7dfff;
-      border-radius: .65rem;
+    }
+    .ever-admin .ever-col-id {
+      font-weight: 700;
+      color: var(--ever-muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .85rem;
+    }
+    .ever-admin .ever-col-title {
+      font-weight: 600;
+      color: #111827;
+    }
+    .ever-admin .ever-thumb {
+      width: 64px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid var(--ever-border);
+      background: #f3f4f6;
+      display: block;
+    }
+    .ever-admin .ever-thumb-empty {
+      width: 64px;
+      height: 40px;
+      border-radius: 6px;
+      background: repeating-linear-gradient(45deg, #f3f4f6, #f3f4f6 5px, #fafafa 5px, #fafafa 10px);
+      border: 1px solid var(--ever-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9ca3af;
+      font-size: .68rem;
+    }
+    .ever-admin .ever-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      font-size: .74rem;
+      font-weight: 700;
+      padding: .22rem .6rem;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+    .ever-admin .ever-badge::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .ever-admin .ever-badge-published { background: #dcfce7; color: #166534; }
+    .ever-admin .ever-badge-draft { background: #fef3c7; color: #92400e; }
+    .ever-admin .ever-badge-planned { background: #e0e7ff; color: #3730a3; }
+    .ever-admin .ever-badge-protected { background: #fee2e2; color: #991b1b; }
+    .ever-admin .ever-badge-default { background: #f3f4f6; color: #374151; }
+    .ever-admin .ever-actions {
+      display: flex;
+      gap: .35rem;
+      justify-content: flex-end;
+    }
+    .ever-admin .ever-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      padding: .4rem .75rem;
+      font-size: .8rem;
+      font-weight: 600;
+      border-radius: 8px;
+      text-decoration: none;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all .15s ease;
+      line-height: 1.2;
+    }
+    .ever-admin .ever-btn-edit { border-color: var(--ever-primary); color: var(--ever-primary-600); background: #fff; }
+    .ever-admin .ever-btn-edit:hover { background: var(--ever-primary-50); }
+    .ever-admin .ever-btn-delete { border-color: #fecaca; color: var(--ever-danger); background: #fff; }
+    .ever-admin .ever-btn-delete:hover { background: #fef2f2; }
+    .ever-admin .ever-btn-primary { background: var(--ever-primary); color: #fff; border-color: var(--ever-primary); }
+    .ever-admin .ever-btn-primary:hover { background: var(--ever-primary-600); color: #fff; }
+    .ever-admin .ever-btn-ghost { background: #fff; color: #374151; border-color: var(--ever-border); }
+    .ever-admin .ever-btn-ghost:hover { background: #f9fafb; }
+    .ever-admin .ever-empty {
+      text-align: center;
+      padding: 3rem 1.5rem;
+      color: var(--ever-muted);
+    }
+    .ever-admin .ever-empty svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: .75rem;
+      color: #d1d5db;
+    }
+    .ever-admin .ever-empty p { margin: 0; font-size: .95rem; }
+    .ever-admin .ever-bulk {
+      display: flex;
+      gap: .5rem;
+      align-items: center;
+      padding: .85rem 1.25rem;
+      border-top: 1px solid var(--ever-border);
+      background: #f9fafb;
+    }
+    .ever-admin .ever-bulk select {
+      border: 1px solid var(--ever-border);
+      border-radius: 8px;
+      padding: .45rem .75rem;
+      font-size: .88rem;
+      background: #fff;
+    }
+    .ever-admin .ever-count {
+      margin-left: auto;
+      font-size: .82rem;
+      color: var(--ever-muted);
+    }
+    @media (max-width: 768px) {
+      .ever-admin .ever-hero { padding: 1.15rem; }
+      .ever-admin .ever-hero h1 { font-size: 1.2rem; }
     }
   </style>
 {% endblock %}
 
 {% block content %}
-  <div class="ever-admin-shell">
-    <section class="ever-admin-hero d-flex flex-wrap justify-content-between align-items-center">
-      <div class="mb-2 mb-md-0">
-        <h2 class="ever-admin-hero__title">{{ definition.title }}</h2>
-        <p class="ever-admin-hero__subtitle">Gestion moderne des contenus avec actions rapides, filtres avancés et traitement en lot.</p>
+<div class="ever-admin">
+  <div class="ever-shell">
+    <section class="ever-hero">
+      <div>
+        <h1>{{ definition.title }}</h1>
+        <p>Gestion des contenus Ever Blog — recherche, filtres et actions en lot.</p>
       </div>
       {% if createUrl is defined and createUrl %}
-        <a class="btn btn-success" href="{{ createUrl }}">+ Ajouter un élément</a>
+        <a class="btn-create" href="{{ createUrl }}">+ Ajouter</a>
       {% endif %}
     </section>
 
-    <div class="ever-admin-nav btn-group mb-3" role="group" aria-label="Navigation Ever Blog">
+    <nav class="ever-tabs" aria-label="Navigation Ever Blog">
       {% for link in navigationLinks %}
-        <a class="btn {{ currentResource == link.key ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ link.url }}">{{ link.label }}</a>
+        <a class="{{ currentResource == link.key ? 'active' : '' }}" href="{{ link.url }}">{{ link.label }}</a>
       {% endfor %}
-    </div>
+    </nav>
 
-    <div class="card ever-admin-card">
-      <h3 class="card-header">Liste des enregistrements</h3>
-      <div class="card-body">
-        <form method="get" class="ever-filter-box">
-          <div class="row">
-            {% for id, label in definition.filters %}
-              <div class="col-md-3 mb-2">
-                <label class="form-control-label font-weight-semibold" for="{{ id }}">{{ label }}</label>
-                <input class="form-control" type="text" id="{{ id }}" name="{{ id }}" value="{{ app.request.get(id) }}" placeholder="Rechercher...">
-              </div>
-            {% endfor %}
-          </div>
-          <button class="btn btn-primary mt-2" type="submit">Filtrer</button>
-        </form>
+    <div class="ever-card">
+      <div class="ever-card-head">
+        <h2>Liste des enregistrements</h2>
+        <span class="ever-count">{{ data.records|length }} résultat{{ data.records|length > 1 ? 's' : '' }}</span>
+      </div>
 
-        <form method="post">
-          {% if data.records is empty %}
-            <div class="ever-empty">Aucune donnée disponible pour le moment.</div>
-          {% else %}
-            <div class="ever-resource-table">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th style="width:42px"></th>
-                    {% for column in definition.columns %}
-                      <th>{{ column.name }}</th>
-                    {% endfor %}
-                    <th style="min-width:160px;">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for row in data.records %}
-                    <tr>
-                      <td><input type="checkbox" name="bulk_ids[]" value="{{ attribute(row, definition.columns|first.id) }}"></td>
-                      {% for column in definition.columns %}
-                        <td>{{ attribute(row, column.id) }}</td>
-                      {% endfor %}
-                      <td>
-                        <a class="btn btn-sm btn-outline-primary" href="{{ row._actions.edit }}">Éditer</a>
-                        <a class="btn btn-sm btn-outline-danger" href="{{ row._actions.delete }}">Supprimer</a>
-                      </td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
+      {% if definition.filters is not empty %}
+      <form method="get" class="ever-filter">
+        <div class="row">
+          {% for id, label in definition.filters %}
+            <div class="col-md-4 mb-2">
+              <label for="filter_{{ id }}">{{ label }}</label>
+              <input type="text" id="filter_{{ id }}" name="{{ id }}" value="{{ app.request.get(id) }}" placeholder="Rechercher…">
             </div>
-          {% endif %}
+          {% endfor %}
+        </div>
+        <div class="ever-filter-actions">
+          <button type="submit" class="ever-btn ever-btn-primary">Filtrer</button>
+          <a href="?" class="ever-btn ever-btn-ghost">Réinitialiser</a>
+        </div>
+      </form>
+      {% endif %}
 
-          <div class="ever-bulk form-inline">
-            <select class="custom-select" name="bulk_action">
+      <form method="post">
+        {% if data.records is empty %}
+          <div class="ever-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75h16.5v16.5H3.75zM3.75 9h16.5M9 9v11.25"/>
+            </svg>
+            <p>Aucune donnée disponible pour le moment.</p>
+          </div>
+        {% else %}
+          <div class="ever-table-wrap">
+            <table class="ever-table">
+              <thead>
+                <tr>
+                  <th class="ever-col-check"><input type="checkbox" aria-label="Tout sélectionner"></th>
+                  {% for column in definition.columns %}
+                    <th>{{ column.name }}</th>
+                  {% endfor %}
+                  <th style="width:1%; text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in data.records %}
+                  <tr>
+                    <td class="ever-col-check">
+                      <input type="checkbox" name="bulk_ids[]" value="{{ attribute(row, definition.columns|first.id) }}">
+                    </td>
+                    {% for column in definition.columns %}
+                      {% set type = column.type|default('text') %}
+                      {% set value = attribute(row, column.id) %}
+                      <td>
+                        {% if type == 'id' %}
+                          <span class="ever-col-id">#{{ value }}</span>
+                        {% elseif type == 'image' %}
+                          {% if value %}
+                            <img src="{{ value }}" alt="" class="ever-thumb" loading="lazy">
+                          {% else %}
+                            <span class="ever-thumb-empty" aria-label="Pas d'image">—</span>
+                          {% endif %}
+                        {% elseif type == 'status' %}
+                          {% set status = value|lower %}
+                          {% set labelMap = {'published': 'Publié', 'draft': 'Brouillon', 'planned': 'Programmé', 'protected': 'Protégé', '1': 'Actif', '0': 'Inactif', '': 'Inactif'} %}
+                          {% set boolMap = {'1': 'published', '0': 'draft', '': 'draft'} %}
+                          {% set badgeKey = boolMap[status]|default(status in ['published','draft','planned','protected'] ? status : 'default') %}
+                          <span class="ever-badge ever-badge-{{ badgeKey }}">{{ labelMap[status]|default(value|capitalize) }}</span>
+                        {% elseif type == 'number' %}
+                          <span class="ever-col-id">{{ value }}</span>
+                        {% elseif column.id == 'title' %}
+                          <span class="ever-col-title">{{ value }}</span>
+                        {% else %}
+                          {{ value }}
+                        {% endif %}
+                      </td>
+                    {% endfor %}
+                    <td>
+                      <div class="ever-actions">
+                        <a class="ever-btn ever-btn-edit" href="{{ row._actions.edit }}">Éditer</a>
+                        <a class="ever-btn ever-btn-delete" href="{{ row._actions.delete }}" onclick="return confirm('Confirmer la suppression ?');">Suppr.</a>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="ever-bulk">
+            <select name="bulk_action">
               {% for action in definition.bulkActions %}
                 <option value="{{ action.id }}">{{ action.name }}</option>
               {% endfor %}
             </select>
-            <button class="btn btn-outline-secondary ml-2" type="submit">Appliquer</button>
+            <button type="submit" class="ever-btn ever-btn-ghost">Appliquer</button>
           </div>
-        </form>
-      </div>
+        {% endif %}
+      </form>
     </div>
   </div>
+</div>
+
+<script>
+  (function() {
+    var selectAll = document.querySelector('.ever-admin .ever-col-check input[type=checkbox]:not([name])');
+    if (selectAll) {
+      selectAll.addEventListener('change', function() {
+        var boxes = document.querySelectorAll('.ever-admin input[name="bulk_ids[]"]');
+        boxes.forEach(function(b){ b.checked = selectAll.checked; });
+      });
+    }
+  })();
+</script>
 {% endblock %}

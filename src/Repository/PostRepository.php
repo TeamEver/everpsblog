@@ -18,6 +18,7 @@ class PostRepository extends EntityRepository
     public function findBackOfficeList($langId, $shopId, $limit = 50)
     {
         return $this->createBasePublishedQb($langId, $shopId, null)
+            ->select('p.id AS id_ever_post, p.status AS post_status, p.viewCount AS count, pl.title AS title')
             ->setMaxResults((int) $limit)
             ->orderBy('p.createdAt', 'DESC')
             ->getQuery()

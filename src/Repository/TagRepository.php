@@ -31,6 +31,21 @@ class TagRepository extends EntityRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * Back office listing for the tags grid.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function findBackOfficeList($langId, $shopId, $limit = 100)
+    {
+        return $this->createLocalizedQb($shopId, $langId)
+            ->select('t.id AS id_ever_tag, t.active AS active, t.count AS count, tl.title AS title, tl.linkRewrite AS link_rewrite')
+            ->orderBy('tl.title', 'ASC')
+            ->setMaxResults((int) $limit)
+            ->getQuery()
+            ->getArrayResult();
+    }
+
     private function createLocalizedQb($shopId, $langId)
     {
         return $this->createQueryBuilder('t')

@@ -40,20 +40,15 @@ final class TagGridDataFactory
      */
     public function build(int $shopId, int $langId, array $filters = []): GridData
     {
-        $rows = $this->tagRepository->findByShopAndLanguage($shopId, $langId);
+        $rows = $this->tagRepository->findBackOfficeList($langId, $shopId);
         $records = [];
 
         foreach ($rows as $row) {
-            $translations = $row['translations'] ?? ($row['tl'] ?? []);
-            if (is_array($translations) && isset($translations[0])) {
-                $translation = $translations[0];
-            } else {
-                $translation = is_array($translations) ? $translations : [];
-            }
-            $title = is_array($translation) ? (string) ($translation['title'] ?? '') : '';
             $records[] = [
-                'id_ever_tag' => (int) ($row['id'] ?? 0),
-                'title' => $title,
+                'id_ever_tag' => (int) ($row['id_ever_tag'] ?? $row['id'] ?? 0),
+                'title' => (string) ($row['title'] ?? ''),
+                'link_rewrite' => (string) ($row['link_rewrite'] ?? ''),
+                'count' => (int) ($row['count'] ?? 0),
                 'active' => (string) ($row['active'] ?? 0),
             ];
         }

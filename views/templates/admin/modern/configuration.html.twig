@@ -3,62 +3,178 @@
 {% block stylesheets %}
   {{ parent() }}
   <style>
-    .ever-config-shell {
-      background: linear-gradient(180deg, #f3f6ff 0%, #f8f9fc 100%);
-      border: 1px solid #edf0ff;
-      border-radius: .85rem;
-      padding: 1.15rem;
+    .ever-admin {
+      --ever-primary: #4f46e5;
+      --ever-primary-600: #4338ca;
+      --ever-primary-50: #eef2ff;
+      --ever-accent: #0ea5e9;
+      --ever-muted: #6b7280;
+      --ever-border: #e5e7eb;
+      --ever-surface: #ffffff;
+      --ever-bg: #f8fafc;
+      color: #111827;
     }
-
-    .ever-config-card {
-      border: 1px solid #e4e9ff;
-      border-radius: .85rem;
-      box-shadow: 0 16px 42px -35px rgba(16, 24, 40, .6);
+    .ever-admin .ever-shell {
+      background: var(--ever-bg);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 1px solid var(--ever-border);
+    }
+    .ever-admin .ever-hero {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 60%, #0ea5e9 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 1.5rem 1.75rem;
+      box-shadow: 0 20px 55px -30px rgba(79, 70, 229, .55);
+      margin-bottom: 1.25rem;
+    }
+    .ever-admin .ever-hero h1 { margin: 0; font-size: 1.4rem; font-weight: 700; }
+    .ever-admin .ever-hero p { margin: .35rem 0 0; opacity: .9; font-size: .92rem; }
+    .ever-admin .ever-tabs {
+      display: flex;
+      gap: .35rem;
+      background: #fff;
+      border: 1px solid var(--ever-border);
+      border-radius: 999px;
+      padding: .35rem;
+      margin-bottom: 1.25rem;
+      overflow-x: auto;
+      width: fit-content;
+      max-width: 100%;
+    }
+    .ever-admin .ever-tabs a {
+      padding: .5rem 1.1rem;
+      font-weight: 600;
+      color: #374151;
+      text-decoration: none;
+      border-radius: 999px;
+      white-space: nowrap;
+      transition: all .15s ease;
+    }
+    .ever-admin .ever-tabs a:hover { background: var(--ever-primary-50); color: var(--ever-primary-600); }
+    .ever-admin .ever-tabs a.active { background: linear-gradient(120deg, var(--ever-primary), var(--ever-accent)); color: #fff; }
+    .ever-admin .ever-card {
+      background: var(--ever-surface);
+      border: 1px solid var(--ever-border);
+      border-radius: 14px;
+      box-shadow: 0 20px 45px -35px rgba(15, 23, 42, .3);
       overflow: hidden;
     }
-
-    .ever-config-card .card-header {
+    .ever-admin .ever-card-head {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--ever-border);
       background: #fff;
-      border-bottom: 1px solid #edf1ff;
+    }
+    .ever-admin .ever-card-head h2 {
+      margin: 0;
+      font-size: 1.05rem;
       font-weight: 700;
     }
-
-    .ever-config-nav .btn {
-      border-radius: 999px;
+    .ever-admin .ever-card-head p {
+      margin: .2rem 0 0;
+      font-size: .88rem;
+      color: var(--ever-muted);
+    }
+    .ever-admin .ever-card-body { padding: 1.5rem; }
+    .ever-admin .ever-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem 1.5rem;
+    }
+    .ever-admin .ever-form-grid .form-group,
+    .ever-admin .ever-form-grid .form-control-group { margin-bottom: 0 !important; }
+    .ever-admin .ever-form-grid label,
+    .ever-admin .ever-form-grid .form-control-label {
+      display: block;
+      font-size: .82rem;
       font-weight: 600;
-      padding-inline: .85rem;
-      margin-bottom: .4rem;
+      color: #374151;
+      margin-bottom: .35rem;
+      text-align: left !important;
     }
-
-    .ever-config-intro {
-      color: #667085;
-      margin-bottom: .8rem;
+    .ever-admin .ever-form-grid input[type="text"],
+    .ever-admin .ever-form-grid input[type="number"],
+    .ever-admin .ever-form-grid input[type="url"],
+    .ever-admin .ever-form-grid select,
+    .ever-admin .ever-form-grid textarea {
+      width: 100%;
+      border: 1px solid var(--ever-border);
+      border-radius: 8px;
+      padding: .55rem .75rem;
+      font-size: .92rem;
+      background: #fff;
+      transition: border-color .15s, box-shadow .15s;
     }
+    .ever-admin .ever-form-grid input:focus,
+    .ever-admin .ever-form-grid select:focus,
+    .ever-admin .ever-form-grid textarea:focus {
+      outline: none;
+      border-color: var(--ever-primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, .15);
+    }
+    .ever-admin .ever-form-grid input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      vertical-align: middle;
+      margin-right: .4rem;
+      accent-color: var(--ever-primary);
+    }
+    .ever-admin .ever-actions {
+      padding: 1rem 1.25rem;
+      background: #f9fafb;
+      border-top: 1px solid var(--ever-border);
+      display: flex;
+      gap: .5rem;
+      justify-content: flex-end;
+    }
+    .ever-admin .ever-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      padding: .55rem 1.25rem;
+      font-size: .9rem;
+      font-weight: 700;
+      border-radius: 8px;
+      text-decoration: none;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+    .ever-admin .ever-btn-primary { background: var(--ever-primary); color: #fff; border-color: var(--ever-primary); }
+    .ever-admin .ever-btn-primary:hover { background: var(--ever-primary-600); color: #fff; }
   </style>
 {% endblock %}
 
 {% block content %}
-  <div class="ever-config-shell">
-    <div class="card mb-3 ever-config-card">
-      <h3 class="card-header">Ever Blog</h3>
-      <div class="card-body">
-        <p class="ever-config-intro">Le back-office Ever Blog utilise désormais des contrôleurs Symfony avec une interface modernisée et orientée productivité.</p>
-        <div class="ever-config-nav btn-group flex-wrap" role="group" aria-label="Ever Blog links">
-          {% for link in navigationLinks %}
-            <a class="btn {{ currentResource == link.key ? 'btn-primary' : 'btn-outline-primary' }}" href="{{ link.url }}">{{ link.label }}</a>
-          {% endfor %}
+<div class="ever-admin">
+  <div class="ever-shell">
+    <section class="ever-hero">
+      <h1>Ever Blog · Configuration</h1>
+      <p>Paramètres globaux du blog : routes, commentaires, pagination et contenu affiché.</p>
+    </section>
+
+    <nav class="ever-tabs" aria-label="Navigation Ever Blog">
+      {% for link in navigationLinks %}
+        <a class="{{ currentResource == link.key ? 'active' : '' }}" href="{{ link.url }}">{{ link.label }}</a>
+      {% endfor %}
+    </nav>
+
+    <div class="ever-card">
+      {{ form_start(configurationForm, {'attr': {'id': 'ever-config-form'}}) }}
+      <div class="ever-card-head">
+        <h2>Paramètres du module</h2>
+        <p>Ajustez le comportement du blog et enregistrez pour appliquer.</p>
+      </div>
+      <div class="ever-card-body">
+        <div class="ever-form-grid">
+          {{ form_widget(configurationForm) }}
         </div>
       </div>
-    </div>
-
-    <div class="card ever-config-card">
-      <h3 class="card-header">Paramètres</h3>
-      <div class="card-body">
-        {{ form_start(configurationForm) }}
-        {{ form_widget(configurationForm) }}
-        <button type="submit" class="btn btn-primary">Enregistrer</button>
-        {{ form_end(configurationForm) }}
+      <div class="ever-actions">
+        <button type="submit" class="ever-btn ever-btn-primary">Enregistrer</button>
       </div>
+      {{ form_end(configurationForm) }}
     </div>
   </div>
+</div>
 {% endblock %}

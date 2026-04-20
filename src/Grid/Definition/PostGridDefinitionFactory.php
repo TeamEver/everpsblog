@@ -10,21 +10,22 @@ final class PostGridDefinitionFactory
     {
         return new GridDefinition(
             'post',
-            'Posts',
-[
-            ['id' => 'id_ever_post', 'name' => 'ID'],
-            ['id' => 'title', 'name' => 'Titre'],
-            ['id' => 'post_status', 'name' => 'Statut'],
-            ['id' => 'count', 'name' => 'Vues']
-        ],
-[
-            'title' => 'Titre',
-            'post_status' => 'Statut'
-        ],
-[
-            ['id' => 'delete', 'name' => 'Supprimer sélection'],
-            ['id' => 'publishall', 'name' => 'Publier sélection']
-        ]
+            'Articles',
+            [
+                ['id' => 'id_ever_post', 'name' => '#', 'type' => 'id'],
+                ['id' => 'featured_image', 'name' => 'Image', 'type' => 'image'],
+                ['id' => 'title', 'name' => 'Titre', 'type' => 'text'],
+                ['id' => 'post_status', 'name' => 'Statut', 'type' => 'status'],
+                ['id' => 'count', 'name' => 'Vues', 'type' => 'number'],
+            ],
+            [
+                'title' => 'Titre',
+                'post_status' => 'Statut',
+            ],
+            [
+                ['id' => 'delete', 'name' => 'Supprimer la sélection'],
+                ['id' => 'publishall', 'name' => 'Publier la sélection'],
+            ]
         );
     }
 }

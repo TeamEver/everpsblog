@@ -5,6 +5,7 @@ namespace PrestaShop\Module\Everpsblog\Grid\Data;
 use PrestaShop\Module\Everpsblog\Core\Grid\GridData;
 use PrestaShop\Module\Everpsblog\Repository\PostRepository;
 use PrestaShop\Module\Everpsblog\Service\AdminRouteSigner;
+use PrestaShop\Module\Everpsblog\Service\BlogImageService;
 use Symfony\Component\Routing\RouterInterface;
 
 final class PostGridDataFactory
@@ -19,13 +20,16 @@ final class PostGridDataFactory
     private $useLegacyFallback;
     /** @var bool */
     private $useModernDeleteAction;
+    /** @var BlogImageService|null */
+    private $blogImageService;
 
     public function __construct(
         PostRepository $postRepository,
         AdminRouteSigner $routeSigner,
         RouterInterface $router,
         bool $useLegacyFallback = true,
-        bool $useModernDeleteAction = false
+        bool $useModernDeleteAction = false,
+        ?BlogImageService $blogImageService = null
     )
     {
         $this->postRepository = $postRepository;
@@ -33,6 +37,7 @@ final class PostGridDataFactory
         $this->router = $router;
         $this->useLegacyFallback = $useLegacyFallback;
         $this->useModernDeleteAction = $useModernDeleteAction;
+        $this->blogImageService = $blogImageService;
     }
 
     /**
@@ -44,11 +49,13 @@ final class PostGridDataFactory
         $records = [];
 
         foreach ($rows as $row) {
+            $postId = (int) ($row['id_ever_post'] ?? $row['id'] ?? 0);
             $records[] = [
-                'id_ever_post' => $row['id'] ?? $row['id'.substr('id_ever_post',3)] ?? 0,
-                'title' => $row['pl']['title'] ?? '',
-                'post_status' => $row['postStatus'] ?? '',
-                'count' => $row['count'] ?? 0
+                'id_ever_post' => $postId,
+                'featured_image' => $this->resolveFeaturedImage($postId, $shopId),
+                'title' => (string) ($row['title'] ?? ''),
+                'post_status' => (string) ($row['post_status'] ?? $row['status'] ?? ''),
+                'count' => (int) ($row['count'] ?? $row['viewCount'] ?? 0),
             ];
         }
 
@@ -100,5 +107,23 @@ final class PostGridDataFactory
     private function routeExists(string $routeName): bool
     {
         return null !== $this->router->getRouteCollection()->get($routeName);
+    }
+
+    private function resolveFeaturedImage(int $postId, int $shopId): ?string
+    {
+        if ($postId <= 0 || null === $this->blogImageService) {
+            return null;
+        }
+
+        try {
+            $image = $this->blogImageService->getBlogImage($postId, $shopId, 'post');
+            if (!\Validate::isLoadedObject($image)) {
+                return null;
+            }
+
+            return (string) $this->blogImageService->getBlogImageUrl($postId, $shopId, 'post');
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 }

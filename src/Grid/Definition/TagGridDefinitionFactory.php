@@ -12,9 +12,11 @@ final class TagGridDefinitionFactory
             'tag',
             'Tags',
 [
-            ['id' => 'id_ever_tag', 'name' => 'ID'],
-            ['id' => 'title', 'name' => 'Titre'],
-            ['id' => 'active', 'name' => 'Actif']
+            ['id' => 'id_ever_tag', 'name' => '#', 'type' => 'id'],
+            ['id' => 'title', 'name' => 'Titre', 'type' => 'text'],
+            ['id' => 'link_rewrite', 'name' => 'Slug', 'type' => 'text'],
+            ['id' => 'count', 'name' => 'Vues', 'type' => 'number'],
+            ['id' => 'active', 'name' => 'Actif', 'type' => 'status']
         ],
 [
             'title' => 'Titre'

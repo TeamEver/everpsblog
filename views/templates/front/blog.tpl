@@ -132,7 +132,7 @@
 <div class="row mt-2" id="everpsblog-posts" data-empty-text="{l s='No posts match your filters yet.' mod='everpsblog'}">
 {hook h="displayBeforeEverLoop"}
 {foreach from=$posts item=item}
-{include file='module:everpsblog/views/templates/front/loop/post_object.tpl'}
+{include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
 {/foreach}
 </div>
 {else}
