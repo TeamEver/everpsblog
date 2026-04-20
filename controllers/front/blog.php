@@ -335,17 +335,17 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
         return $page;
     }
 
-    private function getBlogImageService()
+    protected function getBlogImageService()
     {
         return parent::getBlogImageService();
     }
 
-    private function getBlogTaxonomyService()
+    protected function getBlogTaxonomyService()
     {
         return parent::getBlogTaxonomyService();
     }
 
-    private function getBlogSortOrderService()
+    protected function getBlogSortOrderService()
     {
         return parent::getBlogSortOrderService();
     }
