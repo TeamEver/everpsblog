@@ -40,6 +40,9 @@ services:
     arguments:
       - '@doctrine.orm.entity_manager'
 
+  PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository\AuthorWriteRepository:
+    alias: prestashop.module.everpsblog.blog.repository.author_write
+
   prestashop.module.everpsblog.blog.repository.comment_write:
     class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository\CommentWriteRepository
     arguments:

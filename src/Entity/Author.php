@@ -51,14 +51,10 @@ class Author
     /** @ORM\OneToMany(targetEntity="AuthorProduct", mappedBy="author", cascade={"persist", "remove"}, orphanRemoval=true) */
     private $products;
 
-    /** @ORM\OneToMany(targetEntity="Post", mappedBy="author") */
-    private $posts;
-
     public function __construct()
     {
         $this->translations = new ArrayCollection();
         $this->shops = new ArrayCollection();
         $this->products = new ArrayCollection();
-        $this->posts = new ArrayCollection();
     }
 }

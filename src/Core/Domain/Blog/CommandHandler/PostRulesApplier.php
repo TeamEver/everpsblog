@@ -20,7 +20,8 @@ class PostRulesApplier
      */
     public function apply(Post $post, array $payload): array
     {
-        $post->setAuthorId((int) $payload['author_id']);
+        $post->setShopId((int) ($payload['shop_id'] ?? 0));
+        $post->setAuthorId((int) ($payload['author_id'] ?? 0));
         $post->setDefaultCategoryId($this->resolveDefaultCategory($payload));
         $post->setCreatedAt(new DateTimeImmutable((string) $payload['date_add']));
         $post->setUpdatedAt(new DateTimeImmutable('now'));

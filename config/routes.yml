@@ -241,6 +241,15 @@ everpsblog_admin_author_delete:
   requirements:
     authorId: '\d+'
 
+everpsblog_admin_author_delete_preflight:
+  path: /everpsblog/author/{authorId}/delete-preflight
+  methods: [GET]
+  defaults:
+    _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\AuthorController::deletePreflightAction'
+    _legacy_controller: AdminEverPsBlogAuthor
+  requirements:
+    authorId: '\d+'
+
 
 
 everpsblog_admin_comment_create:

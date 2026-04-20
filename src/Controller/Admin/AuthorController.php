@@ -5,6 +5,7 @@ namespace PrestaShop\Module\Everpsblog\Controller\Admin;
 use PrestaShop\Module\Everpsblog\Application\Blog\AuthorCommandAssembler;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\DeleteAuthorCommand;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandBus\CommandBusInterface;
+use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository\AuthorWriteRepository;
 use PrestaShop\Module\Everpsblog\Form\DataProvider\AuthorFormDataProvider;
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\AuthorType;
 use PrestaShop\Module\Everpsblog\Grid\Data\AuthorGridDataFactory;
@@ -22,8 +23,9 @@ class AuthorController extends AbstractDomainController
     private $definitionFactory;
     private $dataFactory;
     private $formDataProvider;
+    private $authorWriteRepository;
 
-    public function __construct(ContextStateService $contextStateService, CommandBusInterface $commandBus, AuthorCommandAssembler $commandAssembler, AuthorGridDefinitionFactory $definitionFactory, AuthorGridDataFactory $dataFactory, AuthorFormDataProvider $formDataProvider)
+    public function __construct(ContextStateService $contextStateService, CommandBusInterface $commandBus, AuthorCommandAssembler $commandAssembler, AuthorGridDefinitionFactory $definitionFactory, AuthorGridDataFactory $dataFactory, AuthorFormDataProvider $formDataProvider, AuthorWriteRepository $authorWriteRepository)
     {
         parent::__construct($contextStateService);
         $this->commandBus = $commandBus;
@@ -31,6 +33,7 @@ class AuthorController extends AbstractDomainController
         $this->definitionFactory = $definitionFactory;
         $this->dataFactory = $dataFactory;
         $this->formDataProvider = $formDataProvider;
+        $this->authorWriteRepository = $authorWriteRepository;
     }
 
     public function indexAction(Request $request): Response
@@ -118,13 +121,68 @@ class AuthorController extends AbstractDomainController
         return new JsonResponse(['id_ever_author' => $updatedAuthorId], JsonResponse::HTTP_OK);
     }
 
+    /**
+     * Returns metadata the UI needs before deleting an author:
+     * - number of posts attached
+     * - candidate authors to reassign posts to
+     */
+    public function deletePreflightAction(int $authorId): JsonResponse
+    {
+        $postsCount = $this->authorWriteRepository->countPostsForAuthor($authorId);
+        $otherAuthors = $this->authorWriteRepository->listOtherAuthors($authorId);
+
+        return new JsonResponse([
+            'author_id' => $authorId,
+            'posts_count' => $postsCount,
+            'reassignable' => $postsCount > 0 && !empty($otherAuthors),
+            'other_authors' => $otherAuthors,
+        ]);
+    }
+
     public function deleteAction(int $authorId, Request $request): JsonResponse
     {
         $this->validateCsrfToken($request, 'everpsblog_author_delete_' . $authorId);
 
-        $this->commandBus->handle(new DeleteAuthorCommand($authorId));
+        $reassignTo = $this->extractReassignAuthorId($request);
+
+        try {
+            $this->commandBus->handle(new DeleteAuthorCommand($authorId, $reassignTo));
+        } catch (\RuntimeException $exception) {
+            // Reassignment required – surface a 409 with the candidate list so the UI can prompt.
+            $otherAuthors = $this->authorWriteRepository->listOtherAuthors($authorId);
+
+            return new JsonResponse([
+                'error' => $exception->getMessage(),
+                'posts_count' => $this->authorWriteRepository->countPostsForAuthor($authorId),
+                'other_authors' => $otherAuthors,
+            ], JsonResponse::HTTP_CONFLICT);
+        } catch (\InvalidArgumentException $exception) {
+            return new JsonResponse(['error' => $exception->getMessage()], JsonResponse::HTTP_BAD_REQUEST);
+        }
 
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+    }
+
+    private function extractReassignAuthorId(Request $request): ?int
+    {
+        $raw = $request->request->get('reassign_author_id');
+        if (null === $raw) {
+            $raw = $request->query->get('reassign_author_id');
+        }
+        if (null === $raw) {
+            $payload = json_decode((string) $request->getContent(), true);
+            if (is_array($payload) && isset($payload['reassign_author_id'])) {
+                $raw = $payload['reassign_author_id'];
+            }
+        }
+
+        if (null === $raw || '' === $raw) {
+            return null;
+        }
+
+        $value = (int) $raw;
+
+        return $value > 0 ? $value : null;
     }
 
     private function validateCsrfToken(Request $request, string $tokenId): void

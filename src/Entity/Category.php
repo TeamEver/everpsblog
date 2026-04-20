@@ -63,15 +63,11 @@ class Category
     /** @ORM\OneToMany(targetEntity="PostCategory", mappedBy="category") */
     private $postCategories;
 
-    /** @ORM\OneToMany(targetEntity="Post", mappedBy="defaultCategory") */
-    private $defaultPosts;
-
     public function __construct()
     {
         $this->translations = new ArrayCollection();
         $this->shops = new ArrayCollection();
         $this->products = new ArrayCollection();
         $this->postCategories = new ArrayCollection();
-        $this->defaultPosts = new ArrayCollection();
     }
 }

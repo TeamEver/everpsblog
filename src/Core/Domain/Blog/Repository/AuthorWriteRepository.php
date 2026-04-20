@@ -68,6 +68,79 @@ class AuthorWriteRepository
         $connection->delete(_DB_PREFIX_ . 'ever_blog_author', ['id_ever_author' => $authorId]);
     }
 
+    /**
+     * Reassigns every post owned by $fromAuthorId to $toAuthorId.
+     */
+    public function reassignPostsAuthor(int $fromAuthorId, int $toAuthorId): int
+    {
+        if ($fromAuthorId <= 0 || $toAuthorId <= 0 || $fromAuthorId === $toAuthorId) {
+            return 0;
+        }
+
+        return (int) $this->entityManager->getConnection()->update(
+            _DB_PREFIX_ . 'ever_blog_post',
+            ['id_author' => $toAuthorId],
+            ['id_author' => $fromAuthorId]
+        );
+    }
+
+    /**
+     * Clears the author on any post still linked to $authorId (sets id_author = 0).
+     */
+    public function clearAuthorForPosts(int $authorId): int
+    {
+        if ($authorId <= 0) {
+            return 0;
+        }
+
+        return (int) $this->entityManager->getConnection()->update(
+            _DB_PREFIX_ . 'ever_blog_post',
+            ['id_author' => 0],
+            ['id_author' => $authorId]
+        );
+    }
+
+    public function countPostsForAuthor(int $authorId): int
+    {
+        if ($authorId <= 0) {
+            return 0;
+        }
+
+        return (int) $this->entityManager->getConnection()->fetchOne(
+            'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'ever_blog_post` WHERE id_author = :authorId',
+            ['authorId' => $authorId]
+        );
+    }
+
+    public function countOtherAuthors(int $excludeAuthorId): int
+    {
+        return (int) $this->entityManager->getConnection()->fetchOne(
+            'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'ever_blog_author` WHERE id_ever_author <> :authorId',
+            ['authorId' => $excludeAuthorId]
+        );
+    }
+
+    /**
+     * @return array<int, array{id_ever_author:int,nickhandle:string}>
+     */
+    public function listOtherAuthors(int $excludeAuthorId): array
+    {
+        $rows = $this->entityManager->getConnection()->fetchAllAssociative(
+            'SELECT id_ever_author, nickhandle
+             FROM `' . _DB_PREFIX_ . 'ever_blog_author`
+             WHERE id_ever_author <> :authorId
+             ORDER BY nickhandle ASC',
+            ['authorId' => $excludeAuthorId]
+        );
+
+        return array_map(static function ($row) {
+            return [
+                'id_ever_author' => (int) $row['id_ever_author'],
+                'nickhandle' => (string) $row['nickhandle'],
+            ];
+        }, $rows);
+    }
+
     private function replaceRelations(int $authorId, array $data): void
     {
         $connection = $this->entityManager->getConnection();
