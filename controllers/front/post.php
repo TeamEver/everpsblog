@@ -419,8 +419,12 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                             $cookieName,
                             true
                         );
-                        $this->post->content = 
-                            $this->post->content;
+                        $this->post->content = $this->renderQcdBuilderField(
+                            'everpsblog_post',
+                            (int) $this->post->id,
+                            'content',
+                            (string) $this->post->content
+                        );
                     }
                 } else {
                     $this->post->password_protected = true;
@@ -428,8 +432,12 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 }
             } else {
                 // Prepare shortcodes
-                $this->post->content = 
-                    $this->post->content;
+                $this->post->content = $this->renderQcdBuilderField(
+                    'everpsblog_post',
+                    (int) $this->post->id,
+                    'content',
+                    (string) $this->post->content
+                );
             }
             $this->post->title = 
                 $this->post->title;

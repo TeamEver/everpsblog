@@ -128,10 +128,18 @@ class EverPsBlogauthorModuleFrontController extends AbstractFrontController
             $this->context->smarty->assign('page', $page);
             // Now prepare template and show it
             // Prepare shortcodes
-            $this->author->content = 
-                $this->author->content;
-            $this->author->bottom_content = 
-                $this->author->bottom_content;
+            $this->author->content = $this->renderQcdBuilderField(
+                'everpsblog_author',
+                (int) $this->author->id,
+                'content',
+                (string) $this->author->content
+            );
+            $this->author->bottom_content = $this->renderQcdBuilderField(
+                'everpsblog_author',
+                (int) $this->author->id,
+                'bottom_content',
+                (string) $this->author->bottom_content
+            );
             $this->author->nickhandle = 
                 $this->author->nickhandle;
             $posts = $this->getFrontPostsByAuthor(
