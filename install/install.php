@@ -188,6 +188,7 @@ $sql[] =
         `meta_description` varchar(255) DEFAULT NULL,
         `link_rewrite` varchar(255) DEFAULT NULL,
         `content` text NOT NULL,
+        `excerpt` varchar(255) DEFAULT NULL,
         `bottom_content` text DEFAULT NULL,
         `id_lang` int(10) unsigned NOT NULL,
         PRIMARY KEY (`id_ever_author`, `id_lang`)
@@ -215,6 +216,27 @@ $sql[] =
         `id_ever_image` int(10) unsigned NOT NULL,
         `id_shop` int(10) unsigned NOT NULL,
         PRIMARY KEY (`id_ever_image`, `id_shop`)
+    ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
+
+$sql[] =
+    'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_redirect` (
+        `id_ever_redirect` int(10) unsigned NOT NULL auto_increment,
+        `id_shop` int(10) unsigned NOT NULL,
+        `source_url` varchar(2048) DEFAULT NULL,
+        `source_path` varchar(1024) NOT NULL,
+        `source_hash` char(32) NOT NULL,
+        `target_url` varchar(2048) NOT NULL,
+        `entity_type` varchar(32) DEFAULT NULL,
+        `id_element` int(10) unsigned DEFAULT NULL,
+        `http_code` smallint(3) unsigned DEFAULT 301,
+        `active` int(1) unsigned DEFAULT 1,
+        `hits` int(10) unsigned DEFAULT 0,
+        `last_hit` DATETIME DEFAULT NULL,
+        `date_add` DATETIME DEFAULT NULL,
+        `date_upd` DATETIME DEFAULT NULL,
+        PRIMARY KEY (`id_ever_redirect`),
+        UNIQUE KEY `uniq_ever_blog_redirect_shop_source` (`id_shop`, `source_hash`),
+        KEY `idx_ever_blog_redirect_active` (`active`, `id_shop`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';
 
 $sql[] =

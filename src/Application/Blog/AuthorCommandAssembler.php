@@ -40,6 +40,7 @@ class AuthorCommandAssembler
             'id_employee' => 0,
             'nickhandle' => '',
             'bio' => '',
+            'excerpt' => '',
             'meta_title' => '',
             'meta_description' => '',
             'twitter' => '',

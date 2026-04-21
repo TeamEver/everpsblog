@@ -168,6 +168,20 @@
       margin-bottom: .8rem;
     }
 
+    .ever-featured-image-preview {
+      display: block;
+      margin-top: .5rem;
+    }
+    .ever-featured-image-preview img {
+      display: block;
+      max-width: 220px;
+      height: auto;
+      border: 1px solid var(--ever-border);
+      border-radius: 10px;
+      margin-bottom: .45rem;
+      background: #fff;
+    }
+
     .ever-admin-form .form-control-label,
     .ever-admin-form .col-form-label,
     .ever-admin-form label {
@@ -359,9 +373,7 @@
 {% block ever_blog_form_actions %}
   <div class="ever-actions d-flex flex-wrap align-items-center">
     <a class="btn btn-outline-secondary mr-2 mb-2" href="{{ cancelUrl }}">Annuler</a>
-    <button type="submit" class="btn btn-outline-dark mr-2 mb-2" name="_submit_action" value="save" data-ever-publication-action="draft">Enregistrer brouillon</button>
-    <button type="submit" class="btn btn-success mr-2 mb-2" name="_submit_action" value="save" data-ever-publication-action="publish">Publier</button>
-    <button type="submit" class="btn btn-warning mr-2 mb-2" name="_submit_action" value="save" data-ever-publication-action="schedule">Programmer</button>
+    <button type="submit" class="btn btn-success mr-2 mb-2" name="_submit_action" value="save">Enregistrer</button>
     <button type="submit" class="btn btn-primary mb-2" name="_submit_action" value="save_and_stay">Enregistrer et rester</button>
   </div>
 {% endblock %}
@@ -404,7 +416,7 @@
         {% set contentFields = contentFields|merge([child]) %}
       {% elseif fieldName starts with 'meta_title_' or fieldName starts with 'meta_description_' or fieldName starts with 'link_rewrite_' %}
         {% set seoFields = seoFields|merge([child]) %}
-      {% elseif fieldName in ['post_status', 'date_add', 'id_author', 'starred', 'psswd', 'active', 'indexable', 'follow', 'sitemap', 'id_parent_category', 'is_root_category', 'id_employee', 'twitter', 'facebook', 'linkedin', 'count'] %}
+      {% elseif fieldName in ['post_status', 'date_add', 'id_author', 'starred', 'psswd', 'featured_image_file', 'delete_featured_image', 'author_image_file', 'delete_author_image', 'active', 'indexable', 'follow', 'sitemap', 'id_parent_category', 'is_root_category', 'id_employee', 'twitter', 'facebook', 'linkedin', 'count'] %}
         {% set publicationFields = publicationFields|merge([child]) %}
       {% elseif fieldName in ['id_default_category', 'post_categories', 'post_tags', 'post_products', 'allowed_groups', 'category_products', 'tag_products', 'author_products'] %}
         {% set relationFields = relationFields|merge([child]) %}
@@ -594,6 +606,10 @@
         });
 
         Array.prototype.forEach.call(fieldsWithLang, function (field) {
+          if (field.closest('.ever-seo-field[data-lang-id]')) {
+            return;
+          }
+
           var lang = detectLangForField(field);
           var wrapper = field.closest('.form-group, .form-control-group, .mb-3') || field.parentNode;
           if (!lang || !wrapper) {
@@ -720,7 +736,7 @@
         flatpickr(input, {
           enableTime: hasTime,
           time_24hr: true,
-          dateFormat: hasTime ? 'Y-m-d H:i:S' : 'Y-m-d',
+          dateFormat: hasTime ? 'Y-m-d H:i' : 'Y-m-d',
           altInput: true,
           altFormat: hasTime ? 'd/m/Y H:i' : 'd/m/Y',
           allowInput: true

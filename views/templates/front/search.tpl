@@ -19,20 +19,26 @@
 {extends file='page.tpl'}
 
 {block name='content'}
-<h1 class="text-center">{l s='Search results for' mod='everpsblog'} "{$query|escape:'htmlall':'UTF-8'}"</h1>
-<div class="d-flex justify-content-center mb-3">
-    {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
+<div class="everpsblog-blog-header container-fluid px-0 mb-4">
+    <div class="everpsblog-blog-header__inner text-center py-5"{if isset($everpsblog_header_bg_color) && $everpsblog_header_bg_color} style="background: {$everpsblog_header_bg_color|escape:'htmlall':'UTF-8'};"{/if}>
+        <h1 class="m-0 everpsblog-blog-header__title">{l s='Search results for' mod='everpsblog'} "{$query|escape:'htmlall':'UTF-8'}"</h1>
+    </div>
 </div>
-{if isset($post_number) && $post_number > 0}
-<div class="row mt-2">
-    {foreach from=$posts item=item}
-        {include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
-    {/foreach}
+<div class="container my-4">
+    <div class="d-flex justify-content-center mb-3">
+        {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
+    </div>
+    {if isset($post_number) && $post_number > 0}
+    <div class="row mt-2">
+        {foreach from=$posts item=item}
+            {include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
+        {/foreach}
+    </div>
+    <div class="row">
+        {include file='_partials/pagination.tpl' pagination=$pagination}
+    </div>
+    {else}
+    <div class="alert alert-info">{l s='No post found for this search.' mod='everpsblog'}</div>
+    {/if}
 </div>
-<div class="row">
-    {include file='_partials/pagination.tpl' pagination=$pagination}
-</div>
-{else}
-<div class="alert alert-info">{l s='No post found for this search.' mod='everpsblog'}</div>
-{/if}
 {/block}

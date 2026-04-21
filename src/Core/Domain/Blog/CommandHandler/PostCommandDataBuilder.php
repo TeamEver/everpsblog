@@ -25,7 +25,7 @@ class PostCommandDataBuilder
     public function buildFromRequestData(array $data): PostCommandData
     {
         $rootCategoryId = $this->resolveRootCategoryId();
-        $dateAdd = isset($data['date_add']) && $data['date_add'] ? (string) $data['date_add'] : date('Y-m-d H:i:s');
+        $dateAdd = $this->normalizeDateAdd($data['date_add'] ?? '');
 
         return new PostCommandData(
             $this->shopId,
@@ -98,5 +98,27 @@ class PostCommandDataBuilder
         }
 
         return [$value];
+    }
+
+    private function normalizeDateAdd($value): string
+    {
+        $date = trim(str_replace('T', ' ', (string) $value));
+        if ('' === $date) {
+            return date('Y-m-d H:i:s');
+        }
+
+        foreach (['Y-m-d H:i:s', 'Y-m-d H:i', 'Y-m-d', 'd-m-Y H:i:s', 'd-m-Y H:i', 'd-m-Y', 'd/m/Y H:i:s', 'd/m/Y H:i', 'd/m/Y'] as $format) {
+            $parsed = \DateTimeImmutable::createFromFormat('!' . $format, $date);
+            $errors = \DateTimeImmutable::getLastErrors();
+            if (false !== $parsed && (false === $errors || (0 === $errors['warning_count'] && 0 === $errors['error_count']))) {
+                return $parsed->format('Y-m-d H:i:s');
+            }
+        }
+
+        try {
+            return (new \DateTimeImmutable($date))->format('Y-m-d H:i:s');
+        } catch (\Throwable $exception) {
+            return date('Y-m-d H:i:s');
+        }
     }
 }

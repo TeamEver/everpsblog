@@ -47,8 +47,8 @@ final class PostFormDataProvider
 
         $data = [
             'id' => $id,
-            'post_status' => (string) ($post['post_status'] ?? 'draft'),
-            'date_add' => isset($post['date_add']) ? (string) $post['date_add'] : '',
+            'post_status' => $this->normalizeStatusForForm((string) ($post['post_status'] ?? 'draft')),
+            'date_add' => $this->normalizeDateForForm((string) ($post['date_add'] ?? '')),
             'id_author' => (int) ($post['id_author'] ?? 0),
             'id_default_category' => (int) ($post['id_default_category'] ?? 0),
             'indexable' => (bool) ($post['indexable'] ?? 0),
@@ -185,5 +185,36 @@ final class PostFormDataProvider
         });
 
         return array_values(array_map('intval', $items));
+    }
+
+    private function normalizeStatusForForm(string $status): string
+    {
+        if ('planned' === $status) {
+            return 'published';
+        }
+
+        return in_array($status, ['draft', 'published', 'trash'], true) ? $status : 'draft';
+    }
+
+    private function normalizeDateForForm(string $date): string
+    {
+        $date = trim($date);
+        if ('' === $date) {
+            return '';
+        }
+
+        foreach (['Y-m-d H:i:s', 'Y-m-d H:i', 'Y-m-d', 'd-m-Y H:i:s', 'd-m-Y H:i', 'd-m-Y', 'd/m/Y H:i:s', 'd/m/Y H:i', 'd/m/Y'] as $format) {
+            $parsed = \DateTimeImmutable::createFromFormat('!' . $format, $date);
+            $errors = \DateTimeImmutable::getLastErrors();
+            if (false !== $parsed && (false === $errors || (0 === $errors['warning_count'] && 0 === $errors['error_count']))) {
+                return $parsed->format('Y-m-d H:i:s');
+            }
+        }
+
+        try {
+            return (new \DateTimeImmutable($date))->format('Y-m-d H:i:s');
+        } catch (\Throwable $exception) {
+            return '';
+        }
     }
 }

@@ -15,14 +15,28 @@ use PrestaShop\Module\Everpsblog\Entity\Tag;
 
 class PostRepository extends EntityRepository
 {
-    public function findBackOfficeList($langId, $shopId, $limit = 50)
+    public function findBackOfficeList($langId, $shopId, $limit = 50, $orderBy = 'date_add', $orderWay = 'DESC')
     {
-        return $this->createBasePublishedQb($langId, $shopId, null)
-            ->select('p.id AS id_ever_post, p.status AS post_status, p.viewCount AS count, pl.title AS title')
+        $orderMap = [
+            'id_ever_post' => 'p.id',
+            'title' => 'pl.title',
+            'post_status' => 'p.status',
+            'count' => 'p.viewCount',
+            'date_add' => 'p.createdAt',
+        ];
+        $orderField = $orderMap[(string) $orderBy] ?? $orderMap['date_add'];
+        $orderDirection = 'ASC' === strtoupper((string) $orderWay) ? 'ASC' : 'DESC';
+
+        $qb = $this->createBasePublishedQb($langId, $shopId, null)
+            ->select('p.id AS id_ever_post, p.status AS post_status, p.viewCount AS count, p.createdAt AS date_add, pl.title AS title')
             ->setMaxResults((int) $limit)
-            ->orderBy('p.createdAt', 'DESC')
-            ->getQuery()
-            ->getArrayResult();
+            ->orderBy($orderField, $orderDirection);
+
+        if ('p.id' !== $orderField) {
+            $qb->addOrderBy('p.id', 'DESC');
+        }
+
+        return $qb->getQuery()->getArrayResult();
     }
 
     public function findPostsForChoices($langId, $shopId, $limit = 500, $status = 'published')

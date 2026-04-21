@@ -5,7 +5,6 @@ namespace PrestaShop\Module\Everpsblog\Form\Type\Admin;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -116,16 +115,20 @@ final class PostType extends AbstractType
                 'label' => 'Statut',
                 'choices' => [
                     'Brouillon' => 'draft',
+                    'Corbeille' => 'trash',
                     'Publié' => 'published',
                 ],
             ])
-            ->add('date_add', DateTimeType::class, [
+            ->add('date_add', TextType::class, [
                 'required' => false,
                 'label' => 'Date de publication',
-                'widget' => 'single_text',
-                'input' => 'string',
-                'html5' => false,
-                'format' => 'yyyy-MM-dd HH:mm:ss',
+                'empty_data' => '',
+                'help' => 'Si la date est future et que l\'article est publie, il sera programme automatiquement.',
+                'attr' => [
+                    'autocomplete' => 'off',
+                    'placeholder' => 'YYYY-MM-DD HH:mm',
+                    'data-ever-datetime' => '1',
+                ],
             ])
             ->add('id_author', ChoiceType::class, [
                 'required' => false,
@@ -148,6 +151,15 @@ final class PostType extends AbstractType
                 'label' => 'Image à la une',
                 'help' => $options['featured_image_help'],
                 'help_html' => true,
+            ])
+            ->add('delete_featured_image', CheckboxType::class, [
+                'required' => false,
+                'mapped' => false,
+                'disabled' => !$options['has_featured_image'],
+                'label' => 'Supprimer l\'image a la une actuelle',
+                'help' => $options['has_featured_image']
+                    ? 'Cochez puis enregistrez pour supprimer l\'image actuelle.'
+                    : 'Aucune image a la une n\'est encore associee a cet article.',
             ])
         ;
 
@@ -211,18 +223,26 @@ final class PostType extends AbstractType
     private function getAuthorChoices(): array
     {
         $rows = \Db::getInstance()->executeS(
-            'SELECT a.id_ever_author, al.meta_title
+            'SELECT a.id_ever_author, a.nickhandle, al.meta_title, CONCAT(COALESCE(e.firstname, \'\'), \' \', COALESCE(e.lastname, \'\')) AS employee_name
             FROM `' . _DB_PREFIX_ . 'ever_blog_author` a
             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_author_lang` al ON (al.id_ever_author = a.id_ever_author AND al.id_lang = ' . (int) \Context::getContext()->language->id . ')
+            LEFT JOIN `' . _DB_PREFIX_ . 'employee` e ON (e.id_employee = a.id_employee)
             WHERE a.active = 1
-            ORDER BY a.id_ever_author ASC'
+            ORDER BY a.nickhandle ASC, a.id_ever_author ASC'
         ) ?: [];
 
         $choices = [];
         foreach ($rows as $row) {
             $id = (int) $row['id_ever_author'];
-            $label = trim((string) ($row['meta_title'] ?? ''));
-            $choices[$label ?: sprintf('Auteur #%d', $id)] = $id;
+            $label = trim((string) ($row['nickhandle'] ?? ''));
+            if ('' === $label) {
+                $label = trim((string) ($row['employee_name'] ?? ''));
+            }
+            if ('' === $label) {
+                $label = trim((string) ($row['meta_title'] ?? ''));
+            }
+
+            $choices[sprintf('%s (#%d)', $label ?: 'Auteur', $id)] = $id;
         }
 
         return $choices;
@@ -322,7 +342,9 @@ final class PostType extends AbstractType
     {
         $resolver->setDefaults([
             'featured_image_help' => '',
+            'has_featured_image' => false,
         ]);
         $resolver->setAllowedTypes('featured_image_help', 'string');
+        $resolver->setAllowedTypes('has_featured_image', 'bool');
     }
 }

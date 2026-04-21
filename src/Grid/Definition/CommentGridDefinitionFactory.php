@@ -17,6 +17,7 @@ final class CommentGridDefinitionFactory
             ['id' => 'active', 'name' => 'Actif']
         ],
 [
+            'q' => 'Recherche',
             'id_ever_post' => 'Post ID'
         ],
 [

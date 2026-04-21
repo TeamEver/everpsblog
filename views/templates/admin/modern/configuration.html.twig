@@ -94,6 +94,7 @@
     }
     .ever-admin .ever-form-grid input[type="text"],
     .ever-admin .ever-form-grid input[type="number"],
+    .ever-admin .ever-form-grid input[type="password"],
     .ever-admin .ever-form-grid input[type="url"],
     .ever-admin .ever-form-grid select,
     .ever-admin .ever-form-grid textarea {
@@ -142,6 +143,8 @@
     }
     .ever-admin .ever-btn-primary { background: var(--ever-primary); color: #fff; border-color: var(--ever-primary); }
     .ever-admin .ever-btn-primary:hover { background: var(--ever-primary-600); color: #fff; }
+    .ever-admin .ever-btn-import { background: #0f766e; color: #fff; border-color: #0f766e; }
+    .ever-admin .ever-btn-import:hover { background: #115e59; color: #fff; }
   </style>
 {% endblock %}
 
@@ -171,10 +174,45 @@
         </div>
       </div>
       <div class="ever-actions">
+        <button type="submit" name="import_wordpress_blog" value="1" class="ever-btn ever-btn-import" onclick="return confirm('Lancer l import complet du blog WordPress avec les acces REST renseignes ?');">Importer tout le blog WordPress</button>
         <button type="submit" class="ever-btn ever-btn-primary">Enregistrer</button>
       </div>
       {{ form_end(configurationForm) }}
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script src="https://cdn.jsdelivr.net/npm/tinymce@6/tinymce.min.js" referrerpolicy="origin"></script>
+  <script>
+    (function () {
+      var root = document.getElementById('ever-config-form');
+      if (!root || typeof tinymce === 'undefined') { return; }
+
+      var targets = root.querySelectorAll('textarea[data-ever-richtext="1"]');
+      Array.prototype.forEach.call(targets, function (textarea) {
+        if (!textarea.id) {
+          textarea.id = 'ever-config-rte-' + Math.random().toString(36).slice(2, 10);
+        }
+        tinymce.init({
+          target: textarea,
+          license_key: 'gpl',
+          promotion: false,
+          branding: false,
+          language: 'fr_FR',
+          language_url: 'https://cdn.jsdelivr.net/npm/tinymce-i18n@24.11.11/langs7/fr_FR.js',
+          height: 320,
+          menubar: 'edit view insert format tools table',
+          plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount',
+          toolbar: 'undo redo | blocks | bold italic underline forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table | removeformat | code fullscreen',
+          content_style: 'body { font-family:Inter,Helvetica,Arial,sans-serif; font-size:14px; }',
+          setup: function (editor) {
+            editor.on('change keyup', function () { editor.save(); });
+          }
+        });
+      });
+    })();
+  </script>
 {% endblock %}

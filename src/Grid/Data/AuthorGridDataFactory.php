@@ -5,10 +5,13 @@ namespace PrestaShop\Module\Everpsblog\Grid\Data;
 use PrestaShop\Module\Everpsblog\Core\Grid\GridData;
 use PrestaShop\Module\Everpsblog\Repository\AuthorRepository;
 use PrestaShop\Module\Everpsblog\Service\AdminRouteSigner;
+use PrestaShop\Module\Everpsblog\Service\BlogImageService;
 use Symfony\Component\Routing\RouterInterface;
 
 final class AuthorGridDataFactory
 {
+    use GridRecordFilterTrait;
+
     /** @var AuthorRepository */
     private $authorRepository;
     /** @var AdminRouteSigner */
@@ -19,13 +22,16 @@ final class AuthorGridDataFactory
     private $useLegacyFallback;
     /** @var bool */
     private $useModernDeleteAction;
+    /** @var BlogImageService|null */
+    private $blogImageService;
 
     public function __construct(
         AuthorRepository $authorRepository,
         AdminRouteSigner $routeSigner,
         RouterInterface $router,
         bool $useLegacyFallback = true,
-        bool $useModernDeleteAction = false
+        bool $useModernDeleteAction = false,
+        ?BlogImageService $blogImageService = null
     )
     {
         $this->authorRepository = $authorRepository;
@@ -33,6 +39,7 @@ final class AuthorGridDataFactory
         $this->router = $router;
         $this->useLegacyFallback = $useLegacyFallback;
         $this->useModernDeleteAction = $useModernDeleteAction;
+        $this->blogImageService = $blogImageService;
     }
 
     /**
@@ -44,12 +51,19 @@ final class AuthorGridDataFactory
         $records = [];
 
         foreach ($rows as $row) {
+            $authorId = (int) ($row['id'] ?? 0);
             $records[] = [
-                'id_ever_author' => (int) ($row['id'] ?? 0),
+                'id_ever_author' => $authorId,
+                'featured_image' => $this->resolveAuthorImage($authorId, $shopId),
                 'nickhandle' => (string) ($row['nickhandle'] ?? ''),
                 'active' => (string) ($row['active'] ?? 0),
             ];
         }
+        $records = $this->filterRecords($records, $filters, [
+            'id_ever_author',
+            'nickhandle',
+            'active',
+        ]);
 
         foreach ($records as &$record) {
             $id = (int) $record['id_ever_author'];
@@ -98,5 +112,23 @@ final class AuthorGridDataFactory
     private function routeExists(string $routeName): bool
     {
         return null !== $this->router->getRouteCollection()->get($routeName);
+    }
+
+    private function resolveAuthorImage(int $authorId, int $shopId): ?string
+    {
+        if ($authorId <= 0 || null === $this->blogImageService) {
+            return null;
+        }
+
+        try {
+            $image = $this->blogImageService->getBlogImage($authorId, $shopId, 'author');
+            if (!\Validate::isLoadedObject($image)) {
+                return null;
+            }
+
+            return (string) $this->blogImageService->getBlogImageUrl($authorId, $shopId, 'author');
+        } catch (\Throwable $exception) {
+            return null;
+        }
     }
 }

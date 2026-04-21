@@ -37,6 +37,7 @@ class EverPsBlog extends Module
     private $blogCleanerService;
     private $blogSortOrderService;
     private $blogSitemapService;
+    private $blogRedirectService;
     private $legacyImportAdapter;
     private $serviceCachePool;
     public static $route = [];
@@ -45,7 +46,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '6.0.5';
+        $this->version = '6.0.9';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -150,6 +151,8 @@ class EverPsBlog extends Module
                 }
                 return $title;
             })())
+            && Configuration::updateValue('EVERBLOG_HEADER_BG_COLOR', '#0a0f54')
+            && $this->checkAndFixDatabase()
             && $this->checkHooks()
             && $this->checkObligatoryHooks();
     }
@@ -314,6 +317,15 @@ class EverPsBlog extends Module
         return $this->blogSitemapService;
     }
 
+    private function getBlogRedirectService()
+    {
+        if (!$this->blogRedirectService) {
+            $this->blogRedirectService = new \PrestaShop\Module\Everpsblog\Service\BlogRedirectService();
+        }
+
+        return $this->blogRedirectService;
+    }
+
     private function getLegacyImportAdapter()
     {
         if (!$this->legacyImportAdapter) {
@@ -447,6 +459,39 @@ class EverPsBlog extends Module
                 ],
             ],
         ];
+    }
+
+    public function hookActionDispatcherBefore($params)
+    {
+        $controllerType = isset($params['controller_type']) ? (int) $params['controller_type'] : 0;
+        if (class_exists('Dispatcher') && defined('Dispatcher::FC_FRONT') && $controllerType > 0 && $controllerType !== (int) Dispatcher::FC_FRONT) {
+            return;
+        }
+
+        $this->redirectLegacyWordPressUrl();
+    }
+
+    private function redirectLegacyWordPressUrl()
+    {
+        $method = strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'));
+        if (!in_array($method, ['GET', 'HEAD'], true)) {
+            return;
+        }
+
+        $context = Context::getContext();
+        $shopId = isset($context->shop) ? (int) $context->shop->id : (int) Configuration::get('PS_SHOP_DEFAULT');
+        $redirect = $this->getBlogRedirectService()->findRedirectForCurrentRequest($shopId);
+        if (!is_array($redirect) || empty($redirect['target_url'])) {
+            return;
+        }
+
+        $targetUrl = str_replace(["\r", "\n"], '', (string) $redirect['target_url']);
+        if ('' === $targetUrl) {
+            return;
+        }
+
+        header('Location: ' . $targetUrl, true, (int) ($redirect['http_code'] ?? 301));
+        exit;
     }
 
     public function clearEverblogContent()
@@ -905,8 +950,8 @@ class EverPsBlog extends Module
                         'Error : Blog top text is invalid'
                     );
                 }
-                if (Tools::getValue('EVERBLOG_BOTTOM_'.$lang['id_lang'])
-                    && !Validate::isCleanHtml(Tools::getValue('EVERBLOG_BOTTOM_'.$lang['id_lang']))
+                if (Tools::getValue('EVERBLOG_BOTTOM_TEXT_'.$lang['id_lang'])
+                    && !Validate::isCleanHtml(Tools::getValue('EVERBLOG_BOTTOM_TEXT_'.$lang['id_lang']))
                 ) {
                     $this->postErrors[] = $this->l(
                         'Error : Blog bottom text is invalid'
@@ -919,6 +964,13 @@ class EverPsBlog extends Module
                         'Error : Blog page title is invalid'
                     );
                 }
+            }
+            if (Tools::getValue('EVERBLOG_HEADER_BG_COLOR')
+                && !Validate::isColor(Tools::getValue('EVERBLOG_HEADER_BG_COLOR'))
+            ) {
+                $this->postErrors[] = $this->l(
+                    'Error : The field "Blog header background color" is not valid'
+                );
             }
             // Layouts
             if (Tools::getValue('EVERPSBLOG_BLOG_LAYOUT')
@@ -1218,6 +1270,7 @@ class EverPsBlog extends Module
             'EVERPSBLOG_TAG_LAYOUT' => Configuration::get('EVERPSBLOG_TAG_LAYOUT'),
             'EVERBLOG_CSS' => $custom_css,
             'EVERBLOG_CSS_FILE' => Configuration::get('EVERBLOG_CSS_FILE'),
+            'EVERBLOG_HEADER_BG_COLOR' => Configuration::get('EVERBLOG_HEADER_BG_COLOR'),
             'EVERBLOG_IMPORT_AUTHORS' => Configuration::get('EVERBLOG_IMPORT_AUTHORS'),
             'EVERBLOG_IMPORT_CATS' => Configuration::get('EVERBLOG_IMPORT_CATS'),
             'EVERBLOG_IMPORT_TAGS' => Configuration::get('EVERBLOG_IMPORT_TAGS'),
@@ -2283,6 +2336,14 @@ class EverPsBlog extends Module
                         'lang' => false,
                     ],
                     [
+                        'type' => 'color',
+                        'label' => $this->l('Blog header background color'),
+                        'desc' => $this->l('Background color of the header banner on blog, category, tag, author and search pages'),
+                        'hint' => $this->l('Pick the color used behind the main title on blog listing pages'),
+                        'name' => 'EVERBLOG_HEADER_BG_COLOR',
+                        'required' => false,
+                    ],
+                    [
                         'type' => 'textarea',
                         'label' => $this->l('Custom CSS for blog'),
                         'desc' => $this->l('Add here your custom CSS rules'),
@@ -2338,6 +2399,7 @@ class EverPsBlog extends Module
     {
         $controller_name = Tools::getValue('controller');
         $module_name = Tools::getValue('module');
+        $dynamic_header_css = '';
         if ($module_name == 'everpsblog') {
             $this->context->controller->addCSS(
                 $this->module_folder . '/views/css/everpsblog-all.css',
@@ -2354,6 +2416,24 @@ class EverPsBlog extends Module
             $this->context->controller->addJs(
                 $this->_path . 'views/js/everpsblog.js'
             );
+            $header_bg_color = Configuration::get('EVERBLOG_HEADER_BG_COLOR');
+            if (!$header_bg_color || !Validate::isColor($header_bg_color)) {
+                $header_bg_color = '#0a0f54';
+            }
+            $this->context->smarty->assign('everpsblog_header_bg_color', $header_bg_color);
+            $dynamic_header_css = '<style>'
+                . '#module-everpsblog-blog .everpsblog-blog-header__inner,'
+                . '#module-everpsblog-category .everpsblog-blog-header__inner,'
+                . '#module-everpsblog-tag .everpsblog-blog-header__inner,'
+                . '#module-everpsblog-author .everpsblog-blog-header__inner,'
+                . '#module-everpsblog-search .everpsblog-blog-header__inner,'
+                . 'body#module-everpsblog-blog .breadcrumb__wrapper,'
+                . 'body#module-everpsblog-category .breadcrumb__wrapper,'
+                . 'body#module-everpsblog-tag .breadcrumb__wrapper,'
+                . 'body#module-everpsblog-author .breadcrumb__wrapper,'
+                . 'body#module-everpsblog-search .breadcrumb__wrapper'
+                . '{background:' . $header_bg_color . ' !important;}'
+                . '</style>';
         }
         $this->context->controller->addCSS(
             $this->module_folder . '/views/css/everpsblog-columns.css',
@@ -2372,6 +2452,7 @@ class EverPsBlog extends Module
                 'all'
             );
         }
+        return $dynamic_header_css;
     }
 
     public function hookDisplayLeftColumn($params)
@@ -3097,6 +3178,7 @@ public function emptyTrash($id_shop)
     {
         try {
             $this->registerHook('displayHeader');
+            $this->registerHook('actionDispatcherBefore');
             $this->registerHook('beforeRenderingEverpsblogPostSlider');
             $this->registerHook('actionAdminControllerSetMedia');
             $this->registerHook('displayHome');
@@ -3123,6 +3205,7 @@ public function emptyTrash($id_shop)
     {
         try {
             $this->registerHook('moduleRoutes');
+            $this->registerHook('actionDispatcherBefore');
             $this->registerHook('displayBackOfficeHeader');
             $this->registerHook('displayAdminAfterHeader');
             $this->registerHook('actionAdminMetaAfterWriteRobotsFile');
@@ -3988,18 +4071,9 @@ public function emptyTrash($id_shop)
 
     private function saveRedirects($redirects)
     {
-        $redirect_lines = [];
-        foreach ($redirects as $datas) {
-            foreach ($datas as $from => $to) {
-                $redirect_lines[] = 'Redirect 301 ' . rtrim($from, '/') . ' ' . $to;
-            }
-        }
-        if (!empty($redirect_lines)) {
-            file_put_contents(
-                dirname(__FILE__) . '/wordpress_redirects.txt',
-                implode(PHP_EOL, $redirect_lines)
-            );
-        }
+        $shopId = isset($this->context->shop) ? (int) $this->context->shop->id : (int) Configuration::get('PS_SHOP_DEFAULT');
+
+        return $this->getBlogRedirectService()->saveRedirects((array) $redirects, $shopId);
     }
 
     private function getIdLangFromWpData($data)
@@ -4053,6 +4127,8 @@ public function emptyTrash($id_shop)
 
     public function checkAndFixDatabase()
     {
+        return (new \PrestaShop\Module\Everpsblog\Service\DatabaseIntegrityService())->checkAndFix();
+
         $db = Db::getInstance();
         // Ajoute les colonnes manquantes à la table ever_blog_post
         $columnsToAdd = [
@@ -4241,6 +4317,7 @@ public function emptyTrash($id_shop)
             'meta_description' => 'varchar(255) DEFAULT NULL',
             'link_rewrite' => 'varchar(255) DEFAULT NULL',
             'content' => 'text NOT NULL',
+            'excerpt' => 'varchar(255) DEFAULT NULL',
             'bottom_content' => 'text DEFAULT NULL',
             'id_lang' => 'int(10) unsigned NOT NULL',
         ];

@@ -25,6 +25,9 @@ class AuthorLang
     /** @ORM\Column(name="content", type="text") */
     private $content;
 
+    /** @ORM\Column(name="excerpt", type="string", length=255, nullable=true) */
+    private $excerpt;
+
     /** @ORM\Column(name="bottom_content", type="text", nullable=true) */
     private $bottomContent;
 }

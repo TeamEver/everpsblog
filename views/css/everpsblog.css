@@ -30,21 +30,36 @@
 }
 
 
-#module-everpsblog-blog .everpsblog-blog-header {
+#module-everpsblog-blog .everpsblog-blog-header,
+#module-everpsblog-category .everpsblog-blog-header,
+#module-everpsblog-tag .everpsblog-blog-header,
+#module-everpsblog-author .everpsblog-blog-header,
+#module-everpsblog-search .everpsblog-blog-header {
     width: 99.6vw;
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
 }
-#module-everpsblog-blog .everpsblog-blog-header__inner {
+#module-everpsblog-blog .everpsblog-blog-header__inner,
+#module-everpsblog-category .everpsblog-blog-header__inner,
+#module-everpsblog-tag .everpsblog-blog-header__inner,
+#module-everpsblog-author .everpsblog-blog-header__inner,
+#module-everpsblog-search .everpsblog-blog-header__inner {
     width: 100%;
     padding-left: 1rem;
     padding-right: 1rem;
-    background: linear-gradient(90deg, #0a0f54 0%, #0a0f54 50%, #0a0f54 100%);
+    background: #0a0f54;
 }
-#module-everpsblog-blog .everpsblog-blog-header__title {
+#module-everpsblog-blog .everpsblog-blog-header__title,
+#module-everpsblog-category .everpsblog-blog-header__title,
+#module-everpsblog-tag .everpsblog-blog-header__title,
+#module-everpsblog-author .everpsblog-blog-header__title,
+#module-everpsblog-search .everpsblog-blog-header__title,
+#module-everpsblog-author .everpsblog-author-excerpt {
     color: #fff;
 }
-#module-everpsblog-blog .everpsblog-top-category-btn {
+#module-everpsblog-blog .everpsblog-top-category-btn,
+#module-everpsblog-category .everpsblog-top-category-btn,
+#module-everpsblog-category .everpsblog-subcategory-btn {
     border: 1px solid #fff;
     border-radius: 999px;
     color: #fff;
@@ -54,18 +69,36 @@
 }
 #module-everpsblog-blog .everpsblog-top-category-btn:hover,
 #module-everpsblog-blog .everpsblog-top-category-btn:focus,
-#module-everpsblog-blog .everpsblog-top-category-btn.active {
+#module-everpsblog-blog .everpsblog-top-category-btn.active,
+#module-everpsblog-category .everpsblog-top-category-btn:hover,
+#module-everpsblog-category .everpsblog-top-category-btn:focus,
+#module-everpsblog-category .everpsblog-top-category-btn.active,
+#module-everpsblog-category .everpsblog-subcategory-btn:hover,
+#module-everpsblog-category .everpsblog-subcategory-btn:focus,
+#module-everpsblog-category .everpsblog-subcategory-btn.active {
     background-color: #fff;
     color: #0d2f7d;
 }
 
-body#module-everpsblog-blog .breadcrumb__wrapper {
-    background: linear-gradient(90deg, #0a0f54 0%, #0a0f54 50%, #0a0f54 100%);
+body#module-everpsblog-blog .breadcrumb__wrapper,
+body#module-everpsblog-category .breadcrumb__wrapper,
+body#module-everpsblog-tag .breadcrumb__wrapper,
+body#module-everpsblog-author .breadcrumb__wrapper,
+body#module-everpsblog-search .breadcrumb__wrapper {
+    background: #0a0f54;
     background-position: center;
 }
 
 body#module-everpsblog-blog .breadcrumb a,
-body#module-everpsblog-blog .breadcrumb span {
+body#module-everpsblog-blog .breadcrumb span,
+body#module-everpsblog-category .breadcrumb a,
+body#module-everpsblog-category .breadcrumb span,
+body#module-everpsblog-tag .breadcrumb a,
+body#module-everpsblog-tag .breadcrumb span,
+body#module-everpsblog-author .breadcrumb a,
+body#module-everpsblog-author .breadcrumb span,
+body#module-everpsblog-search .breadcrumb a,
+body#module-everpsblog-search .breadcrumb span {
     color: #fff;
 }
 
@@ -514,11 +547,6 @@ body#module-everpsblog-post .breadcrumb__wrapper {
     background-position: center;
 }
 
-body#module-everpsblog-post .breadcrumb a,
-body#module-everpsblog-post .breadcrumb span {
-    color: #fff;
-}
-
 #module-everpsblog-post .everpsblog-post-hero {
     position: relative;
     background: linear-gradient(90deg, #0a0f54 0%, #0a0f54 50%, #0a0f54 100%);
@@ -651,3 +679,4 @@ body#module-everpsblog-post .breadcrumb span {
         gap: .7rem;
     }
 }
+                                                                                                                    

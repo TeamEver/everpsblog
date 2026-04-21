@@ -76,6 +76,7 @@ abstract class AbstractFrontController extends \ModuleFrontController
     public function init()
     {
         parent::init();
+        $this->assignHeaderConfiguration();
 
         $params = [];
         $controllerName = \Dispatcher::getInstance()->getController();
@@ -109,6 +110,18 @@ abstract class AbstractFrontController extends \ModuleFrontController
 
             $this->canonicalRedirection($canonicalUrl);
         }
+    }
+
+    private function assignHeaderConfiguration(): void
+    {
+        $color = trim((string) \Configuration::get('EVERBLOG_HEADER_BG_COLOR'));
+        if (!preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
+            $color = '#0a0f54';
+        }
+
+        $this->context->smarty->assign([
+            'everpsblog_header_bg_color' => $color,
+        ]);
     }
 
 

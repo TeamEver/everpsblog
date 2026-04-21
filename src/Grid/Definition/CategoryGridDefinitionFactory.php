@@ -17,6 +17,7 @@ final class CategoryGridDefinitionFactory
             ['id' => 'active', 'name' => 'Actif']
         ],
 [
+            'q' => 'Recherche',
             'title' => 'Titre'
         ],
 [

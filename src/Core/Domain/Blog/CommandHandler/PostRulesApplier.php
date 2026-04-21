@@ -67,11 +67,20 @@ class PostRulesApplier
      */
     private function resolveStatus(array $payload): string
     {
-        if ((string) $payload['date_add'] > date('Y-m-d H:i:s')) {
+        $status = (string) $payload['post_status'];
+        if ('trash' === $status) {
+            return 'trash';
+        }
+
+        if ((string) $payload['date_add'] > date('Y-m-d H:i:s') && in_array($status, ['published', 'planned'], true)) {
             return 'planned';
         }
 
-        return (string) $payload['post_status'];
+        if ('planned' === $status) {
+            return 'published';
+        }
+
+        return $status;
     }
 
     /**

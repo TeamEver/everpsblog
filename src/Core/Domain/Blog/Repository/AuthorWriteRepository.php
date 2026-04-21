@@ -143,6 +143,8 @@ class AuthorWriteRepository
 
     private function replaceRelations(int $authorId, array $data): void
     {
+        $this->ensureAuthorLangExcerptColumn();
+
         $connection = $this->entityManager->getConnection();
         $connection->delete(_DB_PREFIX_ . 'ever_blog_author_lang', ['id_ever_author' => $authorId]);
         $connection->delete(_DB_PREFIX_ . 'ever_blog_author_shop', ['id_ever_author' => $authorId]);
@@ -161,9 +163,40 @@ class AuthorWriteRepository
                 'meta_title' => $metaTitle,
                 'meta_description' => $metaDescription,
                 'link_rewrite' => Tools::str2url($slug ?: (string) ($data['nickhandle'] ?? 'author-' . $authorId)),
+                'excerpt' => (string) ($data['excerpt_' . $langId] ?? ($data['excerpt'] ?? '')),
                 'content' => $content,
                 'bottom_content' => (string) ($data['bottom_content_' . $langId] ?? ''),
             ]);
+        }
+    }
+
+    private function ensureAuthorLangExcerptColumn(): void
+    {
+        static $done = false;
+        if ($done) {
+            return;
+        }
+
+        $connection = $this->entityManager->getConnection();
+        try {
+            $exists = (bool) $connection->fetchAssociative(
+                'SHOW COLUMNS FROM `' . _DB_PREFIX_ . 'ever_blog_author_lang` LIKE "excerpt"'
+            );
+            if (!$exists) {
+                $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'ever_blog_author_lang`
+                    ADD `excerpt` varchar(255) DEFAULT NULL AFTER `content`';
+                if (method_exists($connection, 'executeStatement')) {
+                    $connection->executeStatement($sql);
+                } else {
+                    $connection->executeUpdate($sql);
+                }
+            }
+            $done = true;
+        } catch (\Throwable $exception) {
+            \PrestaShopLogger::addLog(
+                '[everpsblog][AuthorWriteRepository::ensureAuthorLangExcerptColumn] ' . $exception->getMessage(),
+                3
+            );
         }
     }
 

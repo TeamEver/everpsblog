@@ -21,12 +21,15 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use PrestaShop\Module\Everpsblog\Controller\Front\AuthorController;
+use PrestaShop\Module\Everpsblog\Controller\Front\AbstractFrontController;
+use PrestaShop\Module\Everpsblog\Controller\Front\FrontBlogDataProviderTrait;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\TaxonomyViewModel;
 
-class EverPsBlogauthorModuleFrontController extends AuthorController
+class EverPsBlogauthorModuleFrontController extends AbstractFrontController
 {
+    use FrontBlogDataProviderTrait;
+
     protected $author;
     protected $category;
     protected $tag;
@@ -39,7 +42,7 @@ class EverPsBlogauthorModuleFrontController extends AuthorController
     {
         $this->module_name = 'everpsblog';
         $this->errors = [];
-        $this->author = new EverPsBlogAuthor(
+        $this->author = $this->getFrontAuthor(
             (int) Tools::getValue('id_ever_author'),
             (int) $this->context->language->id,
             (int) $this->context->shop->id
@@ -63,12 +66,12 @@ class EverPsBlogauthorModuleFrontController extends AuthorController
         parent::init();
         // if inactive post or unexists, redirect
         if (!(int) Tools::getValue('id_ever_author')
+            || empty($this->author->id)
             || (bool) $this->author->active === false
         ) {
             Tools::redirect('index.php?controller=404');
         }
-        $this->author->count = $this->author->count + 1;
-        $this->author->save();
+        $this->incrementFrontTaxonomyCount('ever_blog_author', 'id_ever_author', (int) $this->author->id);
     }
 
     public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
@@ -89,7 +92,7 @@ class EverPsBlogauthorModuleFrontController extends AuthorController
                 'id_ever_author',
                 (int) $this->author->id
             ));
-            $this->post_number = EverPsBlogPost::countPostsByAuthor(
+            $this->post_number = $this->countFrontPostsByAuthor(
                 (int) Tools::getValue('id_ever_author'),
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id
@@ -131,7 +134,7 @@ class EverPsBlogauthorModuleFrontController extends AuthorController
                 $this->author->bottom_content;
             $this->author->nickhandle = 
                 $this->author->nickhandle;
-            $posts = EverPsBlogPost::getPostsByAuthor(
+            $posts = $this->getFrontPostsByAuthor(
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id,
                 (int) $this->author->id,
@@ -182,8 +185,8 @@ class EverPsBlogauthorModuleFrontController extends AuthorController
                 'post_number' => (int) $this->post_number,
                 'pagination' => $pagination,
                 'social_share_links' => $social_share_links,
-                'author' => $authorViewModel,
-                'author_legacy' => $this->author,
+                'author' => $this->author,
+                'author_view' => $authorViewModel,
                 'default_lang' => (int) $this->context->language->id,
                 'id_lang' => (int) $this->context->language->id,
                 'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__ . 'modules/everpsblog/views/img/',
@@ -201,7 +204,7 @@ class EverPsBlogauthorModuleFrontController extends AuthorController
 
     public function getBreadcrumbLinks()
     {
-        $this->author = new EverPsBlogAuthor(
+        $this->author = $this->getFrontAuthor(
             (int) Tools::getValue('id_ever_author'),
             (int) $this->context->language->id,
             (int) $this->context->shop->id
@@ -257,17 +260,17 @@ class EverPsBlogauthorModuleFrontController extends AuthorController
         return $page;
     }
 
-    private function getBlogImageService()
+    protected function getBlogImageService()
     {
         return parent::getBlogImageService();
     }
 
-    private function getBlogTaxonomyService()
+    protected function getBlogTaxonomyService()
     {
         return parent::getBlogTaxonomyService();
     }
 
-    private function getBlogSortOrderService()
+    protected function getBlogSortOrderService()
     {
         return parent::getBlogSortOrderService();
     }

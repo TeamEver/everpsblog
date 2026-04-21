@@ -10,6 +10,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 final class PostGridDataFactory
 {
+    use GridRecordFilterTrait;
+
     /** @var PostRepository */
     private $postRepository;
     /** @var AdminRouteSigner */
@@ -45,7 +47,11 @@ final class PostGridDataFactory
      */
     public function build(int $shopId, int $langId, array $filters = []): GridData
     {
-        $rows = $this->postRepository->findBackOfficeList($langId, $shopId);
+        $orderBy = $this->resolveOrderBy($filters['orderBy'] ?? 'date_add');
+        $orderWay = $this->resolveOrderWay($filters['orderWay'] ?? 'DESC');
+        unset($filters['orderBy'], $filters['orderWay']);
+
+        $rows = $this->postRepository->findBackOfficeList($langId, $shopId, 50, $orderBy, $orderWay);
         $records = [];
 
         foreach ($rows as $row) {
@@ -55,9 +61,17 @@ final class PostGridDataFactory
                 'featured_image' => $this->resolveFeaturedImage($postId, $shopId),
                 'title' => (string) ($row['title'] ?? ''),
                 'post_status' => (string) ($row['post_status'] ?? $row['status'] ?? ''),
+                'date_add' => $this->formatDateAdd($row['date_add'] ?? null),
                 'count' => (int) ($row['count'] ?? $row['viewCount'] ?? 0),
             ];
         }
+        $records = $this->filterRecords($records, $filters, [
+            'id_ever_post',
+            'title',
+            'post_status',
+            'date_add',
+            'count',
+        ]);
 
         foreach ($records as &$record) {
             $id = (int) $record['id_ever_post'];
@@ -72,10 +86,17 @@ final class PostGridDataFactory
                     ? $this->resolveUrl('everpsblog_admin_post_delete', ['postId' => $id], 'AdminEverPsBlogPost', ['deletepost' => $id])
                     : $this->routeSigner->sign('AdminEverPsBlogPost', ['deletepost' => $id]),
                 'delete_legacy' => $this->routeSigner->sign('AdminEverPsBlogPost', ['deletepost' => $id]),
+                'duplicate' => $this->resolveUrl(
+                    'everpsblog_admin_post_duplicate',
+                    ['postId' => $id],
+                    'AdminEverPsBlogPost',
+                    ['duplicatepost' => $id]
+                ),
             ];
             $record['_bulk_actions'] = [
-                'delete' => $this->resolveBulkActionUrl('everpsblog_admin_post_bulk_delete', 'AdminEverPsBlogPost'),
-                'publishall' => $this->resolveBulkActionUrl('everpsblog_admin_post_bulk_publish', 'AdminEverPsBlogPost'),
+                'delete' => $this->resolveBulkActionUrl('everpsblog_admin_post_bulk', 'AdminEverPsBlogPost'),
+                'publishall' => $this->resolveBulkActionUrl('everpsblog_admin_post_bulk', 'AdminEverPsBlogPost'),
+                'duplicate' => $this->resolveBulkActionUrl('everpsblog_admin_post_bulk', 'AdminEverPsBlogPost'),
             ];
         }
 
@@ -107,6 +128,37 @@ final class PostGridDataFactory
     private function routeExists(string $routeName): bool
     {
         return null !== $this->router->getRouteCollection()->get($routeName);
+    }
+
+    private function resolveOrderBy($orderBy): string
+    {
+        $orderBy = (string) $orderBy;
+        $allowed = ['id_ever_post', 'title', 'post_status', 'count', 'date_add'];
+
+        return in_array($orderBy, $allowed, true) ? $orderBy : 'date_add';
+    }
+
+    private function resolveOrderWay($orderWay): string
+    {
+        return 'ASC' === strtoupper((string) $orderWay) ? 'ASC' : 'DESC';
+    }
+
+    private function formatDateAdd($value): string
+    {
+        if ($value instanceof \DateTimeInterface) {
+            return $value->format('Y-m-d H:i:s');
+        }
+
+        $date = trim((string) $value);
+        if ('' === $date) {
+            return '';
+        }
+
+        try {
+            return (new \DateTimeImmutable($date))->format('Y-m-d H:i:s');
+        } catch (\Throwable $exception) {
+            return $date;
+        }
     }
 
     private function resolveFeaturedImage(int $postId, int $shopId): ?string

@@ -3,10 +3,13 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use PrestaShop\Module\Everpsblog\Controller\Front\FilterController;
+use PrestaShop\Module\Everpsblog\Controller\Front\AbstractFrontController;
+use PrestaShop\Module\Everpsblog\Controller\Front\FrontBlogDataProviderTrait;
 
-class EverPsBlogfilterModuleFrontController extends FilterController
+class EverPsBlogfilterModuleFrontController extends AbstractFrontController
 {
+    use FrontBlogDataProviderTrait;
+
     public function displayAjax()
     {
         $idCategory = (int) Tools::getValue('category');
@@ -15,7 +18,7 @@ class EverPsBlogfilterModuleFrontController extends FilterController
         $limit = (int) Configuration::get('EVERPSBLOG_PAGINATION');
         $start = ($page - 1) * $limit;
 
-        $posts = EverPsBlogPost::getFilteredPosts(
+        $posts = $this->getFilteredFrontPosts(
             (int) $this->context->language->id,
             (int) $this->context->shop->id,
             $idCategory ?: null,

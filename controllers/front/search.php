@@ -21,46 +21,17 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use PrestaShop\Module\Everpsblog\Controller\Front\SearchController;
+use PrestaShop\Module\Everpsblog\Controller\Front\AbstractFrontController;
+use PrestaShop\Module\Everpsblog\Controller\Front\FrontBlogDataProviderTrait;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 
-class EverPsBlogsearchModuleFrontController extends SearchController
+class EverPsBlogsearchModuleFrontController extends AbstractFrontController
 {
+    use FrontBlogDataProviderTrait;
+
     protected $query;
     public $post_number;
     public $controller_name = 'search';
-
-    /**
-     * Build EverPsBlogPost objects from search rows while preserving listing fields.
-     *
-     * @param array $posts
-     *
-     * @return array
-     */
-    protected function getPostObjects(array $posts)
-    {
-        $postObjects = [];
-
-        foreach ($posts as $post) {
-            if (empty($post['id_ever_post'])) {
-                continue;
-            }
-
-            $postObject = new EverPsBlogPost(
-                (int) $post['id_ever_post'],
-                (int) $this->context->language->id,
-                (int) $this->context->shop->id
-            );
-
-            foreach ($post as $key => $value) {
-                $postObject->{$key} = $value;
-            }
-
-            $postObjects[] = $postObject;
-        }
-
-        return $postObjects;
-    }
 
     public function init()
     {
@@ -83,20 +54,19 @@ class EverPsBlogsearchModuleFrontController extends SearchController
         if (!$this->query) {
             Tools::redirect($this->context->link->getModuleLink('everpsblog', 'blog'));
         }
-        $this->post_number = EverPsBlogPost::countPostsBySearch(
+        $this->post_number = $this->countFrontPostsBySearch(
             $this->query,
             (int) $this->context->language->id,
             (int) $this->context->shop->id
         );
         $pagination = $this->getTemplateVarPagination($this->post_number);
-        $searchPosts = EverPsBlogPost::searchPost(
+        $posts = $this->searchFrontPosts(
             $this->query,
-            (int) $this->context->shop->id,
             (int) $this->context->language->id,
+            (int) $this->context->shop->id,
             (int) $pagination['items_shown_from'] - 1,
             (int) Configuration::get('EVERPSBLOG_PAGINATION')
         );
-        $posts = $this->getPostObjects($searchPosts);
         $postsViewModel = PostViewModel::listFromLegacy($posts);
         $page = $this->context->controller->getTemplateVarPage();
         $page['meta']['title'] = $this->l('Search results for') . ' ' . $this->query;

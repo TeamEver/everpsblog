@@ -22,11 +22,6 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use PrestaShop\Module\Everpsblog\Controller\Front\AbstractFrontController;
-use PrestaShop\Module\Everpsblog\Entity\Author as EverPsBlogAuthor;
-use PrestaShop\Module\Everpsblog\Entity\Category as EverPsBlogCategory;
-use PrestaShop\Module\Everpsblog\Entity\Comment as EverPsBlogComment;
-use PrestaShop\Module\Everpsblog\Entity\Post as EverPsBlogPost;
-use PrestaShop\Module\Everpsblog\Entity\Tag as EverPsBlogTag;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
@@ -59,16 +54,21 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
             $this->allow_comments = (bool) Configuration::get('EVERBLOG_ALLOW_COMMENTS');
         }
         $this->errors = [];
-        $this->post = new EverPsBlogPost(
+        $this->post = $this->getPostForFront(
             (int) Tools::getValue('id_ever_post'),
             (int) $this->context->language->id,
             (int) $this->context->shop->id
         );
+        if (empty($this->post->id)) {
+            Tools::redirect('index.php?controller=404');
+        }
         $customerGroups = Customer::getGroupsStatic(
             (int) $this->context->customer->id
         );
-        $defaultCategory = new EverPsBlogCategory(
-            (int) $this->post->id_default_category
+        $defaultCategory = $this->getCategoryForFront(
+            (int) $this->post->id_default_category,
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id
         );
         if (isset($defaultCategory->allowed_groups) && $defaultCategory->allowed_groups) {
             if (is_array($defaultCategory->allowed_groups)) {
@@ -98,7 +98,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
             }
         }
         if (isset($this->post->id_author) && (int) $this->post->id_author > 0) {
-            $this->author = new EverPsBlogAuthor(
+            $this->author = $this->getAuthorForFront(
                 (int) $this->post->id_author,
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id
@@ -120,7 +120,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                     $groupAllowed = false;
                 }
             }
-            if ((bool) $this->author->active === true && (bool) $groupAllowed === true) {
+            if (!empty($this->author->id) && (bool) $this->author->active === true && (bool) $groupAllowed === true) {
                 $this->author->url = $this->context->link->getModuleLink(
                     'everpsblog',
                     'author',
@@ -176,7 +176,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
         }
         if (!Tools::getValue('preview')) {
             if ((bool) Tools::isSubmit('everpostcomment') === false) {
-                EverPsBlogPost::updatePostViewCount(
+                $this->updatePostViewCount(
                     (int) $this->post->id,
                     (int) $this->context->shop->id
                 );
@@ -259,13 +259,13 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 ) {
                     $errors[] = $this->l('Error : The field "comments" is not valid');
                 }
-                $comment = new EverPsBlogComment();
-                $latest = $comment->getLatestCommentByEmail(
+                $latest = $this->getLatestCommentByEmail(
                     Tools::getValue('customerEmail'),
                     (int) $this->context->language->id
                 );
                 // Safety before : don't allow comment before specific time
-                if ($latest->date_add
+                if (isset($latest->date_add)
+                    && $latest->date_add
                     && strtotime($latest->date_add) >= strtotime('-30 minutes')
                 ) {
                     $errors[] = $this->l('You must wait before sending another comment');
@@ -273,8 +273,9 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 if (count($errors)) {
                     $this->context->smarty->assign(['errors' => $errors]);
                 } else {
-                    $comment->id_ever_post = $this->post->id;
-                    $comment->id_lang = $this->context->language->id;
+                    $comment = new stdClass();
+                    $comment->id_ever_post = (int) $this->post->id;
+                    $comment->id_lang = (int) $this->context->language->id;
                     if (!(bool) $this->context->customer->isLogged()) {
                         $customer = new Customer();
                         if ($customer->getByEmail(
@@ -293,7 +294,8 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                     }
                     $comment->comment = Tools::getValue('evercomment');
                     $comment->active = 0;
-                    $comment->save();
+                    $comment->id = $this->addComment($comment);
+                    $comment->id_ever_comment = $comment->id;
                     // alert admin ! comment saved ! whouhouhouhou !
                     if ($this->sendCommentAlert((int) $comment->id)) {
                         $success[] = $this->l('Your comment has been submitted');
@@ -336,7 +338,9 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                         $pproduct_cover = Product::getCover(
                             (int) $pproduct->id
                         );
-                        $pproduct->cover = (int) $pproduct_cover['id_image'];
+                        if (is_array($pproduct_cover) && isset($pproduct_cover['id_image'])) {
+                            $pproduct->cover = (int) $pproduct_cover['id_image'];
+                        }
                         $ps_products[] = $presenter->present(
                             $presentationSettings,
                             $assembler->assembleProduct(['id_product' => $pproduct->id]),
@@ -349,10 +353,10 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
             $tags = [];
             if (isset($this->post_tags) && !empty($this->post_tags)) {
                 foreach ($this->post_tags as $postTagId) {
-                    $current_post_tag = new EverPsBlogTag(
+                    $current_post_tag = $this->getTagForFront(
                         (int) $postTagId,
-                        (int) $this->context->shop->id,
-                        (int) $this->context->language->id
+                        (int) $this->context->language->id,
+                        (int) $this->context->shop->id
                     );
                     if (isset($current_post_tag->allowed_groups)
                         && $current_post_tag->allowed_groups
@@ -368,22 +372,22 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                             continue;
                         }
                     }
-                    if ((bool) $current_post_tag->active === true) {
+                    if (!empty($current_post_tag->id) && (bool) $current_post_tag->active === true) {
                         $tags[] = $current_post_tag;
                     }
                 }
             }
-            $commentsCount = EverPsBlogComment::commentsCount(
+            $commentsCount = $this->getCommentsCount(
                 (int) $this->post->id,
                 (int) $this->context->language->id
             );
-            $comments = EverPsBlogComment::getCommentsByPost(
+            $comments = $this->getCommentsByPost(
                 (int) $this->post->id,
                 (int) $this->context->language->id
             );
             $related_posts = [];
             if ((bool) Configuration::get('EVERBLOG_SHOW_RELATED_POSTS') === true) {
-                $related_posts = EverPsBlogPost::getPostsByCategory(
+                $related_posts = $this->getPostsByCategoryForFront(
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id,
                     (int) $this->post->id_default_category,
@@ -406,11 +410,11 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 && !$this->context->cookie->__isset($cookieName)
             ) {
                 if (Tools::getValue('post_psswd')) {
-                    if ($this->post->checkPassword($this->post->id, md5(_COOKIE_KEY_ . Tools::getValue('post_psswd'))) === false) {
+                    if ($this->checkPostPassword($this->post->id, md5(_COOKIE_KEY_ . Tools::getValue('post_psswd'))) === false) {
                         $this->post->password_protected = true;
                         $this->post->content = $this->l('This post is password protected');
                     }
-                    if ($this->post->checkPassword($this->post->id, md5(_COOKIE_KEY_ . Tools::getValue('post_psswd'))) === true) {
+                    if ($this->checkPostPassword($this->post->id, md5(_COOKIE_KEY_ . Tools::getValue('post_psswd'))) === true) {
                         $this->context->cookie->__set(
                             $cookieName,
                             true
@@ -447,6 +451,13 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 'class' => 'twitter',
                 'url' => 'https://twitter.com/intent/tweet?text=' . $this->post->title . ' ' . $page['canonical'],
             ];
+            $postImage = $this->getBlogImageService()->getBlogImage(
+                (int) $this->post->id,
+                (int) $this->context->shop->id,
+                'post'
+            );
+            $showFeaturedPost = (bool) Configuration::get('EVERBLOG_SHOW_FEAT_POST')
+                && Validate::isLoadedObject($postImage);
             $file_url = $this->getBlogImageService()->getBlogImageUrl(
                 (int) $this->post->id,
                 (int) $this->context->shop->id,
@@ -459,14 +470,14 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
                 'featured_image' => $file_url,
                 // Show featured image as hero background when available
-                'show_featured_post' => !empty($file_url),
+                'show_featured_post' => $showFeaturedPost,
                 'author_cover' => $this->author_cover,
                 'author' => $this->author,
                 'default_category' => $this->default_category,
                 'social_share_links' => $social_share_links,
                 'count_products' => $count_products,
-                'post' => $postViewModel,
-                'post_legacy' => $this->post,
+                'post' => $this->post,
+                'post_view' => $postViewModel,
                 'tags' => $tags,
                 'ps_products' => $ps_products,
                 'related_posts' => $related_posts,
@@ -493,7 +504,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
 
     public function getBreadcrumbLinks()
     {
-        $this->post = new EverPsBlogPost(
+        $this->post = $this->getPostForFront(
             (int) Tools::getValue('id_ever_post'),
             (int) $this->context->language->id,
             (int) $this->context->shop->id
@@ -507,7 +518,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
             ),
         ];
         if ((int) $this->post->id_default_category > 1) {
-            $parent_category = new EverPsBlogCategory(
+            $parent_category = $this->getCategoryForFront(
                 (int) $this->post->id_default_category,
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id
@@ -523,8 +534,8 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                     ]
                 ),
             ];
-            if ((bool) $parent_category->hasChildren() === true) {
-                $children_categories = EverPsBlogCategory::getChildrenCategories(
+            if ((bool) $this->categoryHasChildren((int) $parent_category->id) === true) {
+                $children_categories = $this->getChildrenCategoriesForFront(
                     (int) $this->post->id_default_category,
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id
@@ -580,12 +591,212 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
         );
     }
 
+    private function getPostForFront($idPost, $idLang, $idShop)
+    {
+        $sql = new DbQuery();
+        $sql->select('p.id_ever_post, p.id_ever_post AS id, p.id_shop, p.id_author, p.id_author AS id_ever_author, p.id_default_category, p.post_status, p.date_add, p.date_upd, p.indexable, p.follow, p.sitemap, p.active, p.allowed_groups, p.post_categories, p.post_tags, p.post_products, p.psswd, p.starred, p.count, p.groups, pl.title AS title, pl.meta_title AS meta_title, pl.meta_description AS meta_description, pl.link_rewrite AS link_rewrite, pl.content AS content, pl.excerpt AS excerpt');
+        $sql->from('ever_blog_post', 'p');
+        $sql->innerJoin('ever_blog_post_lang', 'pl', 'pl.id_ever_post = p.id_ever_post AND pl.id_lang = ' . (int) $idLang);
+        $sql->innerJoin('ever_blog_post_shop', 'ps', 'ps.id_ever_post = p.id_ever_post AND ps.id_shop = ' . (int) $idShop);
+        $sql->where('p.id_ever_post = ' . (int) $idPost);
+
+        return $this->arrayToObject(Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql));
+    }
+
+    private function getCategoryForFront($idCategory, $idLang, $idShop)
+    {
+        $sql = new DbQuery();
+        $sql->select('c.*, c.id_ever_category AS id, cl.title, cl.meta_title, cl.meta_description, cl.link_rewrite, cl.content, cl.bottom_content');
+        $sql->from('ever_blog_category', 'c');
+        $sql->innerJoin('ever_blog_category_lang', 'cl', 'cl.id_ever_category = c.id_ever_category AND cl.id_lang = ' . (int) $idLang);
+        $sql->innerJoin('ever_blog_category_shop', 'cs', 'cs.id_ever_category = c.id_ever_category AND cs.id_shop = ' . (int) $idShop);
+        $sql->where('c.id_ever_category = ' . (int) $idCategory);
+
+        return $this->arrayToObject(Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql));
+    }
+
+    private function getAuthorForFront($idAuthor, $idLang, $idShop)
+    {
+        $sql = new DbQuery();
+        $sql->select('a.*, a.id_ever_author AS id, al.meta_title, al.meta_description, al.link_rewrite, al.content, al.bottom_content');
+        $sql->from('ever_blog_author', 'a');
+        $sql->innerJoin('ever_blog_author_lang', 'al', 'al.id_ever_author = a.id_ever_author AND al.id_lang = ' . (int) $idLang);
+        $sql->innerJoin('ever_blog_author_shop', 'ass', 'ass.id_ever_author = a.id_ever_author AND ass.id_shop = ' . (int) $idShop);
+        $sql->where('a.id_ever_author = ' . (int) $idAuthor);
+
+        return $this->arrayToObject(Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql));
+    }
+
+    private function getTagForFront($idTag, $idLang, $idShop)
+    {
+        $sql = new DbQuery();
+        $sql->select('t.*, t.id_ever_tag AS id, tl.title, tl.meta_title, tl.meta_description, tl.link_rewrite, tl.content, tl.bottom_content');
+        $sql->from('ever_blog_tag', 't');
+        $sql->innerJoin('ever_blog_tag_lang', 'tl', 'tl.id_ever_tag = t.id_ever_tag AND tl.id_lang = ' . (int) $idLang);
+        $sql->innerJoin('ever_blog_tag_shop', 'ts', 'ts.id_ever_tag = t.id_ever_tag AND ts.id_shop = ' . (int) $idShop);
+        $sql->where('t.id_ever_tag = ' . (int) $idTag);
+
+        return $this->arrayToObject(Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql));
+    }
+
+    private function getPostsByCategoryForFront($idLang, $idShop, $idCategory, $start = 0, $limit = 5)
+    {
+        $sql = new DbQuery();
+        $sql->select('p.id_ever_post, p.id_ever_post AS id, p.id_shop, p.id_author, p.id_author AS id_ever_author, p.id_default_category, p.post_status, p.date_add, p.date_upd, p.indexable, p.follow, p.sitemap, p.active, p.allowed_groups, p.post_categories, p.post_tags, p.post_products, p.psswd, p.starred, p.count, p.groups, pl.title AS title, pl.meta_title AS meta_title, pl.meta_description AS meta_description, pl.link_rewrite AS link_rewrite, pl.content AS content, pl.excerpt AS excerpt');
+        $sql->from('ever_blog_post', 'p');
+        $sql->innerJoin('ever_blog_post_lang', 'pl', 'pl.id_ever_post = p.id_ever_post AND pl.id_lang = ' . (int) $idLang);
+        $sql->innerJoin('ever_blog_post_shop', 'ps', 'ps.id_ever_post = p.id_ever_post AND ps.id_shop = ' . (int) $idShop);
+        $sql->innerJoin('ever_blog_post_category', 'pc', 'pc.id_ever_post = p.id_ever_post');
+        $sql->where('pc.id_ever_post_category = ' . (int) $idCategory);
+        $sql->where('p.post_status = "published"');
+        $sql->orderBy('p.date_add DESC, p.id_ever_post DESC');
+        $sql->limit((int) $limit, (int) $start);
+
+        $rows = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql) ?: [];
+        foreach ($rows as &$row) {
+            $postId = (int) $row['id_ever_post'];
+            $row['featured_thumb'] = $this->getBlogImageService()->getBlogThumbUrl($postId, (int) $idShop, 'post');
+            $row['featured_image'] = $this->getBlogImageService()->getBlogImageUrl($postId, (int) $idShop, 'post');
+            $row['cover'] = $row['featured_thumb'];
+        }
+
+        return $this->rowsToObjects($rows);
+    }
+
+    private function getChildrenCategoriesForFront($idParentCategory, $idLang, $idShop)
+    {
+        $sql = new DbQuery();
+        $sql->select('c.*, c.id_ever_category AS id, cl.title, cl.meta_title, cl.meta_description, cl.link_rewrite, cl.content, cl.bottom_content');
+        $sql->from('ever_blog_category', 'c');
+        $sql->innerJoin('ever_blog_category_lang', 'cl', 'cl.id_ever_category = c.id_ever_category AND cl.id_lang = ' . (int) $idLang);
+        $sql->innerJoin('ever_blog_category_shop', 'cs', 'cs.id_ever_category = c.id_ever_category AND cs.id_shop = ' . (int) $idShop);
+        $sql->where('c.id_parent_category = ' . (int) $idParentCategory);
+        $sql->orderBy('cl.title ASC');
+
+        return $this->rowsToObjects(Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql));
+    }
+
+    private function categoryHasChildren($idCategory)
+    {
+        $sql = new DbQuery();
+        $sql->select('COUNT(*)');
+        $sql->from('ever_blog_category');
+        $sql->where('id_parent_category = ' . (int) $idCategory);
+
+        return (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql) > 0;
+    }
+
+    private function updatePostViewCount($idPost, $idShop)
+    {
+        return (bool) Db::getInstance()->execute(
+            'UPDATE `' . _DB_PREFIX_ . 'ever_blog_post`
+            SET `count` = `count` + 1
+            WHERE `id_ever_post` = ' . (int) $idPost . '
+                AND `id_shop` = ' . (int) $idShop
+        );
+    }
+
+    private function getLatestCommentByEmail($email, $idLang)
+    {
+        $sql = new DbQuery();
+        $sql->select('*');
+        $sql->from('ever_blog_comments');
+        $sql->where('user_email = "' . pSQL((string) $email) . '"');
+        $sql->where('id_lang = ' . (int) $idLang);
+        $sql->orderBy('date_add DESC');
+        $sql->limit(1);
+
+        return $this->arrayToObject(Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql));
+    }
+
+    private function addComment($comment)
+    {
+        $now = date('Y-m-d H:i:s');
+        Db::getInstance()->insert('ever_blog_comments', [
+            'id_ever_post' => (int) $comment->id_ever_post,
+            'id_lang' => (int) $comment->id_lang,
+            'comment' => pSQL((string) $comment->comment, true),
+            'name' => pSQL((string) $comment->name),
+            'user_email' => pSQL((string) $comment->user_email),
+            'date_add' => pSQL($now),
+            'date_upd' => pSQL($now),
+            'active' => 0,
+        ]);
+
+        return (int) Db::getInstance()->Insert_ID();
+    }
+
+    private function getCommentsCount($idPost, $idLang)
+    {
+        $sql = new DbQuery();
+        $sql->select('COUNT(*)');
+        $sql->from('ever_blog_comments');
+        $sql->where('id_ever_post = ' . (int) $idPost);
+        $sql->where('id_lang = ' . (int) $idLang);
+        $sql->where('active = 1');
+
+        return (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
+    }
+
+    private function getCommentsByPost($idPost, $idLang)
+    {
+        $sql = new DbQuery();
+        $sql->select('*, id_ever_comment AS id');
+        $sql->from('ever_blog_comments');
+        $sql->where('id_ever_post = ' . (int) $idPost);
+        $sql->where('id_lang = ' . (int) $idLang);
+        $sql->where('active = 1');
+        $sql->orderBy('date_add ASC');
+
+        return $this->rowsToObjects(Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql));
+    }
+
+    private function getComment($idComment)
+    {
+        $sql = new DbQuery();
+        $sql->select('*, id_ever_comment AS id');
+        $sql->from('ever_blog_comments');
+        $sql->where('id_ever_comment = ' . (int) $idComment);
+
+        return $this->arrayToObject(Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql));
+    }
+
+    private function checkPostPassword($idPost, $passwordHash)
+    {
+        $sql = new DbQuery();
+        $sql->select('id_ever_post');
+        $sql->from('ever_blog_post');
+        $sql->where('id_ever_post = ' . (int) $idPost);
+        $sql->where('psswd = "' . pSQL((string) $passwordHash) . '"');
+        $sql->where('post_status = "published"');
+
+        return (bool) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
+    }
+
+    private function arrayToObject($row)
+    {
+        if (!is_array($row)) {
+            return new stdClass();
+        }
+
+        return (object) $row;
+    }
+
+    private function rowsToObjects($rows)
+    {
+        if (!is_array($rows)) {
+            return [];
+        }
+
+        return array_map(function ($row) {
+            return (object) $row;
+        }, $rows);
+    }
+
     protected function sendCommentAlert($id_ever_comment)
     {
         $employee = new Employee((int) Configuration::get('EVERBLOG_ADMIN_EMAIL'));
-        $comment = new EverPsBlogComment(
-            (int) $id_ever_comment
-        );
+        $comment = $this->getComment((int) $id_ever_comment);
 
         $mailDir = _PS_MODULE_DIR_ . 'everpsblog/mails/';
         $everShopEmail = Configuration::get('PS_SHOP_EMAIL');
@@ -601,8 +812,8 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                     null,
                     (int) $this->context->shop->id
                 ),
-                '{comment}' => $comment->comment,
-                '{email}' => $comment->user_email,
+                '{comment}' => isset($comment->comment) ? $comment->comment : '',
+                '{email}' => isset($comment->user_email) ? $comment->user_email : '',
             ],
             $employee->email,
             null,

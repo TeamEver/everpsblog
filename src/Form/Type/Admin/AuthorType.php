@@ -5,10 +5,12 @@ namespace PrestaShop\Module\Everpsblog\Form\Type\Admin;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Regex;
 
@@ -83,6 +85,22 @@ final class AuthorType extends AbstractType
                 'expanded' => false,
                 'attr' => ['data-ever-tagify' => '1'],
             ])
+            ->add('author_image_file', FileType::class, [
+                'required' => false,
+                'mapped' => false,
+                'label' => 'Image auteur',
+                'help' => $options['author_image_help'],
+                'help_html' => true,
+            ])
+            ->add('delete_author_image', CheckboxType::class, [
+                'required' => false,
+                'mapped' => false,
+                'disabled' => !$options['has_author_image'],
+                'label' => 'Supprimer l\'image auteur actuelle',
+                'help' => $options['has_author_image']
+                    ? 'Cochez puis enregistrez pour supprimer l\'image actuelle.'
+                    : 'Aucune image auteur n\'est encore associee a cet auteur.',
+            ])
         ;
 
         foreach (\Language::getLanguages(false) as $lang) {
@@ -111,6 +129,11 @@ final class AuthorType extends AbstractType
                             'message' => 'Le slug doit contenir uniquement des lettres, chiffres et tirets.',
                         ]),
                     ],
+                ])
+                ->add(sprintf('excerpt_%d', $idLang), TextareaType::class, [
+                    'required' => false,
+                    'label' => 'Resume' . $suffix,
+                    'constraints' => [new Length(['max' => 255])],
                 ])
                 ->add(sprintf('content_%d', $idLang), TextareaType::class, [
                     'required' => false,
@@ -195,5 +218,15 @@ final class AuthorType extends AbstractType
         }
 
         return $choices;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'author_image_help' => '',
+            'has_author_image' => false,
+        ]);
+        $resolver->setAllowedTypes('author_image_help', 'string');
+        $resolver->setAllowedTypes('has_author_image', 'bool');
     }
 }

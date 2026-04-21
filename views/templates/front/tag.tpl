@@ -48,55 +48,50 @@
 
 {block name="page_content"}
 {hook h="displayBeforeEverTag" everblogtag=$tag}
-<div class="container">
-    <div class="row">
+<div class="everpsblog-blog-header container-fluid px-0 mb-4">
+    <div class="everpsblog-blog-header__inner text-center py-5"{if isset($everpsblog_header_bg_color) && $everpsblog_header_bg_color} style="background: {$everpsblog_header_bg_color|escape:'htmlall':'UTF-8'};"{/if}>
         {if isset($paginated) && !$paginated && isset($show_featured_tag) && $show_featured_tag}
-        <div class="tag-header">
+        <div class="tag-header mb-3">
             <img src="{$featured_image|escape:'htmlall':'UTF-8'}" class="img img-fluid mx-auto d-block" alt="{$tag->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}" title="{$tag->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}">
         </div>
         {/if}
-        <div class="mb-3 text-center">
-            <h1 class="m-0">{$tag->title|escape:'htmlall':'UTF-8'}</h1>
-        </div>
-        <div class="d-flex justify-content-center mb-3">
-            {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
-        </div>
-        {if isset($allow_feed) && $allow_feed}
-        <a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' mod='everpsblog'} {$tag->title|escape:'htmlall':'UTF-8'}</a>
-        {/if}
+        <h1 class="m-0 everpsblog-blog-header__title">{$tag->title|escape:'htmlall':'UTF-8'}</h1>
     </div>
-{if isset($paginated) && !$paginated}
-<div class="container">
+</div>
+<div class="container my-4">
+    <div class="d-flex justify-content-center mb-3">
+        {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
+    </div>
+    {if isset($allow_feed) && $allow_feed}
+    <div class="text-center mb-3">
+        <a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' mod='everpsblog'} {$tag->title|escape:'htmlall':'UTF-8'}</a>
+    </div>
+    {/if}
+    {if isset($paginated) && !$paginated}
     <div class="row tagcontent">
         {$tag->content nofilter}
     </div>
-</div>
-{/if}
+    {/if}
 
-{if isset($post_number) && $post_number > 0}
-<div class="container">
-    <div class="row">
+    {if isset($post_number) && $post_number > 0}
+    <div class="row mt-2">
         {hook h="displayBeforeEverLoop"}
         {foreach from=$posts item=item}
-        {include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
+            {include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
         {/foreach}
     </div>
-</div>
-{if isset($post_number) && $post_number > 0}
-<div class="row">
-    {include file='_partials/pagination.tpl' pagination=$pagination}
-</div>
-{/if}
-{hook h="displayAfterEverLoop"}
-{if isset($paginated) && !$paginated}
-<div class="container">
+    <div class="row">
+        {include file='_partials/pagination.tpl' pagination=$pagination}
+    </div>
+    {hook h="displayAfterEverLoop"}
+    {if isset($paginated) && !$paginated}
     <div class="row tagbottomcontent {if $animated}zoomed{/if}" itemprop="articleBody">
         {$tag->bottom_content nofilter}
     </div>
+    {/if}
+    {else}
+    <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>
+    {/if}
 </div>
-{/if}
 {hook h="displayAfterEverTag" everblogtag=$tag}
-{else}
-<div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>
-{/if}
 {/block}

@@ -21,7 +21,8 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use PrestaShop\Module\Everpsblog\Controller\Front\TagController;
+use PrestaShop\Module\Everpsblog\Controller\Front\AbstractFrontController;
+use PrestaShop\Module\Everpsblog\Controller\Front\FrontBlogDataProviderTrait;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\TaxonomyViewModel;
 
@@ -30,8 +31,10 @@ use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
 use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 
-class EverPsBlogtagModuleFrontController extends TagController
+class EverPsBlogtagModuleFrontController extends AbstractFrontController
 {
+    use FrontBlogDataProviderTrait;
+
     protected $author;
     protected $category;
     protected $tag;
@@ -42,7 +45,7 @@ class EverPsBlogtagModuleFrontController extends TagController
 
     public function init()
     {
-        $this->tag = new EverPsBlogTag(
+        $this->tag = $this->getFrontTag(
             (int) Tools::getValue('id_ever_tag'),
             (int) $this->context->language->id,
             (int) $this->context->shop->id
@@ -61,11 +64,10 @@ class EverPsBlogtagModuleFrontController extends TagController
         }
         parent::init();
         // if inactive tag or unexists, redirect
-        if ((bool) $this->tag->active === false) {
+        if (empty($this->tag->id) || (bool) $this->tag->active === false) {
             Tools::redirect('index.php?controller=404');
         }
-        $this->tag->count = $this->tag->count + 1;
-        $this->tag->save();
+        $this->incrementFrontTaxonomyCount('ever_blog_tag', 'id_ever_tag', (int) $this->tag->id);
     }
 
     public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
@@ -86,7 +88,7 @@ class EverPsBlogtagModuleFrontController extends TagController
                 'id_ever_tag',
                 (int) $this->tag->id
             ));
-            $this->post_number = EverPsBlogPost::countPostsByTag(
+            $this->post_number = $this->countFrontPostsByTag(
                 (int) Tools::getValue('id_ever_tag'),
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id
@@ -123,7 +125,7 @@ class EverPsBlogtagModuleFrontController extends TagController
             $page['meta']['title'] = $this->tag->meta_title;
             $page['meta']['description'] = $this->tag->meta_description;
             $this->context->smarty->assign('page', $page);
-            $posts = EverPsBlogPost::getPostsByTag(
+            $posts = $this->getFrontPostsByTag(
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id,
                 (int) $this->tag->id,
@@ -160,8 +162,8 @@ class EverPsBlogtagModuleFrontController extends TagController
                 'paginated' => Tools::getValue('page'),
                 'post_number' => (int) $this->post_number,
                 'pagination' => $pagination,
-                'tag' => $tagViewModel,
-                'tag_legacy' => $this->tag,
+                'tag' => $this->tag,
+                'tag_view' => $tagViewModel,
                 'posts' => $postsViewModel,
                 'posts_legacy' => $posts,
                 'default_lang' => (int) $this->context->language->id,
@@ -234,17 +236,17 @@ class EverPsBlogtagModuleFrontController extends TagController
         return $page;
     }
 
-    private function getBlogImageService()
+    protected function getBlogImageService()
     {
         return parent::getBlogImageService();
     }
 
-    private function getBlogTaxonomyService()
+    protected function getBlogTaxonomyService()
     {
         return parent::getBlogTaxonomyService();
     }
 
-    private function getBlogSortOrderService()
+    protected function getBlogSortOrderService()
     {
         return parent::getBlogSortOrderService();
     }

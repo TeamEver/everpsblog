@@ -9,6 +9,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 final class CommentGridDataFactory
 {
+    use GridRecordFilterTrait;
+
     /** @var CommentRepository */
     private $commentRepository;
     /** @var AdminRouteSigner */
@@ -40,16 +42,30 @@ final class CommentGridDataFactory
      */
     public function build(int $langId, array $filters = []): GridData
     {
-        $rows = $this->commentRepository->findByPostAndLanguage((int) ($filters['id_ever_post'] ?? 0), $langId);
+        $postIdFilter = (int) ($filters['id_ever_post'] ?? 0);
+        $rows = $postIdFilter > 0
+            ? $this->commentRepository->findByPostAndLanguage($postIdFilter, $langId)
+            : $this->commentRepository->findBackOfficeList($langId);
         $records = [];
 
         foreach ($rows as $row) {
             $records[] = [
-                'id_ever_comment' => $row['id'] ?? $row['id'.substr('id_ever_comment',3)] ?? 0,
-                'id_ever_post' => $row['postId'] ?? 0,
+                'id_ever_comment' => (int) ($row['id_ever_comment'] ?? $row['id'] ?? 0),
+                'id_ever_post' => (int) ($row['id_ever_post'] ?? $row['postId'] ?? 0),
+                'name' => (string) ($row['name'] ?? ''),
+                'user_email' => (string) ($row['user_email'] ?? $row['userEmail'] ?? ''),
+                'comment' => (string) ($row['comment'] ?? ''),
                 'active' => (string) ($row['active'] ?? 0)
             ];
         }
+        $records = $this->filterRecords($records, $filters, [
+            'id_ever_comment',
+            'id_ever_post',
+            'name',
+            'user_email',
+            'comment',
+            'active',
+        ]);
 
         foreach ($records as &$record) {
             $id = (int) $record['id_ever_comment'];

@@ -169,6 +169,21 @@
       border-bottom: 1px solid var(--ever-border);
       white-space: nowrap;
     }
+    .ever-admin table.ever-table thead th .ever-sort-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      color: inherit;
+      text-decoration: none;
+    }
+    .ever-admin table.ever-table thead th .ever-sort-link:hover {
+      color: var(--ever-primary-600);
+    }
+    .ever-admin .ever-sort-state {
+      color: var(--ever-primary-600);
+      font-size: .68rem;
+      font-weight: 800;
+    }
     .ever-admin table.ever-table tbody td {
       padding: .85rem 1rem;
       font-size: .92rem;
@@ -238,6 +253,7 @@
     .ever-admin .ever-badge-published { background: #dcfce7; color: #166534; }
     .ever-admin .ever-badge-draft { background: #fef3c7; color: #92400e; }
     .ever-admin .ever-badge-planned { background: #e0e7ff; color: #3730a3; }
+    .ever-admin .ever-badge-trash { background: #fee2e2; color: #991b1b; }
     .ever-admin .ever-badge-protected { background: #fee2e2; color: #991b1b; }
     .ever-admin .ever-badge-default { background: #f3f4f6; color: #374151; }
     .ever-admin .ever-actions {
@@ -307,6 +323,8 @@
 {% endblock %}
 
 {% block content %}
+{% set currentOrderBy = app.request.query.get('orderBy')|default('') %}
+{% set currentOrderWay = app.request.query.get('orderWay')|default('DESC')|upper %}
 <div class="ever-admin">
   <div class="ever-shell">
     <section class="ever-hero">
@@ -333,6 +351,10 @@
 
       {% if definition.filters is not empty %}
       <form method="get" class="ever-filter">
+        {% if currentOrderBy %}
+          <input type="hidden" name="orderBy" value="{{ currentOrderBy }}">
+          <input type="hidden" name="orderWay" value="{{ currentOrderWay }}">
+        {% endif %}
         <div class="row">
           {% for id, label in definition.filters %}
             <div class="col-md-4 mb-2">
@@ -348,7 +370,10 @@
       </form>
       {% endif %}
 
-      <form method="post">
+      <form method="post"{% if bulkActionUrl is defined and bulkActionUrl %} action="{{ bulkActionUrl }}"{% endif %} onsubmit="return everpsblogConfirmBulk(this, event);">
+        {% if bulkCsrfTokenId is defined and bulkCsrfTokenId %}
+          <input type="hidden" name="_token" value="{{ csrf_token(bulkCsrfTokenId) }}">
+        {% endif %}
         {% if data.records is empty %}
           <div class="ever-empty">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -363,16 +388,30 @@
                 <tr>
                   <th class="ever-col-check"><input type="checkbox" aria-label="Tout sélectionner"></th>
                   {% for column in definition.columns %}
-                    <th>{{ column.name }}</th>
+                    <th>
+                      {% if column.sortable is defined and column.sortable %}
+                        {% set nextOrderWay = currentOrderBy == column.id and currentOrderWay == 'ASC' ? 'DESC' : 'ASC' %}
+                        {% set sortQuery = app.request.query.all()|merge({'orderBy': column.id, 'orderWay': nextOrderWay}) %}
+                        <a class="ever-sort-link" href="?{{ sortQuery|url_encode }}">
+                          <span>{{ column.name }}</span>
+                          {% if currentOrderBy == column.id %}
+                            <span class="ever-sort-state">{{ currentOrderWay == 'ASC' ? 'ASC' : 'DESC' }}</span>
+                          {% endif %}
+                        </a>
+                      {% else %}
+                        {{ column.name }}
+                      {% endif %}
+                    </th>
                   {% endfor %}
                   <th style="width:1%; text-align:right;">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {% for row in data.records %}
+                  {% set rowId = attribute(row, definition.columns|first.id) %}
                   <tr>
                     <td class="ever-col-check">
-                      <input type="checkbox" name="bulk_ids[]" value="{{ attribute(row, definition.columns|first.id) }}">
+                      <input type="checkbox" name="bulk_ids[]" value="{{ rowId }}">
                     </td>
                     {% for column in definition.columns %}
                       {% set type = column.type|default('text') %}
@@ -390,10 +429,17 @@
                           {% set status = value|lower %}
                           {% set labelMap = {'published': 'Publié', 'draft': 'Brouillon', 'planned': 'Programmé', 'protected': 'Protégé', '1': 'Actif', '0': 'Inactif', '': 'Inactif'} %}
                           {% set boolMap = {'1': 'published', '0': 'draft', '': 'draft'} %}
-                          {% set badgeKey = boolMap[status]|default(status in ['published','draft','planned','protected'] ? status : 'default') %}
+                          {% set labelMap = labelMap|merge({'trash': 'Corbeille'}) %}
+                          {% set badgeKey = boolMap[status]|default(status in ['published','draft','planned','trash','protected'] ? status : 'default') %}
                           <span class="ever-badge ever-badge-{{ badgeKey }}">{{ labelMap[status]|default(value|capitalize) }}</span>
                         {% elseif type == 'number' %}
                           <span class="ever-col-id">{{ value }}</span>
+                        {% elseif type == 'date' %}
+                          {% if value %}
+                            <span class="ever-col-id">{{ value|date('d/m/Y H:i') }}</span>
+                          {% else %}
+                            <span class="ever-col-id">-</span>
+                          {% endif %}
                         {% elseif column.id == 'title' %}
                           <span class="ever-col-title">{{ value }}</span>
                         {% else %}
@@ -404,6 +450,18 @@
                     <td>
                       <div class="ever-actions">
                         <a class="ever-btn ever-btn-edit" href="{{ row._actions.edit }}">Éditer</a>
+                        {% if row._actions.duplicate is defined and row._actions.duplicate %}
+                          <button
+                            type="submit"
+                            class="ever-btn ever-btn-ghost"
+                            formaction="{{ row._actions.duplicate }}"
+                            formmethod="post"
+                            name="_csrf_token"
+                            value="{{ csrf_token('everpsblog_post_duplicate_' ~ rowId) }}"
+                            data-single-action="1"
+                            onclick="return confirm('Dupliquer cet article ?');"
+                          >Dupliquer</button>
+                        {% endif %}
                         <a class="ever-btn ever-btn-delete" href="{{ row._actions.delete }}" onclick="return confirm('Confirmer la suppression ?');">Suppr.</a>
                       </div>
                     </td>
@@ -437,5 +495,29 @@
       });
     }
   })();
+
+  window.everpsblogConfirmBulk = function (form, event) {
+    var submitter = event && event.submitter ? event.submitter : document.activeElement;
+    if (submitter && submitter.getAttribute('data-single-action') === '1') {
+      return true;
+    }
+    var actionSelect = form.querySelector('select[name="bulk_action"]');
+    if (!actionSelect) {
+      return true;
+    }
+    var checked = form.querySelectorAll('input[name="bulk_ids[]"]:checked');
+    if (!checked.length) {
+      alert('Veuillez sélectionner au moins une ligne.');
+      return false;
+    }
+    var action = actionSelect.value;
+    var messages = {
+      'delete': 'Confirmer la suppression de ' + checked.length + ' élément(s) ?',
+      'duplicate': 'Dupliquer ' + checked.length + ' élément(s) ?',
+      'publishall': 'Publier ' + checked.length + ' élément(s) ?'
+    };
+    var message = messages[action] || 'Appliquer cette action à ' + checked.length + ' élément(s) ?';
+    return window.confirm(message);
+  };
 </script>
 {% endblock %}

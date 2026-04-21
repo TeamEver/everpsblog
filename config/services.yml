@@ -12,6 +12,13 @@ services:
     tags:
       - { name: 'console.command' }
 
+  prestashop.module.everpsblog.command.import_wordpress:
+    class: PrestaShop\Module\Everpsblog\Command\ImportWordPressCommand
+    arguments:
+      - '@PrestaShop\Module\Everpsblog\Service\WordPressRestImporter'
+    tags:
+      - { name: 'console.command' }
+
   # ─────────────────────────────────────────────
   # DOMAIN REPOSITORIES (DDD)
   # ─────────────────────────────────────────────
@@ -253,6 +260,24 @@ services:
     class: PrestaShop\Module\Everpsblog\Service\BlogSitemapService
     public: true
 
+  PrestaShop\Module\Everpsblog\Service\WordPressRestImporter:
+    arguments:
+      - '@prestashop.module.everpsblog.service.blog_image'
+      - '@prestashop.module.everpsblog.service.blog_sitemap'
+      - '@prestashop.module.everpsblog.service.blog_redirect'
+
+  prestashop.module.everpsblog.service.blog_redirect:
+    class: PrestaShop\Module\Everpsblog\Service\BlogRedirectService
+
+  PrestaShop\Module\Everpsblog\Service\BlogRedirectService:
+    alias: prestashop.module.everpsblog.service.blog_redirect
+
+  prestashop.module.everpsblog.service.database_integrity:
+    class: PrestaShop\Module\Everpsblog\Service\DatabaseIntegrityService
+
+  PrestaShop\Module\Everpsblog\Service\DatabaseIntegrityService:
+    alias: prestashop.module.everpsblog.service.database_integrity
+
   prestashop.module.everpsblog.blog.image_uploader:
     class: PrestaShop\Module\Everpsblog\Service\ImageUploader
 
@@ -261,6 +286,14 @@ services:
 
   PrestaShop\Module\Everpsblog\Service\AdminRouteSigner:
     class: PrestaShop\Module\Everpsblog\Service\AdminRouteSigner
+
+  prestashop.module.everpsblog.service.post_duplicator:
+    class: PrestaShop\Module\Everpsblog\Service\PostDuplicator
+    arguments:
+      - '@prestashop.module.everpsblog.service.blog_image'
+
+  PrestaShop\Module\Everpsblog\Service\PostDuplicator:
+    alias: prestashop.module.everpsblog.service.post_duplicator
 
   # ─────────────────────────────────────────────
   # DOCTRINE

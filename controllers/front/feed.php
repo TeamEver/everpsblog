@@ -21,10 +21,13 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use PrestaShop\Module\Everpsblog\Controller\Front\FeedController;
+use PrestaShop\Module\Everpsblog\Controller\Front\AbstractFrontController;
+use PrestaShop\Module\Everpsblog\Controller\Front\FrontBlogDataProviderTrait;
 
-class EverPsBlogfeedModuleFrontController extends FeedController
+class EverPsBlogfeedModuleFrontController extends AbstractFrontController
 {
+    use FrontBlogDataProviderTrait;
+
     protected $feed;
     protected $category;
     protected $tag;
@@ -63,54 +66,48 @@ class EverPsBlogfeedModuleFrontController extends FeedController
         parent::initContent();
         switch (Tools::getValue('feed')) {
             case 'category':
-                $feed_obj = new EverPsBlogCategory(
+                $feed_obj = $this->getFrontCategory(
                     (int) Tools::getValue('id_obj'),
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id
                 );
-                $posts = EverPsBlogPost::getPostsByCategory(
+                $posts = $this->getFrontPostsByCategory(
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id,
                     (int) $feed_obj->id,
                     0,
-                    null,
-                    'published',
-                    true
+                    null
                 );
                 break;
 
             case 'tag':
-                $feed_obj = new EverPsBlogTag(
+                $feed_obj = $this->getFrontTag(
                     (int) Tools::getValue('id_obj'),
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id
                 );
-                $posts = EverPsBlogPost::getPostsByTag(
+                $posts = $this->getFrontPostsByTag(
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id,
                     (int) $feed_obj->id,
                     0,
-                    null,
-                    'published',
-                    true
+                    null
                 );
                 break;
 
             case 'author':
-                $feed_obj = new EverPsBlogAuthor(
+                $feed_obj = $this->getFrontAuthor(
                     (int) Tools::getValue('id_obj'),
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id
                 );
                 $feed_obj->title = $feed_obj->nickhandle;
-                $posts = EverPsBlogPost::getPostsByAuthor(
+                $posts = $this->getFrontPostsByAuthor(
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id,
                     (int) $feed_obj->id,
                     0,
-                    null,
-                    'published',
-                    true
+                    null
                 );
                 break;
             
@@ -134,24 +131,12 @@ class EverPsBlogfeedModuleFrontController extends FeedController
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id
                 );
-                $posts_array = EverPsBlogPost::getPosts(
+                $posts = $this->getFrontLatestPosts(
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id,
                     0,
-                    null,
-                    'published',
-                    true
+                    null
                 );
-                $posts = [];
-                foreach ($posts_array as $post_array) {
-                    $post_obj = new stdClass();
-                    $post_obj->id_ever_post = $post_array['id_ever_post'];
-                    $post_obj->title = $post_array['title'];
-                    $post_obj->content = $post_array['content'];
-                    $post_obj->date_add = $post_array['date_add'];
-                    $post_obj->link_rewrite = $post_array['link_rewrite'];
-                    $posts[] = $post_obj;
-                }
                 break;
         }
         $feed_url = $this->context->link->getModuleLink(

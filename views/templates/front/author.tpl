@@ -25,14 +25,14 @@
     <meta name="twitter:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
     <meta name="twitter:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
     {* <meta name="twitter:creator" content="@author_handle"> *}
-    <meta name="twitter:image" content="{$blogImg_dir|escape:'htmlall':'UTF-8'}authors/author_image_{$author->id|escape:'htmlall':'UTF-8'}.jpg">
+    <meta name="twitter:image" content="{$featured_image|escape:'htmlall':'UTF-8'}">
     <!-- Open Graph Card data -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{$urls.current_url|escape:'htmlall':'UTF-8'}">
     <meta property="og:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
     <meta property="og:site_name" content="{$shop.name|escape:'htmlall':'UTF-8'}">
     <meta property="og:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
-    <meta property="og:image" content="{$blogImg_dir|escape:'htmlall':'UTF-8'}authors/author_image_{$author->id|escape:'htmlall':'UTF-8'}.jpg">
+    <meta property="og:image" content="{$featured_image|escape:'htmlall':'UTF-8'}">
     {if isset($hreflang_links) && $hreflang_links}
         {foreach from=$hreflang_links item=hreflang_link}
             <link rel="alternate" hreflang="{$hreflang_link.hreflang|escape:'htmlall':'UTF-8'}" href="{$hreflang_link.href|escape:'htmlall':'UTF-8'}">
@@ -77,21 +77,30 @@
 {block name="page_content"}
 {hook h="displayBeforeEverAuthor" everblogauthor=$author}
 <div class="content" itemscope="itemscope" itemtype="http://schema.org/Blog">
-    <div class="container" itemscope="itemscope" itemtype="http://schema.org/BlogAuthoring" itemprop="blogAuthor">
-        <div class="mb-3 text-center">
-            <h1 itemprop="headline" class="m-0">{$author->nickhandle|escape:'htmlall':'UTF-8'}</h1>
+    <div itemscope="itemscope" itemtype="http://schema.org/BlogAuthoring" itemprop="blogAuthor">
+        <div class="everpsblog-blog-header container-fluid px-0 mb-4">
+            <div class="everpsblog-blog-header__inner text-center py-5"{if isset($everpsblog_header_bg_color) && $everpsblog_header_bg_color} style="background: {$everpsblog_header_bg_color|escape:'htmlall':'UTF-8'};"{/if}>
+                {if isset($paginated) && !$paginated && isset($featured_image) && $featured_image}
+                <div class="author-header mb-3">
+                    <img class="img img-fluid author-featured-image featured-image mx-auto d-block" src="{$featured_image|escape:'htmlall':'UTF-8'}" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
+                </div>
+                {/if}
+                <h1 itemprop="headline" class="m-0 everpsblog-blog-header__title">{$author->nickhandle|escape:'htmlall':'UTF-8'}</h1>
+                {if isset($author->excerpt) && $author->excerpt}
+                    <p class="everpsblog-author-excerpt mt-2 mb-0">{$author->excerpt|escape:'htmlall':'UTF-8'}</p>
+                {/if}
+            </div>
         </div>
-        <div class="d-flex justify-content-center mb-3">
-            {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
+        <div class="container my-4">
+            <div class="d-flex justify-content-center mb-3">
+                {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
+            </div>
+            {if isset($allow_feed) && $allow_feed}
+            <div class="text-center mb-3">
+                <a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' mod='everpsblog'} {$author->nickhandle|escape:'htmlall':'UTF-8'}</a>
+            </div>
+            {/if}
         </div>
-        {if isset($allow_feed) && $allow_feed}
-        <a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' mod='everpsblog'} {$author->nickhandle|escape:'htmlall':'UTF-8'}</a>
-        {/if}
-        {if isset($paginated) && !$paginated}
-        <div class="row author-header">
-            <img class="img img-fluid author-featured-image featured-image" src="{$featured_image|escape:'htmlall':'UTF-8'}" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
-        </div>
-        {/if}
     </div>
     {if isset($paginated) && !$paginated}
     <div class="container">

@@ -21,15 +21,18 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use PrestaShop\Module\Everpsblog\Controller\Front\CustomerCommentsController;
+use PrestaShop\Module\Everpsblog\Controller\Front\AbstractFrontController;
+use PrestaShop\Module\Everpsblog\Controller\Front\FrontBlogDataProviderTrait;
 
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
 use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 
-class EverPsBlogcustomercommentsModuleFrontController extends CustomerCommentsController
+class EverPsBlogcustomercommentsModuleFrontController extends AbstractFrontController
 {
+    use FrontBlogDataProviderTrait;
+
     public $controller_name = 'customercomments';
     
     public function init()
@@ -64,17 +67,20 @@ class EverPsBlogcustomercommentsModuleFrontController extends CustomerCommentsCo
         $animate = Configuration::get(
             'EVERBLOG_ANIMATE'
         );
-        $comments = EverPsBlogComment::getCommentsByEmail(
+        $comments = $this->getFrontCommentsByEmail(
             $this->context->customer->email,
             (int) $this->context->language->id
         );
         $cust_comments = [];
         foreach ($comments as $comment) {
-            $post = new EverPsBlogPost(
+            $post = $this->getFrontPost(
                 (int) $comment->id_ever_post,
-                (int) $this->context->shop->id,
-                (int) $this->context->language->id
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id
             );
+            if (empty($post->id)) {
+                continue;
+            }
             $post->featured_image = $this->getBlogImageService()->getBlogImageUrl(
                 (int) $post->id,
                 (int) $this->context->shop->id,
@@ -129,17 +135,17 @@ class EverPsBlogcustomercommentsModuleFrontController extends CustomerCommentsCo
         return $page;
     }
 
-    private function getBlogImageService()
+    protected function getBlogImageService()
     {
         return parent::getBlogImageService();
     }
 
-    private function getBlogTaxonomyService()
+    protected function getBlogTaxonomyService()
     {
         return parent::getBlogTaxonomyService();
     }
 
-    private function getBlogSortOrderService()
+    protected function getBlogSortOrderService()
     {
         return parent::getBlogSortOrderService();
     }

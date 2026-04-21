@@ -19,6 +19,7 @@ final class TagGridDefinitionFactory
             ['id' => 'active', 'name' => 'Actif', 'type' => 'status']
         ],
 [
+            'q' => 'Recherche',
             'title' => 'Titre'
         ],
 [

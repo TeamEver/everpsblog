@@ -21,7 +21,8 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-use PrestaShop\Module\Everpsblog\Controller\Front\CategoryController;
+use PrestaShop\Module\Everpsblog\Controller\Front\AbstractFrontController;
+use PrestaShop\Module\Everpsblog\Controller\Front\FrontBlogDataProviderTrait;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\TaxonomyViewModel;
 
@@ -30,8 +31,10 @@ use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
 use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 
-class EverPsBlogcategoryModuleFrontController extends CategoryController
+class EverPsBlogcategoryModuleFrontController extends AbstractFrontController
 {
+    use FrontBlogDataProviderTrait;
+
     protected $author;
     protected $category;
     protected $tag;
@@ -42,7 +45,7 @@ class EverPsBlogcategoryModuleFrontController extends CategoryController
 
     public function init()
     {
-        $this->category = new EverPsBlogCategory(
+        $this->category = $this->getFrontCategory(
             (int) Tools::getValue('id_ever_category'),
             (int) $this->context->language->id,
             (int) $this->context->shop->id
@@ -63,14 +66,14 @@ class EverPsBlogcategoryModuleFrontController extends CategoryController
                 Tools::redirect('index.php?controller=404');
             }
         }
-        $this->category->count = $this->category->count + 1;
-        $this->category->save();
+        $this->incrementFrontTaxonomyCount('ever_blog_category', 'id_ever_category', (int) $this->category->id);
         parent::init();
         $this->parent_categories = $this->getBlogTaxonomyService()->getCategoryParentsTaxonomy(
             (int) $this->category->id
         ) ?: [];
         // if inactive category or unexists, redirect
-        if (!$this->category->active
+        if (empty($this->category->id)
+            || !$this->category->active
             || $this->category->is_root_category
         ) {
             Tools::redirect('index.php?controller=404');
@@ -95,7 +98,7 @@ class EverPsBlogcategoryModuleFrontController extends CategoryController
                 'id_ever_category',
                 (int) $this->category->id
             ));
-            $this->post_number = EverPsBlogPost::countPostsByCategory(
+            $this->post_number = $this->countFrontPostsByCategory(
                 (int) Tools::getValue('id_ever_category'),
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id
@@ -136,14 +139,14 @@ class EverPsBlogcategoryModuleFrontController extends CategoryController
             $page['meta']['title'] = $meta_title;
             $page['meta']['description'] = $meta_description;
             $this->context->smarty->assign('page', $page);
-            $posts = EverPsBlogPost::getPostsByCategory(
+            $posts = $this->getFrontPostsByCategory(
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id,
                 (int) $this->category->id,
                 (int) $pagination['items_shown_from'] - 1
             );
-            if ($this->category->hasChildren()) {
-                $children_categories = EverPsBlogCategory::getChildrenCategories(
+            if ($this->frontCategoryHasChildren((int) $this->category->id)) {
+                $children_categories = $this->getFrontChildrenCategories(
                     (int) $this->category->id,
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id
@@ -187,8 +190,8 @@ class EverPsBlogcategoryModuleFrontController extends CategoryController
                 'paginated' => Tools::getValue('page'),
                 'post_number' => (int) $this->post_number,
                 'pagination' => $pagination,
-                'category' => $categoryViewModel,
-                'category_legacy' => $this->category,
+                'category' => $this->category,
+                'category_view' => $categoryViewModel,
                 'posts' => $postsViewModel,
                 'posts_legacy' => $posts,
                 'default_lang' => (int) $this->context->language->id,
@@ -237,7 +240,7 @@ class EverPsBlogcategoryModuleFrontController extends CategoryController
             ),
         ];
         foreach ($this->parent_categories as $parent_category) {
-            $category = new EverPsBlogCategory(
+            $category = $this->getFrontCategory(
                 (int) $parent_category,
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id
@@ -287,17 +290,17 @@ class EverPsBlogcategoryModuleFrontController extends CategoryController
         return $page;
     }
 
-    private function getBlogImageService()
+    protected function getBlogImageService()
     {
         return parent::getBlogImageService();
     }
 
-    private function getBlogTaxonomyService()
+    protected function getBlogTaxonomyService()
     {
         return parent::getBlogTaxonomyService();
     }
 
-    private function getBlogSortOrderService()
+    protected function getBlogSortOrderService()
     {
         return parent::getBlogSortOrderService();
     }

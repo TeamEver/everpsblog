@@ -9,6 +9,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 final class TagGridDataFactory
 {
+    use GridRecordFilterTrait;
+
     /** @var TagRepository */
     private $tagRepository;
     /** @var AdminRouteSigner */
@@ -52,6 +54,13 @@ final class TagGridDataFactory
                 'active' => (string) ($row['active'] ?? 0),
             ];
         }
+        $records = $this->filterRecords($records, $filters, [
+            'id_ever_tag',
+            'title',
+            'link_rewrite',
+            'count',
+            'active',
+        ]);
 
         foreach ($records as &$record) {
             $id = (int) $record['id_ever_tag'];

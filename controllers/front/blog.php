@@ -60,7 +60,7 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
         $sortWay = in_array(strtoupper($sortWay), $allowedSortWay, true) ? strtoupper($sortWay) : 'DESC';
 
         $sql = new DbQuery();
-        $sql->select('p.id_ever_post, p.id_ever_post AS id, p.id_default_category, p.id_author AS id_ever_author, p.date_add, pl.title, pl.link_rewrite, pl.meta_title, pl.meta_description, pl.excerpt, pl.content');
+        $sql->select('p.id_ever_post, p.id_ever_post AS id, p.id_default_category, p.id_author AS id_ever_author, p.post_status, p.date_add, p.date_upd, p.active, p.starred, p.count, pl.title AS title, pl.link_rewrite AS link_rewrite, pl.meta_title AS meta_title, pl.meta_description AS meta_description, pl.excerpt AS excerpt, pl.content AS content');
         $sql->from('ever_blog_post', 'p');
         $sql->innerJoin('ever_blog_post_lang', 'pl', 'pl.id_ever_post = p.id_ever_post AND pl.id_lang = ' . (int) $idLang);
         $sql->innerJoin('ever_blog_post_shop', 'ps', 'ps.id_ever_post = p.id_ever_post AND ps.id_shop = ' . (int) $idShop);
@@ -82,11 +82,20 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
                     'link_rewrite' => (string) $row['link_rewrite'],
                 ]
             );
-            $row['cover'] = $this->getBlogImageService()->getBlogThumbUrl(
+            $row['featured_thumb'] = $this->getBlogImageService()->getBlogThumbUrl(
                 (int) $row['id_ever_post'],
                 (int) $idShop,
                 'post'
             );
+            $row['featured_image'] = $this->getBlogImageService()->getBlogImageUrl(
+                (int) $row['id_ever_post'],
+                (int) $idShop,
+                'post'
+            );
+            $row['cover'] = $row['featured_thumb'];
+            $row['summary'] = !empty($row['excerpt'])
+                ? (string) $row['excerpt']
+                : Tools::substr(trim(strip_tags((string) $row['content'])), 0, 300);
         }
 
         return $rows;

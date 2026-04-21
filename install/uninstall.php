@@ -37,6 +37,7 @@ $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'ever_blog_author_lang`';
 $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'ever_blog_author_shop`';
 $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'ever_blog_image`';
 $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'ever_blog_image_shop`';
+$sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'ever_blog_redirect`';
 $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'ever_blog_post_category`';
 $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'ever_blog_post_tag`';
 $sql[] = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'ever_blog_post_product`';

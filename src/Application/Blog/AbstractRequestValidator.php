@@ -125,6 +125,9 @@ abstract class AbstractRequestValidator
         if ('' === $status) {
             $status = 'draft';
         }
+        if (!in_array($status, ['draft', 'published', 'trash', 'planned', 'protected'], true)) {
+            $status = 'draft';
+        }
 
         $dateValue = (string) ($requestData[$dateField] ?? '');
         if ('' === trim($dateValue)) {
@@ -141,6 +144,18 @@ abstract class AbstractRequestValidator
         }
 
         $now = new DateTimeImmutable('now');
+        $requestData[$dateField] = $publicationDate->format('Y-m-d H:i:s');
+        if ($publicationDate > $now && 'published' === $status) {
+            $requestData[$statusField] = 'planned';
+
+            return $requestData;
+        }
+        if ($publicationDate <= $now && 'planned' === $status) {
+            $requestData[$statusField] = 'published';
+
+            return $requestData;
+        }
+
         if ($publicationDate > $now && 'published' === $status) {
             $requestData[$statusField] = 'planned';
             $this->addGlobalError('Le statut a été ajusté à "planned" car la date de publication est dans le futur.');
@@ -206,9 +221,13 @@ abstract class AbstractRequestValidator
 
     private function parseDate(string $date): ?DateTimeImmutable
     {
-        $parsed = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $date);
-        if (false !== $parsed) {
-            return $parsed;
+        $date = trim(str_replace('T', ' ', $date));
+        foreach (['Y-m-d H:i:s', 'Y-m-d H:i', 'Y-m-d', 'd-m-Y H:i:s', 'd-m-Y H:i', 'd-m-Y', 'd/m/Y H:i:s', 'd/m/Y H:i', 'd/m/Y'] as $format) {
+            $parsed = DateTimeImmutable::createFromFormat('!' . $format, $date);
+            $errors = DateTimeImmutable::getLastErrors();
+            if (false !== $parsed && (false === $errors || (0 === $errors['warning_count'] && 0 === $errors['error_count']))) {
+                return $parsed;
+            }
         }
 
         try {

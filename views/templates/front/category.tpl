@@ -76,29 +76,33 @@
 
 {block name="page_content"}
 {hook h="displayBeforeEverCategory" everblogcategory=$category}
-<div class="everpsblog-category-header container-fluid p-0 mb-4">
-  <div class="everpsblog-category-hero"{if isset($show_featured_cat) && $show_featured_cat} style="background-image:url('{$featured_image|escape:'htmlall':'UTF-8'}');"{/if}>
-    <div class="everpsblog-category-hero-overlay">
-      <h1 class="everpsblog-category-title m-0">{$category->title|escape:'htmlall':'UTF-8'}</h1>
-      {if isset($children_categories) && $children_categories && !empty($children_categories)}
-      <div class="everpsblog-subcategories" role="navigation" aria-label="{l s='Sous-catégories' mod='everpsblog'}">
-        <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category'=>$category->id_ever_category, 'link_rewrite'=>$category->link_rewrite])|escape:'htmlall':'UTF-8'}" class="everpsblog-subcategory-btn active" title="{$category->title|escape:'htmlall':'UTF-8'}">{$category->title|escape:'htmlall':'UTF-8'}</a>
-        {foreach from=$children_categories item=item}
-          {if !$item->is_root_category}
-          <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category'=>$item->id_ever_category, 'link_rewrite'=>$item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="everpsblog-subcategory-btn" title="{$item->title|escape:'htmlall':'UTF-8'}">{$item->title|escape:'htmlall':'UTF-8'}</a>
-          {/if}
-        {/foreach}
-      </div>
-      {/if}
+<div class="everpsblog-blog-header everpsblog-category-header container-fluid px-0 mb-4">
+    <div class="everpsblog-blog-header__inner everpsblog-category-hero text-center py-5"{if isset($show_featured_cat) && $show_featured_cat && isset($featured_image) && $featured_image} style="background-image:url('{$featured_image|escape:'htmlall':'UTF-8'}'); background-size: cover; background-position: center;"{elseif isset($everpsblog_header_bg_color) && $everpsblog_header_bg_color} style="background: {$everpsblog_header_bg_color|escape:'htmlall':'UTF-8'};"{/if}>
+        <div class="everpsblog-category-hero-overlay">
+            <h1 class="m-0 everpsblog-blog-header__title everpsblog-category-title">{$category->title|escape:'htmlall':'UTF-8'}</h1>
+            {if isset($children_categories) && $children_categories && !empty($children_categories)}
+            <div class="everpsblog-subcategories everpsblog-blog-header__categories d-flex flex-wrap justify-content-center gap-2 mt-4" role="navigation" aria-label="{l s='Sous-catégories' mod='everpsblog'}">
+                <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category'=>$category->id_ever_category, 'link_rewrite'=>$category->link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn everpsblog-top-category-btn everpsblog-subcategory-btn active" title="{$category->title|escape:'htmlall':'UTF-8'}">{$category->title|escape:'htmlall':'UTF-8'}</a>
+                {foreach from=$children_categories item=item}
+                    {if !$item->is_root_category}
+                    <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category'=>$item->id_ever_category, 'link_rewrite'=>$item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn everpsblog-top-category-btn everpsblog-subcategory-btn" title="{$item->title|escape:'htmlall':'UTF-8'}">{$item->title|escape:'htmlall':'UTF-8'}</a>
+                    {/if}
+                {/foreach}
+            </div>
+            {/if}
+        </div>
     </div>
-  </div>
 </div>
-<div class="d-flex justify-content-center mb-3">
-    {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
+<div class="container my-4">
+    <div class="d-flex justify-content-center mb-3">
+        {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
+    </div>
+    {if isset($allow_feed) && $allow_feed}
+    <div class="text-center mb-3">
+        <a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' mod='everpsblog'} {$category->title|escape:'htmlall':'UTF-8'}</a>
+    </div>
+    {/if}
 </div>
-{if isset($allow_feed) && $allow_feed}
-<a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' mod='everpsblog'} {$category->title|escape:'htmlall':'UTF-8'}</a>
-{/if}
 {if isset($paginated) && !$paginated}
 <div class="container">
     <div class="row categoryinfos d-none">

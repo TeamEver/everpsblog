@@ -60,6 +60,7 @@ final class AuthorFormDataProvider
             'allowed_groups' => $this->normalizeIntCollection($author['allowed_groups'] ?? null),
             'author_products' => $this->normalizeIntCollection($author['author_products'] ?? null),
             'bio' => '',
+            'excerpt' => '',
             'meta_title' => '',
             'meta_description' => '',
             'link_rewrite' => '',
@@ -67,8 +68,11 @@ final class AuthorFormDataProvider
             'bottom_content' => '',
         ];
 
+        $translationSelect = $this->authorExcerptColumnExists()
+            ? 'id_lang, meta_title, meta_description, link_rewrite, excerpt, content, bottom_content'
+            : 'id_lang, meta_title, meta_description, link_rewrite, "" AS excerpt, content, bottom_content';
         $translations = $connection->fetchAllAssociative(
-            'SELECT id_lang, meta_title, meta_description, link_rewrite, content, bottom_content
+            'SELECT ' . $translationSelect . '
              FROM `' . _DB_PREFIX_ . 'ever_blog_author_lang`
              WHERE id_ever_author = :id',
             ['id' => $id]
@@ -88,6 +92,7 @@ final class AuthorFormDataProvider
             $data['meta_title_' . $langId] = $metaTitle;
             $data['meta_description_' . $langId] = (string) ($translation['meta_description'] ?? $data['meta_description']);
             $data['link_rewrite_' . $langId] = (string) ($translation['link_rewrite'] ?? Tools::str2url($data['nickhandle'] ?: $metaTitle));
+            $data['excerpt_' . $langId] = (string) ($translation['excerpt'] ?? $data['excerpt']);
             $data['content_' . $langId] = $content;
             $data['bio_' . $langId] = $content;
             $data['bottom_content_' . $langId] = (string) ($translation['bottom_content'] ?? $data['bottom_content']);
@@ -96,6 +101,7 @@ final class AuthorFormDataProvider
                 $data['meta_title'] = $metaTitle;
                 $data['meta_description'] = (string) $data['meta_description_' . $langId];
                 $data['link_rewrite'] = (string) $data['link_rewrite_' . $langId];
+                $data['excerpt'] = (string) $data['excerpt_' . $langId];
                 $data['content'] = $content;
                 $data['bio'] = $content;
                 $data['bottom_content'] = (string) $data['bottom_content_' . $langId];
@@ -125,6 +131,7 @@ final class AuthorFormDataProvider
             'allowed_groups' => [],
             'author_products' => [],
             'bio' => '',
+            'excerpt' => '',
             'meta_title' => '',
             'meta_description' => '',
             'link_rewrite' => '',
@@ -137,6 +144,7 @@ final class AuthorFormDataProvider
             $data['meta_title_' . $langId] = '';
             $data['meta_description_' . $langId] = '';
             $data['link_rewrite_' . $langId] = '';
+            $data['excerpt_' . $langId] = '';
             $data['content_' . $langId] = '';
             $data['bio_' . $langId] = '';
             $data['bottom_content_' . $langId] = '';
@@ -170,5 +178,23 @@ final class AuthorFormDataProvider
         });
 
         return array_values(array_map('intval', $items));
+    }
+
+    private function authorExcerptColumnExists(): bool
+    {
+        static $exists;
+        if (null !== $exists) {
+            return $exists;
+        }
+
+        try {
+            $exists = (bool) $this->entityManager->getConnection()->fetchAssociative(
+                'SHOW COLUMNS FROM `' . _DB_PREFIX_ . 'ever_blog_author_lang` LIKE "excerpt"'
+            );
+        } catch (\Throwable $exception) {
+            $exists = false;
+        }
+
+        return $exists;
     }
 }

@@ -9,6 +9,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 final class CategoryGridDataFactory
 {
+    use GridRecordFilterTrait;
+
     /** @var CategoryRepository */
     private $categoryRepository;
     /** @var AdminRouteSigner */
@@ -57,6 +59,11 @@ final class CategoryGridDataFactory
                 'active' => (string) ($row['active'] ?? 0),
             ];
         }
+        $records = $this->filterRecords($records, $filters, [
+            'id_ever_category',
+            'title',
+            'active',
+        ]);
 
         foreach ($records as &$record) {
             $id = (int) $record['id_ever_category'];

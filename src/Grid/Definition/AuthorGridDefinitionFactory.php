@@ -13,10 +13,12 @@ final class AuthorGridDefinitionFactory
             'Authors',
 [
             ['id' => 'id_ever_author', 'name' => 'ID'],
+            ['id' => 'featured_image', 'name' => 'Image', 'type' => 'image'],
             ['id' => 'nickhandle', 'name' => 'Pseudo'],
             ['id' => 'active', 'name' => 'Actif']
         ],
 [
+            'q' => 'Recherche',
             'nickhandle' => 'Pseudo'
         ],
 [

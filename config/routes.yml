@@ -57,6 +57,24 @@ everpsblog_admin_post_delete:
   requirements:
     postId: '\d+'
 
+everpsblog_admin_post_duplicate:
+  path: /everpsblog/post/{postId}/duplicate
+  methods: [POST]
+  defaults:
+    _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\PostController::duplicateAction'
+    _legacy_controller: AdminEverPsBlogPost
+    _legacy_link: AdminEverPsBlogPost
+  requirements:
+    postId: '\d+'
+
+everpsblog_admin_post_bulk:
+  path: /everpsblog/post/bulk
+  methods: [POST]
+  defaults:
+    _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\PostController::bulkAction'
+    _legacy_controller: AdminEverPsBlogPost
+    _legacy_link: AdminEverPsBlogPost
+
 everpsblog_admin_category:
   path: /everpsblog/category
   methods: [GET]
