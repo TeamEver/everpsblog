@@ -15,6 +15,8 @@ abstract class AbstractFrontController extends \ModuleFrontController
     private $blogTaxonomyService;
     private $blogSortOrderService;
     private $serviceCachePool;
+    private $qcdBuilderModule;
+    private $qcdBuilderModuleResolved = false;
 
     public function getTemplateVarPage()
     {
@@ -155,6 +157,44 @@ abstract class AbstractFrontController extends \ModuleFrontController
         ];
     }
 
+
+    protected function renderQcdBuilderField(string $targetType, int $targetId, string $targetField, string $fallbackContent): string
+    {
+        $builder = $this->getQcdBuilderModule();
+        if (!$builder || !method_exists($builder, 'renderTargetField')) {
+            return $fallbackContent;
+        }
+
+        return (string) $builder->renderTargetField(
+            $targetType,
+            $targetId,
+            $targetField,
+            $fallbackContent,
+            (int) $this->context->shop->id,
+            (int) $this->context->language->id
+        );
+    }
+
+    protected function getQcdBuilderModule(): ?\Module
+    {
+        if ($this->qcdBuilderModuleResolved) {
+            return $this->qcdBuilderModule;
+        }
+
+        static $cachedQcdBuilderModule;
+        static $cachedQcdBuilderModuleResolved = false;
+
+        if (!$cachedQcdBuilderModuleResolved) {
+            $module = \Module::getInstanceByName('qcdpagebuilder');
+            $cachedQcdBuilderModule = ($module instanceof \Module) ? $module : null;
+            $cachedQcdBuilderModuleResolved = true;
+        }
+
+        $this->qcdBuilderModule = $cachedQcdBuilderModule;
+        $this->qcdBuilderModuleResolved = true;
+
+        return $this->qcdBuilderModule;
+    }
 
     protected function getTemplateVarPagination($total = 0)
     {

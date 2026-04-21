@@ -154,10 +154,18 @@ class EverPsBlogcategoryModuleFrontController extends AbstractFrontController
             } else {
                 $children_categories = false;
             }
-            $this->category->content = 
-                $this->category->content;
-            $this->category->bottom_content = 
-                $this->category->bottom_content;
+            $this->category->content = $this->renderQcdBuilderField(
+                'everpsblog_category',
+                (int) $this->category->id,
+                'content',
+                (string) $this->category->content
+            );
+            $this->category->bottom_content = $this->renderQcdBuilderField(
+                'everpsblog_category',
+                (int) $this->category->id,
+                'bottom_content',
+                (string) $this->category->bottom_content
+            );
             $postsViewModel = PostViewModel::listFromLegacy($posts);
             $categoryViewModel = TaxonomyViewModel::fromLegacy($this->category, 'category');
             Hook::exec('actionBeforeEverCategoryInitContent', [
