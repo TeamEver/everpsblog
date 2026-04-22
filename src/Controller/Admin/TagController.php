@@ -97,6 +97,10 @@ class TagController extends AbstractDomainController
             'cancelUrl' => $this->generateUrl('everpsblog_admin_tag'),
             'createUrl' => $this->generateUrl('everpsblog_admin_tag_form'),
             'navigationLinks' => $this->getAdminNavigationLinks(),
+            'qcdPageBuilderTargets' => $this->buildQcdPageBuilderTargets('everpsblog_tag', $tagId, [
+                'content' => 'Editer le contenu avec Page Builder',
+                'bottom_content' => 'Editer le bas de page avec Page Builder',
+            ]),
         ]);
     }
 

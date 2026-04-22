@@ -99,6 +99,10 @@ class CategoryController extends AbstractDomainController
             'cancelUrl' => $this->generateUrl('everpsblog_admin_category'),
             'createUrl' => $this->generateUrl('everpsblog_admin_category_form'),
             'navigationLinks' => $this->getAdminNavigationLinks(),
+            'qcdPageBuilderTargets' => $this->buildQcdPageBuilderTargets('everpsblog_category', $categoryId, [
+                'content' => 'Editer le contenu avec Page Builder',
+                'bottom_content' => 'Editer le bas de page avec Page Builder',
+            ]),
         ]);
     }
 

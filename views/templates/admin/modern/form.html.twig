@@ -487,6 +487,13 @@
     </div>
   </div>
 
+  {% if qcdPageBuilderTargets is defined and qcdPageBuilderTargets is not empty %}
+  <script>
+    window.everQcdPageBuilderTargets = window.everQcdPageBuilderTargets || {};
+    window.everQcdPageBuilderTargets['ever-modern-form'] = {{ qcdPageBuilderTargets|json_encode|raw }};
+  </script>
+  {% endif %}
+
   <script>
     (function () {
       var root = document.getElementById('ever-admin-form-root');

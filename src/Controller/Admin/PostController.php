@@ -135,6 +135,9 @@ class PostController extends AbstractDomainController
             'cancelUrl' => $this->generateUrl('everpsblog_admin_post'),
             'createUrl' => $this->generateUrl('everpsblog_admin_post_form'),
             'navigationLinks' => $this->getAdminNavigationLinks(),
+            'qcdPageBuilderTargets' => $this->buildQcdPageBuilderTargets('everpsblog_post', $postId, [
+                'content' => 'Editer le contenu avec Page Builder',
+            ]),
         ]);
     }
 

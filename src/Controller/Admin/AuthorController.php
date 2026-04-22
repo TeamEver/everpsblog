@@ -124,6 +124,10 @@ class AuthorController extends AbstractDomainController
             'cancelUrl' => $this->generateUrl('everpsblog_admin_author'),
             'createUrl' => $this->generateUrl('everpsblog_admin_author_form'),
             'navigationLinks' => $this->getAdminNavigationLinks(),
+            'qcdPageBuilderTargets' => $this->buildQcdPageBuilderTargets('everpsblog_author', $authorId, [
+                'content' => 'Editer la biographie avec Page Builder',
+                'bottom_content' => 'Editer le bas de page avec Page Builder',
+            ]),
         ]);
     }
 

@@ -131,6 +131,18 @@ class EverPsBlogtagModuleFrontController extends AbstractFrontController
                 (int) $this->tag->id,
                 (int) $pagination['items_shown_from'] - 1
             );
+            $this->tag->content = $this->renderQcdBuilderField(
+                'everpsblog_tag',
+                (int) $this->tag->id,
+                'content',
+                (string) $this->tag->content
+            );
+            $this->tag->bottom_content = $this->renderQcdBuilderField(
+                'everpsblog_tag',
+                (int) $this->tag->id,
+                'bottom_content',
+                (string) $this->tag->bottom_content
+            );
             $postsViewModel = PostViewModel::listFromLegacy($posts);
             $tagViewModel = TaxonomyViewModel::fromLegacy($this->tag, 'tag');
             Hook::exec('actionBeforeEverTagInitContent', [

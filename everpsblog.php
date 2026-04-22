@@ -2366,18 +2366,23 @@ class EverPsBlog extends Module
         if (Tools::getValue('configure') == $this->name) {
             $this->context->controller->addJs($this->_path . 'views/js/ever.js');
         }
+        $blogAdminControllers = [
+            'AdminEverPsBlog',
+            'AdminEverPsBlogPost',
+            'AdminEverPsBlogTag',
+            'AdminEverPsBlogAuthor',
+            'AdminEverPsBlogCategory',
+            'AdminEverPsBlogComment',
+        ];
+        $isBlogAdminController = in_array(Tools::getValue('controller'), $blogAdminControllers)
+            || Tools::getValue('configure') == $this->name;
+
+        if ($isBlogAdminController) {
+            $this->context->controller->addJs($this->_path . 'views/js/adminQcdPageBuilder.js');
+        }
+
         if ((bool) Configuration::get('EVERBLOG_TINYMCE') === true) {
-            $blogAdminControllers = [
-                'AdminEverPsBlog',
-                'AdminEverPsBlogPost',
-                'AdminEverPsBlogTag',
-                'AdminEverPsBlogAuthor',
-                'AdminEverPsBlogCategory',
-                'AdminEverPsBlogComment',
-            ];
-            if (in_array(Tools::getValue('controller'), $blogAdminControllers)
-                || Tools::getValue('configure') == $this->name
-            ) {
+            if ($isBlogAdminController) {
                 $this->context->controller->addJs($this->_path . 'views/js/adminTinyMce.js');
             }
         }

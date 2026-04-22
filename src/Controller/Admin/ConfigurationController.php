@@ -81,6 +81,10 @@ class ConfigurationController extends AbstractDomainController
             'currentResource' => 'configuration',
             'navigationLinks' => $this->getAdminNavigationLinks(),
             'configurationForm' => $form->createView(),
+            'qcdPageBuilderTargets' => $this->buildQcdPageBuilderTargets('everpsblog_configuration', 1, [
+                'top_text' => 'Editer le haut de page avec Page Builder',
+                'bottom_text' => 'Editer le bas de page avec Page Builder',
+            ]),
         ]);
     }
 

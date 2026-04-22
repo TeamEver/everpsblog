@@ -185,6 +185,12 @@
 
 {% block javascripts %}
   {{ parent() }}
+  {% if qcdPageBuilderTargets is defined and qcdPageBuilderTargets is not empty %}
+  <script>
+    window.everQcdPageBuilderTargets = window.everQcdPageBuilderTargets || {};
+    window.everQcdPageBuilderTargets['ever-config-form'] = {{ qcdPageBuilderTargets|json_encode|raw }};
+  </script>
+  {% endif %}
   <script src="https://cdn.jsdelivr.net/npm/tinymce@6/tinymce.min.js" referrerpolicy="origin"></script>
   <script>
     (function () {
