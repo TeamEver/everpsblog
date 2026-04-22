@@ -34,9 +34,11 @@
             {include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
         {/foreach}
     </div>
+    {if isset($pagination.should_be_displayed) && $pagination.should_be_displayed}
     <div class="row">
         {include file='_partials/pagination.tpl' pagination=$pagination}
     </div>
+    {/if}
     {else}
     <div class="alert alert-info">{l s='No post found for this search.' mod='everpsblog'}</div>
     {/if}

@@ -80,9 +80,11 @@
             {include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
         {/foreach}
     </div>
+    {if isset($pagination.should_be_displayed) && $pagination.should_be_displayed}
     <div class="row">
         {include file='_partials/pagination.tpl' pagination=$pagination}
     </div>
+    {/if}
     {hook h="displayAfterEverLoop"}
     {if isset($paginated) && !$paginated}
     <div class="row tagbottomcontent {if $animated}zoomed{/if}" itemprop="articleBody">

@@ -138,7 +138,7 @@
 {else}
 <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>
 {/if}
-{if isset($post_number) && $post_number > 0}
+{if isset($post_number) && $post_number > 0 && isset($pagination.should_be_displayed) && $pagination.should_be_displayed}
 <div class="row">
     {include file='_partials/pagination.tpl' pagination=$pagination}
 </div>

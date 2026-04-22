@@ -233,7 +233,7 @@ abstract class AbstractFrontController extends \ModuleFrontController
             'current_page' => $pagination->getPage(),
             'pages_count' => $pagination->getPagesCount(),
             'pages' => $pages,
-            'should_be_displayed' => (count($pagination->buildLinks()) > 3),
+            'should_be_displayed' => $pagination->getPagesCount() > 1,
         ];
     }
 

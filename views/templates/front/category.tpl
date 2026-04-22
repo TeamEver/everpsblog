@@ -122,7 +122,7 @@
         {/foreach}
     </div>
 </div>
-{if isset($post_number) && $post_number > 0}
+{if isset($post_number) && $post_number > 0 && isset($pagination.should_be_displayed) && $pagination.should_be_displayed}
 <div class="row">
     {include file='_partials/pagination.tpl' pagination=$pagination}
 </div>
