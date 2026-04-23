@@ -28,7 +28,7 @@ class CategoryCommandAssembler
 
     public function assembleUpdate(int $categoryId, array $requestData): UpdateCategoryCommand
     {
-        $validatedData = $this->validator->validate($requestData);
+        $validatedData = $this->validator->validate($requestData, $categoryId);
 
         return new UpdateCategoryCommand($categoryId, $this->mergeDefaults($validatedData));
     }

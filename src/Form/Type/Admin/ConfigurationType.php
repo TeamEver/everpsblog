@@ -37,6 +37,11 @@ class ConfigurationType extends AbstractType
                 'label' => 'Moderate comments',
                 'required' => false,
             ])
+            ->add('rss_enabled', CheckboxType::class, [
+                'label' => 'Enable RSS feeds',
+                'required' => false,
+                'help' => 'Adds RSS feed links on blog, category, tag and author pages.',
+            ])
             ->add('posts_per_page', IntegerType::class, [
                 'label' => 'Posts per page',
                 'constraints' => [new GreaterThan(['value' => 0])],

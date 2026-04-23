@@ -74,6 +74,7 @@ class CategoryController extends AbstractDomainController
                 : $this->generateUrl('everpsblog_admin_category_form'),
             'banner_image_help' => $bannerImageHelp,
             'has_banner_image' => $hasBannerImage,
+            'current_category_id' => $categoryId,
         ]);
         $form->handleRequest($request);
 

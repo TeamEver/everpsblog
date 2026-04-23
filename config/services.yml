@@ -73,6 +73,7 @@ services:
       - '@doctrine.orm.entity_manager'
       - '@prestashop.module.everpsblog.blog.post_rules_applier'
       - '@prestashop.module.everpsblog.blog.repository.post_write'
+      - '@prestashop.module.everpsblog.service.blog_redirect'
 
   prestashop.module.everpsblog.blog.delete_post_handler:
     class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\DeletePostHandler

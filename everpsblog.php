@@ -740,7 +740,15 @@ class EverPsBlog extends Module
     public function hookDisplayAdminAfterHeader()
     {
         if ($this->checkLatestEverModuleVersion()) {
-            return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/upgrade.tpl');
+            $upgradeUrl = 'https://www.team-ever.com/prestashop-module-de-blog-gratuit/';
+
+            return sprintf(
+                '<div class="panel everheader"><div class="panel-body"><div class="col-12 col-lg-12"><p class="alert alert-warning">%s <a href="%s" target="_blank" rel="noopener noreferrer">%s</a> %s</p></div></div></div>',
+                Tools::safeOutput($this->transAdmin('An upgrade is available for Ever Blog. Please check')),
+                Tools::safeOutput($upgradeUrl),
+                Tools::safeOutput($upgradeUrl),
+                Tools::safeOutput($this->transAdmin('to get latest version of this module'))
+            );
         }
     }
 

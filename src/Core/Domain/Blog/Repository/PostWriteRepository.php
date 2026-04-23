@@ -42,6 +42,40 @@ class PostWriteRepository
         });
     }
 
+    /**
+     * @return array<int, string>
+     */
+    public function getLocalizedSlugs(int $postId): array
+    {
+        if ($postId <= 0) {
+            return [];
+        }
+
+        $rows = \Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+            'SELECT `id_lang`, `link_rewrite`
+             FROM `' . _DB_PREFIX_ . 'ever_blog_post_lang`
+             WHERE `id_ever_post` = ' . (int) $postId
+        );
+
+        if (!is_array($rows)) {
+            return [];
+        }
+
+        $slugs = [];
+        foreach ($rows as $row) {
+            $langId = (int) ($row['id_lang'] ?? 0);
+            $slug = trim((string) ($row['link_rewrite'] ?? ''));
+
+            if ($langId <= 0 || '' === $slug) {
+                continue;
+            }
+
+            $slugs[$langId] = $slug;
+        }
+
+        return $slugs;
+    }
+
     private function clearRelations(int $postId): void
     {
         if ($postId <= 0) {

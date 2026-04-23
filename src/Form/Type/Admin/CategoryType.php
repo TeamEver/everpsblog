@@ -27,7 +27,7 @@ final class CategoryType extends AbstractType
                 'required' => false,
                 'label' => 'Parent category',
                 'placeholder' => 'None',
-                'choices' => $this->getParentCategoryChoices(),
+                'choices' => $this->getParentCategoryChoices($options['current_category_id']),
             ])
             ->add('active', CheckboxType::class, [
                 'required' => false,
@@ -126,7 +126,7 @@ final class CategoryType extends AbstractType
     /**
      * @return array<string, int>
      */
-    private function getParentCategoryChoices(): array
+    private function getParentCategoryChoices(?int $currentCategoryId): array
     {
         $idShop = (int) \Context::getContext()->shop->id;
         $rows = \Db::getInstance()->executeS(
@@ -142,7 +142,7 @@ final class CategoryType extends AbstractType
         $choices = [];
         foreach ($rows as $row) {
             $id = (int) ($row['id_ever_category'] ?? 0);
-            if ($id <= 0) {
+            if ($id <= 0 || (null !== $currentCategoryId && $currentCategoryId === $id)) {
                 continue;
             }
 
@@ -207,9 +207,11 @@ final class CategoryType extends AbstractType
         $resolver->setDefaults([
             'banner_image_help' => '',
             'has_banner_image' => false,
+            'current_category_id' => null,
             'translation_domain' => 'Modules.Everpsblog.Admin',
         ]);
         $resolver->setAllowedTypes('banner_image_help', 'string');
         $resolver->setAllowedTypes('has_banner_image', 'bool');
+        $resolver->setAllowedTypes('current_category_id', ['null', 'int']);
     }
 }

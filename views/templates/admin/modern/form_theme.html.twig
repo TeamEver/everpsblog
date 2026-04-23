@@ -1,0 +1,12 @@
+{% block form_help %}
+  {% if help is not empty %}
+    {% set helpClass = (help_attr.class|default('') ~ ' form-text text-muted')|trim %}
+    {% set translatedHelp = help|trans(help_translation_parameters, translation_domain) %}
+
+    {% if help_html|default(false) %}
+      <div id="{{ id }}_help" class="{{ helpClass }}">{{ translatedHelp|raw }}</div>
+    {% else %}
+      <small id="{{ id }}_help" class="{{ helpClass }}">{{ translatedHelp }}</small>
+    {% endif %}
+  {% endif %}
+{% endblock %}

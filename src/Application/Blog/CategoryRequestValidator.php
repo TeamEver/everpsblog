@@ -4,7 +4,7 @@ namespace PrestaShop\Module\Everpsblog\Application\Blog;
 
 class CategoryRequestValidator extends AbstractRequestValidator
 {
-    public function validate(array $requestData): array
+    public function validate(array $requestData, ?int $currentCategoryId = null): array
     {
         $this->resetErrors();
 
@@ -12,7 +12,9 @@ class CategoryRequestValidator extends AbstractRequestValidator
         $requestData = $this->normalizeSeoFields($requestData);
 
         $parentCategoryId = (int) ($requestData['id_parent_category'] ?? 0);
-        if ($parentCategoryId > 0 && !$this->existsInCurrentShopModuleTable('ever_blog_category', 'id_ever_category', $parentCategoryId, 'ever_blog_category_shop')) {
+        if ($parentCategoryId > 0 && null !== $currentCategoryId && $parentCategoryId === $currentCategoryId) {
+            $this->addFieldError('id_parent_category', $this->transAdmin('A category cannot be its own parent.'));
+        } elseif ($parentCategoryId > 0 && !$this->existsInCurrentShopModuleTable('ever_blog_category', 'id_ever_category', $parentCategoryId, 'ever_blog_category_shop')) {
             $this->addFieldError('id_parent_category', $this->transAdmin('Parent category not found (id: %id%).', ['%id%' => $parentCategoryId]));
         }
 

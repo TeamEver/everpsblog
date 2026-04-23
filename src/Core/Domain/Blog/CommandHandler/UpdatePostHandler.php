@@ -7,6 +7,7 @@ use InvalidArgumentException;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\UpdatePostCommand;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository\PostWriteRepository;
 use PrestaShop\Module\Everpsblog\Entity\Post;
+use PrestaShop\Module\Everpsblog\Service\BlogRedirectService;
 
 class UpdatePostHandler
 {
@@ -16,15 +17,19 @@ class UpdatePostHandler
     private $rulesApplier;
     /** @var PostWriteRepository */
     private $postWriteRepository;
+    /** @var BlogRedirectService */
+    private $blogRedirectService;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         PostRulesApplier $rulesApplier,
-        PostWriteRepository $postWriteRepository
+        PostWriteRepository $postWriteRepository,
+        BlogRedirectService $blogRedirectService
     ) {
         $this->entityManager = $entityManager;
         $this->rulesApplier = $rulesApplier;
         $this->postWriteRepository = $postWriteRepository;
+        $this->blogRedirectService = $blogRedirectService;
     }
 
     public function __invoke(UpdatePostCommand $command): int
@@ -35,9 +40,71 @@ class UpdatePostHandler
             throw new InvalidArgumentException(sprintf('Post with id %d not found.', $command->getPostId()));
         }
 
-        $relations = $this->rulesApplier->apply($post, $command->getData()->toArray());
+        $data = $command->getData()->toArray();
+        $previousSlugs = $this->postWriteRepository->getLocalizedSlugs((int) $post->getId());
+
+        $relations = $this->rulesApplier->apply($post, $data);
         $this->postWriteRepository->save($post, $relations);
+        $this->saveSlugRedirects((int) $post->getId(), $data, $previousSlugs);
 
         return (int) $post->getId();
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @param array<int, string> $previousSlugs
+     */
+    private function saveSlugRedirects(int $postId, array $data, array $previousSlugs): void
+    {
+        $shopId = (int) ($data['shop_id'] ?? 0);
+        $translations = isset($data['translations']) && is_array($data['translations'])
+            ? $data['translations']
+            : [];
+
+        if ($postId <= 0 || $shopId <= 0 || empty($previousSlugs) || empty($translations)) {
+            return;
+        }
+
+        $link = new \Link();
+        foreach ($previousSlugs as $langId => $previousSlug) {
+            $translation = $translations[$langId] ?? null;
+            if (!is_array($translation)) {
+                continue;
+            }
+
+            $newSlug = trim((string) ($translation['link_rewrite'] ?? ''));
+            if ('' === $newSlug || $newSlug === $previousSlug) {
+                continue;
+            }
+
+            $sourceUrl = (string) $link->getModuleLink(
+                'everpsblog',
+                'post',
+                [
+                    'id_ever_post' => $postId,
+                    'link_rewrite' => $previousSlug,
+                ],
+                true,
+                (int) $langId,
+                $shopId
+            );
+            $targetUrl = (string) $link->getModuleLink(
+                'everpsblog',
+                'post',
+                [
+                    'id_ever_post' => $postId,
+                    'link_rewrite' => $newSlug,
+                ],
+                true,
+                (int) $langId,
+                $shopId
+            );
+
+            if ('' === $sourceUrl || '' === $targetUrl || $sourceUrl === $targetUrl) {
+                continue;
+            }
+
+            $this->blogRedirectService->saveRedirect($sourceUrl, $targetUrl, $shopId, 'post', $postId);
+        }
     }
 }
