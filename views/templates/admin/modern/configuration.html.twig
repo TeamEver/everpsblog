@@ -267,6 +267,47 @@
       var root = document.getElementById('ever-config-form');
       if (!root || typeof tinymce === 'undefined') { return; }
 
+      var everTinyMceUploadUrl = '{{ path('everpsblog_admin_tinymce_upload')|e('js') }}';
+      var everTinyMceUploadToken = '{{ csrf_token('everpsblog_tinymce_upload')|e('js') }}';
+      function everTinyMceImageUploadHandler(blobInfo, progress) {
+        return new Promise(function (resolve, reject) {
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', everTinyMceUploadUrl);
+          xhr.withCredentials = true;
+          xhr.upload.onprogress = function (event) {
+            if (event.lengthComputable && typeof progress === 'function') {
+              progress(event.loaded / event.total * 100);
+            }
+          };
+          xhr.onload = function () {
+            var json;
+            try {
+              json = JSON.parse(xhr.responseText || '{}');
+            } catch (error) {
+              reject('Invalid upload response.');
+              return;
+            }
+            if (xhr.status < 200 || xhr.status >= 300) {
+              reject(json.error || 'Image upload failed.');
+              return;
+            }
+            if (!json || typeof json.location !== 'string') {
+              reject('Invalid upload response.');
+              return;
+            }
+            resolve(json.location);
+          };
+          xhr.onerror = function () {
+            reject('Image upload failed.');
+          };
+
+          var formData = new FormData();
+          formData.append('_token', everTinyMceUploadToken);
+          formData.append('file', blobInfo.blob(), blobInfo.filename());
+          xhr.send(formData);
+        });
+      }
+
       var targets = root.querySelectorAll('textarea[data-ever-richtext="1"]');
       Array.prototype.forEach.call(targets, function (textarea) {
         if (!textarea.id) {
@@ -281,6 +322,9 @@
           menubar: 'edit view insert format tools table',
           plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount',
           toolbar: 'undo redo | blocks | bold italic underline forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table | removeformat | code fullscreen',
+          automatic_uploads: true,
+          paste_data_images: true,
+          images_upload_handler: everTinyMceImageUploadHandler,
           content_style: 'body { font-family:Inter,Helvetica,Arial,sans-serif; font-size:14px; }',
           setup: function (editor) {
             editor.on('change keyup', function () { editor.save(); });

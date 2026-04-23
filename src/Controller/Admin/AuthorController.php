@@ -141,6 +141,7 @@ class AuthorController extends AbstractDomainController
             'cancelUrl' => $this->generateUrl('everpsblog_admin_author'),
             'createUrl' => $this->generateUrl('everpsblog_admin_author_form'),
             'navigationLinks' => $this->getAdminNavigationLinks(),
+            'everBlogLanguages' => $this->getEverBlogLanguages(),
             'qcdPageBuilderTargets' => $this->buildQcdPageBuilderTargets('everpsblog_author', $authorId, [
                 'content' => $this->transAdmin('Edit biography with Page Builder'),
                 'bottom_content' => $this->transAdmin('Edit bottom content with Page Builder'),
@@ -236,7 +237,8 @@ class AuthorController extends AbstractDomainController
         $this->deleteAuthorImageFiles($authorId);
 
         $targetFileName = sprintf('%d.%s', $authorId, $extension);
-        $this->imageUploader->upload($uploadedImage, $targetDirectory, $targetFileName);
+        $storedPath = $this->imageUploader->upload($uploadedImage, $targetDirectory, $targetFileName);
+        $storedFileName = basename($storedPath);
 
         $image = $this->blogImageService->getBlogImage($authorId, $shopId, 'author');
         if (!\Validate::isLoadedObject($image)) {
@@ -246,7 +248,7 @@ class AuthorController extends AbstractDomainController
         $image->id_element = $authorId;
         $image->id_shop = $shopId;
         $image->image_type = 'author';
-        $image->image_link = 'img/author/' . $targetFileName;
+        $image->image_link = 'img/author/' . $storedFileName;
         if (!(bool) $image->save()) {
             throw new \RuntimeException($this->transAdmin('Unable to save the author image reference.'));
         }

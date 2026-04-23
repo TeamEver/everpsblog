@@ -148,6 +148,7 @@ class PostController extends AbstractDomainController
             'cancelUrl' => $this->generateUrl('everpsblog_admin_post'),
             'createUrl' => $this->generateUrl('everpsblog_admin_post_form'),
             'navigationLinks' => $this->getAdminNavigationLinks(),
+            'everBlogLanguages' => $this->getEverBlogLanguages(),
             'qcdPageBuilderTargets' => $this->buildQcdPageBuilderTargets('everpsblog_post', $postId, [
                 'content' => $this->transAdmin('Edit content with Page Builder'),
             ]),
@@ -426,7 +427,8 @@ class PostController extends AbstractDomainController
         $this->deleteBlogImageFiles($postId, $imageType);
 
         $targetFileName = sprintf('%d.%s', $postId, $extension);
-        $this->imageUploader->upload($uploadedImage, $targetDirectory, $targetFileName);
+        $storedPath = $this->imageUploader->upload($uploadedImage, $targetDirectory, $targetFileName);
+        $storedFileName = basename($storedPath);
 
         $image = $this->blogImageService->getBlogImage($postId, $shopId, $imageType);
         if (!\Validate::isLoadedObject($image)) {
@@ -436,7 +438,7 @@ class PostController extends AbstractDomainController
         $image->id_element = $postId;
         $image->id_shop = $shopId;
         $image->image_type = $imageType;
-        $image->image_link = 'img/' . $imageType . '/' . $targetFileName;
+        $image->image_link = 'img/' . $imageType . '/' . $storedFileName;
         if (!(bool) $image->save()) {
             throw new \RuntimeException($this->transAdmin('Unable to save the image reference.'));
         }

@@ -2373,12 +2373,37 @@ class EverPsBlog extends Module
 
         if ($isBlogAdminController) {
             $this->context->controller->addJs($this->_path . 'views/js/adminQcdPageBuilder.js');
+            $this->registerBackOfficeTinyMceUploadConfig();
         }
 
         if ((bool) Configuration::get('EVERBLOG_TINYMCE') === true) {
             if ($isBlogAdminController) {
                 $this->context->controller->addJs($this->_path . 'views/js/adminTinyMce.js');
             }
+        }
+    }
+
+    private function registerBackOfficeTinyMceUploadConfig()
+    {
+        if (!class_exists('Media')) {
+            return;
+        }
+
+        try {
+            $container = \PrestaShop\PrestaShop\Adapter\SymfonyContainer::getInstance();
+            if (!$container || !$container->has('router')) {
+                return;
+            }
+
+            \Media::addJsDef([
+                'everpsblogTinyMceUploadUrl' => $container->get('router')->generate('everpsblog_admin_tinymce_upload'),
+                'everpsblogTinyMceUploadToken' => \Tools::getAdminTokenLite('AdminEverPsBlog'),
+            ]);
+        } catch (\Throwable $exception) {
+            \PrestaShopLogger::addLog(
+                '[everpsblog][registerBackOfficeTinyMceUploadConfig] ' . $exception->getMessage(),
+                2
+            );
         }
     }
 

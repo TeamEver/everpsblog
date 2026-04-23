@@ -18,6 +18,62 @@
 
 var customTinyMCE = {
     init: function () {
+        var everTinyMceImageUploadHandler = function (blobInfo, success, failure, progress) {
+            var uploadPromise = new Promise(function (resolve, reject) {
+                if (!window.everpsblogTinyMceUploadUrl || !window.everpsblogTinyMceUploadToken) {
+                    reject('Image upload is not configured.');
+                    return;
+                }
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', window.everpsblogTinyMceUploadUrl);
+                xhr.withCredentials = true;
+                xhr.upload.onprogress = function (event) {
+                    if (event.lengthComputable && typeof progress === 'function') {
+                        progress(event.loaded / event.total * 100);
+                    }
+                };
+                xhr.onload = function () {
+                    var json;
+                    try {
+                        json = JSON.parse(xhr.responseText || '{}');
+                    } catch (error) {
+                        reject('Invalid upload response.');
+                        return;
+                    }
+                    if (xhr.status < 200 || xhr.status >= 300) {
+                        reject(json.error || 'Image upload failed.');
+                        return;
+                    }
+                    if (!json || typeof json.location !== 'string') {
+                        reject('Invalid upload response.');
+                        return;
+                    }
+                    resolve(json.location);
+                };
+                xhr.onerror = function () {
+                    reject('Image upload failed.');
+                };
+
+                var formData = new FormData();
+                formData.append('_legacy_token', window.everpsblogTinyMceUploadToken);
+                formData.append('file', blobInfo.blob(), blobInfo.filename());
+                xhr.send(formData);
+            });
+
+            if (typeof success === 'function') {
+                uploadPromise.then(success).catch(function (message) {
+                    if (typeof failure === 'function') {
+                        failure(message);
+                    }
+                });
+
+                return;
+            }
+
+            return uploadPromise;
+        };
+
         window.defaultTinyMceConfig = {
             menubar: true,
             statusbar: true,
@@ -34,6 +90,9 @@ var customTinyMCE = {
             statusbar: false,
             relative_urls : false,
             convert_urls: false,
+            automatic_uploads: true,
+            paste_data_images: true,
+            images_upload_handler: everTinyMceImageUploadHandler,
             extended_valid_elements : "em[class|name|id]",
             menu: {
                 edit: {title: 'Edit', items: 'undo redo | cut copy paste | selectall'},

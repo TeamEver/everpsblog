@@ -40,7 +40,8 @@ class AdminBlogImageManager
         $this->deleteFiles($elementId, $imageType);
 
         $targetFileName = sprintf('%d.%s', $elementId, $extension);
-        $this->imageUploader->upload($uploadedImage, $targetDirectory, $targetFileName);
+        $storedPath = $this->imageUploader->upload($uploadedImage, $targetDirectory, $targetFileName);
+        $storedFileName = basename($storedPath);
 
         $image = $this->blogImageService->getBlogImage($elementId, $shopId, $imageType);
         if (!\Validate::isLoadedObject($image)) {
@@ -50,7 +51,7 @@ class AdminBlogImageManager
         $image->id_element = $elementId;
         $image->id_shop = $shopId;
         $image->image_type = $imageType;
-        $image->image_link = 'img/' . $imageType . '/' . $targetFileName;
+        $image->image_link = 'img/' . $imageType . '/' . $storedFileName;
         if (!(bool) $image->save()) {
             throw new \RuntimeException('Unable to save the image reference.');
         }

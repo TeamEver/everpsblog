@@ -286,7 +286,7 @@
       <div class="small text-muted mr-2">{{ 'Editing language:'|trans({}, 'Modules.Everpsblog.Admin') }}</div>
       <div class="btn-group btn-group-sm" role="group" aria-label="{{ 'Language selector'|trans({}, 'Modules.Everpsblog.Admin') }}">
         {% for lang in everBlogLanguages %}
-          <button type="button" class="btn btn-outline-secondary ever-lang-switch {{ loop.first ? 'active' : '' }}" data-lang-id="{{ lang.id }}">{{ lang.label }}</button>
+          <button type="button" class="btn btn-outline-secondary ever-lang-switch {{ loop.first ? 'active' : '' }}" data-lang-id="{{ lang.id }}" title="{{ lang.name|default(lang.label) }}">{{ lang.label }}</button>
         {% endfor %}
       </div>
     </div>
@@ -439,24 +439,44 @@
     {% endif %}
   {% endfor %}
 
+  {# Prefer the language list provided by the controller (real Prestashop iso_code).
+     Fallback: derive labels from form field labels when the template is rendered
+     outside of the modern controllers. #}
+  {% set everBlogLanguagesFromController = everBlogLanguages is defined and everBlogLanguages is iterable ? everBlogLanguages : [] %}
   {% set everBlogLanguages = [] %}
-  {% set everBlogLanguageLabels = {} %}
-  {% for field in contentFields|merge(seoFields)|merge(publicationFields)|merge(relationFields) %}
-    {% set fieldNameParts = field.vars.name|split('_') %}
-    {% set fieldIdParts = field.vars.id|split('_') %}
-    {% set maybeLangIdFromName = fieldNameParts|last %}
-    {% set maybeLangIdFromId = fieldIdParts|last %}
-    {% set maybeLangId = maybeLangIdFromName matches '/^\\d+$/' ? maybeLangIdFromName : (maybeLangIdFromId matches '/^\\d+$/' ? maybeLangIdFromId : null) %}
-    {% if maybeLangId %}
-      {% set labelParts = field.vars.label|default('')|split('(') %}
-      {% set labelSuffix = labelParts|length > 1 ? (labelParts|last|split(')')|first) : '' %}
-      {% set languageLabel = labelSuffix ? labelSuffix|upper : 'Language #%id%'|trans({'%id%': maybeLangId}, 'Modules.Everpsblog.Admin') %}
-      {% set everBlogLanguageLabels = everBlogLanguageLabels|merge({ (maybeLangId): languageLabel }) %}
-    {% endif %}
-  {% endfor %}
-  {% for langId in langIds %}
-    {% set everBlogLanguages = everBlogLanguages|merge([{ id: langId, label: everBlogLanguageLabels[langId]|default('Language #%id%'|trans({'%id%': langId}, 'Modules.Everpsblog.Admin')) }]) %}
-  {% endfor %}
+
+  {% if everBlogLanguagesFromController is not empty %}
+    {% for lang in everBlogLanguagesFromController %}
+      {% set langIdStr = (lang.id|default('')) ~ '' %}
+      {% if langIdStr != '' and (langIds is empty or langIdStr in langIds) %}
+        {% set everBlogLanguages = everBlogLanguages|merge([{
+          id: langIdStr,
+          label: lang.label|default('L' ~ langIdStr),
+          name: lang.name|default(lang.label|default('L' ~ langIdStr))
+        }]) %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% if everBlogLanguages is empty %}
+    {% set everBlogLanguageLabels = {} %}
+    {% for field in contentFields|merge(seoFields)|merge(publicationFields)|merge(relationFields) %}
+      {% set fieldNameParts = field.vars.name|split('_') %}
+      {% set fieldIdParts = field.vars.id|split('_') %}
+      {% set maybeLangIdFromName = fieldNameParts|last %}
+      {% set maybeLangIdFromId = fieldIdParts|last %}
+      {% set maybeLangId = maybeLangIdFromName matches '/^\\d+$/' ? maybeLangIdFromName : (maybeLangIdFromId matches '/^\\d+$/' ? maybeLangIdFromId : null) %}
+      {% if maybeLangId %}
+        {% set labelParts = field.vars.label|default('')|split('(') %}
+        {% set labelSuffix = labelParts|length > 1 ? (labelParts|last|split(')')|first) : '' %}
+        {% set languageLabel = labelSuffix ? labelSuffix|upper : 'Language #%id%'|trans({'%id%': maybeLangId}, 'Modules.Everpsblog.Admin') %}
+        {% set everBlogLanguageLabels = everBlogLanguageLabels|merge({ (maybeLangId): languageLabel }) %}
+      {% endif %}
+    {% endfor %}
+    {% for langId in langIds %}
+      {% set everBlogLanguages = everBlogLanguages|merge([{ id: langId, label: everBlogLanguageLabels[langId]|default('Language #%id%'|trans({'%id%': langId}, 'Modules.Everpsblog.Admin')) }]) %}
+    {% endfor %}
+  {% endif %}
 
   {% set everBlogSections = {
     content: contentFields,
@@ -699,6 +719,47 @@
       var root = document.getElementById('ever-admin-form-root');
       if (!root || typeof tinymce === 'undefined') { return; }
 
+      var everTinyMceUploadUrl = '{{ path('everpsblog_admin_tinymce_upload')|e('js') }}';
+      var everTinyMceUploadToken = '{{ csrf_token('everpsblog_tinymce_upload')|e('js') }}';
+      function everTinyMceImageUploadHandler(blobInfo, progress) {
+        return new Promise(function (resolve, reject) {
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', everTinyMceUploadUrl);
+          xhr.withCredentials = true;
+          xhr.upload.onprogress = function (event) {
+            if (event.lengthComputable && typeof progress === 'function') {
+              progress(event.loaded / event.total * 100);
+            }
+          };
+          xhr.onload = function () {
+            var json;
+            try {
+              json = JSON.parse(xhr.responseText || '{}');
+            } catch (error) {
+              reject('Invalid upload response.');
+              return;
+            }
+            if (xhr.status < 200 || xhr.status >= 300) {
+              reject(json.error || 'Image upload failed.');
+              return;
+            }
+            if (!json || typeof json.location !== 'string') {
+              reject('Invalid upload response.');
+              return;
+            }
+            resolve(json.location);
+          };
+          xhr.onerror = function () {
+            reject('Image upload failed.');
+          };
+
+          var formData = new FormData();
+          formData.append('_token', everTinyMceUploadToken);
+          formData.append('file', blobInfo.blob(), blobInfo.filename());
+          xhr.send(formData);
+        });
+      }
+
       var targets = root.querySelectorAll('textarea[data-ever-richtext="1"]');
       Array.prototype.forEach.call(targets, function (textarea) {
         if (!textarea.id) {
@@ -715,6 +776,9 @@
           menubar: 'edit view insert format tools table',
           plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount',
           toolbar: 'undo redo | blocks | bold italic underline forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table | removeformat | code fullscreen',
+          automatic_uploads: true,
+          paste_data_images: true,
+          images_upload_handler: everTinyMceImageUploadHandler,
           content_style: 'body { font-family:Inter,Helvetica,Arial,sans-serif; font-size:14px; }',
           setup: function (editor) {
             editor.on('change keyup', function () { editor.save(); });

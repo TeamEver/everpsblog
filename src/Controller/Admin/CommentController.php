@@ -97,6 +97,7 @@ class CommentController extends AbstractDomainController
             'cancelUrl' => $this->generateUrl('everpsblog_admin_comment'),
             'createUrl' => $this->generateUrl('everpsblog_admin_comment_form'),
             'navigationLinks' => $this->getAdminNavigationLinks(),
+            'everBlogLanguages' => $this->getEverBlogLanguages(),
         ]);
     }
 

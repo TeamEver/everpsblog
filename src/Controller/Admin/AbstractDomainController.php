@@ -66,6 +66,46 @@ abstract class AbstractDomainController extends FrameworkBundleAdminController
         ];
     }
 
+    /**
+     * Build the language switcher payload consumed by the modern form template.
+     * Returns one entry per active Prestashop language with its real ISO code
+     * as label, so the BO never shows "FR/FR/EN/EN" duplicates caused by label
+     * parsing.
+     *
+     * @return array<int, array<string, int|string>>
+     */
+    protected function getEverBlogLanguages(): array
+    {
+        $languages = [];
+        try {
+            $rawLanguages = \Language::getLanguages(false);
+        } catch (\Throwable $exception) {
+            return [];
+        }
+
+        foreach ($rawLanguages as $language) {
+            $idLang = (int) ($language['id_lang'] ?? 0);
+            if ($idLang <= 0) {
+                continue;
+            }
+
+            $isoCode = strtoupper((string) ($language['iso_code'] ?? ''));
+            $name = trim((string) ($language['name'] ?? ''));
+
+            if ('' === $isoCode) {
+                $isoCode = 'L' . $idLang;
+            }
+
+            $languages[] = [
+                'id' => $idLang,
+                'label' => $isoCode,
+                'name' => '' !== $name ? $name : $isoCode,
+            ];
+        }
+
+        return $languages;
+    }
+
     protected function refreshSitemapsAfterBackOfficeChange(BlogSitemapService $blogSitemapService, bool $flashWarning = true): bool
     {
         try {
