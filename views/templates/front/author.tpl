@@ -88,7 +88,7 @@
                     </div>
                     {/if}
                     {if isset($author->excerpt) && $author->excerpt}
-                        <p class="everpsblog-author-excerpt mt-2 mb-0">{$author->excerpt|escape:'htmlall':'UTF-8'}</p>
+                        <p class="everpsblog-author-excerpt mt-2 mb-0">{$author->excerpt nofilter}</p>
                     {/if}
                 </div>
             </div>

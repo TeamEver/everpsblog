@@ -210,7 +210,7 @@
                             </a>
                         </h2>
                         {if isset($author_summary) && $author_summary}
-                        <p class="everpsblog-post-author-box__summary mb-3" itemprop="description">{$author_summary|escape:'htmlall':'UTF-8'}</p>
+                        <p class="everpsblog-post-author-box__summary mb-3" itemprop="description">{$author_summary nofilter}</p>
                         {/if}
                         {if isset($author_social_links) && $author_social_links}
                         <div class="everpsblog-post-author-box__social-list d-flex flex-wrap">

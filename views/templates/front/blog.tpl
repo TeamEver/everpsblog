@@ -78,11 +78,7 @@
 <div class="everpsblog-blog-header container-fluid px-0 mb-4">
     <div class="everpsblog-blog-header__inner text-center py-5"{if isset($everpsblog_header_bg_color) && $everpsblog_header_bg_color} style="background: {$everpsblog_header_bg_color|escape:'htmlall':'UTF-8'};"{/if}>
         <h1 class="m-0 everpsblog-blog-header__title">
-            {if isset($blog_page_title) && $blog_page_title}
-                {$blog_page_title|escape:'htmlall':'UTF-8'}
-            {else}
-                {l s='Our blog' d='Modules.Everpsblog.Shop'}
-            {/if}
+            {l s='Our blog' d='Modules.Everpsblog.Shop'}
         </h1>
         {if !isset($pagination) || $pagination.current_page <= 1}
         <div class="everpsblog-blog-header__categories d-flex flex-wrap justify-content-center gap-2 mt-4">
