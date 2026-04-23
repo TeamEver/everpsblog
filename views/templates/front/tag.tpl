@@ -53,9 +53,7 @@
         <div class="everpsblog-taxonomy-hero-overlay">
             <h1 class="m-0 everpsblog-blog-header__title">{$tag->title|escape:'htmlall':'UTF-8'}</h1>
             {if isset($has_tag_banner) && $has_tag_banner && isset($tag_banner_image) && $tag_banner_image}
-            <div class="everpsblog-taxonomy-banner">
-                <img src="{$tag_banner_image|escape:'htmlall':'UTF-8'}" alt="{$tag->title|escape:'htmlall':'UTF-8'}" title="{$tag->title|escape:'htmlall':'UTF-8'}">
-            </div>
+            <div class="everpsblog-taxonomy-banner" style="background-image: url('{$tag_banner_image|escape:'htmlall':'UTF-8'}');" aria-label="{$tag->title|escape:'htmlall':'UTF-8'}"></div>
             {/if}
         </div>
     </div>
