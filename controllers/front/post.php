@@ -342,6 +342,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 }
             }
             $count_products = count($ps_products);
+            $ps_products_chunks = $count_products > 0 ? array_chunk($ps_products, 4) : [];
             $tags = [];
             if (isset($this->post_tags) && !empty($this->post_tags)) {
                 foreach ($this->post_tags as $postTagId) {
@@ -480,6 +481,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 'post_view' => $postViewModel,
                 'tags' => $tags,
                 'ps_products' => $ps_products,
+                'ps_products_chunks' => $ps_products_chunks,
                 'related_posts' => $related_posts,
                 'default_lang' => (int) $this->context->language->id,
                 'id_lang' => (int) $this->context->language->id,
