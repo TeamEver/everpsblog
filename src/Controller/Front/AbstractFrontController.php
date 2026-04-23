@@ -190,8 +190,15 @@ abstract class AbstractFrontController extends \ModuleFrontController
         static $cachedQcdBuilderModuleResolved = false;
 
         if (!$cachedQcdBuilderModuleResolved) {
-            $module = \Module::getInstanceByName('qcdpagebuilder');
-            $cachedQcdBuilderModule = ($module instanceof \Module) ? $module : null;
+            $cachedQcdBuilderModule = null;
+            if (\Module::isInstalled('qcdpagebuilder') && \Module::isEnabled('qcdpagebuilder')) {
+                $module = \Module::getInstanceByName('qcdpagebuilder');
+                if ($module instanceof \Module && (bool) $module->active) {
+                    if (!method_exists($module, 'isEnabledForShopContext') || (bool) $module->isEnabledForShopContext()) {
+                        $cachedQcdBuilderModule = $module;
+                    }
+                }
+            }
             $cachedQcdBuilderModuleResolved = true;
         }
 

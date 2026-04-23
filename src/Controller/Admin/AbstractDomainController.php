@@ -179,13 +179,25 @@ abstract class AbstractDomainController extends FrameworkBundleAdminController
 
     private function isQcdPageBuilderActive(): bool
     {
+        if (!\Module::isInstalled('qcdpagebuilder') || !\Module::isEnabled('qcdpagebuilder')) {
+            return false;
+        }
+
         try {
             $module = \Module::getInstanceByName('qcdpagebuilder');
         } catch (\Throwable $exception) {
             return false;
         }
 
-        return $module instanceof \Module && (bool) $module->active;
+        if (!$module instanceof \Module || !(bool) $module->active) {
+            return false;
+        }
+
+        if (method_exists($module, 'isEnabledForShopContext')) {
+            return (bool) $module->isEnabledForShopContext();
+        }
+
+        return true;
     }
 
     private function buildQcdPageBuilderUrl(string $targetType, int $targetId, string $targetField, int $idLang): string
