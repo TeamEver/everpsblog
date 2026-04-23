@@ -290,6 +290,7 @@ abstract class AbstractFrontController extends \ModuleFrontController
         $currentPage = (int) \Tools::getValue('page');
         $hreflangLinks = [];
         $xDefaultHref = '';
+        $requiredParams = $this->getHreflangRequiredParams($controllerName);
 
         foreach (\Language::getLanguages(true, $idShop) as $language) {
             $idLang = (int) ($language['id_lang'] ?? 0);
@@ -298,6 +299,10 @@ abstract class AbstractFrontController extends \ModuleFrontController
             }
 
             $params = $localizedParamsByLang[$idLang] ?? [];
+            if (!$this->hasHreflangRequiredParams($params, $requiredParams)) {
+                continue;
+            }
+
             if ($currentPage > 1) {
                 $params['page'] = $currentPage;
             }
@@ -333,6 +338,40 @@ abstract class AbstractFrontController extends \ModuleFrontController
             'hreflang_links' => $hreflangLinks,
             'hreflang_x_default' => $xDefaultHref,
         ]);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getHreflangRequiredParams(string $controllerName): array
+    {
+        $requiredParamsByController = [
+            'post' => ['id_ever_post', 'link_rewrite'],
+            'category' => ['id_ever_category', 'link_rewrite'],
+            'tag' => ['id_ever_tag', 'link_rewrite'],
+            'author' => ['id_ever_author', 'link_rewrite'],
+        ];
+
+        return $requiredParamsByController[$controllerName] ?? [];
+    }
+
+    /**
+     * @param array<string, int|string> $params
+     * @param string[] $requiredParams
+     */
+    private function hasHreflangRequiredParams(array $params, array $requiredParams): bool
+    {
+        foreach ($requiredParams as $requiredParam) {
+            if (!array_key_exists($requiredParam, $params) || (string) $params[$requiredParam] === '') {
+                return false;
+            }
+
+            if (strpos($requiredParam, 'id_ever_') === 0 && (int) $params[$requiredParam] <= 0) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
