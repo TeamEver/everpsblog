@@ -25,12 +25,8 @@ final class CategoryType extends AbstractType
             ->add('id_parent_category', ChoiceType::class, [
                 'required' => false,
                 'label' => 'Parent category',
-                'placeholder' => 'None (root)',
+                'placeholder' => 'None',
                 'choices' => $this->getParentCategoryChoices(),
-            ])
-            ->add('is_root_category', CheckboxType::class, [
-                'required' => false,
-                'label' => 'Root category',
             ])
             ->add('active', CheckboxType::class, [
                 'required' => false,
@@ -125,7 +121,8 @@ final class CategoryType extends AbstractType
             FROM `' . _DB_PREFIX_ . 'ever_blog_category` c
             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category_shop` cs ON (cs.id_ever_category = c.id_ever_category)
             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category_lang` cl ON (cl.id_ever_category = c.id_ever_category AND cl.id_lang = ' . (int) \Context::getContext()->language->id . ')
-            WHERE c.id_shop = ' . $idShop . ' OR cs.id_shop = ' . $idShop . '
+            WHERE COALESCE(c.is_root_category, 0) = 0
+                AND (c.id_shop = ' . $idShop . ' OR cs.id_shop = ' . $idShop . ')
             ORDER BY c.id_ever_category ASC'
         ) ?: [];
 

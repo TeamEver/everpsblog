@@ -3085,6 +3085,15 @@ public function emptyTrash($id_shop)
         $this->generateBlogSitemap();
     }
 
+    public function hookActionObjectEverPsBlogCategoryDeleteBefore($params)
+    {
+        $categoryId = isset($params['object']->id) ? (int) $params['object']->id : 0;
+        $shopId = (int) Context::getContext()->shop->id;
+        if ($this->getBlogInstallService()->isProtectedCategoryId($categoryId, $shopId)) {
+            throw new PrestaShopException($this->transAdmin('Root and Unclassed categories cannot be deleted.'));
+        }
+    }
+
     public function hookActionObjectEverPsBlogTagDeleteAfter($params)
     {
         $old_img = $this->module_folder . '/views/img/tags/tag_image_' . (int) $params['object']->id . '.jpg';
@@ -3212,6 +3221,7 @@ public function emptyTrash($id_shop)
             $this->registerHook('actionObjectEverPsBlogAuthorUpdateAfter');
             $this->registerHook('actionObjectShopDeleteAfter');
             $this->registerHook('actionObjectEverPsBlogPostDeleteAfter');
+            $this->registerHook('actionObjectEverPsBlogCategoryDeleteBefore');
             $this->registerHook('actionObjectEverPsBlogCategoryDeleteAfter');
             $this->registerHook('actionObjectEverPsBlogTagDeleteAfter');
             $this->registerHook('actionObjectAuthorDeleteAfter');

@@ -8,7 +8,10 @@ class CategoryRepository extends EntityRepository
 {
     public function findByShopAndLanguage($shopId, $langId)
     {
-        return $this->createLocalizedQb($shopId, $langId)->getQuery()->getArrayResult();
+        return $this->createLocalizedQb($shopId, $langId)
+            ->andWhere('COALESCE(c.rootCategory, 0) = 0')
+            ->getQuery()
+            ->getArrayResult();
     }
 
     public function findAllCategories($langId, $shopId, $active = 1, $onlyParent = 0, $withoutParent = false)

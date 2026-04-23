@@ -411,7 +411,7 @@
                   {% set rowId = attribute(row, definition.columns|first.id) %}
                   <tr>
                     <td class="ever-col-check">
-                      <input type="checkbox" name="bulk_ids[]" value="{{ rowId }}">
+                      <input type="checkbox" name="bulk_ids[]" value="{{ rowId }}"{% if row._is_deletable is defined and not row._is_deletable %} disabled{% endif %}>
                     </td>
                     {% for column in definition.columns %}
                       {% set type = column.type|default('text') %}
@@ -462,7 +462,9 @@
                             onclick="return confirm('{{ 'Duplicate this post?'|trans({}, 'Modules.Everpsblog.Admin')|e('js') }}');"
                           >{{ 'Duplicate'|trans({}, 'Modules.Everpsblog.Admin') }}</button>
                         {% endif %}
-                        <a class="ever-btn ever-btn-delete" href="{{ row._actions.delete }}" onclick="return confirm('{{ 'Confirm deletion?'|trans({}, 'Modules.Everpsblog.Admin')|e('js') }}');">{{ 'Delete'|trans({}, 'Modules.Everpsblog.Admin') }}</a>
+                        {% if row._actions.delete is defined and row._actions.delete %}
+                          <a class="ever-btn ever-btn-delete" href="{{ row._actions.delete }}" onclick="return confirm('{{ 'Confirm deletion?'|trans({}, 'Modules.Everpsblog.Admin')|e('js') }}');">{{ 'Delete'|trans({}, 'Modules.Everpsblog.Admin') }}</a>
+                        {% endif %}
                       </div>
                     </td>
                   </tr>

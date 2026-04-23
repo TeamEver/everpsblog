@@ -5,6 +5,7 @@ namespace PrestaShop\Module\Everpsblog\Grid\Data;
 use PrestaShop\Module\Everpsblog\Core\Grid\GridData;
 use PrestaShop\Module\Everpsblog\Repository\CategoryRepository;
 use PrestaShop\Module\Everpsblog\Service\AdminRouteSigner;
+use PrestaShop\Module\Everpsblog\Service\BlogInstallService;
 use Symfony\Component\Routing\RouterInterface;
 
 final class CategoryGridDataFactory
@@ -13,6 +14,8 @@ final class CategoryGridDataFactory
 
     /** @var CategoryRepository */
     private $categoryRepository;
+    /** @var BlogInstallService */
+    private $blogInstallService;
     /** @var AdminRouteSigner */
     private $routeSigner;
     /** @var RouterInterface */
@@ -24,6 +27,7 @@ final class CategoryGridDataFactory
 
     public function __construct(
         CategoryRepository $categoryRepository,
+        BlogInstallService $blogInstallService,
         AdminRouteSigner $routeSigner,
         RouterInterface $router,
         bool $useLegacyFallback = true,
@@ -31,6 +35,7 @@ final class CategoryGridDataFactory
     )
     {
         $this->categoryRepository = $categoryRepository;
+        $this->blogInstallService = $blogInstallService;
         $this->routeSigner = $routeSigner;
         $this->router = $router;
         $this->useLegacyFallback = $useLegacyFallback;
@@ -43,6 +48,7 @@ final class CategoryGridDataFactory
     public function build(int $shopId, int $langId, array $filters = []): GridData
     {
         $rows = $this->categoryRepository->findByShopAndLanguage($shopId, $langId);
+        $unclassedCategoryId = $this->blogInstallService->getUnclassedCategoryId($shopId);
         $records = [];
 
         foreach ($rows as $row) {
@@ -53,10 +59,12 @@ final class CategoryGridDataFactory
                 $translation = is_array($translations) ? $translations : [];
             }
             $title = is_array($translation) ? (string) ($translation['title'] ?? '') : '';
+            $id = (int) ($row['id'] ?? 0);
             $records[] = [
-                'id_ever_category' => (int) ($row['id'] ?? 0),
+                'id_ever_category' => $id,
                 'title' => $title,
                 'active' => (string) ($row['active'] ?? 0),
+                '_is_deletable' => $id > 0 && $id !== $unclassedCategoryId,
             ];
         }
         $records = $this->filterRecords($records, $filters, [
@@ -74,11 +82,13 @@ final class CategoryGridDataFactory
                     'AdminEverPsBlogCategory',
                     ['updatecategory' => $id]
                 ),
-                'delete' => $this->useModernDeleteAction
-                    ? $this->resolveUrl('everpsblog_admin_category_delete', ['categoryId' => $id], 'AdminEverPsBlogCategory', ['deletecategory' => $id])
-                    : $this->routeSigner->sign('AdminEverPsBlogCategory', ['deletecategory' => $id]),
-                'delete_legacy' => $this->routeSigner->sign('AdminEverPsBlogCategory', ['deletecategory' => $id]),
             ];
+            if (!empty($record['_is_deletable'])) {
+                $record['_actions']['delete'] = $this->useModernDeleteAction
+                    ? $this->resolveUrl('everpsblog_admin_category_delete', ['categoryId' => $id], 'AdminEverPsBlogCategory', ['deletecategory' => $id])
+                    : $this->routeSigner->sign('AdminEverPsBlogCategory', ['deletecategory' => $id]);
+                $record['_actions']['delete_legacy'] = $this->routeSigner->sign('AdminEverPsBlogCategory', ['deletecategory' => $id]);
+            }
             $record['_bulk_actions'] = [
                 'delete' => $this->resolveBulkActionUrl('everpsblog_admin_category_bulk_delete', 'AdminEverPsBlogCategory'),
             ];

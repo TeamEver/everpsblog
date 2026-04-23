@@ -627,7 +627,7 @@ class WordPressRestImporter
              FROM `' . _DB_PREFIX_ . 'ever_blog_category` c
              LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category_shop` cs
                 ON cs.id_ever_category = c.id_ever_category
-             WHERE c.is_root_category = 0
+             WHERE COALESCE(c.is_root_category, 0) = 0
                 AND (c.id_shop = ' . (int) $shopId . ' OR cs.id_shop = ' . (int) $shopId . ')
              ORDER BY c.id_ever_category ASC'
         );

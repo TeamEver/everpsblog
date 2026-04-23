@@ -9,6 +9,7 @@ use PrestaShop\Module\Everpsblog\Form\DataProvider\CategoryFormDataProvider;
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\CategoryType;
 use PrestaShop\Module\Everpsblog\Grid\Data\CategoryGridDataFactory;
 use PrestaShop\Module\Everpsblog\Grid\Definition\CategoryGridDefinitionFactory;
+use PrestaShop\Module\Everpsblog\Service\BlogInstallService;
 use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
 use Symfony\Component\Form\FormError;
@@ -24,8 +25,9 @@ class CategoryController extends AbstractDomainController
     private $dataFactory;
     private $formDataProvider;
     private $blogSitemapService;
+    private $blogInstallService;
 
-    public function __construct(ContextStateService $contextStateService, CommandBusInterface $commandBus, CategoryCommandAssembler $commandAssembler, CategoryGridDefinitionFactory $definitionFactory, CategoryGridDataFactory $dataFactory, CategoryFormDataProvider $formDataProvider, BlogSitemapService $blogSitemapService)
+    public function __construct(ContextStateService $contextStateService, CommandBusInterface $commandBus, CategoryCommandAssembler $commandAssembler, CategoryGridDefinitionFactory $definitionFactory, CategoryGridDataFactory $dataFactory, CategoryFormDataProvider $formDataProvider, BlogSitemapService $blogSitemapService, BlogInstallService $blogInstallService)
     {
         parent::__construct($contextStateService);
         $this->commandBus = $commandBus;
@@ -34,6 +36,7 @@ class CategoryController extends AbstractDomainController
         $this->dataFactory = $dataFactory;
         $this->formDataProvider = $formDataProvider;
         $this->blogSitemapService = $blogSitemapService;
+        $this->blogInstallService = $blogInstallService;
     }
 
     public function indexAction(Request $request): Response
@@ -51,6 +54,12 @@ class CategoryController extends AbstractDomainController
     public function formAction(Request $request, ?int $categoryId = null): Response
     {
         $isEdit = null !== $categoryId;
+        if ($isEdit && $this->blogInstallService->isRootCategoryId((int) $categoryId, $this->getContextShopId())) {
+            $this->addFlash('warning', $this->transAdmin('Root category is managed automatically and cannot be edited from the back office.'));
+
+            return $this->redirectToRoute('everpsblog_admin_category');
+        }
+
         $csrfTokenId = $isEdit ? 'everpsblog_category_update_' . $categoryId : 'everpsblog_category_create';
 
         $form = $this->createForm(CategoryType::class, $this->formDataProvider->getData($categoryId), [
@@ -134,8 +143,15 @@ class CategoryController extends AbstractDomainController
     {
         $this->validateCsrfToken($request, 'everpsblog_category_delete_' . $categoryId);
 
-        $this->commandBus->handle(new DeleteCategoryCommand($categoryId));
-        $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService, false);
+        try {
+            $this->commandBus->handle(new DeleteCategoryCommand($categoryId));
+            $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService, false);
+        } catch (\RuntimeException $exception) {
+            return new JsonResponse(
+                ['error' => $this->transAdmin($exception->getMessage())],
+                JsonResponse::HTTP_CONFLICT
+            );
+        }
 
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }

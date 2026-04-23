@@ -35,7 +35,7 @@ class CategoryCommandAssembler
 
     private function mergeDefaults(array $data): array
     {
-        return array_merge([
+        $merged = array_merge([
             'id_shop' => $this->shopId,
             'title' => '',
             'meta_title' => '',
@@ -51,5 +51,8 @@ class CategoryCommandAssembler
             'allowed_groups' => [],
             'category_products' => [],
         ], $data);
+        $merged['is_root_category'] = 0;
+
+        return $merged;
     }
 }

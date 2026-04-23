@@ -263,7 +263,7 @@ final class PostType extends AbstractType
             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category_lang` cl ON (cl.id_ever_category = c.id_ever_category AND cl.id_lang = ' . (int) \Context::getContext()->language->id . ')
             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category_shop` cs ON (cs.id_ever_category = c.id_ever_category)
             WHERE c.active = 1
-                AND c.is_root_category = 0
+                AND COALESCE(c.is_root_category, 0) = 0
                 AND (c.id_shop = ' . $idShop . ' OR cs.id_shop = ' . $idShop . ')
             ORDER BY c.id_ever_category ASC'
         ) ?: [];

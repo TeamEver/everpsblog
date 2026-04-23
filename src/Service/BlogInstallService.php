@@ -103,6 +103,26 @@ class BlogInstallService
         );
     }
 
+    public function isRootCategoryId(int $categoryId, ?int $shopId = null): bool
+    {
+        if ($categoryId <= 0) {
+            return false;
+        }
+
+        $where = 'c.id_ever_category = ' . (int) $categoryId . ' AND c.is_root_category = 1';
+        if (null !== $shopId && $shopId > 0) {
+            $where .= ' AND (c.id_shop = ' . (int) $shopId . ' OR cs.id_shop = ' . (int) $shopId . ')';
+        }
+
+        return (bool) \Db::getInstance()->getValue(
+            'SELECT c.id_ever_category
+             FROM `' . _DB_PREFIX_ . 'ever_blog_category` c
+             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category_shop` cs
+                ON cs.id_ever_category = c.id_ever_category
+             WHERE ' . $where
+        );
+    }
+
     public function ensureRootCategory(int $shopId): int
     {
         $rootId = $this->getRootCategoryId($shopId);
@@ -157,7 +177,7 @@ class BlogInstallService
                 AND root.id_shop = ' . (int) $shopId . '
              INNER JOIN `' . _DB_PREFIX_ . 'ever_blog_category_lang` cl
                 ON cl.id_ever_category = c.id_ever_category
-             WHERE c.is_root_category = 0
+             WHERE COALESCE(c.is_root_category, 0) = 0
                 AND c.id_shop = ' . (int) $shopId . '
                 AND cl.link_rewrite IN ("unclassed", "non-classe")
              ORDER BY c.id_ever_category ASC'
@@ -168,6 +188,29 @@ class BlogInstallService
         }
 
         return $unclassedId;
+    }
+
+    public function isUnclassedCategoryId(int $categoryId, ?int $shopId = null): bool
+    {
+        if ($categoryId <= 0) {
+            return false;
+        }
+
+        $shopIds = null !== $shopId && $shopId > 0 ? [$shopId] : $this->getCategoryShopIds($categoryId);
+        foreach ($shopIds as $categoryShopId) {
+            if ($categoryId === $this->getUnclassedCategoryId((int) $categoryShopId)) {
+                return true;
+            }
+        }
+
+        $globalConfiguredId = (int) \Configuration::get('EVERBLOG_UNCLASSED_ID');
+
+        return $globalConfiguredId > 0 && $categoryId === $globalConfiguredId;
+    }
+
+    public function isProtectedCategoryId(int $categoryId, ?int $shopId = null): bool
+    {
+        return $this->isRootCategoryId($categoryId, $shopId) || $this->isUnclassedCategoryId($categoryId, $shopId);
     }
 
     private function categoryBelongsToShop(int $categoryId, int $shopId): bool
@@ -184,6 +227,30 @@ class BlogInstallService
              WHERE c.id_ever_category = ' . (int) $categoryId . '
                 AND (c.id_shop = ' . (int) $shopId . ' OR cs.id_shop = ' . (int) $shopId . ')'
         );
+    }
+
+    /**
+     * @return int[]
+     */
+    private function getCategoryShopIds(int $categoryId): array
+    {
+        $rows = \Db::getInstance()->executeS(
+            'SELECT DISTINCT id_shop
+             FROM (
+                SELECT id_shop
+                FROM `' . _DB_PREFIX_ . 'ever_blog_category`
+                WHERE id_ever_category = ' . (int) $categoryId . '
+                UNION
+                SELECT id_shop
+                FROM `' . _DB_PREFIX_ . 'ever_blog_category_shop`
+                WHERE id_ever_category = ' . (int) $categoryId . '
+             ) shops
+             WHERE id_shop > 0'
+        ) ?: [];
+
+        return array_values(array_filter(array_map(static function (array $row): int {
+            return (int) ($row['id_shop'] ?? 0);
+        }, $rows)));
     }
 
     private function transAdmin(string $message): string

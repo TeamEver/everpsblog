@@ -94,6 +94,7 @@ services:
     class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\DeleteCategoryHandler
     arguments:
       - '@prestashop.module.everpsblog.blog.repository.category_write'
+      - '@prestashop.module.everpsblog.blog.install_service'
 
   prestashop.module.everpsblog.blog.create_tag_handler:
     class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\CreateTagHandler
