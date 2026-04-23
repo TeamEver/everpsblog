@@ -147,12 +147,12 @@ class EverPsBlogauthorModuleFrontController extends AbstractFrontController
             ]);
             $social_share_links = [];
             $social_share_links['facebook'] = [
-                'label' => $this->trans('Share', [], 'Modules.Everpsblog.Shop'),
+                'label' => $this->transShop('Share'),
                 'class' => 'facebook',
                 'url' => 'https://www.facebook.com/sharer.php?u=' . $page['canonical'],
             ];
             $social_share_links['twitter'] = [
-                'label' => $this->trans('Tweet', [], 'Modules.Everpsblog.Shop'),
+                'label' => $this->transShop('Tweet'),
                 'class' => 'twitter',
                 'url' => 'https://twitter.com/intent/tweet?text=' . $this->author->nickhandle . ' ' . $page['canonical'],
             ];

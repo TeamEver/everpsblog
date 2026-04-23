@@ -28,7 +28,7 @@ abstract class AbstractDomainController extends FrameworkBundleAdminController
 
     protected function transAdmin(string $message, array $parameters = []): string
     {
-        return $this->trans($message, $parameters, 'Modules.Everpsblog.Admin');
+        return $this->trans($message, 'Modules.Everpsblog.Admin', $parameters);
     }
 
     /**
