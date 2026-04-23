@@ -96,16 +96,11 @@
     </div>
 </div>
 <div class="container my-4">
-    <div class="d-flex justify-content-center mb-3">
-        {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
-    </div>
+    {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
 {if isset($facet_url)}
 <script type="text/javascript">
     var facetUrl = '{$facet_url|escape:'javascript'}';
 </script>
-{/if}
-{if isset($allow_feed) && $allow_feed}
-<a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' d='Modules.Everpsblog.Shop'} {$page.meta.title|escape:'htmlall':'UTF-8'}</a>
 {/if}
 <span class="paginated float-end d-none">{if isset($pagination) && $pagination.current_page > 0}{l s='(page' d='Modules.Everpsblog.Shop'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' d='Modules.Everpsblog.Shop'}{/if}</span>
 {if isset($paginated) && !$paginated}

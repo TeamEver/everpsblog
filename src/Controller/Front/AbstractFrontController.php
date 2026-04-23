@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace PrestaShop\Module\Everpsblog\Controller\Front;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 use PrestaShop\PrestaShop\Core\Product\Search\Pagination;
 
 require_once dirname(__DIR__, 3) . '/everpsblog.php';

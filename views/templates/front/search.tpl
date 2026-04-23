@@ -25,9 +25,7 @@
     </div>
 </div>
 <div class="container my-4">
-    <div class="d-flex justify-content-center mb-3">
-        {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
-    </div>
+    {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
     {if isset($post_number) && $post_number > 0}
     <div class="row mt-2">
         {foreach from=$posts item=item}

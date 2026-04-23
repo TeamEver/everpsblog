@@ -1,6 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PrestaShop\Module\Everpsblog\Controller\Admin;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\ConfigurationType;
 use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;

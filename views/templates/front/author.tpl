@@ -86,14 +86,7 @@
             </div>
         </div>
         <div class="container my-4">
-            <div class="d-flex justify-content-center mb-3">
-                {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
-            </div>
-            {if isset($allow_feed) && $allow_feed}
-            <div class="text-center mb-3">
-                <a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' d='Modules.Everpsblog.Shop'} {$author->nickhandle|escape:'htmlall':'UTF-8'}</a>
-            </div>
-            {/if}
+            {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
         </div>
     </div>
     {if isset($show_author_intro) && $show_author_intro}

@@ -6,14 +6,19 @@
     background: url(../img/social.png) no-repeat;
     height: 20px;
     width: 20px;
-    text-indent: -3000px;
-    margin-top: -1.7em;
-    float: right;
     filter: alpha(opacity=60);
     -moz-opacity: 0.6;
     -khtml-opacity: 0.6;
     opacity: 0.6;
     background-position: -60px 0;
+    transition: opacity .2s ease-in-out;
+}
+.rss-link:hover,
+.rss-link:focus{
+    filter: alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
 }
 #module-everpsblog-post img{
     max-width: 100%;

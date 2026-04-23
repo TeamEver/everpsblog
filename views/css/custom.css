@@ -1,4 +1,32 @@
 /* just to avoid error in console log */
+.everpsblog-search-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: start;
+    gap: 1rem;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.everpsblog-search-toolbar__search {
+    grid-column: 2;
+    justify-self: center;
+}
+
+.everpsblog-search {
+    margin: 0;
+}
+
+.everpsblog-search .input-group {
+    flex-wrap: nowrap;
+}
+
+.everpsblog-search-toolbar > .rss-link {
+    grid-column: 3;
+    justify-self: end;
+    align-self: start;
+}
+
 .everpsblog-search input[type="search"] {
     /* Keep outer rounding only on the left side */
     border-radius: .6rem 0 0 .6rem;
@@ -8,6 +36,34 @@
 /* Match search button rounding with the input */
 .everpsblog-search button[type="submit"] {
     border-radius: 0 .6rem .6rem 0;
+}
+
+@media (max-width: 767.98px) {
+    .everpsblog-search-toolbar {
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+    }
+
+    .everpsblog-search-toolbar__search {
+        grid-column: 1;
+        justify-self: stretch;
+    }
+
+    .everpsblog-search {
+        width: 100%;
+    }
+
+    .everpsblog-search .input-group {
+        width: 100%;
+    }
+
+    .everpsblog-search input[type="search"] {
+        max-width: none;
+    }
+
+    .everpsblog-search-toolbar > .rss-link {
+        grid-column: 2;
+    }
 }
 
 /* Force X branding even if the active theme still styles .twitter buttons. */
