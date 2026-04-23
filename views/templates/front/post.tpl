@@ -97,9 +97,7 @@
                     <div class="everpsblog-post-hero-overlay">
                         <h1 class="everpsblog-post-title mb-4">{$post->title|escape:'htmlall':'UTF-8'}</h1>
                         {if isset($has_post_banner) && $has_post_banner && isset($post_banner_image) && $post_banner_image}
-                        <div class="everpsblog-post-banner">
-                            <img src="{$post_banner_image|escape:'htmlall':'UTF-8'}" alt="{$post->title|escape:'htmlall':'UTF-8'}" title="{$post->title|escape:'htmlall':'UTF-8'}">
-                        </div>
+                        <div class="everpsblog-post-banner" style="background-image: url('{$post_banner_image|escape:'htmlall':'UTF-8'}');" aria-label="{$post->title|escape:'htmlall':'UTF-8'}"></div>
                         {/if}
                         {if $social_share_links}
                         <div class="social-sharing social-sharing-hero">

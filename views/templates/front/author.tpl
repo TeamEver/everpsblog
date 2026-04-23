@@ -83,9 +83,7 @@
                 <div class="everpsblog-taxonomy-hero-overlay">
                     <h1 itemprop="headline" class="m-0 everpsblog-blog-header__title">{$author->nickhandle|escape:'htmlall':'UTF-8'}</h1>
                     {if isset($has_author_banner) && $has_author_banner && isset($author_banner_image) && $author_banner_image}
-                    <div class="everpsblog-taxonomy-banner">
-                        <img src="{$author_banner_image|escape:'htmlall':'UTF-8'}" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'}" title="{$author->nickhandle|escape:'htmlall':'UTF-8'}">
-                    </div>
+                    <div class="everpsblog-taxonomy-banner" style="background-image: url('{$author_banner_image|escape:'htmlall':'UTF-8'}');" aria-label="{$author->nickhandle|escape:'htmlall':'UTF-8'}"></div>
                     {/if}
                     {if isset($author->excerpt) && $author->excerpt}
                         <p class="everpsblog-author-excerpt mt-2 mb-0">{$author->excerpt nofilter}</p>

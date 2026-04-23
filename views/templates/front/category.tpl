@@ -81,9 +81,7 @@
         <div class="everpsblog-category-hero-overlay">
             <h1 class="m-0 everpsblog-blog-header__title everpsblog-category-title">{$category->title|escape:'htmlall':'UTF-8'}</h1>
             {if isset($has_category_banner) && $has_category_banner && isset($category_banner_image) && $category_banner_image}
-            <div class="everpsblog-taxonomy-banner">
-                <img src="{$category_banner_image|escape:'htmlall':'UTF-8'}" alt="{$category->title|escape:'htmlall':'UTF-8'}" title="{$category->title|escape:'htmlall':'UTF-8'}">
-            </div>
+            <div class="everpsblog-taxonomy-banner" style="background-image: url('{$category_banner_image|escape:'htmlall':'UTF-8'}');" aria-label="{$category->title|escape:'htmlall':'UTF-8'}"></div>
             {/if}
             {if isset($children_categories) && $children_categories && !empty($children_categories)}
             <div class="everpsblog-subcategories everpsblog-blog-header__categories d-flex flex-wrap justify-content-center gap-2 mt-4" role="navigation" aria-label="{l s='Subcategories' d='Modules.Everpsblog.Shop'}">

@@ -611,14 +611,12 @@ body#module-everpsblog-post .product-miniature .product-miniature{
 
 #module-everpsblog-post .everpsblog-post-banner {
     width: 100%;
-}
-
-#module-everpsblog-post .everpsblog-post-banner img {
-    display: block;
-    width: 100%;
+    min-height: 260px;
     max-height: 420px;
-    object-fit: cover;
-    background: #fff;
+    height: clamp(260px, 34vw, 420px);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 
 #module-everpsblog-category .everpsblog-taxonomy-hero-overlay,
@@ -633,16 +631,12 @@ body#module-everpsblog-post .product-miniature .product-miniature{
 #module-everpsblog-author .everpsblog-taxonomy-banner {
     width: 100%;
     margin-top: 1.5rem;
-}
-
-#module-everpsblog-category .everpsblog-taxonomy-banner img,
-#module-everpsblog-tag .everpsblog-taxonomy-banner img,
-#module-everpsblog-author .everpsblog-taxonomy-banner img {
-    display: block;
-    width: 100%;
+    min-height: 260px;
     max-height: 420px;
-    object-fit: cover;
-    background: #fff;
+    height: clamp(260px, 34vw, 420px);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 
 #module-everpsblog-post .everpsblog-post-title {
