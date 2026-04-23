@@ -113,7 +113,7 @@ class ModuleTranslationCatalogService
 
     private function translationTableExists(): bool
     {
-        return (bool) \Db::getInstance()->getValue(
+        return (bool) \Db::getInstance()->executeS(
             'SHOW TABLES LIKE "' . pSQL(_DB_PREFIX_ . 'translation') . '"'
         );
     }
