@@ -38,8 +38,8 @@ class EverPsBlog extends Module
     private $blogSortOrderService;
     private $blogSitemapService;
     private $blogRedirectService;
+    private $blogFrontCacheInvalidator;
     private $legacyImportAdapter;
-    private $serviceCachePool;
     public static $route = [];
 
     public function __construct()
@@ -220,9 +220,7 @@ class EverPsBlog extends Module
     private function getBlogTaxonomyService()
     {
         if (!$this->blogTaxonomyService) {
-            $this->blogTaxonomyService = new \PrestaShop\Module\Everpsblog\Service\BlogTaxonomyService(
-                $this->getServiceCachePool()
-            );
+            $this->blogTaxonomyService = new \PrestaShop\Module\Everpsblog\Service\BlogTaxonomyService();
         }
 
         return $this->blogTaxonomyService;
@@ -231,12 +229,19 @@ class EverPsBlog extends Module
     private function getBlogImageService()
     {
         if (!$this->blogImageService) {
-            $this->blogImageService = new \PrestaShop\Module\Everpsblog\Service\BlogImageService(
-                $this->getServiceCachePool()
-            );
+            $this->blogImageService = new \PrestaShop\Module\Everpsblog\Service\BlogImageService();
         }
 
         return $this->blogImageService;
+    }
+
+    private function getBlogFrontCacheInvalidator()
+    {
+        if (!$this->blogFrontCacheInvalidator) {
+            $this->blogFrontCacheInvalidator = new \PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheInvalidator();
+        }
+
+        return $this->blogFrontCacheInvalidator;
     }
 
 
@@ -345,13 +350,37 @@ class EverPsBlog extends Module
         return $this->legacyImportAdapter;
     }
 
-    private function getServiceCachePool()
+    private function buildLegacyPostCacheSnapshot($post): array
     {
-        if (!$this->serviceCachePool) {
-            $this->serviceCachePool = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
+        if (!is_object($post)) {
+            return [
+                'author_id' => 0,
+                'default_category_id' => 0,
+                'category_ids' => [],
+                'tag_ids' => [],
+            ];
         }
 
-        return $this->serviceCachePool;
+        return [
+            'author_id' => (int) ($post->id_author ?? 0),
+            'default_category_id' => (int) ($post->id_default_category ?? 0),
+            'category_ids' => $this->normalizeLegacyCacheIds($post->post_categories ?? []),
+            'tag_ids' => $this->normalizeLegacyCacheIds($post->post_tags ?? []),
+        ];
+    }
+
+    private function normalizeLegacyCacheIds($value): array
+    {
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            $value = is_array($decoded) ? $decoded : preg_split('/\s*,\s*/', $value, -1, PREG_SPLIT_NO_EMPTY);
+        }
+
+        if (!is_array($value)) {
+            return [];
+        }
+
+        return array_values(array_unique(array_filter(array_map('intval', $value))));
     }
 
     /**
@@ -1305,6 +1334,11 @@ public function emptyTrash($id_shop)
         $this->getBlogTaxonomyService()->checkDefaultPostCategory(
             $params['object']->id
         );
+        $this->getBlogFrontCacheInvalidator()->invalidatePostMutation(
+            (int) $params['object']->id,
+            [],
+            $this->buildLegacyPostCacheSnapshot($params['object'])
+        );
         // Drop temp img
         $tmp_file = _PS_IMG_DIR_
         . 'tmp/ever_blog_post_mini_'
@@ -1322,6 +1356,11 @@ public function emptyTrash($id_shop)
         if (!in_array(Context::getContext()->controller->controller_type, $controllerTypes)) {
             return;
         }
+        $this->getBlogFrontCacheInvalidator()->invalidateCategoryMutation(
+            (int) $params['object']->id,
+            [],
+            ['parent_id' => (int) ($params['object']->id_parent_category ?? 0)]
+        );
         // Drop temp img
         $tmp_file = _PS_IMG_DIR_
         . 'tmp/ever_blog_category_mini_'
@@ -1339,6 +1378,7 @@ public function emptyTrash($id_shop)
         if (!in_array(Context::getContext()->controller->controller_type, $controllerTypes)) {
             return;
         }
+        $this->getBlogFrontCacheInvalidator()->invalidateTagMutation((int) $params['object']->id);
         // Drop temp img
         $tmp_file = _PS_IMG_DIR_
         . 'tmp/ever_blog_tag_mini_'
@@ -1356,6 +1396,7 @@ public function emptyTrash($id_shop)
         if (!in_array(Context::getContext()->controller->controller_type, $controllerTypes)) {
             return;
         }
+        $this->getBlogFrontCacheInvalidator()->invalidateAuthorMutation((int) $params['object']->id);
         // Drop temp img
         $tmp_file = _PS_IMG_DIR_
         . 'tmp/ever_blog_author_mini_'
@@ -1382,6 +1423,11 @@ public function emptyTrash($id_shop)
 
     public function hookActionObjectEverPsBlogPostDeleteAfter($params)
     {
+        $this->getBlogFrontCacheInvalidator()->invalidatePostMutation(
+            (int) $params['object']->id,
+            $this->buildLegacyPostCacheSnapshot($params['object']),
+            []
+        );
         $old_img = _PS_MODULE_DIR_
         . 'everpsblog/views/img/posts/post_image_'
         . (int) $params['object']->id
@@ -1411,6 +1457,11 @@ public function emptyTrash($id_shop)
 
     public function hookActionObjectEverPsBlogCategoryDeleteAfter($params)
     {
+        $this->getBlogFrontCacheInvalidator()->invalidateCategoryMutation(
+            (int) $params['object']->id,
+            ['parent_id' => (int) ($params['object']->id_parent_category ?? 0)],
+            []
+        );
         $shopId = (int) Context::getContext()->shop->id;
         if ((int) $params['object']->id == $this->getBlogInstallService()->getUnclassedCategoryId($shopId)) {
             $rootCategoryId = $this->getBlogInstallService()->getRootCategoryId($shopId);
@@ -1462,6 +1513,7 @@ public function emptyTrash($id_shop)
 
     public function hookActionObjectEverPsBlogTagDeleteAfter($params)
     {
+        $this->getBlogFrontCacheInvalidator()->invalidateTagMutation((int) $params['object']->id);
         $old_img = $this->module_folder . '/views/img/tags/tag_image_' . (int) $params['object']->id . '.jpg';
         if (file_exists($old_img)) {
             unlink($old_img);
@@ -1475,6 +1527,7 @@ public function emptyTrash($id_shop)
 
     public function hookActionObjectAuthorDeleteAfter($params)
     {
+        $this->getBlogFrontCacheInvalidator()->invalidateAuthorMutation((int) $params['object']->id);
         $old_img = _PS_MODULE_DIR_
         . 'everpsblog/views/img/authors/author_image_'
         . (int) $params['object']->id

@@ -8,6 +8,8 @@ use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\UpdatePostCommand;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository\PostWriteRepository;
 use PrestaShop\Module\Everpsblog\Entity\Post;
 use PrestaShop\Module\Everpsblog\Service\BlogRedirectService;
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheInvalidator;
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheRelationResolver;
 
 class UpdatePostHandler
 {
@@ -19,17 +21,25 @@ class UpdatePostHandler
     private $postWriteRepository;
     /** @var BlogRedirectService */
     private $blogRedirectService;
+    /** @var BlogFrontCacheInvalidator */
+    private $cacheInvalidator;
+    /** @var BlogFrontCacheRelationResolver */
+    private $cacheRelationResolver;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         PostRulesApplier $rulesApplier,
         PostWriteRepository $postWriteRepository,
-        BlogRedirectService $blogRedirectService
+        BlogRedirectService $blogRedirectService,
+        ?BlogFrontCacheInvalidator $cacheInvalidator = null,
+        ?BlogFrontCacheRelationResolver $cacheRelationResolver = null
     ) {
         $this->entityManager = $entityManager;
         $this->rulesApplier = $rulesApplier;
         $this->postWriteRepository = $postWriteRepository;
         $this->blogRedirectService = $blogRedirectService;
+        $this->cacheInvalidator = $cacheInvalidator ?: new BlogFrontCacheInvalidator();
+        $this->cacheRelationResolver = $cacheRelationResolver ?: new BlogFrontCacheRelationResolver();
     }
 
     public function __invoke(UpdatePostCommand $command): int
@@ -42,9 +52,15 @@ class UpdatePostHandler
 
         $data = $command->getData()->toArray();
         $previousSlugs = $this->postWriteRepository->getLocalizedSlugs((int) $post->getId());
+        $beforeSnapshot = $this->cacheRelationResolver->getPostSnapshot((int) $post->getId());
 
         $relations = $this->rulesApplier->apply($post, $data);
         $this->postWriteRepository->save($post, $relations);
+        $this->cacheInvalidator->invalidatePostMutation(
+            (int) $post->getId(),
+            $beforeSnapshot,
+            $this->cacheRelationResolver->getPostSnapshot((int) $post->getId())
+        );
         $this->saveSlugRedirects((int) $post->getId(), $data, $previousSlugs);
 
         return (int) $post->getId();

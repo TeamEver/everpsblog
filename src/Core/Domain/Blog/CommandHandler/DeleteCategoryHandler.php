@@ -5,6 +5,8 @@ namespace PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\DeleteCategoryCommand;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository\CategoryWriteRepository;
 use PrestaShop\Module\Everpsblog\Service\BlogInstallService;
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheInvalidator;
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheRelationResolver;
 
 class DeleteCategoryHandler
 {
@@ -12,11 +14,22 @@ class DeleteCategoryHandler
     private $repository;
     /** @var BlogInstallService */
     private $blogInstallService;
+    /** @var BlogFrontCacheInvalidator */
+    private $cacheInvalidator;
+    /** @var BlogFrontCacheRelationResolver */
+    private $cacheRelationResolver;
 
-    public function __construct(CategoryWriteRepository $repository, BlogInstallService $blogInstallService)
+    public function __construct(
+        CategoryWriteRepository $repository,
+        BlogInstallService $blogInstallService,
+        ?BlogFrontCacheInvalidator $cacheInvalidator = null,
+        ?BlogFrontCacheRelationResolver $cacheRelationResolver = null
+    )
     {
         $this->repository = $repository;
         $this->blogInstallService = $blogInstallService;
+        $this->cacheInvalidator = $cacheInvalidator ?: new BlogFrontCacheInvalidator();
+        $this->cacheRelationResolver = $cacheRelationResolver ?: new BlogFrontCacheRelationResolver();
     }
 
     public function __invoke(DeleteCategoryCommand $command): void
@@ -26,6 +39,8 @@ class DeleteCategoryHandler
             throw new \RuntimeException('Root and Unclassed categories cannot be deleted.');
         }
 
+        $beforeSnapshot = $this->cacheRelationResolver->getCategorySnapshot($categoryId);
         $this->repository->delete($categoryId);
+        $this->cacheInvalidator->invalidateCategoryMutation($categoryId, $beforeSnapshot, []);
     }
 }

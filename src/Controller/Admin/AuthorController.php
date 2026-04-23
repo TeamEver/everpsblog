@@ -13,6 +13,7 @@ use PrestaShop\Module\Everpsblog\Grid\Definition\AuthorGridDefinitionFactory;
 use PrestaShop\Module\Everpsblog\Service\AdminBlogImageManager;
 use PrestaShop\Module\Everpsblog\Service\BlogImageService;
 use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheInvalidator;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
 use PrestaShop\Module\Everpsblog\Service\ImageUploader;
 use Symfony\Component\Form\FormError;
@@ -33,6 +34,7 @@ class AuthorController extends AbstractDomainController
     private $imageUploader;
     private $blogSitemapService;
     private $adminBlogImageManager;
+    private $cacheInvalidator;
 
     public function __construct(
         ContextStateService $contextStateService,
@@ -45,7 +47,8 @@ class AuthorController extends AbstractDomainController
         BlogImageService $blogImageService,
         ImageUploader $imageUploader,
         BlogSitemapService $blogSitemapService,
-        AdminBlogImageManager $adminBlogImageManager
+        AdminBlogImageManager $adminBlogImageManager,
+        ?BlogFrontCacheInvalidator $cacheInvalidator = null
     ) {
         parent::__construct($contextStateService);
         $this->commandBus = $commandBus;
@@ -58,6 +61,7 @@ class AuthorController extends AbstractDomainController
         $this->imageUploader = $imageUploader;
         $this->blogSitemapService = $blogSitemapService;
         $this->adminBlogImageManager = $adminBlogImageManager;
+        $this->cacheInvalidator = $cacheInvalidator ?: new BlogFrontCacheInvalidator();
     }
 
     public function indexAction(Request $request): Response
@@ -254,6 +258,7 @@ class AuthorController extends AbstractDomainController
         }
 
         $this->blogImageService->clearCache();
+        $this->cacheInvalidator->invalidateImageMutation($authorId, 'author');
     }
 
     private function handleBannerImageUpload($uploadedImage, int $authorId): void
@@ -292,6 +297,7 @@ class AuthorController extends AbstractDomainController
 
         $this->deleteAuthorImageFiles($authorId);
         $this->blogImageService->clearCache();
+        $this->cacheInvalidator->invalidateImageMutation($authorId, 'author');
     }
 
     private function deleteAuthorImageFiles(int $authorId): void

@@ -2,14 +2,19 @@
 
 namespace PrestaShop\Module\Everpsblog\Service;
 
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheInvalidator;
+
 final class PostDuplicator
 {
     /** @var BlogImageService */
     private $blogImageService;
+    /** @var BlogFrontCacheInvalidator */
+    private $cacheInvalidator;
 
-    public function __construct(BlogImageService $blogImageService)
+    public function __construct(BlogImageService $blogImageService, ?BlogFrontCacheInvalidator $cacheInvalidator = null)
     {
         $this->blogImageService = $blogImageService;
+        $this->cacheInvalidator = $cacheInvalidator ?: new BlogFrontCacheInvalidator();
     }
 
     public function duplicate(int $sourcePostId, int $shopId): int
@@ -32,6 +37,7 @@ final class PostDuplicator
         $this->ensureDefaultCategoryRelation($newPostId, (int) ($source['id_default_category'] ?? 0));
         $this->duplicatePostImage($sourcePostId, $newPostId, $shopId, 'post');
         $this->duplicatePostImage($sourcePostId, $newPostId, $shopId, 'post_banner');
+        $this->cacheInvalidator->invalidatePostMutation($newPostId);
 
         return $newPostId;
     }

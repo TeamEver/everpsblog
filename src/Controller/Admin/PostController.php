@@ -12,6 +12,7 @@ use PrestaShop\Module\Everpsblog\Grid\Definition\PostGridDefinitionFactory;
 use PrestaShop\Module\Everpsblog\Service\Audit\SensitiveActionLogger;
 use PrestaShop\Module\Everpsblog\Service\BlogImageService;
 use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheInvalidator;
 use PrestaShop\Module\Everpsblog\Service\ImageUploader;
 use PrestaShop\Module\Everpsblog\Service\PostDuplicator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -32,6 +33,7 @@ class PostController extends AbstractDomainController
     private $imageUploader;
     private $postDuplicator;
     private $blogSitemapService;
+    private $cacheInvalidator;
 
     public function __construct(
         \PrestaShop\Module\Everpsblog\Service\ContextStateService $contextStateService,
@@ -44,7 +46,8 @@ class PostController extends AbstractDomainController
         BlogImageService $blogImageService,
         ImageUploader $imageUploader,
         PostDuplicator $postDuplicator,
-        BlogSitemapService $blogSitemapService
+        BlogSitemapService $blogSitemapService,
+        ?BlogFrontCacheInvalidator $cacheInvalidator = null
     ) {
         parent::__construct($contextStateService);
         $this->commandBus = $commandBus;
@@ -57,6 +60,7 @@ class PostController extends AbstractDomainController
         $this->imageUploader = $imageUploader;
         $this->postDuplicator = $postDuplicator;
         $this->blogSitemapService = $blogSitemapService;
+        $this->cacheInvalidator = $cacheInvalidator ?: new BlogFrontCacheInvalidator();
     }
 
     public function indexAction(Request $request): Response
@@ -444,6 +448,7 @@ class PostController extends AbstractDomainController
         }
 
         $this->blogImageService->clearCache();
+        $this->cacheInvalidator->invalidateImageMutation($postId, $imageType);
     }
 
     private function deleteFeaturedImage(int $postId): void
@@ -475,6 +480,7 @@ class PostController extends AbstractDomainController
 
         $this->deleteBlogImageFiles($postId, $imageType);
         $this->blogImageService->clearCache();
+        $this->cacheInvalidator->invalidateImageMutation($postId, $imageType);
     }
 
     private function deleteBlogImageFiles(int $postId, string $imageType): void

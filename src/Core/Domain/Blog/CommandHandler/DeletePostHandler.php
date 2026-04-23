@@ -7,6 +7,8 @@ use InvalidArgumentException;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\DeletePostCommand;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository\PostWriteRepository;
 use PrestaShop\Module\Everpsblog\Entity\Post;
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheInvalidator;
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheRelationResolver;
 
 class DeletePostHandler
 {
@@ -14,11 +16,22 @@ class DeletePostHandler
     private $entityManager;
     /** @var PostWriteRepository */
     private $postWriteRepository;
+    /** @var BlogFrontCacheInvalidator */
+    private $cacheInvalidator;
+    /** @var BlogFrontCacheRelationResolver */
+    private $cacheRelationResolver;
 
-    public function __construct(EntityManagerInterface $entityManager, PostWriteRepository $postWriteRepository)
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        PostWriteRepository $postWriteRepository,
+        ?BlogFrontCacheInvalidator $cacheInvalidator = null,
+        ?BlogFrontCacheRelationResolver $cacheRelationResolver = null
+    )
     {
         $this->entityManager = $entityManager;
         $this->postWriteRepository = $postWriteRepository;
+        $this->cacheInvalidator = $cacheInvalidator ?: new BlogFrontCacheInvalidator();
+        $this->cacheRelationResolver = $cacheRelationResolver ?: new BlogFrontCacheRelationResolver();
     }
 
     public function __invoke(DeletePostCommand $command): void
@@ -29,6 +42,8 @@ class DeletePostHandler
             throw new InvalidArgumentException(sprintf('Post with id %d not found.', $command->getPostId()));
         }
 
+        $beforeSnapshot = $this->cacheRelationResolver->getPostSnapshot((int) $post->getId());
         $this->postWriteRepository->delete($post);
+        $this->cacheInvalidator->invalidatePostMutation((int) $command->getPostId(), $beforeSnapshot, []);
     }
 }

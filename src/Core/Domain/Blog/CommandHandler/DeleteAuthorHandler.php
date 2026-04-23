@@ -4,21 +4,34 @@ namespace PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler;
 
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\DeleteAuthorCommand;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository\AuthorWriteRepository;
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheInvalidator;
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheRelationResolver;
 
 class DeleteAuthorHandler
 {
     /** @var AuthorWriteRepository */
     private $repository;
+    /** @var BlogFrontCacheInvalidator */
+    private $cacheInvalidator;
+    /** @var BlogFrontCacheRelationResolver */
+    private $cacheRelationResolver;
 
-    public function __construct(AuthorWriteRepository $repository)
+    public function __construct(
+        AuthorWriteRepository $repository,
+        ?BlogFrontCacheInvalidator $cacheInvalidator = null,
+        ?BlogFrontCacheRelationResolver $cacheRelationResolver = null
+    )
     {
         $this->repository = $repository;
+        $this->cacheInvalidator = $cacheInvalidator ?: new BlogFrontCacheInvalidator();
+        $this->cacheRelationResolver = $cacheRelationResolver ?: new BlogFrontCacheRelationResolver();
     }
 
     public function __invoke(DeleteAuthorCommand $command): void
     {
         $authorId = $command->getAuthorId();
         $reassignTo = $command->getReassignToAuthorId();
+        $affectedPostIds = $this->cacheRelationResolver->listPostIdsByAuthor($authorId);
 
         if ($reassignTo !== null) {
             if ($reassignTo === $authorId) {
@@ -40,5 +53,9 @@ class DeleteAuthorHandler
         }
 
         $this->repository->delete($authorId);
+        $this->cacheInvalidator->invalidateAuthorMutation($authorId, $affectedPostIds);
+        if ($reassignTo !== null) {
+            $this->cacheInvalidator->invalidateAuthorMutation($reassignTo, $affectedPostIds);
+        }
     }
 }

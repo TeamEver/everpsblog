@@ -2,6 +2,8 @@
 
 namespace PrestaShop\Module\Everpsblog\Service;
 
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheInvalidator;
+
 class WordPressRestImporter
 {
     /** @var BlogImageService */
@@ -15,6 +17,8 @@ class WordPressRestImporter
 
     /** @var BlogInstallService */
     private $blogInstallService;
+    /** @var BlogFrontCacheInvalidator */
+    private $cacheInvalidator;
 
     /** @var array<int, int> */
     private $categoryCache = [];
@@ -32,12 +36,14 @@ class WordPressRestImporter
         BlogImageService $blogImageService,
         BlogSitemapService $blogSitemapService,
         BlogRedirectService $blogRedirectService,
-        BlogInstallService $blogInstallService
+        BlogInstallService $blogInstallService,
+        ?BlogFrontCacheInvalidator $cacheInvalidator = null
     ) {
         $this->blogImageService = $blogImageService;
         $this->blogSitemapService = $blogSitemapService;
         $this->blogRedirectService = $blogRedirectService;
         $this->blogInstallService = $blogInstallService;
+        $this->cacheInvalidator = $cacheInvalidator ?: new BlogFrontCacheInvalidator();
     }
 
     public function import(string $siteUrl, string $username, string $password, int $shopId, int $defaultLangId): array
@@ -97,6 +103,7 @@ class WordPressRestImporter
         } while (true);
 
         $this->blogImageService->clearCache();
+        $this->cacheInvalidator->invalidateAll();
         $this->blogSitemapService->refreshForShop($shopId);
         $stats['redirects'] = $this->redirectsSaved;
 

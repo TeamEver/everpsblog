@@ -3,15 +3,16 @@
 namespace PrestaShop\Module\Everpsblog\Service;
 
 use PrestaShop\Module\Everpsblog\Model\BlogImageModel;
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogCachePoolFactory;
 use Psr\Cache\CacheItemPoolInterface;
 
 class BlogImageService
 {
     private $cache;
 
-    public function __construct(CacheItemPoolInterface $cache)
+    public function __construct(?CacheItemPoolInterface $cache = null)
     {
-        $this->cache = $cache;
+        $this->cache = $cache ?: BlogCachePoolFactory::create('image');
     }
 
     private function cacheKey($suffix)

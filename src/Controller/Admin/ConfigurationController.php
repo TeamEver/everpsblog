@@ -10,6 +10,7 @@ if (!defined('_PS_VERSION_')) {
 
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\ConfigurationType;
 use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheInvalidator;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
 use PrestaShop\Module\Everpsblog\Service\ModuleTranslationCatalogService;
 use PrestaShop\Module\Everpsblog\Service\WordPressRestImporter;
@@ -24,17 +25,21 @@ class ConfigurationController extends AbstractDomainController
     private $blogSitemapService;
     /** @var ModuleTranslationCatalogService */
     private $translationCatalogService;
+    /** @var BlogFrontCacheInvalidator */
+    private $cacheInvalidator;
 
     public function __construct(
         ContextStateService $contextStateService,
         WordPressRestImporter $wordPressRestImporter,
         BlogSitemapService $blogSitemapService,
-        ModuleTranslationCatalogService $translationCatalogService
+        ModuleTranslationCatalogService $translationCatalogService,
+        ?BlogFrontCacheInvalidator $cacheInvalidator = null
     ) {
         parent::__construct($contextStateService);
         $this->wordPressRestImporter = $wordPressRestImporter;
         $this->blogSitemapService = $blogSitemapService;
         $this->translationCatalogService = $translationCatalogService;
+        $this->cacheInvalidator = $cacheInvalidator ?: new BlogFrontCacheInvalidator();
     }
 
     public function indexAction(Request $request): Response
@@ -105,6 +110,7 @@ class ConfigurationController extends AbstractDomainController
             }
 
             $this->addFlash('success', $this->transAdmin('Settings saved.'));
+            $this->cacheInvalidator->invalidateConfiguration();
 
             if ($request->request->has('import_wordpress_blog')) {
                 $this->importWordPressBlog($formData);

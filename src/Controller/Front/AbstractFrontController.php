@@ -8,6 +8,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCache;
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheInvalidator;
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheTags;
 use PrestaShop\PrestaShop\Core\Product\Search\Pagination;
 
 require_once dirname(__DIR__, 3) . '/everpsblog.php';
@@ -18,7 +21,8 @@ abstract class AbstractFrontController extends \ModuleFrontController
     private $blogImageService;
     private $blogTaxonomyService;
     private $blogSortOrderService;
-    private $serviceCachePool;
+    private $blogFrontCache;
+    private $blogFrontCacheInvalidator;
     private $qcdBuilderModule;
     private $qcdBuilderModuleResolved = false;
 
@@ -64,13 +68,31 @@ abstract class AbstractFrontController extends \ModuleFrontController
         }
 
         if (isset($sql)) {
-            $seoMetas = \Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
+            $seoMetas = $this->frontCacheRemember(
+                __METHOD__,
+                [$pageName, (int) ($idCategory ?? $idPost ?? $idTag ?? $idAuthor ?? 0), $idLang],
+                function () use ($sql) {
+                    $row = \Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
+
+                    return is_array($row) ? $row : [];
+                },
+                $this->frontTagsForControllerEntity(
+                    str_replace('module-everpsblog-', '', $pageName),
+                    (int) ($idCategory ?? $idPost ?? $idTag ?? $idAuthor ?? 0)
+                )
+            );
+            if (!is_array($seoMetas) || empty($seoMetas)) {
+                $seoMetas = [];
+            }
+
+            if (!empty($seoMetas)) {
             $index = ((int) $seoMetas['indexable']) ? 'index' : 'noindex';
             $follow = ((int) $seoMetas['follow']) ? 'follow' : 'nofollow';
 
             $seo['title'] = $seoMetas['meta_title'] ?: $seoMetas['title'];
             $seo['description'] = $seoMetas['meta_description'];
             $seo['robots'] = $index . ', ' . $follow;
+            }
         }
 
         $page = parent::getTemplateVarPage();
@@ -161,7 +183,16 @@ abstract class AbstractFrontController extends \ModuleFrontController
             (int) $this->context->language->id
         );
 
-        $row = \Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
+        $row = $this->frontCacheRemember(
+            __METHOD__,
+            [$table, $idColumn, $resourceId, (int) $this->context->language->id],
+            function () use ($sql) {
+                $data = \Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
+
+                return is_array($data) ? $data : [];
+            },
+            $this->frontTagsForControllerEntity($this->frontControllerNameFromIdColumn($idColumn), $resourceId)
+        );
         if (!is_array($row) || empty($row[$idColumn]) || empty($row['link_rewrite'])) {
             return [];
         }
@@ -416,7 +447,16 @@ abstract class AbstractFrontController extends \ModuleFrontController
             $resourceId
         );
 
-        $rows = \Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+        $rows = $this->frontCacheRemember(
+            __METHOD__,
+            [$langTable, $idColumn, $resourceId],
+            function () use ($sql) {
+                $data = \Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+
+                return is_array($data) ? $data : [];
+            },
+            $this->frontTagsForControllerEntity($this->frontControllerNameFromIdColumn($idColumn), $resourceId)
+        );
         if (!$rows) {
             return [];
         }
@@ -461,9 +501,7 @@ abstract class AbstractFrontController extends \ModuleFrontController
     protected function getBlogImageService()
     {
         if (!$this->blogImageService) {
-            $this->blogImageService = new \PrestaShop\Module\Everpsblog\Service\BlogImageService(
-                $this->getServiceCachePool()
-            );
+            $this->blogImageService = new \PrestaShop\Module\Everpsblog\Service\BlogImageService();
         }
 
         return $this->blogImageService;
@@ -472,9 +510,7 @@ abstract class AbstractFrontController extends \ModuleFrontController
     protected function getBlogTaxonomyService()
     {
         if (!$this->blogTaxonomyService) {
-            $this->blogTaxonomyService = new \PrestaShop\Module\Everpsblog\Service\BlogTaxonomyService(
-                $this->getServiceCachePool()
-            );
+            $this->blogTaxonomyService = new \PrestaShop\Module\Everpsblog\Service\BlogTaxonomyService();
         }
 
         return $this->blogTaxonomyService;
@@ -489,12 +525,132 @@ abstract class AbstractFrontController extends \ModuleFrontController
         return $this->blogSortOrderService;
     }
 
-    private function getServiceCachePool()
+    protected function getBlogFrontCacheService(): BlogFrontCache
     {
-        if (!$this->serviceCachePool) {
-            $this->serviceCachePool = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
+        if (!$this->blogFrontCache) {
+            $this->blogFrontCache = new BlogFrontCache();
         }
 
-        return $this->serviceCachePool;
+        return $this->blogFrontCache;
+    }
+
+    protected function getBlogFrontCacheInvalidatorService(): BlogFrontCacheInvalidator
+    {
+        if (!$this->blogFrontCacheInvalidator) {
+            $this->blogFrontCacheInvalidator = new BlogFrontCacheInvalidator();
+        }
+
+        return $this->blogFrontCacheInvalidator;
+    }
+
+    /**
+     * @param array<int|string, mixed> $parts
+     * @param callable(): mixed $resolver
+     * @param string[] $tags
+     * @param null|callable(mixed): array<int, string> $dynamicTagsResolver
+     *
+     * @return mixed
+     */
+    protected function frontCacheRemember(string $scope, array $parts, callable $resolver, array $tags = [], ?callable $dynamicTagsResolver = null)
+    {
+        return $this->getBlogFrontCacheService()->remember($scope, $parts, $resolver, $tags, $dynamicTagsResolver);
+    }
+
+    /**
+     * @param mixed $items
+     * @param string[] $idFields
+     *
+     * @return string[]
+     */
+    protected function frontExtractEntityTags($items, string $entityType, array $idFields = ['id']): array
+    {
+        if (!is_iterable($items)) {
+            return [];
+        }
+
+        $tags = [];
+        foreach ($items as $item) {
+            $entityId = $this->frontExtractEntityId($item, $idFields);
+            if ($entityId <= 0) {
+                continue;
+            }
+
+            $tags[] = $this->frontEntityTag($entityType, $entityId);
+        }
+
+        return array_values(array_unique(array_filter($tags)));
+    }
+
+    protected function frontEntityTag(string $entityType, int $entityId): string
+    {
+        switch ($entityType) {
+            case 'post':
+                return BlogFrontCacheTags::post($entityId);
+            case 'category':
+                return BlogFrontCacheTags::category($entityId);
+            case 'tag':
+                return BlogFrontCacheTags::tag($entityId);
+            case 'author':
+                return BlogFrontCacheTags::author($entityId);
+            case 'comment':
+                return BlogFrontCacheTags::comment($entityId);
+        }
+
+        return trim((string) preg_replace('/[^A-Za-z0-9_.-]+/', '.', $entityType . '.' . $entityId), '.');
+    }
+
+    /**
+     * @return string[]
+     */
+    private function frontTagsForControllerEntity(string $controllerName, int $entityId): array
+    {
+        if ($entityId <= 0) {
+            return [];
+        }
+
+        switch ($controllerName) {
+            case 'post':
+            case 'category':
+            case 'tag':
+            case 'author':
+                return [$this->frontEntityTag($controllerName, $entityId)];
+        }
+
+        return [];
+    }
+
+    private function frontControllerNameFromIdColumn(string $idColumn): string
+    {
+        switch ($idColumn) {
+            case 'id_ever_post':
+                return 'post';
+            case 'id_ever_category':
+                return 'category';
+            case 'id_ever_tag':
+                return 'tag';
+            case 'id_ever_author':
+                return 'author';
+        }
+
+        return '';
+    }
+
+    /**
+     * @param mixed $item
+     * @param string[] $idFields
+     */
+    private function frontExtractEntityId($item, array $idFields): int
+    {
+        foreach ($idFields as $idField) {
+            if (is_array($item) && isset($item[$idField])) {
+                return (int) $item[$idField];
+            }
+
+            if (is_object($item) && isset($item->{$idField})) {
+                return (int) $item->{$idField};
+            }
+        }
+
+        return 0;
     }
 }

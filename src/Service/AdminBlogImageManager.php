@@ -2,6 +2,7 @@
 
 namespace PrestaShop\Module\Everpsblog\Service;
 
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheInvalidator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class AdminBlogImageManager
@@ -11,11 +12,14 @@ class AdminBlogImageManager
 
     /** @var ImageUploader */
     private $imageUploader;
+    /** @var BlogFrontCacheInvalidator */
+    private $cacheInvalidator;
 
-    public function __construct(BlogImageService $blogImageService, ImageUploader $imageUploader)
+    public function __construct(BlogImageService $blogImageService, ImageUploader $imageUploader, ?BlogFrontCacheInvalidator $cacheInvalidator = null)
     {
         $this->blogImageService = $blogImageService;
         $this->imageUploader = $imageUploader;
+        $this->cacheInvalidator = $cacheInvalidator ?: new BlogFrontCacheInvalidator();
     }
 
     public function upload($uploadedImage, int $elementId, int $shopId, string $imageType): void
@@ -57,6 +61,7 @@ class AdminBlogImageManager
         }
 
         $this->blogImageService->clearCache();
+        $this->cacheInvalidator->invalidateImageMutation($elementId, $imageType);
     }
 
     public function delete(int $elementId, int $shopId, string $imageType): void
@@ -77,6 +82,7 @@ class AdminBlogImageManager
 
         $this->deleteFiles($elementId, $imageType);
         $this->blogImageService->clearCache();
+        $this->cacheInvalidator->invalidateImageMutation($elementId, $imageType);
     }
 
     public function hasImage(int $elementId, int $shopId, string $imageType): bool

@@ -19,6 +19,11 @@ services:
     tags:
       - { name: 'console.command' }
 
+  prestashop.module.everpsblog.command.cache_warmup:
+    class: PrestaShop\Module\Everpsblog\Command\WarmupCacheCommand
+    tags:
+      - { name: 'console.command' }
+
   # ─────────────────────────────────────────────
   # DOMAIN REPOSITORIES (DDD)
   # ─────────────────────────────────────────────
@@ -256,8 +261,6 @@ services:
 
   prestashop.module.everpsblog.service.blog_image:
     class: PrestaShop\Module\Everpsblog\Service\BlogImageService
-    arguments:
-      - '@cache.app'
 
   PrestaShop\Module\Everpsblog\Service\BlogImageService:
     alias: prestashop.module.everpsblog.service.blog_image
@@ -408,6 +411,9 @@ services:
 
   PrestaShop\Module\Everpsblog\Service\Audit\:
     resource: '../src/Service/Audit/*'
+
+  PrestaShop\Module\Everpsblog\Service\Cache\:
+    resource: '../src/Service/Cache/*'
 
   PrestaShop\Module\Everpsblog\Adapter\:
     resource: '../src/Adapter/*'

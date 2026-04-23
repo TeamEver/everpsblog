@@ -22,6 +22,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use PrestaShop\Module\Everpsblog\Controller\Front\AbstractFrontController;
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheTags;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
@@ -41,15 +42,17 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
 
     private function getPostRowsCount($idLang, $idShop)
     {
-        $sql = new DbQuery();
-        $sql->select('COUNT(DISTINCT p.id_ever_post)');
-        $sql->from('ever_blog_post', 'p');
-        $sql->innerJoin('ever_blog_post_lang', 'pl', 'pl.id_ever_post = p.id_ever_post AND pl.id_lang = ' . (int) $idLang);
-        $sql->innerJoin('ever_blog_post_shop', 'ps', 'ps.id_ever_post = p.id_ever_post AND ps.id_shop = ' . (int) $idShop);
-        $sql->where('p.post_status = "published"');
-        $sql->where('p.active = 1');
+        return (int) $this->frontCacheRemember(__METHOD__, [$idLang, $idShop], function () use ($idLang, $idShop) {
+            $sql = new DbQuery();
+            $sql->select('COUNT(DISTINCT p.id_ever_post)');
+            $sql->from('ever_blog_post', 'p');
+            $sql->innerJoin('ever_blog_post_lang', 'pl', 'pl.id_ever_post = p.id_ever_post AND pl.id_lang = ' . (int) $idLang);
+            $sql->innerJoin('ever_blog_post_shop', 'ps', 'ps.id_ever_post = p.id_ever_post AND ps.id_shop = ' . (int) $idShop);
+            $sql->where('p.post_status = "published"');
+            $sql->where('p.active = 1');
 
-        return (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
+            return (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql);
+        }, [BlogFrontCacheTags::BLOG_LISTING]);
     }
 
     private function getPostRows($idLang, $idShop, $start, $limit, $starred = null, $sortBy = 'p.date_add', $sortWay = 'DESC')
@@ -58,73 +61,89 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
         $allowedSortWay = ['ASC', 'DESC'];
         $sortBy = in_array($sortBy, $allowedSortBy, true) ? $sortBy : 'p.date_add';
         $sortWay = in_array(strtoupper($sortWay), $allowedSortWay, true) ? strtoupper($sortWay) : 'DESC';
-
-        $sql = new DbQuery();
-        $sql->select('p.id_ever_post, p.id_ever_post AS id, p.id_default_category, p.id_author AS id_ever_author, p.post_status, p.date_add, p.date_upd, p.active, p.starred, p.count, pl.title AS title, pl.link_rewrite AS link_rewrite, pl.meta_title AS meta_title, pl.meta_description AS meta_description, pl.excerpt AS excerpt, pl.content AS content');
-        $sql->from('ever_blog_post', 'p');
-        $sql->innerJoin('ever_blog_post_lang', 'pl', 'pl.id_ever_post = p.id_ever_post AND pl.id_lang = ' . (int) $idLang);
-        $sql->innerJoin('ever_blog_post_shop', 'ps', 'ps.id_ever_post = p.id_ever_post AND ps.id_shop = ' . (int) $idShop);
-        $sql->where('p.post_status = "published"');
-        $sql->where('p.active = 1');
+        $baseTags = [BlogFrontCacheTags::BLOG_LISTING];
         if (null !== $starred) {
-            $sql->where('p.starred = ' . (int) $starred);
-        }
-        $sql->orderBy($sortBy . ' ' . $sortWay . ', p.id_ever_post DESC');
-        $sql->limit((int) $limit, (int) $start);
-
-        $rows = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql) ?: [];
-        foreach ($rows as &$row) {
-            $row['url'] = $this->context->link->getModuleLink(
-                $this->module->name,
-                'post',
-                [
-                    'id_ever_post' => (int) $row['id_ever_post'],
-                    'link_rewrite' => (string) $row['link_rewrite'],
-                ]
-            );
-            $row['featured_thumb'] = $this->getBlogImageService()->getBlogThumbUrl(
-                (int) $row['id_ever_post'],
-                (int) $idShop,
-                'post'
-            );
-            $row['featured_image'] = $this->getBlogImageService()->getBlogImageUrl(
-                (int) $row['id_ever_post'],
-                (int) $idShop,
-                'post'
-            );
-            $row['cover'] = $row['featured_thumb'];
-            $row['summary'] = !empty($row['excerpt'])
-                ? (string) $row['excerpt']
-                : Tools::substr(trim(strip_tags((string) $row['content'])), 0, 300);
+            $baseTags[] = BlogFrontCacheTags::BLOG_STARRED;
         }
 
-        return $rows;
+        return $this->frontCacheRemember(__METHOD__, [$idLang, $idShop, $start, $limit, $starred, $sortBy, $sortWay], function () use ($idLang, $idShop, $start, $limit, $starred, $sortBy, $sortWay) {
+            $sql = new DbQuery();
+            $sql->select('p.id_ever_post, p.id_ever_post AS id, p.id_default_category, p.id_author AS id_ever_author, p.post_status, p.date_add, p.date_upd, p.active, p.starred, p.count, pl.title AS title, pl.link_rewrite AS link_rewrite, pl.meta_title AS meta_title, pl.meta_description AS meta_description, pl.excerpt AS excerpt, pl.content AS content');
+            $sql->from('ever_blog_post', 'p');
+            $sql->innerJoin('ever_blog_post_lang', 'pl', 'pl.id_ever_post = p.id_ever_post AND pl.id_lang = ' . (int) $idLang);
+            $sql->innerJoin('ever_blog_post_shop', 'ps', 'ps.id_ever_post = p.id_ever_post AND ps.id_shop = ' . (int) $idShop);
+            $sql->where('p.post_status = "published"');
+            $sql->where('p.active = 1');
+            if (null !== $starred) {
+                $sql->where('p.starred = ' . (int) $starred);
+            }
+            $sql->orderBy($sortBy . ' ' . $sortWay . ', p.id_ever_post DESC');
+            $sql->limit((int) $limit, (int) $start);
+
+            $rows = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql) ?: [];
+            foreach ($rows as &$row) {
+                $row['url'] = $this->context->link->getModuleLink(
+                    $this->module->name,
+                    'post',
+                    [
+                        'id_ever_post' => (int) $row['id_ever_post'],
+                        'link_rewrite' => (string) $row['link_rewrite'],
+                    ]
+                );
+                $row['featured_thumb'] = $this->getBlogImageService()->getBlogThumbUrl(
+                    (int) $row['id_ever_post'],
+                    (int) $idShop,
+                    'post'
+                );
+                $row['featured_image'] = $this->getBlogImageService()->getBlogImageUrl(
+                    (int) $row['id_ever_post'],
+                    (int) $idShop,
+                    'post'
+                );
+                $row['cover'] = $row['featured_thumb'];
+                $row['summary'] = !empty($row['excerpt'])
+                    ? (string) $row['excerpt']
+                    : Tools::substr(trim(strip_tags((string) $row['content'])), 0, 300);
+            }
+
+            return $rows;
+        }, $baseTags, function ($rows) {
+            return $this->frontExtractEntityTags($rows, 'post', ['id', 'id_ever_post']);
+        });
     }
 
     private function getFrontLocalizedCategories($idLang, $idShop)
     {
-        $sql = new DbQuery();
-        $sql->select('c.id_ever_category, c.is_root_category, cl.title, cl.link_rewrite');
-        $sql->from('ever_blog_category', 'c');
-        $sql->innerJoin('ever_blog_category_lang', 'cl', 'cl.id_ever_category = c.id_ever_category AND cl.id_lang = ' . (int) $idLang);
-        $sql->innerJoin('ever_blog_category_shop', 'cs', 'cs.id_ever_category = c.id_ever_category AND cs.id_shop = ' . (int) $idShop);
-        $sql->where('c.active = 1');
-        $sql->orderBy('cl.title ASC');
+        return $this->frontCacheRemember(__METHOD__, [$idLang, $idShop], function () use ($idLang, $idShop) {
+            $sql = new DbQuery();
+            $sql->select('c.id_ever_category, c.is_root_category, cl.title, cl.link_rewrite');
+            $sql->from('ever_blog_category', 'c');
+            $sql->innerJoin('ever_blog_category_lang', 'cl', 'cl.id_ever_category = c.id_ever_category AND cl.id_lang = ' . (int) $idLang);
+            $sql->innerJoin('ever_blog_category_shop', 'cs', 'cs.id_ever_category = c.id_ever_category AND cs.id_shop = ' . (int) $idShop);
+            $sql->where('c.active = 1');
+            $sql->orderBy('cl.title ASC');
 
-        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql) ?: [];
+            return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql) ?: [];
+        }, [BlogFrontCacheTags::BLOG_CATEGORIES_INDEX], function ($categories) {
+            return $this->frontExtractEntityTags($categories, 'category', ['id_ever_category', 'id']);
+        });
     }
 
     private function getFrontLocalizedTags($idLang, $idShop)
     {
-        $sql = new DbQuery();
-        $sql->select('t.id_ever_tag, tl.title, tl.link_rewrite');
-        $sql->from('ever_blog_tag', 't');
-        $sql->innerJoin('ever_blog_tag_lang', 'tl', 'tl.id_ever_tag = t.id_ever_tag AND tl.id_lang = ' . (int) $idLang);
-        $sql->innerJoin('ever_blog_tag_shop', 'ts', 'ts.id_ever_tag = t.id_ever_tag AND ts.id_shop = ' . (int) $idShop);
-        $sql->where('t.active = 1');
-        $sql->orderBy('tl.title ASC');
+        return $this->frontCacheRemember(__METHOD__, [$idLang, $idShop], function () use ($idLang, $idShop) {
+            $sql = new DbQuery();
+            $sql->select('t.id_ever_tag, tl.title, tl.link_rewrite');
+            $sql->from('ever_blog_tag', 't');
+            $sql->innerJoin('ever_blog_tag_lang', 'tl', 'tl.id_ever_tag = t.id_ever_tag AND tl.id_lang = ' . (int) $idLang);
+            $sql->innerJoin('ever_blog_tag_shop', 'ts', 'ts.id_ever_tag = t.id_ever_tag AND ts.id_shop = ' . (int) $idShop);
+            $sql->where('t.active = 1');
+            $sql->orderBy('tl.title ASC');
 
-        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql) ?: [];
+            return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql) ?: [];
+        }, [BlogFrontCacheTags::BLOG_TAGS_INDEX], function ($tags) {
+            return $this->frontExtractEntityTags($tags, 'tag', ['id_ever_tag', 'id']);
+        });
     }
 
     public function init()

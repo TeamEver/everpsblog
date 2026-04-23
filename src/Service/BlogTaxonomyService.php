@@ -2,15 +2,16 @@
 
 namespace PrestaShop\Module\Everpsblog\Service;
 
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogCachePoolFactory;
 use Psr\Cache\CacheItemPoolInterface;
 
 class BlogTaxonomyService
 {
     private $cache;
 
-    public function __construct(CacheItemPoolInterface $cache)
+    public function __construct(?CacheItemPoolInterface $cache = null)
     {
-        $this->cache = $cache;
+        $this->cache = $cache ?: BlogCachePoolFactory::create('taxonomy');
     }
 
     private function cacheKey($suffix)
