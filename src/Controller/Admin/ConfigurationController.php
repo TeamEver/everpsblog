@@ -42,6 +42,7 @@ class ConfigurationController extends AbstractDomainController
             'product_posts' => (int) \Configuration::get('EVERPSBLOG_PRODUCT_NBR'),
             'excerpt_length' => (int) \Configuration::get('EVERPSBLOG_EXCERPT'),
             'title_length' => (int) \Configuration::get('EVERPSBLOG_TITLE_LENGTH'),
+            'default_author_id' => (int) \Configuration::get('EVERBLOG_DEFAULT_AUTHOR_ID'),
             'header_bg_color' => $this->getHeaderBackgroundColor(),
             'wordpress_api_url' => (string) \Configuration::get('EVER_WP_API_URL'),
             'wordpress_api_user' => (string) \Configuration::get('EVER_WP_API_USER'),
@@ -56,6 +57,7 @@ class ConfigurationController extends AbstractDomainController
         $form = $this->createForm(ConfigurationType::class, $configurationData, [
             'method' => Request::METHOD_POST,
             'action' => $this->generateUrl('everpsblog_admin_dashboard'),
+            'author_choices' => $this->getAuthorChoices(),
         ]);
         $form->handleRequest($request);
 
@@ -69,6 +71,7 @@ class ConfigurationController extends AbstractDomainController
             \Configuration::updateValue('EVERPSBLOG_PRODUCT_NBR', (int) $formData['product_posts']);
             \Configuration::updateValue('EVERPSBLOG_EXCERPT', (int) $formData['excerpt_length']);
             \Configuration::updateValue('EVERPSBLOG_TITLE_LENGTH', (int) $formData['title_length']);
+            \Configuration::updateValue('EVERBLOG_DEFAULT_AUTHOR_ID', (int) $formData['default_author_id']);
             \Configuration::updateValue('EVERBLOG_HEADER_BG_COLOR', $this->normalizeHeaderBackgroundColor((string) ($formData['header_bg_color'] ?? '')));
             \Configuration::updateValue('EVERBLOG_TOP_TEXT', $this->extractLocalizedFormData($formData, 'top_text'), true);
             \Configuration::updateValue('EVERBLOG_BOTTOM_TEXT', $this->extractLocalizedFormData($formData, 'bottom_text'), true);
@@ -79,6 +82,17 @@ class ConfigurationController extends AbstractDomainController
             \Configuration::updateValue('EVERBLOG_ENABLE_AUTHORS', (bool) $formData['wordpress_enable_authors']);
             \Configuration::updateValue('EVERBLOG_ENABLE_CATS', (bool) $formData['wordpress_enable_categories']);
             \Configuration::updateValue('EVERBLOG_ENABLE_TAGS', (bool) $formData['wordpress_enable_tags']);
+
+            $reassignedPosts = $this->assignOrphanPostsToDefaultAuthor((int) $formData['default_author_id']);
+            if ($reassignedPosts > 0) {
+                $this->addFlash(
+                    'success',
+                    $this->transAdmin(
+                        '%count% orphan post(s) were reassigned to the default author.',
+                        ['%count%' => $reassignedPosts]
+                    )
+                );
+            }
 
             $this->addFlash('success', $this->transAdmin('Settings saved.'));
 
@@ -197,6 +211,65 @@ class ConfigurationController extends AbstractDomainController
         }
 
         return $values;
+    }
+
+    /**
+     * @return array<string,int>
+     */
+    private function getAuthorChoices(): array
+    {
+        $shopId = $this->getContextShopId();
+        $rows = \Db::getInstance()->executeS(
+            'SELECT DISTINCT a.id_ever_author, a.nickhandle
+             FROM `' . _DB_PREFIX_ . 'ever_blog_author` a
+             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_author_shop` aps
+                ON aps.id_ever_author = a.id_ever_author
+             WHERE a.id_shop = ' . (int) $shopId . '
+                OR aps.id_shop = ' . (int) $shopId . '
+             ORDER BY a.nickhandle ASC'
+        ) ?: [];
+
+        $choices = [];
+        foreach ($rows as $row) {
+            $authorId = (int) ($row['id_ever_author'] ?? 0);
+            $nickhandle = trim((string) ($row['nickhandle'] ?? ''));
+            if ($authorId <= 0) {
+                continue;
+            }
+            $choices[$nickhandle ?: '#' . $authorId] = $authorId;
+        }
+
+        return $choices;
+    }
+
+    private function assignOrphanPostsToDefaultAuthor(int $defaultAuthorId): int
+    {
+        if ($defaultAuthorId <= 0) {
+            return 0;
+        }
+
+        $shopId = $this->getContextShopId();
+        $authorExists = (bool) \Db::getInstance()->getValue(
+            'SELECT a.id_ever_author
+             FROM `' . _DB_PREFIX_ . 'ever_blog_author` a
+             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_author_shop` aps
+                ON aps.id_ever_author = a.id_ever_author
+             WHERE a.id_ever_author = ' . (int) $defaultAuthorId . '
+                AND (a.id_shop = ' . (int) $shopId . ' OR aps.id_shop = ' . (int) $shopId . ')'
+        );
+
+        if (!$authorExists) {
+            return 0;
+        }
+
+        $db = \Db::getInstance();
+        $db->update(
+            'ever_blog_post',
+            ['id_author' => $defaultAuthorId],
+            'id_author = 0 AND id_shop = ' . (int) $shopId
+        );
+
+        return (int) $db->Affected_Rows();
     }
 
     private function importWordPressBlog(array $formData): void
