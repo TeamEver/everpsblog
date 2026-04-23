@@ -221,6 +221,73 @@ trait FrontBlogDataProviderTrait
         );
     }
 
+    protected function getFrontLinkedProductViewData($productIds, $idLang, $idShop): array
+    {
+        $products = $this->presentFrontProducts($this->normalizeFrontProductIds($productIds), (int) $idLang, (int) $idShop);
+        $countProducts = count($products);
+
+        return [
+            'count_products' => $countProducts,
+            'ps_products' => $products,
+            'ps_products_chunks' => $countProducts > 0 ? array_chunk($products, 4) : [],
+        ];
+    }
+
+    private function normalizeFrontProductIds($value): array
+    {
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            $value = is_array($decoded) ? $decoded : preg_split('/\s*,\s*/', $value, -1, PREG_SPLIT_NO_EMPTY);
+        }
+
+        if (!is_array($value)) {
+            return [];
+        }
+
+        return array_values(array_unique(array_filter(array_map('intval', $value))));
+    }
+
+    private function presentFrontProducts(array $productIds, int $idLang, int $idShop): array
+    {
+        if (empty($productIds)) {
+            return [];
+        }
+
+        $assembler = new \ProductAssembler($this->context);
+        $presenterFactory = new \ProductPresenterFactory($this->context);
+        $presentationSettings = $presenterFactory->getPresentationSettings();
+        $presentationSettings->showPrices = true;
+
+        $presenter = new \PrestaShop\PrestaShop\Core\Product\ProductListingPresenter(
+            new \PrestaShop\PrestaShop\Adapter\Image\ImageRetriever($this->context->link),
+            $this->context->link,
+            new \PrestaShop\PrestaShop\Adapter\Product\PriceFormatter(),
+            new \PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever(),
+            $this->context->getTranslator()
+        );
+
+        $products = [];
+        foreach ($productIds as $productId) {
+            $product = new \Product((int) $productId, true, (int) $idLang, (int) $idShop);
+            if (!\Validate::isLoadedObject($product) || !\Product::checkAccessStatic((int) $product->id, false)) {
+                continue;
+            }
+
+            $cover = \Product::getCover((int) $product->id);
+            if (is_array($cover) && isset($cover['id_image'])) {
+                $product->cover = (int) $cover['id_image'];
+            }
+
+            $products[] = $presenter->present(
+                $presentationSettings,
+                $assembler->assembleProduct(['id_product' => (int) $product->id]),
+                $this->context->language
+            );
+        }
+
+        return $products;
+    }
+
     protected function frontRowToObject($row)
     {
         if (!is_array($row)) {

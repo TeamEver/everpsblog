@@ -60,7 +60,7 @@ class ConfigurationType extends AbstractType
             ->add('header_bg_color', TextType::class, [
                 'label' => 'Blog header color',
                 'required' => false,
-                'help' => 'Color applied to the main banner on blog, category, tag, author and search pages.',
+                'help' => 'Color applied to the main banner on blog, post, category, tag, author and search pages.',
                 'attr' => [
                     'type' => 'color',
                 ],

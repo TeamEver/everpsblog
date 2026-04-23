@@ -142,8 +142,14 @@ class EverPsBlogauthorModuleFrontController extends AbstractFrontController
             );
             $postsViewModel = PostViewModel::listFromLegacy($posts);
             $authorViewModel = TaxonomyViewModel::fromLegacy($this->author, 'author');
+            $linkedProductViewData = $this->getFrontLinkedProductViewData(
+                $this->author->author_products ?? [],
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id
+            );
             Hook::exec('actionBeforeEverAuthorInitContent', [
                 'blog_author' => $this->author,
+                'blog_products' => $linkedProductViewData['ps_products'],
             ]);
             $social_share_links = [];
             $social_share_links['facebook'] = [
@@ -172,7 +178,7 @@ class EverPsBlogauthorModuleFrontController extends AbstractFrontController
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id
             );
-            $this->context->smarty->assign([
+            $this->context->smarty->assign(array_merge([
                 'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
                 'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
                 'allow_feed' => (bool) Configuration::get('EVERBLOG_RSS'),
@@ -192,7 +198,8 @@ class EverPsBlogauthorModuleFrontController extends AbstractFrontController
                 'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__ . 'modules/everpsblog/views/img/',
                 'animated' => (bool) $animate,
                 'logged' => (bool) $this->context->customer->isLogged(),
-            ]);
+                'linked_products_block_id' => 'author-' . (int) $this->author->id,
+            ], $linkedProductViewData));
             $this->setTemplate('module:everpsblog/views/templates/front/author.tpl');
         }
     }

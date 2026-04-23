@@ -160,9 +160,15 @@ class EverPsBlogcategoryModuleFrontController extends AbstractFrontController
             );
             $postsViewModel = PostViewModel::listFromLegacy($posts);
             $categoryViewModel = TaxonomyViewModel::fromLegacy($this->category, 'category');
+            $linkedProductViewData = $this->getFrontLinkedProductViewData(
+                $this->category->category_products ?? [],
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id
+            );
             Hook::exec('actionBeforeEverCategoryInitContent', [
                 'blog_category' => $this->category,
                 'blog_posts' => $posts,
+                'blog_products' => $linkedProductViewData['ps_products'],
             ]);
             $file_url = $this->getBlogImageService()->getBlogImageUrl(
                 (int) $this->category->id,
@@ -180,7 +186,7 @@ class EverPsBlogcategoryModuleFrontController extends AbstractFrontController
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id
             );
-            $this->context->smarty->assign([
+            $this->context->smarty->assign(array_merge([
                 'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
                 'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
                 'children_categories' => $children_categories,
@@ -202,7 +208,8 @@ class EverPsBlogcategoryModuleFrontController extends AbstractFrontController
                 'show_featured_cat' => (bool)Configuration::get('EVERBLOG_SHOW_FEAT_CAT'),
                 'sort_orders' => $sortOrders,
                 'sort_selected' => $sortSelected ? $sortSelected['label'] : null,
-            ]);
+                'linked_products_block_id' => 'category-' . (int) $this->category->id,
+            ], $linkedProductViewData));
             $this->setTemplate('module:' . $this->module->name . '/views/templates/front/category.tpl');
         } else {
             Tools::redirect('index.php?controller=404');

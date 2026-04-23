@@ -161,6 +161,22 @@ final class PostType extends AbstractType
                     ? 'Check this box and save to delete the current image.'
                     : 'No featured image is associated with this post yet.',
             ])
+            ->add('banner_image_file', FileType::class, [
+                'required' => false,
+                'mapped' => false,
+                'label' => 'Banner image',
+                'help' => $options['banner_image_help'],
+                'help_html' => true,
+            ])
+            ->add('delete_banner_image', CheckboxType::class, [
+                'required' => false,
+                'mapped' => false,
+                'disabled' => !$options['has_banner_image'],
+                'label' => 'Delete current banner image',
+                'help' => $options['has_banner_image']
+                    ? 'Check this box and save to delete the current banner image.'
+                    : 'No banner image is associated with this post yet.',
+            ])
         ;
 
         $builder->add($publicationTab);
@@ -354,9 +370,13 @@ final class PostType extends AbstractType
         $resolver->setDefaults([
             'featured_image_help' => '',
             'has_featured_image' => false,
+            'banner_image_help' => '',
+            'has_banner_image' => false,
             'translation_domain' => 'Modules.Everpsblog.Admin',
         ]);
         $resolver->setAllowedTypes('featured_image_help', 'string');
         $resolver->setAllowedTypes('has_featured_image', 'bool');
+        $resolver->setAllowedTypes('banner_image_help', 'string');
+        $resolver->setAllowedTypes('has_banner_image', 'bool');
     }
 }

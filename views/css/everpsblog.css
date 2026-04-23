@@ -80,28 +80,6 @@
     color: #0d2f7d;
 }
 
-body#module-everpsblog-blog .breadcrumb__wrapper,
-body#module-everpsblog-category .breadcrumb__wrapper,
-body#module-everpsblog-tag .breadcrumb__wrapper,
-body#module-everpsblog-author .breadcrumb__wrapper,
-body#module-everpsblog-search .breadcrumb__wrapper {
-    background: #0a0f54;
-    background-position: center;
-}
-
-body#module-everpsblog-blog .breadcrumb a,
-body#module-everpsblog-blog .breadcrumb span,
-body#module-everpsblog-category .breadcrumb a,
-body#module-everpsblog-category .breadcrumb span,
-body#module-everpsblog-tag .breadcrumb a,
-body#module-everpsblog-tag .breadcrumb span,
-body#module-everpsblog-author .breadcrumb a,
-body#module-everpsblog-author .breadcrumb span,
-body#module-everpsblog-search .breadcrumb a,
-body#module-everpsblog-search .breadcrumb span {
-    color: #fff;
-}
-
 /* Blog posts listing cards */
 .everpsblog-listing-card {
     border-radius: 1rem;
@@ -426,16 +404,6 @@ body#module-everpsblog-post .product-miniature .product-miniature{
     margin-right: calc(50% - 50vw);
 }
 
-body#module-everpsblog-category .breadcrumb__wrapper {
-    background: linear-gradient(90deg, #0a0f54 0%, #0a0f54 50%, #0a0f54 100%);
-    background-position: center;
-}
-
-body#module-everpsblog-category .breadcrumb a,
-body#module-everpsblog-category .breadcrumb span {
-    color: #fff;
-}
-
 #module-everpsblog-category .everpsblog-category-hero {
     position: relative;
     background: linear-gradient(90deg, #0a0f54 0%, #0a0f54 50%, #0a0f54 100%);
@@ -561,6 +529,25 @@ body#module-everpsblog-category .breadcrumb span {
     align-items: center;
     padding: 2rem 1rem;
     text-align: center;
+    gap: 1.5rem;
+}
+
+#module-everpsblog-post .everpsblog-post-hero--has-banner .everpsblog-post-hero-overlay {
+    max-width: 1120px;
+    min-height: 0;
+    padding: 2.5rem 1rem;
+}
+
+#module-everpsblog-post .everpsblog-post-banner {
+    width: 100%;
+}
+
+#module-everpsblog-post .everpsblog-post-banner img {
+    display: block;
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    background: #fff;
 }
 
 #module-everpsblog-post .everpsblog-post-title {

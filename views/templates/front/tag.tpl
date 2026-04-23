@@ -95,5 +95,6 @@
     <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' d='Modules.Everpsblog.Shop'}</div>
     {/if}
 </div>
+{include file='module:everpsblog/views/templates/front/loop/linked_products.tpl'}
 {hook h="displayAfterEverTag" everblogtag=$tag}
 {/block}

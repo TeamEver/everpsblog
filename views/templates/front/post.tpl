@@ -93,9 +93,14 @@
     <div class="everpsblog-post-header container-fluid p-0">
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-body mx-0 px-0 py-0">
-                <div class="everpsblog-post-hero mb-4"{if isset($show_featured_post) && $show_featured_post && isset($featured_image) && $featured_image} style="background-image:url('{$featured_image|escape:'htmlall':'UTF-8'}');"{/if}>
+                <div class="everpsblog-post-hero{if isset($has_post_banner) && $has_post_banner} everpsblog-post-hero--has-banner{/if} mb-4"{if isset($everpsblog_header_bg_color) && $everpsblog_header_bg_color} style="background: {$everpsblog_header_bg_color|escape:'htmlall':'UTF-8'};"{/if}>
                     <div class="everpsblog-post-hero-overlay">
                         <h1 class="everpsblog-post-title mb-4">{$post->title|escape:'htmlall':'UTF-8'}</h1>
+                        {if isset($has_post_banner) && $has_post_banner && isset($post_banner_image) && $post_banner_image}
+                        <div class="everpsblog-post-banner">
+                            <img src="{$post_banner_image|escape:'htmlall':'UTF-8'}" alt="{$post->title|escape:'htmlall':'UTF-8'}" title="{$post->title|escape:'htmlall':'UTF-8'}">
+                        </div>
+                        {/if}
                         {if $social_share_links}
                         <div class="social-sharing social-sharing-hero">
                             <ul>
@@ -381,50 +386,7 @@ document.addEventListener('DOMContentLoaded', function () {
 {hook h="displayAfterEverComment"}
 {/if}
 {/if}
-{if isset($count_products) && $count_products > 0}
-<section id="linked-products" class="blog-linked-products container mt-4">
-  <h2 class="text-center mb-3">{l s='Linked products' d='Modules.Everpsblog.Shop'}</h2>
-  {if $count_products > 4 && isset($ps_products_chunks) && $ps_products_chunks}
-    {assign var="blpCarouselId" value="linkedProductsCarousel-"|cat:$post->id}
-    <div id="{$blpCarouselId|escape:'htmlall':'UTF-8'}" class="carousel slide blog-linked-products-carousel position-relative" data-bs-ride="false" data-bs-interval="false">
-      <div class="carousel-inner">
-        {foreach from=$ps_products_chunks item="slide" name="blpSlides"}
-          <div class="carousel-item{if $smarty.foreach.blpSlides.first} active{/if}">
-            <div class="row">
-              {foreach from=$slide item="product"}
-                <div class="col-12 col-sm-6 col-lg-3 mb-3 d-flex">
-                  {include file="catalog/_partials/miniatures/product.tpl" product=$product}
-                </div>
-              {/foreach}
-            </div>
-          </div>
-        {/foreach}
-      </div>
-      <button class="carousel-control-prev" type="button" data-bs-target="#{$blpCarouselId|escape:'htmlall':'UTF-8'}" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">{l s='Previous' d='Shop.Theme.Actions'}</span>
-      </button>
-      <button class="carousel-control-next" type="button" data-bs-target="#{$blpCarouselId|escape:'htmlall':'UTF-8'}" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">{l s='Next' d='Shop.Theme.Actions'}</span>
-      </button>
-      <div class="carousel-indicators position-relative mt-3 mx-0">
-        {foreach from=$ps_products_chunks item="slide" name="blpInd"}
-          <button type="button" data-bs-target="#{$blpCarouselId|escape:'htmlall':'UTF-8'}" data-bs-slide-to="{$smarty.foreach.blpInd.index|escape:'htmlall':'UTF-8'}"{if $smarty.foreach.blpInd.first} class="active" aria-current="true"{/if} aria-label="{l s='Slide' d='Modules.Everpsblog.Shop'} {$smarty.foreach.blpInd.iteration|escape:'htmlall':'UTF-8'}"></button>
-        {/foreach}
-      </div>
-    </div>
-  {else}
-    <div class="row">
-      {foreach from=$ps_products item="product"}
-        <div class="col-12 col-sm-6 col-lg-3 mb-3 d-flex">
-          {include file="catalog/_partials/miniatures/product.tpl" product=$product}
-        </div>
-      {/foreach}
-    </div>
-  {/if}
-</section>
-{/if}
+{include file='module:everpsblog/views/templates/front/loop/linked_products.tpl' linked_products_block_id=$post->id}
 {if isset($related_posts) && $related_posts}
 <section id="related-posts" class="mt-2">
   <h2 class="text-center">{l s='Related posts' d='Modules.Everpsblog.Shop'}</h2>

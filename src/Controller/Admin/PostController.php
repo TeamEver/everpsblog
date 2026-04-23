@@ -82,6 +82,8 @@ class PostController extends AbstractDomainController
         $csrfTokenId = $isEdit ? 'everpsblog_post_update_' . $postId : 'everpsblog_post_create';
         $featuredImageHelp = $isEdit ? $this->buildFeaturedImageHelp((int) $postId) : '';
         $hasFeaturedImage = $isEdit ? $this->hasFeaturedImage((int) $postId) : false;
+        $bannerImageHelp = $isEdit ? $this->buildBannerImageHelp((int) $postId) : '';
+        $hasBannerImage = $isEdit ? $this->hasBannerImage((int) $postId) : false;
         $form = $this->createForm(PostType::class, $this->formDataProvider->getData($postId), [
             'method' => Request::METHOD_POST,
             'action' => $isEdit
@@ -89,6 +91,8 @@ class PostController extends AbstractDomainController
                 : $this->generateUrl('everpsblog_admin_post_form'),
             'featured_image_help' => $featuredImageHelp,
             'has_featured_image' => $hasFeaturedImage,
+            'banner_image_help' => $bannerImageHelp,
+            'has_banner_image' => $hasBannerImage,
         ]);
         $form->handleRequest($request);
 
@@ -106,7 +110,11 @@ class PostController extends AbstractDomainController
                     if ((bool) $publicationForm->get('delete_featured_image')->getData()) {
                         $this->deleteFeaturedImage((int) $savedPostId);
                     }
+                    if ((bool) $publicationForm->get('delete_banner_image')->getData()) {
+                        $this->deleteBannerImage((int) $savedPostId);
+                    }
                     $this->handleFeaturedImageUpload($publicationForm->get('featured_image_file')->getData(), (int) $savedPostId);
+                    $this->handleBannerImageUpload($publicationForm->get('banner_image_file')->getData(), (int) $savedPostId);
                     $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService);
                     $submitAction = (string) $request->request->get('_submit_action', 'save');
 
@@ -387,6 +395,16 @@ class PostController extends AbstractDomainController
 
     private function handleFeaturedImageUpload($uploadedImage, int $postId): void
     {
+        $this->handleBlogImageUpload($uploadedImage, $postId, 'post');
+    }
+
+    private function handleBannerImageUpload($uploadedImage, int $postId): void
+    {
+        $this->handleBlogImageUpload($uploadedImage, $postId, 'post_banner');
+    }
+
+    private function handleBlogImageUpload($uploadedImage, int $postId, string $imageType): void
+    {
         if (!$uploadedImage instanceof UploadedFile) {
             return;
         }
@@ -396,26 +414,29 @@ class PostController extends AbstractDomainController
         if (!in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true)) {
             throw new \RuntimeException($this->transAdmin('Unsupported image format.'));
         }
+        if ('jpeg' === $extension) {
+            $extension = 'jpg';
+        }
 
-        $targetDirectory = rtrim(_PS_IMG_DIR_, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'post';
+        $targetDirectory = rtrim(_PS_IMG_DIR_, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $imageType;
         if (!is_dir($targetDirectory) && !@mkdir($targetDirectory, 0755, true) && !is_dir($targetDirectory)) {
             throw new \RuntimeException($this->transAdmin('Unable to create the image destination directory.'));
         }
 
-        $this->deleteFeaturedImageFiles($postId);
+        $this->deleteBlogImageFiles($postId, $imageType);
 
         $targetFileName = sprintf('%d.%s', $postId, $extension);
         $this->imageUploader->upload($uploadedImage, $targetDirectory, $targetFileName);
 
-        $image = $this->blogImageService->getBlogImage($postId, $shopId, 'post');
+        $image = $this->blogImageService->getBlogImage($postId, $shopId, $imageType);
         if (!\Validate::isLoadedObject($image)) {
             $image = $this->blogImageService->createImageModel();
         }
 
         $image->id_element = $postId;
         $image->id_shop = $shopId;
-        $image->image_type = 'post';
-        $image->image_link = 'img/post/' . $targetFileName;
+        $image->image_type = $imageType;
+        $image->image_link = 'img/' . $imageType . '/' . $targetFileName;
         if (!(bool) $image->save()) {
             throw new \RuntimeException($this->transAdmin('Unable to save the image reference.'));
         }
@@ -425,8 +446,18 @@ class PostController extends AbstractDomainController
 
     private function deleteFeaturedImage(int $postId): void
     {
+        $this->deleteBlogImage($postId, 'post');
+    }
+
+    private function deleteBannerImage(int $postId): void
+    {
+        $this->deleteBlogImage($postId, 'post_banner');
+    }
+
+    private function deleteBlogImage(int $postId, string $imageType): void
+    {
         $shopId = $this->getContextShopId();
-        $image = $this->blogImageService->getBlogImage($postId, $shopId, 'post');
+        $image = $this->blogImageService->getBlogImage($postId, $shopId, $imageType);
 
         if (\Validate::isLoadedObject($image)) {
             $this->deleteReferencedImageFile((string) $image->image_link);
@@ -440,18 +471,27 @@ class PostController extends AbstractDomainController
             }
         }
 
-        $this->deleteFeaturedImageFiles($postId);
+        $this->deleteBlogImageFiles($postId, $imageType);
         $this->blogImageService->clearCache();
     }
 
-    private function deleteFeaturedImageFiles(int $postId): void
+    private function deleteBlogImageFiles(int $postId, string $imageType): void
     {
-        $targetDirectory = rtrim(_PS_IMG_DIR_, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'post';
+        $targetDirectory = rtrim(_PS_IMG_DIR_, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $imageType;
         if (!is_dir($targetDirectory)) {
             return;
         }
 
         foreach ((array) glob($targetDirectory . DIRECTORY_SEPARATOR . $postId . '.*') as $existingFile) {
+            @unlink($existingFile);
+        }
+
+        $thumbDirectory = $targetDirectory . DIRECTORY_SEPARATOR . 'thumbs';
+        if (!is_dir($thumbDirectory)) {
+            return;
+        }
+
+        foreach ((array) glob($thumbDirectory . DIRECTORY_SEPARATOR . $postId . '-*') as $existingFile) {
             @unlink($existingFile);
         }
     }
@@ -478,27 +518,47 @@ class PostController extends AbstractDomainController
 
     private function hasFeaturedImage(int $postId): bool
     {
+        return $this->hasBlogImage($postId, 'post');
+    }
+
+    private function hasBannerImage(int $postId): bool
+    {
+        return $this->hasBlogImage($postId, 'post_banner');
+    }
+
+    private function hasBlogImage(int $postId, string $imageType): bool
+    {
         $shopId = $this->getContextShopId();
-        $image = $this->blogImageService->getBlogImage($postId, $shopId, 'post');
+        $image = $this->blogImageService->getBlogImage($postId, $shopId, $imageType);
 
         return \Validate::isLoadedObject($image);
     }
 
     private function buildFeaturedImageHelp(int $postId): string
     {
+        return $this->buildImageHelp($postId, 'post', $this->transAdmin('Current image'));
+    }
+
+    private function buildBannerImageHelp(int $postId): string
+    {
+        return $this->buildImageHelp($postId, 'post_banner', $this->transAdmin('Current banner image'));
+    }
+
+    private function buildImageHelp(int $postId, string $imageType, string $label): string
+    {
         $shopId = $this->getContextShopId();
-        $image = $this->blogImageService->getBlogImage($postId, $shopId, 'post');
+        $image = $this->blogImageService->getBlogImage($postId, $shopId, $imageType);
         if (!\Validate::isLoadedObject($image)) {
             return '';
         }
-        $url = (string) $this->blogImageService->getBlogImageUrl($postId, $shopId, 'post');
+        $url = (string) $this->blogImageService->getBlogImageUrl($postId, $shopId, $imageType);
         if ('' === $url) {
             return '';
         }
 
         return sprintf(
             '%s: <a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
-            $this->transAdmin('Current image'),
+            $label,
             htmlspecialchars($url, ENT_QUOTES, 'UTF-8'),
             htmlspecialchars($url, ENT_QUOTES, 'UTF-8')
         );

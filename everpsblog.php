@@ -2332,7 +2332,7 @@ class EverPsBlog extends Module
                     [
                         'type' => 'color',
                         'label' => $this->transAdmin('Blog header background color'),
-                        'desc' => $this->transAdmin('Background color of the header banner on blog, category, tag, author and search pages'),
+                        'desc' => $this->transAdmin('Background color of the header banner on blog, post, category, tag, author and search pages'),
                         'hint' => $this->transAdmin('Pick the color used behind the main title on blog listing pages'),
                         'name' => 'EVERBLOG_HEADER_BG_COLOR',
                         'required' => false,

@@ -457,6 +457,11 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 (int) $this->context->shop->id,
                 'post'
             );
+            $postBannerImage = $this->getBlogImageService()->getBlogImage(
+                (int) $this->post->id,
+                (int) $this->context->shop->id,
+                'post_banner'
+            );
             $showFeaturedPost = (bool) Configuration::get('EVERBLOG_SHOW_FEAT_POST')
                 && Validate::isLoadedObject($postImage);
             $file_url = $this->getBlogImageService()->getBlogImageUrl(
@@ -464,13 +469,20 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 (int) $this->context->shop->id,
                 'post'
             );
+            $hasPostBanner = Validate::isLoadedObject($postBannerImage);
+            $postBannerUrl = $hasPostBanner ? $this->getBlogImageService()->getBlogImageUrl(
+                (int) $this->post->id,
+                (int) $this->context->shop->id,
+                'post_banner'
+            ) : '';
             $postViewModel = PostViewModel::fromLegacy($this->post);
             $this->context->smarty->assign([
                 'show_author' => (bool) Configuration::get('EVERBLOG_SHOW_AUTHOR'),
                 'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
                 'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
                 'featured_image' => $file_url,
-                // Show featured image as hero background when available
+                'post_banner_image' => $postBannerUrl,
+                'has_post_banner' => $hasPostBanner,
                 'show_featured_post' => $showFeaturedPost,
                 'author_cover' => $this->author_cover,
                 'author' => $this->author,

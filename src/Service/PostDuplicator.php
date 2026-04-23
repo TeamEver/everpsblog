@@ -30,7 +30,8 @@ final class PostDuplicator
         $this->duplicateTranslations($sourcePostId, $newPostId);
         $this->duplicateRelations($sourcePostId, $newPostId);
         $this->ensureDefaultCategoryRelation($newPostId, (int) ($source['id_default_category'] ?? 0));
-        $this->duplicateFeaturedImage($sourcePostId, $newPostId, $shopId);
+        $this->duplicatePostImage($sourcePostId, $newPostId, $shopId, 'post');
+        $this->duplicatePostImage($sourcePostId, $newPostId, $shopId, 'post_banner');
 
         return $newPostId;
     }
@@ -156,9 +157,9 @@ final class PostDuplicator
         );
     }
 
-    private function duplicateFeaturedImage(int $sourcePostId, int $newPostId, int $shopId): void
+    private function duplicatePostImage(int $sourcePostId, int $newPostId, int $shopId, string $imageType): void
     {
-        $sourceImage = $this->blogImageService->getBlogImage($sourcePostId, $shopId, 'post');
+        $sourceImage = $this->blogImageService->getBlogImage($sourcePostId, $shopId, $imageType);
         if (!\Validate::isLoadedObject($sourceImage)) {
             return;
         }
@@ -173,9 +174,9 @@ final class PostDuplicator
             return;
         }
 
-        $targetDirectory = rtrim(_PS_IMG_DIR_, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'post';
+        $targetDirectory = rtrim(_PS_IMG_DIR_, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $imageType;
         if (!is_dir($targetDirectory) && !@mkdir($targetDirectory, 0755, true) && !is_dir($targetDirectory)) {
-            \PrestaShopLogger::addLog('[everpsblog][PostDuplicator] Unable to create post image directory.', 2);
+            \PrestaShopLogger::addLog('[everpsblog][PostDuplicator] Unable to create post image directory for ' . $imageType . '.', 2);
 
             return;
         }
@@ -183,7 +184,7 @@ final class PostDuplicator
         $targetFileName = sprintf('%d.%s', $newPostId, $extension);
         $targetPath = $targetDirectory . DIRECTORY_SEPARATOR . $targetFileName;
         if (!@copy($sourcePath, $targetPath)) {
-            \PrestaShopLogger::addLog('[everpsblog][PostDuplicator] Unable to copy featured image.', 2);
+            \PrestaShopLogger::addLog('[everpsblog][PostDuplicator] Unable to copy ' . $imageType . ' image.', 2);
 
             return;
         }
@@ -191,8 +192,8 @@ final class PostDuplicator
         $image = $this->blogImageService->createImageModel();
         $image->id_element = $newPostId;
         $image->id_shop = $shopId;
-        $image->image_type = 'post';
-        $image->image_link = 'img/post/' . $targetFileName;
+        $image->image_type = $imageType;
+        $image->image_link = 'img/' . $imageType . '/' . $targetFileName;
 
         if ((bool) $image->save()) {
             $imageId = (int) ($image->id ?: $image->id_ever_image);

@@ -158,5 +158,6 @@
     </div>
 </div>
 {/if}
+{include file='module:everpsblog/views/templates/front/loop/linked_products.tpl'}
 {hook h="displayAfterEverAuthor" everblogauthor=$author}
 {/block}

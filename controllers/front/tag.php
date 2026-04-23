@@ -137,9 +137,15 @@ class EverPsBlogtagModuleFrontController extends AbstractFrontController
             );
             $postsViewModel = PostViewModel::listFromLegacy($posts);
             $tagViewModel = TaxonomyViewModel::fromLegacy($this->tag, 'tag');
+            $linkedProductViewData = $this->getFrontLinkedProductViewData(
+                $this->tag->tag_products ?? [],
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id
+            );
             Hook::exec('actionBeforeEverTagInitContent', [
                 'blog_tag' => $this->tag,
                 'blog_posts' => $posts,
+                'blog_products' => $linkedProductViewData['ps_products'],
             ]);
             $file_url = $this->getBlogImageService()->getBlogImageUrl(
                 (int) $this->tag->id,
@@ -157,7 +163,7 @@ class EverPsBlogtagModuleFrontController extends AbstractFrontController
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id
             );
-            $this->context->smarty->assign([
+            $this->context->smarty->assign(array_merge([
                 'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
                 'blog_type' => Configuration::get('EVERPSBLOG_TYPE'),
                 'allow_feed' => (bool)Configuration::get('EVERBLOG_RSS'),
@@ -176,7 +182,8 @@ class EverPsBlogtagModuleFrontController extends AbstractFrontController
                 'animated' => $animate,
                 'show_featured_post' => true,
                 'show_featured_tag' => (bool) Configuration::get('EVERBLOG_SHOW_FEAT_TAG'),
-            ]);
+                'linked_products_block_id' => 'tag-' . (int) $this->tag->id,
+            ], $linkedProductViewData));
             $this->setTemplate('module:everpsblog/views/templates/front/tag.tpl');
         } else {
             Tools::redirect('index.php?controller=404');
