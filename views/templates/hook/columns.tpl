@@ -20,7 +20,7 @@
 
 {if isset($showCategories) && $showCategories && isset($categories) && !empty($categories)}
 <div class="columns_everblog_wrapper category_wrapper">
-    <p class="text-uppercase h6 hidden-sm-down">{l s='Categories from the blog' mod='everpsblog'}</p>
+    <p class="text-uppercase h6 hidden-sm-down">{l s='Categories from the blog' d='Modules.Everpsblog.Shop'}</p>
     {foreach from=$categories item=category}
     {if $category.is_root_category == 0}
         <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category' => $category.id_ever_category, 'link_rewrite' => $category.link_rewrite])|escape:'htmlall':'UTF-8'}" class="category d-block" title="{$category.title|escape:'htmlall':'UTF-8'}">
@@ -34,7 +34,7 @@
 {if isset($page.page_name) && $page.page_name == 'module-everpsblog-post'
     && isset($ps_products) && $ps_products}
 <div class="columns_everblog_wrapper products_wrapper">
-    <p class="text-uppercase h6 hidden-sm-down">{l s='Linked products' mod='everpsblog'}</p>
+    <p class="text-uppercase h6 hidden-sm-down">{l s='Linked products' d='Modules.Everpsblog.Shop'}</p>
     <div class="products">
         {foreach from=$ps_products item="product"}
             {include file="catalog/_partials/miniatures/product.tpl" product=$product productClasses="col-12"}
@@ -44,7 +44,7 @@
 {/if}
 {if isset($showTags) && $showTags && isset($tags) && !empty($tags)}
 <div class="columns_everblog_wrapper tag_wrapper">
-    <p class="text-uppercase h6 hidden-sm-down">{l s='Tags from the blog' mod='everpsblog'}</p>
+    <p class="text-uppercase h6 hidden-sm-down">{l s='Tags from the blog' d='Modules.Everpsblog.Shop'}</p>
 {foreach from=$tags item=tag}
     <a href="{$link->getModuleLink('everpsblog', 'tag', ['id_ever_tag'=>$tag.id_ever_tag, 'link_rewrite' => $tag.link_rewrite])|escape:'htmlall':'UTF-8'}" class="badge bg-info m-1 tag" title="{$tag.title|escape:'htmlall':'UTF-8'}">
         {$tag.title|escape:'htmlall':'UTF-8'}

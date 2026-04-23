@@ -52,14 +52,6 @@ class EverPsBlogfeedModuleFrontController extends AbstractFrontController
         parent::init();
     }
 
-    public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
-    {
-        return $this->context->getTranslator()->trans(
-            $string,
-            [],
-            'Modules.Everpsblog.feed'
-        );
-    }
 
     public function initContent()
     {

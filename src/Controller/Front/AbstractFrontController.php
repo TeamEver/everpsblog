@@ -114,6 +114,11 @@ abstract class AbstractFrontController extends \ModuleFrontController
         }
     }
 
+    protected function transShop(string $message, array $parameters = []): string
+    {
+        return $this->context->getTranslator()->trans($message, $parameters, 'Modules.Everpsblog.Shop');
+    }
+
     private function assignHeaderConfiguration(): void
     {
         $color = trim((string) \Configuration::get('EVERBLOG_HEADER_BG_COLOR'));
@@ -286,7 +291,7 @@ abstract class AbstractFrontController extends \ModuleFrontController
     protected function assignHreflangLinks(string $controllerName, array $localizedParamsByLang = []): void
     {
         $idShop = (int) $this->context->shop->id;
-        $defaultLangId = (int) \Configuration::get('PS_LANG_DEFAULT');
+        $defaultLangId = (int) \Configuration::get('PS_LANG_DEFAULT', null, null, $idShop);
         $currentPage = (int) \Tools::getValue('page');
         $hreflangLinks = [];
         $xDefaultHref = '';

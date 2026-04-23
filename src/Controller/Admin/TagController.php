@@ -9,6 +9,7 @@ use PrestaShop\Module\Everpsblog\Form\DataProvider\TagFormDataProvider;
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\TagType;
 use PrestaShop\Module\Everpsblog\Grid\Data\TagGridDataFactory;
 use PrestaShop\Module\Everpsblog\Grid\Definition\TagGridDefinitionFactory;
+use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,8 +23,9 @@ class TagController extends AbstractDomainController
     private $definitionFactory;
     private $dataFactory;
     private $formDataProvider;
+    private $blogSitemapService;
 
-    public function __construct(ContextStateService $contextStateService, CommandBusInterface $commandBus, TagCommandAssembler $commandAssembler, TagGridDefinitionFactory $definitionFactory, TagGridDataFactory $dataFactory, TagFormDataProvider $formDataProvider)
+    public function __construct(ContextStateService $contextStateService, CommandBusInterface $commandBus, TagCommandAssembler $commandAssembler, TagGridDefinitionFactory $definitionFactory, TagGridDataFactory $dataFactory, TagFormDataProvider $formDataProvider, BlogSitemapService $blogSitemapService)
     {
         parent::__construct($contextStateService);
         $this->commandBus = $commandBus;
@@ -31,6 +33,7 @@ class TagController extends AbstractDomainController
         $this->definitionFactory = $definitionFactory;
         $this->dataFactory = $dataFactory;
         $this->formDataProvider = $formDataProvider;
+        $this->blogSitemapService = $blogSitemapService;
     }
 
     public function indexAction(Request $request): Response
@@ -66,9 +69,10 @@ class TagController extends AbstractDomainController
                     $savedTagId = $isEdit
                         ? $this->commandBus->handle($this->commandAssembler->assembleUpdate((int) $tagId, (array) $form->getData()))
                         : $this->commandBus->handle($this->commandAssembler->assembleCreate((array) $form->getData()));
+                    $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService);
                     $submitAction = (string) $request->request->get('_submit_action', 'save');
 
-                    $this->addFlash('success', $isEdit ? 'Tag mis à jour.' : 'Tag créé.');
+                    $this->addFlash('success', $isEdit ? $this->transAdmin('Tag updated.') : $this->transAdmin('Tag created.'));
 
                     if ('save_and_stay' === $submitAction) {
                         return $this->redirectToRoute('everpsblog_admin_tag_edit', ['tagId' => $savedTagId]);
@@ -76,7 +80,7 @@ class TagController extends AbstractDomainController
 
                     return $this->redirectToRoute('everpsblog_admin_tag');
                 } catch (\Throwable $exception) {
-                    $message = sprintf('Impossible d\'enregistrer le tag : %s', $this->describeException($exception));
+                    $message = $this->transAdmin('Unable to save tag: %error%', ['%error%' => $this->describeException($exception)]);
                     $form->addError(new FormError($message));
                     $this->addFlash('error', $message);
                     \PrestaShopLogger::addLog(
@@ -98,8 +102,8 @@ class TagController extends AbstractDomainController
             'createUrl' => $this->generateUrl('everpsblog_admin_tag_form'),
             'navigationLinks' => $this->getAdminNavigationLinks(),
             'qcdPageBuilderTargets' => $this->buildQcdPageBuilderTargets('everpsblog_tag', $tagId, [
-                'content' => 'Editer le contenu avec Page Builder',
-                'bottom_content' => 'Editer le bas de page avec Page Builder',
+                'content' => $this->transAdmin('Edit content with Page Builder'),
+                'bottom_content' => $this->transAdmin('Edit bottom content with Page Builder'),
             ]),
         ]);
     }
@@ -109,8 +113,9 @@ class TagController extends AbstractDomainController
         $this->validateCsrfToken($request, 'everpsblog_tag_create');
 
         $tagId = $this->commandBus->handle($this->commandAssembler->assembleCreate($request->request->all()));
+        $sitemapsRefreshed = $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService, false);
 
-        return new JsonResponse(['id_ever_tag' => $tagId], JsonResponse::HTTP_CREATED);
+        return new JsonResponse(['id_ever_tag' => $tagId, 'sitemaps_refreshed' => $sitemapsRefreshed], JsonResponse::HTTP_CREATED);
     }
 
     public function updateAction(int $tagId, Request $request): JsonResponse
@@ -118,8 +123,9 @@ class TagController extends AbstractDomainController
         $this->validateCsrfToken($request, 'everpsblog_tag_update_' . $tagId);
 
         $updatedTagId = $this->commandBus->handle($this->commandAssembler->assembleUpdate($tagId, $request->request->all()));
+        $sitemapsRefreshed = $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService, false);
 
-        return new JsonResponse(['id_ever_tag' => $updatedTagId], JsonResponse::HTTP_OK);
+        return new JsonResponse(['id_ever_tag' => $updatedTagId, 'sitemaps_refreshed' => $sitemapsRefreshed], JsonResponse::HTTP_OK);
     }
 
     public function deleteAction(int $tagId, Request $request): JsonResponse
@@ -127,6 +133,7 @@ class TagController extends AbstractDomainController
         $this->validateCsrfToken($request, 'everpsblog_tag_delete_' . $tagId);
 
         $this->commandBus->handle(new DeleteTagCommand($tagId));
+        $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService, false);
 
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }

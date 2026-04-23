@@ -11,6 +11,7 @@ use PrestaShop\Module\Everpsblog\Grid\Data\PostGridDataFactory;
 use PrestaShop\Module\Everpsblog\Grid\Definition\PostGridDefinitionFactory;
 use PrestaShop\Module\Everpsblog\Service\Audit\SensitiveActionLogger;
 use PrestaShop\Module\Everpsblog\Service\BlogImageService;
+use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
 use PrestaShop\Module\Everpsblog\Service\ImageUploader;
 use PrestaShop\Module\Everpsblog\Service\PostDuplicator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -30,6 +31,7 @@ class PostController extends AbstractDomainController
     private $blogImageService;
     private $imageUploader;
     private $postDuplicator;
+    private $blogSitemapService;
 
     public function __construct(
         \PrestaShop\Module\Everpsblog\Service\ContextStateService $contextStateService,
@@ -41,7 +43,8 @@ class PostController extends AbstractDomainController
         SensitiveActionLogger $sensitiveActionLogger,
         BlogImageService $blogImageService,
         ImageUploader $imageUploader,
-        PostDuplicator $postDuplicator
+        PostDuplicator $postDuplicator,
+        BlogSitemapService $blogSitemapService
     ) {
         parent::__construct($contextStateService);
         $this->commandBus = $commandBus;
@@ -53,6 +56,7 @@ class PostController extends AbstractDomainController
         $this->blogImageService = $blogImageService;
         $this->imageUploader = $imageUploader;
         $this->postDuplicator = $postDuplicator;
+        $this->blogSitemapService = $blogSitemapService;
     }
 
     public function indexAction(Request $request): Response
@@ -103,9 +107,10 @@ class PostController extends AbstractDomainController
                         $this->deleteFeaturedImage((int) $savedPostId);
                     }
                     $this->handleFeaturedImageUpload($publicationForm->get('featured_image_file')->getData(), (int) $savedPostId);
+                    $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService);
                     $submitAction = (string) $request->request->get('_submit_action', 'save');
 
-                    $this->addFlash('success', $isEdit ? 'Article mis à jour.' : 'Article créé.');
+                    $this->addFlash('success', $isEdit ? $this->transAdmin('Post updated.') : $this->transAdmin('Post created.'));
 
                     if ('save_and_stay' === $submitAction) {
                         return $this->redirectToRoute('everpsblog_admin_post_edit', ['postId' => $savedPostId]);
@@ -114,7 +119,7 @@ class PostController extends AbstractDomainController
                     return $this->redirectToRoute('everpsblog_admin_post');
                 } catch (\Throwable $exception) {
                     $debug = (string) $this->describeException($exception);
-                    $message = sprintf('Impossible d\'enregistrer l\'article : %s', $debug);
+                    $message = $this->transAdmin('Unable to save post: %error%', ['%error%' => $debug]);
                     $form->addError(new FormError($message));
                     $this->addFlash('error', $message);
                     \PrestaShopLogger::addLog(
@@ -136,7 +141,7 @@ class PostController extends AbstractDomainController
             'createUrl' => $this->generateUrl('everpsblog_admin_post_form'),
             'navigationLinks' => $this->getAdminNavigationLinks(),
             'qcdPageBuilderTargets' => $this->buildQcdPageBuilderTargets('everpsblog_post', $postId, [
-                'content' => 'Editer le contenu avec Page Builder',
+                'content' => $this->transAdmin('Edit content with Page Builder'),
             ]),
         ]);
     }
@@ -147,8 +152,9 @@ class PostController extends AbstractDomainController
 
         $command = $this->commandAssembler->assembleCreate($request->request->all());
         $postId = $this->commandBus->handle($command);
+        $sitemapsRefreshed = $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService, false);
 
-        return new JsonResponse(['id_ever_post' => $postId], JsonResponse::HTTP_CREATED);
+        return new JsonResponse(['id_ever_post' => $postId, 'sitemaps_refreshed' => $sitemapsRefreshed], JsonResponse::HTTP_CREATED);
     }
 
     public function updateAction(int $postId, Request $request): JsonResponse
@@ -158,8 +164,9 @@ class PostController extends AbstractDomainController
         $command = $this->commandAssembler->assembleUpdate($postId, $request->request->all());
 
         $updatedPostId = $this->commandBus->handle($command);
+        $sitemapsRefreshed = $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService, false);
 
-        return new JsonResponse(['id_ever_post' => $updatedPostId], JsonResponse::HTTP_OK);
+        return new JsonResponse(['id_ever_post' => $updatedPostId, 'sitemaps_refreshed' => $sitemapsRefreshed], JsonResponse::HTTP_OK);
     }
 
     public function deleteAction(int $postId, Request $request): JsonResponse
@@ -168,12 +175,13 @@ class PostController extends AbstractDomainController
 
         $this->commandBus->handle(new DeletePostCommand($postId));
         $this->sensitiveActionLogger->log('bo_post_delete', ['post_id' => $postId]);
+        $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService, false);
 
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
 
     /**
-     * Duplique un article depuis la liste BO et redirige vers le formulaire d'édition de la copie.
+     * Duplicates a post from the back office list and redirects to the copied post form.
      */
     public function duplicateAction(int $postId, Request $request): Response
     {
@@ -185,7 +193,14 @@ class PostController extends AbstractDomainController
                 'source_post_id' => $postId,
                 'new_post_id' => $newPostId,
             ]);
-            $this->addFlash('success', sprintf('Article #%d dupliqué avec succès (copie #%d).', $postId, $newPostId));
+            $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService);
+            $this->addFlash(
+                'success',
+                $this->transAdmin(
+                    'Post #%post_id% duplicated successfully (copy #%copy_id%).',
+                    ['%post_id%' => $postId, '%copy_id%' => $newPostId]
+                )
+            );
 
             return $this->redirectToRoute('everpsblog_admin_post_edit', ['postId' => $newPostId]);
         } catch (\Throwable $exception) {
@@ -194,14 +209,20 @@ class PostController extends AbstractDomainController
                     . ' @ ' . $exception->getFile() . ':' . $exception->getLine(),
                 3
             );
-            $this->addFlash('error', sprintf('Impossible de dupliquer l\'article #%d : %s', $postId, $exception->getMessage()));
+            $this->addFlash(
+                'error',
+                $this->transAdmin(
+                    'Unable to duplicate post #%post_id%: %error%',
+                    ['%post_id%' => $postId, '%error%' => $exception->getMessage()]
+                )
+            );
 
             return $this->redirectToRoute('everpsblog_admin_post');
         }
     }
 
     /**
-     * Dispatcher des actions groupées du grid Articles (delete / publishall / duplicate).
+     * Dispatches post grid bulk actions (delete / publishall / duplicate).
      */
     public function bulkAction(Request $request): Response
     {
@@ -219,7 +240,7 @@ class PostController extends AbstractDomainController
         $ids = array_values(array_unique($ids));
 
         if (empty($ids)) {
-            $this->addFlash('warning', 'Veuillez sélectionner au moins un article.');
+            $this->addFlash('warning', $this->transAdmin('Please select at least one post.'));
 
             return $this->redirectToRoute('everpsblog_admin_post');
         }
@@ -232,7 +253,7 @@ class PostController extends AbstractDomainController
             case 'publishall':
                 return $this->handleBulkPublish($ids);
             default:
-                $this->addFlash('error', 'Action groupée inconnue.');
+                $this->addFlash('error', $this->transAdmin('Unknown bulk action.'));
 
                 return $this->redirectToRoute('everpsblog_admin_post');
         }
@@ -264,10 +285,11 @@ class PostController extends AbstractDomainController
         }
 
         if ($success > 0) {
-            $this->addFlash('success', sprintf('%d article(s) dupliqué(s).', $success));
+            $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService);
+            $this->addFlash('success', $this->transAdmin('%count% post(s) duplicated.', ['%count%' => $success]));
         }
         if (!empty($failures)) {
-            $this->addFlash('error', sprintf('Échec de duplication pour : #%s.', implode(', #', $failures)));
+            $this->addFlash('error', $this->transAdmin('Duplication failed for: #%ids%.', ['%ids%' => implode(', #', $failures)]));
         }
 
         return $this->redirectToRoute('everpsblog_admin_post');
@@ -296,10 +318,11 @@ class PostController extends AbstractDomainController
         }
 
         if ($success > 0) {
-            $this->addFlash('success', sprintf('%d article(s) supprimé(s).', $success));
+            $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService);
+            $this->addFlash('success', $this->transAdmin('%count% post(s) deleted.', ['%count%' => $success]));
         }
         if (!empty($failures)) {
-            $this->addFlash('error', sprintf('Échec de suppression pour : #%s.', implode(', #', $failures)));
+            $this->addFlash('error', $this->transAdmin('Deletion failed for: #%ids%.', ['%ids%' => implode(', #', $failures)]));
         }
 
         return $this->redirectToRoute('everpsblog_admin_post');
@@ -340,9 +363,10 @@ class PostController extends AbstractDomainController
         }
 
         if ($success > 0) {
-            $this->addFlash('success', sprintf('%d article(s) publié(s).', $success));
+            $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService);
+            $this->addFlash('success', $this->transAdmin('%count% post(s) published.', ['%count%' => $success]));
         } else {
-            $this->addFlash('error', 'Aucun article publié.');
+            $this->addFlash('error', $this->transAdmin('No post was published.'));
         }
 
         return $this->redirectToRoute('everpsblog_admin_post');
@@ -370,12 +394,12 @@ class PostController extends AbstractDomainController
         $shopId = $this->getContextShopId();
         $extension = strtolower((string) ($uploadedImage->guessExtension() ?: $uploadedImage->getClientOriginalExtension() ?: 'jpg'));
         if (!in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true)) {
-            throw new \RuntimeException('Format d\'image non pris en charge.');
+            throw new \RuntimeException($this->transAdmin('Unsupported image format.'));
         }
 
         $targetDirectory = rtrim(_PS_IMG_DIR_, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'post';
         if (!is_dir($targetDirectory) && !@mkdir($targetDirectory, 0755, true) && !is_dir($targetDirectory)) {
-            throw new \RuntimeException('Impossible de créer le dossier de destination des images.');
+            throw new \RuntimeException($this->transAdmin('Unable to create the image destination directory.'));
         }
 
         $this->deleteFeaturedImageFiles($postId);
@@ -393,7 +417,7 @@ class PostController extends AbstractDomainController
         $image->image_type = 'post';
         $image->image_link = 'img/post/' . $targetFileName;
         if (!(bool) $image->save()) {
-            throw new \RuntimeException('Impossible d\'enregistrer la référence de l\'image.');
+            throw new \RuntimeException($this->transAdmin('Unable to save the image reference.'));
         }
 
         $this->blogImageService->clearCache();
@@ -473,7 +497,8 @@ class PostController extends AbstractDomainController
         }
 
         return sprintf(
-            'Image actuelle : <a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+            '%s: <a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+            $this->transAdmin('Current image'),
             htmlspecialchars($url, ENT_QUOTES, 'UTF-8'),
             htmlspecialchars($url, ENT_QUOTES, 'UTF-8')
         );

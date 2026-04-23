@@ -3,7 +3,9 @@
 namespace PrestaShop\Module\Everpsblog\Controller\Admin;
 
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\ConfigurationType;
+use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
+use PrestaShop\Module\Everpsblog\Service\ModuleTranslationCatalogService;
 use PrestaShop\Module\Everpsblog\Service\WordPressRestImporter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,11 +14,21 @@ class ConfigurationController extends AbstractDomainController
 {
     /** @var WordPressRestImporter */
     private $wordPressRestImporter;
+    /** @var BlogSitemapService */
+    private $blogSitemapService;
+    /** @var ModuleTranslationCatalogService */
+    private $translationCatalogService;
 
-    public function __construct(ContextStateService $contextStateService, WordPressRestImporter $wordPressRestImporter)
-    {
+    public function __construct(
+        ContextStateService $contextStateService,
+        WordPressRestImporter $wordPressRestImporter,
+        BlogSitemapService $blogSitemapService,
+        ModuleTranslationCatalogService $translationCatalogService
+    ) {
         parent::__construct($contextStateService);
         $this->wordPressRestImporter = $wordPressRestImporter;
+        $this->blogSitemapService = $blogSitemapService;
+        $this->translationCatalogService = $translationCatalogService;
     }
 
     public function indexAction(Request $request): Response
@@ -68,10 +80,12 @@ class ConfigurationController extends AbstractDomainController
             \Configuration::updateValue('EVERBLOG_ENABLE_CATS', (bool) $formData['wordpress_enable_categories']);
             \Configuration::updateValue('EVERBLOG_ENABLE_TAGS', (bool) $formData['wordpress_enable_tags']);
 
-            $this->addFlash('success', 'La configuration a été enregistrée.');
+            $this->addFlash('success', $this->trans('Settings saved.', [], 'Modules.Everpsblog.Admin'));
 
             if ($request->request->has('import_wordpress_blog')) {
                 $this->importWordPressBlog($formData);
+            } else {
+                $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService);
             }
 
             return $this->redirectToRoute('everpsblog_admin_dashboard');
@@ -81,11 +95,68 @@ class ConfigurationController extends AbstractDomainController
             'currentResource' => 'configuration',
             'navigationLinks' => $this->getAdminNavigationLinks(),
             'configurationForm' => $form->createView(),
+            'sitemapUrls' => $this->blogSitemapService->getSitemapIndexes($this->getContextShopId()),
+            'translationExportUrl' => $this->generateUrl('everpsblog_admin_translation_export'),
+            'translationImportUrl' => $this->generateUrl('everpsblog_admin_translation_import'),
             'qcdPageBuilderTargets' => $this->buildQcdPageBuilderTargets('everpsblog_configuration', 1, [
-                'top_text' => 'Editer le haut de page avec Page Builder',
-                'bottom_text' => 'Editer le bas de page avec Page Builder',
+                'top_text' => $this->trans('Edit the top blog content with Page Builder', [], 'Modules.Everpsblog.Admin'),
+                'bottom_text' => $this->trans('Edit the bottom blog content with Page Builder', [], 'Modules.Everpsblog.Admin'),
             ]),
         ]);
+    }
+
+    public function exportTranslationsAction(): Response
+    {
+        $payload = $this->translationCatalogService->export();
+        $response = new Response(json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        $response->headers->set('Content-Type', 'application/json; charset=UTF-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="everpsblog-translations-' . date('Ymd-His') . '.json"');
+
+        return $response;
+    }
+
+    public function importTranslationsAction(Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('everpsblog_translation_import', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', $this->trans('Invalid security token.', [], 'Modules.Everpsblog.Admin'));
+
+            return $this->redirectToRoute('everpsblog_admin_dashboard');
+        }
+
+        $file = $request->files->get('translation_file');
+        if (null === $file || !is_callable([$file, 'getRealPath'])) {
+            $this->addFlash('error', $this->trans('Please select a translation export file.', [], 'Modules.Everpsblog.Admin'));
+
+            return $this->redirectToRoute('everpsblog_admin_dashboard');
+        }
+
+        $path = (string) $file->getRealPath();
+        $content = is_file($path) ? file_get_contents($path) : false;
+        if (false === $content || '' === trim((string) $content)) {
+            $this->addFlash('error', $this->trans('The selected translation file is empty.', [], 'Modules.Everpsblog.Admin'));
+
+            return $this->redirectToRoute('everpsblog_admin_dashboard');
+        }
+
+        try {
+            $stats = $this->translationCatalogService->importFromJson((string) $content);
+            $this->addFlash(
+                'success',
+                $this->trans(
+                    'Translations imported: %imported% item(s), %skipped% skipped.',
+                    [
+                        '%imported%' => (int) $stats['imported'],
+                        '%skipped%' => (int) $stats['skipped'],
+                    ],
+                    'Modules.Everpsblog.Admin'
+                )
+            );
+        } catch (\Throwable $exception) {
+            \PrestaShopLogger::addLog('EverPsBlog translation import failed: ' . $exception->getMessage(), 3);
+            $this->addFlash('error', $this->trans('Unable to import translations: %error%', ['%error%' => $this->describeException($exception)], 'Modules.Everpsblog.Admin'));
+        }
+
+        return $this->redirectToRoute('everpsblog_admin_dashboard');
     }
 
     private function getLocalizedBlogContentData(): array
@@ -133,7 +204,7 @@ class ConfigurationController extends AbstractDomainController
     {
         $apiUrl = trim((string) ($formData['wordpress_api_url'] ?? ''));
         if ('' === $apiUrl) {
-            $this->addFlash('error', 'Renseignez l\'URL WordPress avant de lancer l\'import.');
+            $this->addFlash('error', $this->trans('Enter the WordPress URL before starting the import.', [], 'Modules.Everpsblog.Admin'));
 
             return;
         }
@@ -149,21 +220,24 @@ class ConfigurationController extends AbstractDomainController
 
             $this->addFlash(
                 'success',
-                sprintf(
-                    'Import WordPress termine : %d article(s) cree(s), %d article(s) mis a jour, %d categorie(s), %d tag(s), %d auteur(s), %d image(s), %d redirection(s), %d element(s) ignore(s).',
-                    (int) $stats['posts_created'],
-                    (int) $stats['posts_updated'],
-                    (int) $stats['categories'],
-                    (int) $stats['tags'],
-                    (int) $stats['authors'],
-                    (int) $stats['images'],
-                    (int) ($stats['redirects'] ?? 0),
-                    (int) $stats['skipped']
+                $this->trans(
+                    'WordPress import completed: %created% created post(s), %updated% updated post(s), %categories% category item(s), %tags% tag item(s), %authors% author item(s), %images% image(s), %redirects% redirect(s), %skipped% skipped item(s).',
+                    [
+                        '%created%' => (int) $stats['posts_created'],
+                        '%updated%' => (int) $stats['posts_updated'],
+                        '%categories%' => (int) $stats['categories'],
+                        '%tags%' => (int) $stats['tags'],
+                        '%authors%' => (int) $stats['authors'],
+                        '%images%' => (int) $stats['images'],
+                        '%redirects%' => (int) ($stats['redirects'] ?? 0),
+                        '%skipped%' => (int) $stats['skipped'],
+                    ],
+                    'Modules.Everpsblog.Admin'
                 )
             );
         } catch (\Throwable $exception) {
             \PrestaShopLogger::addLog('EverPsBlog WordPress import failed: ' . $exception->getMessage(), 3);
-            $this->addFlash('error', 'Import WordPress impossible : ' . $this->describeException($exception));
+            $this->addFlash('error', $this->trans('Unable to import WordPress content: %error%', ['%error%' => $this->describeException($exception)], 'Modules.Everpsblog.Admin'));
         }
     }
 

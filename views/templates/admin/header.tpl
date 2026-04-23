@@ -17,7 +17,7 @@
 *}
 <div class="panel everheader">
     <div class="panel-heading">
-        <i class="icon icon-smile"></i> {l s='Ever Blog' mod='everpsblog'}
+        <i class="icon icon-smile"></i> {l s='Ever Blog' d='Modules.Everpsblog.Admin'}
     </div>
     <div class="panel-body">
         {if isset($everpsblog_quick_links) && $everpsblog_quick_links}
@@ -39,16 +39,16 @@
             <div class="col-lg-6">
                 <p class="everpsblog-logo">
                     <a href="#everbottom" id="evertop">
-                       <img id="everlogo" src="{$image_dir|escape:'htmlall':'UTF-8'}/ever.png" alt="{l s='Ever Blog logo' mod='everpsblog'}" class="img-responsive">
+                       <img id="everlogo" src="{$image_dir|escape:'htmlall':'UTF-8'}/ever.png" alt="{l s='Ever Blog logo' d='Modules.Everpsblog.Admin'}" class="img-responsive">
                     </a>
                 </p>
                 <p class="everpsblog-welcome">
-                    <strong>{l s='Welcome to Ever Blog !' mod='everpsblog'}</strong><br />{l s='Use the form below to configure the key parameters of your blog.' mod='everpsblog'}
+                    <strong>{l s='Welcome to Ever Blog !' d='Modules.Everpsblog.Admin'}</strong><br />{l s='Use the form below to configure the key parameters of your blog.' d='Modules.Everpsblog.Admin'}
                 </p>
                 {if $blog_sitemaps}
                     <div class="dropdown everpsblog-sitemaps">
                       <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {l s='View generated sitemaps' mod='everpsblog'}
+                        {l s='View generated sitemaps' d='Modules.Everpsblog.Admin'}
                       </button>
                       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         {foreach from=$blog_sitemaps item=sitemap}
@@ -60,18 +60,18 @@
                     </div>
                 {/if}
                 <div class="alert alert-info everpsblog-cron">
-                    <strong>{l s='Set up these cron tasks to automate maintenance' mod='everpsblog'}</strong>
+                    <strong>{l s='Set up these cron tasks to automate maintenance' d='Modules.Everpsblog.Admin'}</strong>
                     <ul class="list-unstyled everpsblog-cron-list">
-                        <li><span class="icon icon-trash"></span> <strong>{l s='Empty trash' mod='everpsblog'} :</strong> <a href="{$everpsblogcron|escape:'htmlall':'UTF-8'}" target="_blank" rel="noopener">{$everpsblogcron|escape:'htmlall':'UTF-8'}</a></li>
-                        <li><span class="icon icon-calendar"></span> <strong>{l s='Publish planned posts' mod='everpsblog'} :</strong> <a href="{$everpsblogcronplanned|escape:'htmlall':'UTF-8'}" target="_blank" rel="noopener">{$everpsblogcronplanned|escape:'htmlall':'UTF-8'}</a></li>
-                        <li><span class="icon icon-bell"></span> <strong>{l s='Pending notifications' mod='everpsblog'} :</strong> <a href="{$everpsblogcronpending|escape:'htmlall':'UTF-8'}" target="_blank" rel="noopener">{$everpsblogcronpending|escape:'htmlall':'UTF-8'}</a></li>
-                        <li><span class="icon icon-sitemap"></span> <strong>{l s='XML sitemaps generation' mod='everpsblog'} :</strong> <a href="{$everpsblogcronsitemap|escape:'htmlall':'UTF-8'}" target="_blank" rel="noopener">{$everpsblogcronsitemap|escape:'htmlall':'UTF-8'}</a></li>
+                        <li><span class="icon icon-trash"></span> <strong>{l s='Empty trash' d='Modules.Everpsblog.Admin'} :</strong> <a href="{$everpsblogcron|escape:'htmlall':'UTF-8'}" target="_blank" rel="noopener">{$everpsblogcron|escape:'htmlall':'UTF-8'}</a></li>
+                        <li><span class="icon icon-calendar"></span> <strong>{l s='Publish planned posts' d='Modules.Everpsblog.Admin'} :</strong> <a href="{$everpsblogcronplanned|escape:'htmlall':'UTF-8'}" target="_blank" rel="noopener">{$everpsblogcronplanned|escape:'htmlall':'UTF-8'}</a></li>
+                        <li><span class="icon icon-bell"></span> <strong>{l s='Pending notifications' d='Modules.Everpsblog.Admin'} :</strong> <a href="{$everpsblogcronpending|escape:'htmlall':'UTF-8'}" target="_blank" rel="noopener">{$everpsblogcronpending|escape:'htmlall':'UTF-8'}</a></li>
+                        <li><span class="icon icon-sitemap"></span> <strong>{l s='XML sitemaps generation' d='Modules.Everpsblog.Admin'} :</strong> <a href="{$everpsblogcronsitemap|escape:'htmlall':'UTF-8'}" target="_blank" rel="noopener">{$everpsblogcronsitemap|escape:'htmlall':'UTF-8'}</a></li>
                     </ul>
                 </div>
             </div>
             <div class="col-lg-6">
                 <div class="alert alert-warning everpsblog-support">
-                    <p>{l s='This module is free and will always be! You can support our free modules by making a donation using the button below.' mod='everpsblog'}</p>
+                    <p>{l s='This module is free and will always be! You can support our free modules by making a donation using the button below.' d='Modules.Everpsblog.Admin'}</p>
                     {if isset($everpsblog_support_links) && $everpsblog_support_links}
                         <ul class="list-unstyled everpsblog-support-links">
                             {foreach from=$everpsblog_support_links item=supportLink}
@@ -83,7 +83,7 @@
                 <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="everpsblog-donation">
                     <input type="hidden" name="cmd" value="_s-xclick" />
                     <input type="hidden" name="hosted_button_id" value="3LE8ABFYJKP98" />
-                    <input type="image" src="https://www.team-ever.com/wp-content/uploads/2019/06/appel_a_dons-1.jpg" border="0" name="submit" title="{l s='Support Team Ever modules with a donation' mod='everpsblog'}" alt="{l s='Support Team Ever modules with a donation' mod='everpsblog'}" />
+                    <input type="image" src="https://www.team-ever.com/wp-content/uploads/2019/06/appel_a_dons-1.jpg" border="0" name="submit" title="{l s='Support Team Ever modules with a donation' d='Modules.Everpsblog.Admin'}" alt="{l s='Support Team Ever modules with a donation' d='Modules.Everpsblog.Admin'}" />
                     <img alt="" border="0" src="https://www.paypal.com/fr_FR/i/scr/pixel.gif" width="1" height="1" />
                 </form>
             </div>

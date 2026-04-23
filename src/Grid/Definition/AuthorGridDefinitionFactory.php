@@ -11,19 +11,19 @@ final class AuthorGridDefinitionFactory
         return new GridDefinition(
             'author',
             'Authors',
-[
-            ['id' => 'id_ever_author', 'name' => 'ID'],
-            ['id' => 'featured_image', 'name' => 'Image', 'type' => 'image'],
-            ['id' => 'nickhandle', 'name' => 'Pseudo'],
-            ['id' => 'active', 'name' => 'Actif']
-        ],
-[
-            'q' => 'Recherche',
-            'nickhandle' => 'Pseudo'
-        ],
-[
-            ['id' => 'delete', 'name' => 'Supprimer sélection']
-        ]
+            [
+                ['id' => 'id_ever_author', 'name' => 'ID'],
+                ['id' => 'featured_image', 'name' => 'Image', 'type' => 'image'],
+                ['id' => 'nickhandle', 'name' => 'Nickname'],
+                ['id' => 'active', 'name' => 'Active'],
+            ],
+            [
+                'q' => 'Search',
+                'nickhandle' => 'Nickname',
+            ],
+            [
+                ['id' => 'delete', 'name' => 'Delete selected'],
+            ]
         );
     }
 }

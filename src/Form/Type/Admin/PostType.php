@@ -27,27 +27,27 @@ final class PostType extends AbstractType
     {
         $contentTab = $builder->create('content_tab', FormType::class, [
             'inherit_data' => true,
-            'label' => 'Contenu',
+            'label' => 'Content',
             'attr' => ['data-tab' => 'content'],
         ]);
 
         foreach (\Language::getLanguages(false) as $lang) {
             $idLang = (int) $lang['id_lang'];
             $isoCode = strtoupper((string) ($lang['iso_code'] ?? ''));
-            $suffix = $isoCode ? sprintf(' (%s)', $isoCode) : sprintf(' (langue #%d)', $idLang);
+            $suffix = $isoCode ? sprintf(' (%s)', $isoCode) : sprintf(' (language #%d)', $idLang);
 
             $contentTab
                 ->add(sprintf('title_%d', $idLang), TextType::class, [
                     'required' => false,
-                    'label' => 'Titre' . $suffix,
+                    'label' => 'Title' . $suffix,
                 ])
                 ->add(sprintf('content_%d', $idLang), TextareaType::class, [
                     'required' => false,
-                    'label' => 'Contenu' . $suffix,
+                    'label' => 'Content' . $suffix,
                 ])
                 ->add(sprintf('excerpt_%d', $idLang), TextareaType::class, [
                     'required' => false,
-                    'label' => 'Résumé' . $suffix,
+                    'label' => 'Excerpt' . $suffix,
                 ])
             ;
         }
@@ -74,13 +74,13 @@ final class PostType extends AbstractType
             ])
             ->add('sitemap', CheckboxType::class, [
                 'required' => false,
-                'label' => 'Inclure dans le sitemap',
+                'label' => 'Include in sitemap',
             ]);
 
         foreach (\Language::getLanguages(false) as $lang) {
             $idLang = (int) $lang['id_lang'];
             $isoCode = strtoupper((string) ($lang['iso_code'] ?? ''));
-            $suffix = $isoCode ? sprintf(' (%s)', $isoCode) : sprintf(' (langue #%d)', $idLang);
+            $suffix = $isoCode ? sprintf(' (%s)', $isoCode) : sprintf(' (language #%d)', $idLang);
 
             $seoTab
                 ->add(sprintf('meta_title_%d', $idLang), TextType::class, [
@@ -93,7 +93,7 @@ final class PostType extends AbstractType
                 ])
                 ->add(sprintf('link_rewrite_%d', $idLang), TextType::class, [
                     'required' => false,
-                    'label' => 'URL simplifiée' . $suffix,
+                    'label' => 'Friendly URL' . $suffix,
                 ])
             ;
         }
@@ -112,43 +112,43 @@ final class PostType extends AbstractType
         $publicationTab
             ->add('post_status', ChoiceType::class, [
                 'required' => false,
-                'label' => 'Statut',
+                'label' => 'Status',
                 'choices' => [
-                    'Brouillon' => 'draft',
-                    'Corbeille' => 'trash',
-                    'Publié' => 'published',
+                    'Draft' => 'draft',
+                    'Trash' => 'trash',
+                    'Published' => 'published',
                 ],
             ])
             ->add('date_add', TextType::class, [
                 'required' => false,
-                'label' => 'Date de publication',
+                'label' => 'Publication date',
                 'empty_data' => '',
-                'help' => 'Si la date est future et que l\'article est publie, il sera programme automatiquement.',
+                'help' => 'If the date is in the future and the post is published, it will be planned automatically.',
                 'attr' => [
                     'autocomplete' => 'off',
-                    'placeholder' => 'YYYY-MM-DD HH:mm',
+                    'placeholder' => 'YYYY-MM-DD',
                     'data-ever-datetime' => '1',
                 ],
             ])
             ->add('id_author', ChoiceType::class, [
                 'required' => false,
-                'label' => 'Auteur',
-                'placeholder' => 'Sélectionnez un auteur',
+                'label' => 'Author',
+                'placeholder' => 'Select an author',
                 'choices' => $this->getAuthorChoices(),
             ])
             ->add('starred', CheckboxType::class, [
                 'required' => false,
-                'label' => 'Mettre en avant',
+                'label' => 'Feature this post',
             ])
             ->add('psswd', PasswordType::class, [
                 'required' => false,
-                'label' => 'Mot de passe',
+                'label' => 'Password',
                 'empty_data' => '',
             ])
             ->add('featured_image_file', FileType::class, [
                 'required' => false,
                 'mapped' => false,
-                'label' => 'Image à la une',
+                'label' => 'Featured image',
                 'help' => $options['featured_image_help'],
                 'help_html' => true,
             ])
@@ -156,10 +156,10 @@ final class PostType extends AbstractType
                 'required' => false,
                 'mapped' => false,
                 'disabled' => !$options['has_featured_image'],
-                'label' => 'Supprimer l\'image a la une actuelle',
+                'label' => 'Delete current featured image',
                 'help' => $options['has_featured_image']
-                    ? 'Cochez puis enregistrez pour supprimer l\'image actuelle.'
-                    : 'Aucune image a la une n\'est encore associee a cet article.',
+                    ? 'Check this box and save to delete the current image.'
+                    : 'No featured image is associated with this post yet.',
             ])
         ;
 
@@ -170,20 +170,20 @@ final class PostType extends AbstractType
     {
         $taxonomyTab = $builder->create('taxonomy_tab', FormType::class, [
             'inherit_data' => true,
-            'label' => 'Taxonomie',
+            'label' => 'Taxonomy',
             'attr' => ['data-tab' => 'taxonomy'],
         ]);
 
         $taxonomyTab
             ->add('id_default_category', ChoiceType::class, [
                 'required' => false,
-                'label' => 'Catégorie par défaut',
-                'placeholder' => 'Sélectionnez une catégorie',
+                'label' => 'Default category',
+                'placeholder' => 'Select a category',
                 'choices' => $this->getCategoryChoices(),
             ])
             ->add('post_categories', ChoiceType::class, [
                 'required' => false,
-                'label' => 'Catégories',
+                'label' => 'Categories',
                 'choices' => $this->getCategoryChoices(),
                 'multiple' => true,
                 'expanded' => false,
@@ -199,7 +199,7 @@ final class PostType extends AbstractType
             ])
             ->add('post_products', ChoiceType::class, [
                 'required' => false,
-                'label' => 'Produits liés',
+                'label' => 'Linked products',
                 'choices' => $this->getProductChoices(),
                 'multiple' => true,
                 'expanded' => false,
@@ -207,7 +207,7 @@ final class PostType extends AbstractType
             ])
             ->add('allowed_groups', ChoiceType::class, [
                 'required' => false,
-                'label' => 'Groupes autorisés',
+                'label' => 'Allowed groups',
                 'choices' => $this->getGroupChoices(),
                 'multiple' => true,
                 'expanded' => true,
@@ -222,12 +222,15 @@ final class PostType extends AbstractType
      */
     private function getAuthorChoices(): array
     {
+        $idShop = (int) \Context::getContext()->shop->id;
         $rows = \Db::getInstance()->executeS(
-            'SELECT a.id_ever_author, a.nickhandle, al.meta_title, CONCAT(COALESCE(e.firstname, \'\'), \' \', COALESCE(e.lastname, \'\')) AS employee_name
+            'SELECT DISTINCT a.id_ever_author, a.nickhandle, al.meta_title, CONCAT(COALESCE(e.firstname, \'\'), \' \', COALESCE(e.lastname, \'\')) AS employee_name
             FROM `' . _DB_PREFIX_ . 'ever_blog_author` a
             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_author_lang` al ON (al.id_ever_author = a.id_ever_author AND al.id_lang = ' . (int) \Context::getContext()->language->id . ')
+            LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_author_shop` ash ON (ash.id_ever_author = a.id_ever_author)
             LEFT JOIN `' . _DB_PREFIX_ . 'employee` e ON (e.id_employee = a.id_employee)
             WHERE a.active = 1
+                AND (a.id_shop = ' . $idShop . ' OR ash.id_shop = ' . $idShop . ')
             ORDER BY a.nickhandle ASC, a.id_ever_author ASC'
         ) ?: [];
 
@@ -242,7 +245,7 @@ final class PostType extends AbstractType
                 $label = trim((string) ($row['meta_title'] ?? ''));
             }
 
-            $choices[sprintf('%s (#%d)', $label ?: 'Auteur', $id)] = $id;
+            $choices[sprintf('%s (#%d)', $label ?: 'Author', $id)] = $id;
         }
 
         return $choices;
@@ -253,11 +256,15 @@ final class PostType extends AbstractType
      */
     private function getCategoryChoices(): array
     {
+        $idShop = (int) \Context::getContext()->shop->id;
         $rows = \Db::getInstance()->executeS(
-            'SELECT c.id_ever_category, cl.title
+            'SELECT DISTINCT c.id_ever_category, cl.title
             FROM `' . _DB_PREFIX_ . 'ever_blog_category` c
             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category_lang` cl ON (cl.id_ever_category = c.id_ever_category AND cl.id_lang = ' . (int) \Context::getContext()->language->id . ')
+            LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category_shop` cs ON (cs.id_ever_category = c.id_ever_category)
             WHERE c.active = 1
+                AND c.is_root_category = 0
+                AND (c.id_shop = ' . $idShop . ' OR cs.id_shop = ' . $idShop . ')
             ORDER BY c.id_ever_category ASC'
         ) ?: [];
 
@@ -265,7 +272,7 @@ final class PostType extends AbstractType
         foreach ($rows as $row) {
             $id = (int) $row['id_ever_category'];
             $label = trim((string) ($row['title'] ?? ''));
-            $choices[$label ?: sprintf('Catégorie #%d', $id)] = $id;
+            $choices[$label ?: sprintf('Category #%d', $id)] = $id;
         }
 
         return $choices;
@@ -276,11 +283,14 @@ final class PostType extends AbstractType
      */
     private function getTagChoices(): array
     {
+        $idShop = (int) \Context::getContext()->shop->id;
         $rows = \Db::getInstance()->executeS(
-            'SELECT t.id_ever_tag, tl.title
+            'SELECT DISTINCT t.id_ever_tag, tl.title
             FROM `' . _DB_PREFIX_ . 'ever_blog_tag` t
             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_tag_lang` tl ON (tl.id_ever_tag = t.id_ever_tag AND tl.id_lang = ' . (int) \Context::getContext()->language->id . ')
+            LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_tag_shop` ts ON (ts.id_ever_tag = t.id_ever_tag)
             WHERE t.active = 1
+                AND (t.id_shop = ' . $idShop . ' OR ts.id_shop = ' . $idShop . ')
             ORDER BY t.id_ever_tag ASC'
         ) ?: [];
 
@@ -302,6 +312,7 @@ final class PostType extends AbstractType
         $rows = \Db::getInstance()->executeS(
             'SELECT p.id_product, pl.name
             FROM `' . _DB_PREFIX_ . 'product` p
+            INNER JOIN `' . _DB_PREFIX_ . 'product_shop` ps ON (ps.id_product = p.id_product AND ps.id_shop = ' . (int) \Context::getContext()->shop->id . ')
             LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl ON (pl.id_product = p.id_product AND pl.id_lang = ' . (int) \Context::getContext()->language->id . ' AND pl.id_shop = ' . (int) \Context::getContext()->shop->id . ')
             ORDER BY p.id_product DESC
             LIMIT 500'
@@ -311,7 +322,7 @@ final class PostType extends AbstractType
         foreach ($rows as $row) {
             $id = (int) $row['id_product'];
             $label = trim((string) ($row['name'] ?? ''));
-            $choices[$label ?: sprintf('Produit #%d', $id)] = $id;
+            $choices[$label ?: sprintf('Product #%d', $id)] = $id;
         }
 
         return $choices;
@@ -332,7 +343,7 @@ final class PostType extends AbstractType
             }
 
             $label = trim((string) ($group['name'] ?? ''));
-            $choices[$label ?: sprintf('Groupe #%d', $id)] = $id;
+            $choices[$label ?: sprintf('Group #%d', $id)] = $id;
         }
 
         return $choices;
@@ -343,6 +354,7 @@ final class PostType extends AbstractType
         $resolver->setDefaults([
             'featured_image_help' => '',
             'has_featured_image' => false,
+            'translation_domain' => 'Modules.Everpsblog.Admin',
         ]);
         $resolver->setAllowedTypes('featured_image_help', 'string');
         $resolver->setAllowedTypes('has_featured_image', 'bool');

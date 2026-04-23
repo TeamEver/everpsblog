@@ -29,7 +29,7 @@ class DeleteAuthorHandler
             $postsCount = $this->repository->countPostsForAuthor($authorId);
             if ($postsCount > 0 && $this->repository->countOtherAuthors($authorId) > 0) {
                 throw new \RuntimeException(sprintf(
-                    'Impossible de supprimer cet auteur : %d article(s) lui sont rattachés. Réassignez-les à un autre auteur avant suppression.',
+                    'Unable to delete this author: %d post(s) are attached to this author. Reassign them to another author before deletion.',
                     $postsCount
                 ));
             }

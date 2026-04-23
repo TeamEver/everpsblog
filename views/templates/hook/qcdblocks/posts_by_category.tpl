@@ -13,11 +13,11 @@
             {elseif !empty($attributes.category.title)}
                 {$attributes.category.title|escape:'htmlall':'UTF-8'}
             {else}
-                {l s='Articles de la catégorie' mod='everpsblog'}
+                {l s='Category posts' d='Modules.Everpsblog.Shop'}
             {/if}
         </h2>
         {if !empty($attributes.category.url)}
-            <a class="btn btn-sm btn-outline-primary" href="{$attributes.category.url|escape:'htmlall':'UTF-8'}">{l s='Voir la catégorie' mod='everpsblog'}</a>
+            <a class="btn btn-sm btn-outline-primary" href="{$attributes.category.url|escape:'htmlall':'UTF-8'}">{l s='View category' d='Modules.Everpsblog.Shop'}</a>
         {/if}
     </header>
     {if !empty($attributes.posts)}
@@ -43,6 +43,6 @@
             {/foreach}
         </div>
     {else}
-        <p class="text-muted mb-0">{l s='Aucun article dans cette catégorie.' mod='everpsblog'}</p>
+        <p class="text-muted mb-0">{l s='No post in this category.' d='Modules.Everpsblog.Shop'}</p>
     {/if}
 </section>

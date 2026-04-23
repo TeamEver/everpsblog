@@ -184,14 +184,6 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
         }
     }
 
-    public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
-    {
-        return$this->context->getTranslator()->trans(
-            $string,
-            [],
-            'Modules.Everpsblog.post'
-        );
-    }
 
     public function initContent()
     {
@@ -226,7 +218,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
             if (Tools::isSubmit('everpostcomment')) {
                 // Mokay, let's see your IP first
                 if (in_array($_SERVER['REMOTE_ADDR'], $this->ip_banned)) {
-                    $errors[] = $this->l(
+                    $errors[] = $this->transShop(
                         'Wow ! What have you done ? You\'re banned from this blog !'
                     );
                 }
@@ -235,10 +227,10 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                     if (!Tools::getValue('customerEmail')
                         || !Validate::isEmail(Tools::getValue('customerEmail'))
                     ) {
-                        $errors[] = $this->l('Error : The field "Email" is not valid');
+                        $errors[] = $this->transShop('Error : The field "Email" is not valid');
                     } else {
                         if (in_array(Tools::getValue('customerEmail'), $this->users_banned)) {
-                            $errors[] = $this->l(
+                            $errors[] = $this->transShop(
                                 'Wow ! What have you done ? You\'re banned from this blog !'
                             );
                         }
@@ -246,18 +238,18 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                     if (!Tools::getValue('name')
                         || !Validate::isCleanHtml(Tools::getValue('name'))
                     ) {
-                        $errors[] = $this->l('Error : The field "name" is not valid');
+                        $errors[] = $this->transShop('Error : The field "name" is not valid');
                     }
                 }
                 if (!Tools::getValue('RgpdCompliance')
                     || !Validate::isBool(Tools::getValue('RgpdCompliance'))
                 ) {
-                    $errors[] = $this->l('Error : The field "RGPD" is not valid');
+                    $errors[] = $this->transShop('Error : The field "RGPD" is not valid');
                 }
                 if (!Tools::getValue('evercomment')
                     || !Validate::isCleanHtml(Tools::getValue('evercomment'))
                 ) {
-                    $errors[] = $this->l('Error : The field "comments" is not valid');
+                    $errors[] = $this->transShop('Error : The field "comments" is not valid');
                 }
                 $latest = $this->getLatestCommentByEmail(
                     Tools::getValue('customerEmail'),
@@ -268,7 +260,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                     && $latest->date_add
                     && strtotime($latest->date_add) >= strtotime('-30 minutes')
                 ) {
-                    $errors[] = $this->l('You must wait before sending another comment');
+                    $errors[] = $this->transShop('You must wait before sending another comment');
                 }
                 if (count($errors)) {
                     $this->context->smarty->assign(['errors' => $errors]);
@@ -298,12 +290,12 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                     $comment->id_ever_comment = $comment->id;
                     // alert admin ! comment saved ! whouhouhouhou !
                     if ($this->sendCommentAlert((int) $comment->id)) {
-                        $success[] = $this->l('Your comment has been submitted');
+                        $success[] = $this->transShop('Your comment has been submitted');
                         $this->context->smarty->assign([
                             'successes' => $success,
                         ]);
                     } else {
-                        $errors[] = $this->l('Email has not been sent to admin');
+                        $errors[] = $this->transShop('Email has not been sent to admin');
                         $this->context->smarty->assign([
                             'errors' => $errors,
                         ]);
@@ -412,7 +404,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 if (Tools::getValue('post_psswd')) {
                     if ($this->checkPostPassword($this->post->id, md5(_COOKIE_KEY_ . Tools::getValue('post_psswd'))) === false) {
                         $this->post->password_protected = true;
-                        $this->post->content = $this->l('This post is password protected');
+                        $this->post->content = $this->transShop('This post is password protected');
                     }
                     if ($this->checkPostPassword($this->post->id, md5(_COOKIE_KEY_ . Tools::getValue('post_psswd'))) === true) {
                         $this->context->cookie->__set(
@@ -428,7 +420,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                     }
                 } else {
                     $this->post->password_protected = true;
-                    $this->post->content = $this->l('This post is password protected');
+                    $this->post->content = $this->transShop('This post is password protected');
                 }
             } else {
                 // Prepare shortcodes
@@ -450,12 +442,12 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
             ]);
             $social_share_links = [];
             $social_share_links['facebook'] = [
-                'label' => $this->l('Share'),
+                'label' => $this->transShop('Share'),
                 'class' => 'facebook',
                 'url' => 'https://www.facebook.com/sharer.php?u=' . $page['canonical'],
             ];
             $social_share_links['twitter'] = [
-                'label' => $this->l('Tweet'),
+                'label' => $this->transShop('Tweet'),
                 'class' => 'twitter',
                 'url' => 'https://twitter.com/intent/tweet?text=' . $this->post->title . ' ' . $page['canonical'],
             ];
@@ -519,7 +511,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
         );
         $breadcrumb = parent::getBreadcrumbLinks();
         $breadcrumb['links'][] = [
-            'title' => $this->l('Blog'),
+            'title' => $this->transShop('Blog'),
             'url' => $this->context->link->getModuleLink(
                 'everpsblog',
                 'blog'
@@ -811,7 +803,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
         $mail = Mail::send(
             (int) $this->context->language->id,
             'everpsblog',
-            $this->l('A new comment is pending'),
+            $this->transShop('A new comment is pending'),
             [
                 '{shop_name}'=>Configuration::get('PS_SHOP_NAME'),
                 '{shop_logo}'=>_PS_IMG_DIR_ . Configuration::get(

@@ -60,7 +60,7 @@
                         </a>
                         {else}
                         <div class="d-flex align-items-center justify-content-center w-100 h-100 bg-light text-muted">
-                            <span class="small fw-semibold">{l s='Image not available' mod='everpsblog'}</span>
+                            <span class="small fw-semibold">{l s='Image not available' d='Modules.Everpsblog.Shop'}</span>
                         </div>
                         {/if}
                     </div>
@@ -74,13 +74,13 @@
                         </a>
                     </h2>
                     {if isset($item.date_add) && $item.date_add}
-                    <p class="small text-muted mb-3">{$item.date_add|escape:'htmlall':'UTF-8'}</p>
+                    <p class="small text-muted mb-3">{$item.date_add|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</p>
                     {/if}
                     <div class="everpsblogcontent rte mb-3 text-body" id="everpsblog-post-content-{$post_id|escape:'htmlall':'UTF-8'}">
                         {$post_summary|strip_tags|truncate:300:'...'|escape:'htmlall':'UTF-8'}
                     </div>
                     <div class="mt-auto text-center text-lg-start">
-                        <a href="{$post_link|escape:'htmlall':'UTF-8'}" class="btn btn-primary btn-blog-primary rounded-pill px-4 fw-semibold" title="{$post_title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}">{l s='Lire la suite' mod='everpsblog'} <i class="material-icons" aria-hidden="true">chevron_right</i></a>
+                        <a href="{$post_link|escape:'htmlall':'UTF-8'}" class="btn btn-primary btn-blog-primary rounded-pill px-4 fw-semibold" title="{$post_title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}">{l s='Read more' d='Modules.Everpsblog.Shop'} <i class="material-icons" aria-hidden="true">chevron_right</i></a>
                     </div>
                 </div>
             </div>

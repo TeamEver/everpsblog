@@ -145,6 +145,33 @@
     .ever-admin .ever-btn-primary:hover { background: var(--ever-primary-600); color: #fff; }
     .ever-admin .ever-btn-import { background: #0f766e; color: #fff; border-color: #0f766e; }
     .ever-admin .ever-btn-import:hover { background: #115e59; color: #fff; }
+    .ever-admin .ever-sitemaps-card { margin-bottom: 1.25rem; }
+    .ever-admin .ever-sitemap-list {
+      display: grid;
+      gap: .55rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .ever-admin .ever-sitemap-list li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      border: 1px solid var(--ever-border);
+      border-radius: 8px;
+      padding: .65rem .75rem;
+      background: #f9fafb;
+    }
+    .ever-admin .ever-sitemap-list a {
+      overflow-wrap: anywhere;
+      font-weight: 600;
+    }
+    .ever-admin .ever-sitemap-note {
+      margin: .9rem 0 0;
+      color: var(--ever-muted);
+      font-size: .88rem;
+    }
   </style>
 {% endblock %}
 
@@ -152,21 +179,64 @@
 <div class="ever-admin">
   <div class="ever-shell">
     <section class="ever-hero">
-      <h1>Ever Blog · Configuration</h1>
-      <p>Paramètres globaux du blog : routes, commentaires, pagination et contenu affiché.</p>
+      <h1>{{ 'Ever Blog - Configuration'|trans({}, 'Modules.Everpsblog.Admin') }}</h1>
+      <p>{{ 'Global blog settings: routes, comments, pagination and displayed content.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
     </section>
 
-    <nav class="ever-tabs" aria-label="Navigation Ever Blog">
+    <nav class="ever-tabs" aria-label="{{ 'Ever Blog navigation'|trans({}, 'Modules.Everpsblog.Admin') }}">
       {% for link in navigationLinks %}
-        <a class="{{ currentResource == link.key ? 'active' : '' }}" href="{{ link.url }}">{{ link.label }}</a>
+        <a class="{{ currentResource == link.key ? 'active' : '' }}" href="{{ link.url }}">{{ link.label|trans({}, 'Modules.Everpsblog.Admin') }}</a>
       {% endfor %}
     </nav>
+
+    <div class="ever-card ever-sitemaps-card">
+      <div class="ever-card-head">
+        <h2>{{ 'XML sitemaps'|trans({}, 'Modules.Everpsblog.Admin') }}</h2>
+        <p>{{ 'Module URLs to submit to Google Search Console.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+      </div>
+      <div class="ever-card-body">
+        {% if sitemapUrls is defined and sitemapUrls is not empty %}
+          <ul class="ever-sitemap-list">
+            {% for sitemapUrl in sitemapUrls %}
+              <li>
+                <a href="{{ sitemapUrl }}" target="_blank" rel="noopener noreferrer">{{ sitemapUrl }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+          <p class="ever-sitemap-note">{{ 'These URLs are also synchronized in robots.txt with Allow and Sitemap directives.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+        {% else %}
+          <p class="ever-sitemap-note">{{ 'No Ever Blog sitemap has been generated yet. Save a post, category, tag, author or the configuration to regenerate files.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="ever-card ever-sitemaps-card">
+      <div class="ever-card-head">
+        <h2>{{ 'Module translations'|trans({}, 'Modules.Everpsblog.Admin') }}</h2>
+        <p>{{ 'Export the translations customized for this module and import them on another shop.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+      </div>
+      <div class="ever-card-body">
+        <div class="ever-form-grid">
+          <div>
+            <a class="ever-btn ever-btn-primary" href="{{ translationExportUrl }}">{{ 'Export translations'|trans({}, 'Modules.Everpsblog.Admin') }}</a>
+          </div>
+          <form method="post" action="{{ translationImportUrl }}" enctype="multipart/form-data">
+            <input type="hidden" name="_token" value="{{ csrf_token('everpsblog_translation_import') }}">
+            <label for="everpsblog-translation-file">{{ 'Translation export file'|trans({}, 'Modules.Everpsblog.Admin') }}</label>
+            <input id="everpsblog-translation-file" type="file" name="translation_file" accept="application/json,.json" required>
+            <div class="ever-actions" style="padding-left:0;padding-right:0;border-top:none;">
+              <button type="submit" class="ever-btn ever-btn-import">{{ 'Import translations'|trans({}, 'Modules.Everpsblog.Admin') }}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
     <div class="ever-card">
       {{ form_start(configurationForm, {'attr': {'id': 'ever-config-form'}}) }}
       <div class="ever-card-head">
-        <h2>Paramètres du module</h2>
-        <p>Ajustez le comportement du blog et enregistrez pour appliquer.</p>
+        <h2>{{ 'Module settings'|trans({}, 'Modules.Everpsblog.Admin') }}</h2>
+        <p>{{ 'Adjust the blog behavior and save to apply changes.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
       </div>
       <div class="ever-card-body">
         <div class="ever-form-grid">
@@ -174,8 +244,8 @@
         </div>
       </div>
       <div class="ever-actions">
-        <button type="submit" name="import_wordpress_blog" value="1" class="ever-btn ever-btn-import" onclick="return confirm('Lancer l import complet du blog WordPress avec les acces REST renseignes ?');">Importer tout le blog WordPress</button>
-        <button type="submit" class="ever-btn ever-btn-primary">Enregistrer</button>
+        <button type="submit" name="import_wordpress_blog" value="1" class="ever-btn ever-btn-import" onclick="return confirm('{{ 'Start the full WordPress blog import with the configured REST credentials?'|trans({}, 'Modules.Everpsblog.Admin')|e('js') }}');">{{ 'Import the full WordPress blog'|trans({}, 'Modules.Everpsblog.Admin') }}</button>
+        <button type="submit" class="ever-btn ever-btn-primary">{{ 'Save'|trans({}, 'Modules.Everpsblog.Admin') }}</button>
       </div>
       {{ form_end(configurationForm) }}
     </div>
@@ -207,8 +277,6 @@
           license_key: 'gpl',
           promotion: false,
           branding: false,
-          language: 'fr_FR',
-          language_url: 'https://cdn.jsdelivr.net/npm/tinymce-i18n@24.11.11/langs7/fr_FR.js',
           height: 320,
           menubar: 'edit view insert format tools table',
           plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount',

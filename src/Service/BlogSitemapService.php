@@ -4,6 +4,9 @@ namespace PrestaShop\Module\Everpsblog\Service;
 
 class BlogSitemapService
 {
+    private const ROBOTS_BLOCK_START = '# BEGIN EverPsBlog sitemaps';
+    private const ROBOTS_BLOCK_END = '# END EverPsBlog sitemaps';
+
     public function generate($context, $shopId)
     {
         $languages = \Language::getLanguages(true, (int) $shopId);
@@ -20,31 +23,112 @@ class BlogSitemapService
         return $result;
     }
 
-    public function getSitemapIndexes()
+    public function refreshForShop(int $shopId): bool
     {
-        $siteUrl = \Tools::getHttpHost(true) . __PS_BASE_URI__;
+        $generated = (bool) $this->generate(\Context::getContext(), (int) $shopId);
+        $robotsUpdated = (bool) $this->synchronizeRobotsTxt($this->getSitemapIndexes());
+
+        return $generated && $robotsUpdated;
+    }
+
+    public function getSitemapIndexes(?int $shopId = null)
+    {
+        $shopId = null !== $shopId ? (int) $shopId : null;
         $indexes = [];
         foreach (glob(_PS_ROOT_DIR_ . '/*') as $index) {
-            if (is_file($index) && pathinfo($index, PATHINFO_EXTENSION) === 'xml' && strpos(basename($index), 'indexable') !== false) {
-                $indexes[] = $siteUrl . basename($index);
+            $filename = basename($index);
+            if (is_file($index) && pathinfo($index, PATHINFO_EXTENSION) === 'xml' && $this->isModuleSitemapIndex($filename, $shopId)) {
+                $filenameShopId = $this->extractShopIdFromSitemapFilename($filename);
+                $indexes[] = $this->getShopBaseUrl($filenameShopId ?: $shopId) . $filename;
             }
         }
 
+        sort($indexes);
+
         return $indexes;
+    }
+
+    public function getRobotsDirectives(?array $sitemapIndexes = null): array
+    {
+        $sitemapIndexes = $sitemapIndexes ?? $this->getSitemapIndexes();
+        $directives = [];
+
+        foreach ($sitemapIndexes as $sitemapIndex) {
+            $sitemapIndex = trim((string) $sitemapIndex);
+            if ('' === $sitemapIndex) {
+                continue;
+            }
+
+            $path = parse_url($sitemapIndex, PHP_URL_PATH);
+            if (is_string($path) && '' !== $path) {
+                $directives[] = 'Allow: ' . $path;
+            }
+
+            $directives[] = 'Sitemap: ' . $sitemapIndex;
+        }
+
+        return array_values(array_unique($directives));
+    }
+
+    public function synchronizeRobotsTxt(?array $sitemapIndexes = null): bool
+    {
+        $robotsPath = rtrim(_PS_ROOT_DIR_, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'robots.txt';
+        $content = is_file($robotsPath) ? file_get_contents($robotsPath) : '';
+        if (false === $content) {
+            \PrestaShopLogger::addLog('[everpsblog][BlogSitemapService] Unable to read robots.txt.', 3);
+
+            return false;
+        }
+
+        $contentWithoutManagedBlock = $this->removeManagedRobotsBlock((string) $content);
+        $existingLines = $this->normalizeRobotsLines($contentWithoutManagedBlock);
+        $missingDirectives = [];
+
+        foreach ($this->getRobotsDirectives($sitemapIndexes) as $directive) {
+            if (!in_array($this->normalizeRobotsLine($directive), $existingLines, true)) {
+                $missingDirectives[] = $directive;
+            }
+        }
+
+        $newContent = rtrim($contentWithoutManagedBlock);
+        if (!empty($missingDirectives)) {
+            if ($this->hasAllowDirective($missingDirectives)) {
+                array_unshift($missingDirectives, 'User-agent: *');
+            }
+
+            $newContent .= ('' === $newContent ? '' : PHP_EOL)
+                . self::ROBOTS_BLOCK_START . PHP_EOL
+                . implode(PHP_EOL, $missingDirectives) . PHP_EOL
+                . self::ROBOTS_BLOCK_END;
+        }
+
+        $newContent .= PHP_EOL;
+        if ($newContent === (string) $content) {
+            return true;
+        }
+
+        if (false === @file_put_contents($robotsPath, $newContent, LOCK_EX)) {
+            \PrestaShopLogger::addLog('[everpsblog][BlogSitemapService] Unable to update robots.txt.', 3);
+
+            return false;
+        }
+
+        return true;
     }
 
     private function processSitemapPost($shopId, $idLang)
     {
         $filename = 'blogpost_' . (int) $shopId . '_lang_' . \Language::getIsoById((int) $idLang);
-        $sql = 'SELECT p.id_ever_post, p.date_upd, p.allowed_groups, pl.link_rewrite
+        $sql = 'SELECT DISTINCT p.id_ever_post, p.date_upd, p.allowed_groups, pl.link_rewrite
                 FROM `' . _DB_PREFIX_ . 'ever_blog_post` p
                 INNER JOIN `' . _DB_PREFIX_ . 'ever_blog_post_lang` pl
                     ON pl.id_ever_post = p.id_ever_post AND pl.id_lang = ' . (int) $idLang . '
-                WHERE p.sitemap = 1 AND p.post_status = "published"';
+                LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_post_shop` ps
+                    ON ps.id_ever_post = p.id_ever_post
+                WHERE p.sitemap = 1
+                    AND p.post_status = "published"
+                    AND (p.id_shop = ' . (int) $shopId . ' OR ps.id_shop = ' . (int) $shopId . ')';
         $rows = \Db::getInstance()->executeS($sql) ?: [];
-        if (!$rows) {
-            return true;
-        }
 
         $items = [];
         $link = new \Link();
@@ -56,7 +140,7 @@ class BlogSitemapService
                 'url' => $link->getModuleLink('everpsblog', 'post', [
                     'id_ever_post' => (int) $row['id_ever_post'],
                     'link_rewrite' => (string) $row['link_rewrite'],
-                ]),
+                ], true, (int) $idLang, (int) $shopId),
                 'date' => (string) $row['date_upd'],
             ];
         }
@@ -67,15 +151,16 @@ class BlogSitemapService
     private function processSitemapAuthor($shopId, $idLang)
     {
         $filename = 'blogauthor_' . (int) $shopId . '_lang_' . \Language::getIsoById((int) $idLang);
-        $sql = 'SELECT a.id_ever_author, a.date_upd, a.allowed_groups, a.active, al.link_rewrite
+        $sql = 'SELECT DISTINCT a.id_ever_author, a.date_upd, a.allowed_groups, a.active, al.link_rewrite
                 FROM `' . _DB_PREFIX_ . 'ever_blog_author` a
                 INNER JOIN `' . _DB_PREFIX_ . 'ever_blog_author_lang` al
                     ON al.id_ever_author = a.id_ever_author AND al.id_lang = ' . (int) $idLang . '
-                WHERE a.sitemap = 1 AND a.active = 1';
+                LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_author_shop` ash
+                    ON ash.id_ever_author = a.id_ever_author
+                WHERE a.sitemap = 1
+                    AND a.active = 1
+                    AND (a.id_shop = ' . (int) $shopId . ' OR ash.id_shop = ' . (int) $shopId . ')';
         $rows = \Db::getInstance()->executeS($sql) ?: [];
-        if (!$rows) {
-            return true;
-        }
 
         $items = [];
         $link = new \Link();
@@ -87,7 +172,7 @@ class BlogSitemapService
                 'url' => $link->getModuleLink('everpsblog', 'author', [
                     'id_ever_author' => (int) $row['id_ever_author'],
                     'link_rewrite' => (string) $row['link_rewrite'],
-                ]),
+                ], true, (int) $idLang, (int) $shopId),
                 'date' => (string) $row['date_upd'],
             ];
         }
@@ -98,15 +183,16 @@ class BlogSitemapService
     private function processSitemapTag($shopId, $idLang)
     {
         $filename = 'blogtag_' . (int) $shopId . '_lang_' . \Language::getIsoById((int) $idLang);
-        $sql = 'SELECT t.id_ever_tag, t.date_upd, t.allowed_groups, t.active, tl.link_rewrite
+        $sql = 'SELECT DISTINCT t.id_ever_tag, t.date_upd, t.allowed_groups, t.active, tl.link_rewrite
                 FROM `' . _DB_PREFIX_ . 'ever_blog_tag` t
                 INNER JOIN `' . _DB_PREFIX_ . 'ever_blog_tag_lang` tl
                     ON tl.id_ever_tag = t.id_ever_tag AND tl.id_lang = ' . (int) $idLang . '
-                WHERE t.sitemap = 1 AND t.active = 1';
+                LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_tag_shop` ts
+                    ON ts.id_ever_tag = t.id_ever_tag
+                WHERE t.sitemap = 1
+                    AND t.active = 1
+                    AND (t.id_shop = ' . (int) $shopId . ' OR ts.id_shop = ' . (int) $shopId . ')';
         $rows = \Db::getInstance()->executeS($sql) ?: [];
-        if (!$rows) {
-            return true;
-        }
 
         $items = [];
         $link = new \Link();
@@ -118,7 +204,7 @@ class BlogSitemapService
                 'url' => $link->getModuleLink('everpsblog', 'tag', [
                     'id_ever_tag' => (int) $row['id_ever_tag'],
                     'link_rewrite' => (string) $row['link_rewrite'],
-                ]),
+                ], true, (int) $idLang, (int) $shopId),
                 'date' => (string) $row['date_upd'],
             ];
         }
@@ -129,15 +215,16 @@ class BlogSitemapService
     private function processSitemapCategory($shopId, $idLang)
     {
         $filename = 'blogcategory_' . (int) $shopId . '_lang_' . \Language::getIsoById((int) $idLang);
-        $sql = 'SELECT c.id_ever_category, c.date_upd, c.allowed_groups, c.active, c.is_root_category, cl.link_rewrite
+        $sql = 'SELECT DISTINCT c.id_ever_category, c.date_upd, c.allowed_groups, c.active, c.is_root_category, cl.link_rewrite
                 FROM `' . _DB_PREFIX_ . 'ever_blog_category` c
                 INNER JOIN `' . _DB_PREFIX_ . 'ever_blog_category_lang` cl
                     ON cl.id_ever_category = c.id_ever_category AND cl.id_lang = ' . (int) $idLang . '
-                WHERE c.sitemap = 1 AND c.active = 1';
+                LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category_shop` cs
+                    ON cs.id_ever_category = c.id_ever_category
+                WHERE c.sitemap = 1
+                    AND c.active = 1
+                    AND (c.id_shop = ' . (int) $shopId . ' OR cs.id_shop = ' . (int) $shopId . ')';
         $rows = \Db::getInstance()->executeS($sql) ?: [];
-        if (!$rows) {
-            return true;
-        }
 
         $items = [];
         $link = new \Link();
@@ -149,7 +236,7 @@ class BlogSitemapService
                 'url' => $link->getModuleLink('everpsblog', 'category', [
                     'id_ever_category' => (int) $row['id_ever_category'],
                     'link_rewrite' => (string) $row['link_rewrite'],
-                ]),
+                ], true, (int) $idLang, (int) $shopId),
                 'date' => (string) $row['date_upd'],
             ];
         }
@@ -160,8 +247,14 @@ class BlogSitemapService
     private function writeSitemapFiles($filename, array $items)
     {
         $chunkSize = max(1, (int) \Configuration::get('EVERBLOG_SITEMAP_NUMBER'));
-        $domain = \Tools::getHttpHost(true) . __PS_BASE_URI__;
+        $shopId = (int) preg_replace('/^blog(?:post|author|tag|category)_([0-9]+)_.+$/', '$1', $filename);
+        $domain = $this->getShopBaseUrl($shopId);
         $path = _PS_ROOT_DIR_ . '/';
+        $this->removeExistingSitemapFiles($path, $filename);
+
+        if (empty($items)) {
+            return true;
+        }
 
         $chunks = array_chunk($items, $chunkSize);
         $count = 0;
@@ -202,6 +295,80 @@ class BlogSitemapService
         $indexwriter->endDocument();
 
         return true;
+    }
+
+    private function isModuleSitemapIndex(string $filename, ?int $shopId = null): bool
+    {
+        $shopPattern = null !== $shopId ? (string) (int) $shopId : '[0-9]+';
+
+        return (bool) preg_match('/^blog(post|author|tag|category)_' . $shopPattern . '_lang_.+-indexable\.xml$/', $filename);
+    }
+
+    private function extractShopIdFromSitemapFilename(string $filename): int
+    {
+        if (preg_match('/^blog(?:post|author|tag|category)_([0-9]+)_lang_.+-indexable\.xml$/', $filename, $matches)) {
+            return (int) $matches[1];
+        }
+
+        return 0;
+    }
+
+    private function getShopBaseUrl(?int $shopId = null): string
+    {
+        $shopId = (int) ($shopId ?: \Context::getContext()->shop->id);
+        $link = new \Link();
+        if (method_exists($link, 'getBaseLink')) {
+            return rtrim((string) $link->getBaseLink($shopId, true), '/') . '/';
+        }
+
+        return rtrim(\Tools::getHttpHost(true) . __PS_BASE_URI__, '/') . '/';
+    }
+
+    private function removeExistingSitemapFiles(string $path, string $filename): void
+    {
+        foreach ((array) glob($path . $filename . '*.xml') as $file) {
+            if (is_file($file)) {
+                @unlink($file);
+            }
+        }
+    }
+
+    private function removeManagedRobotsBlock(string $content): string
+    {
+        $pattern = '/(?:\R|^)' . preg_quote(self::ROBOTS_BLOCK_START, '/') . '.*?' . preg_quote(self::ROBOTS_BLOCK_END, '/') . '\R?/s';
+
+        return (string) preg_replace($pattern, PHP_EOL, $content);
+    }
+
+    private function normalizeRobotsLines(string $content): array
+    {
+        $lines = preg_split('/\R/', $content) ?: [];
+        $normalized = [];
+
+        foreach ($lines as $line) {
+            $line = $this->normalizeRobotsLine((string) $line);
+            if ('' !== $line) {
+                $normalized[] = $line;
+            }
+        }
+
+        return array_values(array_unique($normalized));
+    }
+
+    private function normalizeRobotsLine(string $line): string
+    {
+        return preg_replace('/\s+/', ' ', trim($line)) ?: '';
+    }
+
+    private function hasAllowDirective(array $directives): bool
+    {
+        foreach ($directives as $directive) {
+            if (0 === stripos((string) $directive, 'Allow:')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

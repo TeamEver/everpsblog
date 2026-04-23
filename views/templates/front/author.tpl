@@ -42,7 +42,7 @@
         {/if}
     {/if}
     {if isset($allow_feed) && $allow_feed}
-    <link rel="alternate" type="application/rss+xml" title="{$page.meta.title|escape:'htmlall':'UTF-8'} {if isset($pagination) && $pagination.current_page > 0}{l s='(page' mod='everpsblog'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' mod='everpsblog'}{/if}" href="{$feed_url|escape:'htmlall':'UTF-8'}" />
+    <link rel="alternate" type="application/rss+xml" title="{$page.meta.title|escape:'htmlall':'UTF-8'} {if isset($pagination) && $pagination.current_page > 0}{l s='(page' d='Modules.Everpsblog.Shop'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' d='Modules.Everpsblog.Shop'}{/if}" href="{$feed_url|escape:'htmlall':'UTF-8'}" />
     {/if}
     <script type="application/ld+json">
     {
@@ -56,8 +56,8 @@
     "image": [
       "{$featured_image|escape:'htmlall':'UTF-8'}"
      ],
-    "datePublished": "{$author->date_add|escape:'htmlall':'UTF-8'}",
-    "dateModified": "{$author->date_upd|escape:'htmlall':'UTF-8'}",
+    "datePublished": "{$author->date_add|date_format:'%Y-%m-%d'|escape:'htmlall':'UTF-8'}",
+    "dateModified": "{$author->date_upd|date_format:'%Y-%m-%d'|escape:'htmlall':'UTF-8'}",
     "author": {
       "@type": "Person",
       "name": "{$author->nickhandle|escape:'htmlall':'UTF-8'}"
@@ -97,7 +97,7 @@
             </div>
             {if isset($allow_feed) && $allow_feed}
             <div class="text-center mb-3">
-                <a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' mod='everpsblog'} {$author->nickhandle|escape:'htmlall':'UTF-8'}</a>
+                <a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' d='Modules.Everpsblog.Shop'} {$author->nickhandle|escape:'htmlall':'UTF-8'}</a>
             </div>
             {/if}
         </div>
@@ -117,17 +117,17 @@
             <ul>
             {if isset($author->facebook) && $author->facebook}
                 <li>
-                    <a href="{$author->facebook|escape:'htmlall':'UTF-8'}" target="_blank" rel="nofollow" class="facebook icon-gray" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{l s='Follow me !' mod='everpsblog'}</a>
+                    <a href="{$author->facebook|escape:'htmlall':'UTF-8'}" target="_blank" rel="nofollow" class="facebook icon-gray" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{l s='Follow me !' d='Modules.Everpsblog.Shop'}</a>
                 </li>
             {/if}
             {if isset($author->linkedin) && $author->linkedin}
                 <li>
-                    <a href="{$author->linkedin|escape:'htmlall':'UTF-8'}" target="_blank" rel="nofollow" class="linkedin icon-gray" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{l s='Follow me !' mod='everpsblog'}</a>
+                    <a href="{$author->linkedin|escape:'htmlall':'UTF-8'}" target="_blank" rel="nofollow" class="linkedin icon-gray" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{l s='Follow me !' d='Modules.Everpsblog.Shop'}</a>
                 </li>
             {/if}
             {if isset($author->twitter) && $author->twitter}
                 <li>
-                    <a href="{$author->twitter|escape:'htmlall':'UTF-8'}" target="_blank" rel="nofollow" class="twitter icon-gray" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{l s='Follow me !' mod='everpsblog'}</a>
+                    <a href="{$author->twitter|escape:'htmlall':'UTF-8'}" target="_blank" rel="nofollow" class="twitter icon-gray" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{l s='Follow me !' d='Modules.Everpsblog.Shop'}</a>
                 </li>
             {/if}
             </ul>
@@ -149,7 +149,7 @@
 {/if}
 {hook h="displayAfterEverLoop"}
 {else}
-<div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>
+<div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' d='Modules.Everpsblog.Shop'}</div>
 {/if}
 {if isset($paginated) && !$paginated}
 <div class="container">

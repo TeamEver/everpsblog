@@ -52,14 +52,19 @@ class EverPsBlog extends Module
         $this->bootstrap = true;
         $this->module_folder = _PS_MODULE_DIR_ . 'everpsblog';
         parent::__construct();
-        $this->displayName = $this->l('Ever Blog');
-        $this->description = $this->l('Simply a blog 😀');
-        $this->confirmUninstall = $this->l('Do you really want to uninstall this module ?');
+        $this->displayName = $this->transAdmin('Ever Blog');
+        $this->description = $this->transAdmin('Simply a blog');
+        $this->confirmUninstall = $this->transAdmin('Do you really want to uninstall this module ?');
         $this->ps_versions_compliancy = [
             'min' => '1.7',
             'max' => _PS_VERSION_,
         ];
         $this->context = Context::getContext();
+    }
+
+    private function transAdmin(string $message, array $parameters = []): string
+    {
+        return Context::getContext()->getTranslator()->trans($message, $parameters, 'Modules.Everpsblog.Admin');
     }
 
     public function install()
@@ -92,32 +97,32 @@ class EverPsBlog extends Module
             && $this->installModuleTab(
                 'AdminEverPsBlog',
                 'IMPROVE',
-                $this->l('Blog')
+                $this->transAdmin('Blog')
             )
             && $this->installModuleTab(
                 'AdminEverPsBlogPost',
                 'AdminEverPsBlog',
-                $this->l('Posts')
+                $this->transAdmin('Posts')
             )
             && $this->installModuleTab(
                 'AdminEverPsBlogCategory',
                 'AdminEverPsBlog',
-                $this->l('Categories')
+                $this->transAdmin('Categories')
             )
             && $this->installModuleTab(
                 'AdminEverPsBlogTag',
                 'AdminEverPsBlog',
-                $this->l('Tags')
+                $this->transAdmin('Tags')
             )
             && $this->installModuleTab(
                 'AdminEverPsBlogComment',
                 'AdminEverPsBlog',
-                $this->l('Comments')
+                $this->transAdmin('Comments')
             )
             && $this->installModuleTab(
                 'AdminEverPsBlogAuthor',
                 'AdminEverPsBlog',
-                $this->l('Authors')
+                $this->transAdmin('Authors')
             )
             && Configuration::updateValue('EVERPSBLOG_ROUTE', 'blog')
             && Configuration::updateValue('EVERBLOG_ADMIN_EMAIL', 1)
@@ -496,7 +501,7 @@ class EverPsBlog extends Module
 
     public function clearEverblogContent()
     {
-        // Suppression des anciens posts, catégories, et tags
+        // Remove old posts, categories and tags.
         Db::getInstance()->execute('DELETE FROM ' . _DB_PREFIX_ . 'ever_blog_post');
         Db::getInstance()->execute('DELETE FROM ' . _DB_PREFIX_ . 'ever_blog_post_lang');
         Db::getInstance()->execute('DELETE FROM ' . _DB_PREFIX_ . 'ever_blog_category');
@@ -508,102 +513,91 @@ class EverPsBlog extends Module
 
     public function migrateMagentoToEverblog()
     {
-        // Supprimer le contenu actuel d'Everblog
+        $shopId = (int) Context::getContext()->shop->id;
+        $langId = (int) Context::getContext()->language->id;
+
+        // Delete the current Everblog content.
         $this->clearEverblogContent();
 
-        // Récupérer les catégories, tags et posts de Magento
+        // Fetch categories, tags and posts from Magento.
         $categories = Db::getInstance()->executeS('SELECT * FROM aw_blog_cat');
         $tags = Db::getInstance()->executeS('SELECT * FROM aw_blog_tags');
         $posts = Db::getInstance()->executeS('SELECT * FROM aw_blog');
 
-        // Récupérer tous les IDs de groupes dans PrestaShop
+        // Fetch all PrestaShop group IDs.
         $groups = Db::getInstance()->executeS('SELECT id_group FROM ' . _DB_PREFIX_ . 'group');
         $groupIds = array_column($groups, 'id_group');
         $allowedGroupsJson = json_encode($groupIds); // Convertir en JSON
 
-        // Créer une catégorie par défaut "Non classé"
-        $defaultCategory = new EverPsBlogCategory();
-        $defaultCategory->title = [1 => 'Non classé']; // Assuming language ID = 1
-        $defaultCategory->meta_title = [1 => 'Non classé'];
-        $defaultCategory->meta_description = [1 => ''];
-        $defaultCategory->link_rewrite = [1 => Tools::link_rewrite('non-classe')];
-        $defaultCategory->date_add = date('Y-m-d H:i:s');
-        $defaultCategory->date_upd = date('Y-m-d H:i:s');
-        $defaultCategory->id_parent_category = 1;
-        $defaultCategory->allowed_groups = $allowedGroupsJson;
-        $defaultCategory->indexable = true;
-        $defaultCategory->follow = true;
-        $defaultCategory->active = true;
-        $defaultCategory->id_shop = 1;
-        $defaultCategory->save();
-        // Récupérer l'ID de la catégorie par défaut
-        $defaultCategoryId = Configuration::get('EVERBLOG_UNCLASSED_ID');
+        // Create the default "Uncategorized" category.
+        $rootCategoryId = $this->getBlogInstallService()->ensureRootCategory($shopId);
+        $defaultCategoryId = $this->getBlogInstallService()->ensureUnclassedCategory($shopId, $rootCategoryId, $this);
 
-        // Insérer les catégories dans Everblog
+        // Insert categories into Everblog.
         foreach ($categories as $category) {
             $newCategory = new EverPsBlogCategory();
-            $newCategory->title = [1 => $category['title']]; // Assuming language ID = 1
-            $newCategory->meta_title = [1 => $category['meta_keywords']];
-            $newCategory->meta_description = [1 => $category['meta_description']];
-            $newCategory->link_rewrite = [1 => Tools::link_rewrite($category['title'])];
+            $newCategory->title = [$langId => $category['title']];
+            $newCategory->meta_title = [$langId => $category['meta_keywords']];
+            $newCategory->meta_description = [$langId => $category['meta_description']];
+            $newCategory->link_rewrite = [$langId => Tools::link_rewrite($category['title'])];
             $newCategory->date_add = date('Y-m-d H:i:s');
             $newCategory->date_upd = date('Y-m-d H:i:s');
             $newCategory->allowed_groups = $allowedGroupsJson;
             $newCategory->active = true;
-            $newCategory->id_shop = 1;
+            $newCategory->id_shop = $shopId;
             $newCategory->save();
         }
 
-        // Insérer les tags dans Everblog
+        // Insert tags into Everblog.
         foreach ($tags as $tag) {
             $newTag = new EverPsBlogTag();
-            $newTag->title = [1 => $tag['tag']];
-            $newTag->meta_title = [1 => $tag['tag']];
-            $newTag->meta_description = [1 => ''];
-            $newTag->link_rewrite = [1 => Tools::link_rewrite($tag['tag'])];
+            $newTag->title = [$langId => $tag['tag']];
+            $newTag->meta_title = [$langId => $tag['tag']];
+            $newTag->meta_description = [$langId => ''];
+            $newTag->link_rewrite = [$langId => Tools::link_rewrite($tag['tag'])];
             $newTag->allowed_groups = $allowedGroupsJson;
             $newTag->date_add = date('Y-m-d H:i:s');
             $newTag->date_upd = date('Y-m-d H:i:s');
             $newTag->indexable = true;
             $newTag->follow = true;
             $newTag->active = true;
-            $newTag->id_shop = 1;
+            $newTag->id_shop = $shopId;
             $newTag->save();
         }
 
-        // Insérer les posts dans Everblog
+        // Insert posts into Everblog.
         foreach ($posts as $post) {
             $post['post_content'] = str_replace('\r\n', '<p></p>', $post['post_content']);
             // Nettoyage et remplacement des images dans le contenu
             $cleanedContent = $this->replaceAndDownloadImages($post['post_content']);
             $cleanedContent = Tools::purifyHTML($cleanedContent);
             $cleanedExcerpt = $this->replaceAndDownloadImages($post['short_content']);
-            // Création du post
+            // Create the post.
             $newPost = new EverPsBlogPost();
-            $newPost->title = [1 => $post['title']];
-            $newPost->meta_title = [1 => $post['meta_keywords']];
-            $newPost->meta_description = [1 => $post['meta_description']];
-            $newPost->link_rewrite = [1 => Tools::link_rewrite($post['title'])];
+            $newPost->title = [$langId => $post['title']];
+            $newPost->meta_title = [$langId => $post['meta_keywords']];
+            $newPost->meta_description = [$langId => $post['meta_description']];
+            $newPost->link_rewrite = [$langId => Tools::link_rewrite($post['title'])];
             $newPost->date_add = $post['created_time'] ? $post['created_time'] : date('Y-m-d H:i:s');
             $newPost->date_upd = $post['update_time'] ? $post['update_time'] : date('Y-m-d H:i:s');
             $newPost->active = ($post['status'] == 1) ? true : false;
             $newPost->indexable = ($post['status'] == 1) ? true : false;
             $newPost->follow = ($post['status'] == 1) ? true : false;
-            $newPost->content = [1 => $cleanedContent];
+            $newPost->content = [$langId => $cleanedContent];
             $newPost->post_status = 'published';
-            $newPost->id_shop = 1;
+            $newPost->id_shop = $shopId;
             $newPost->id_default_category = $defaultCategoryId;
-            $newPost->allowed_groups = $allowedGroupsJson; // Ajouter les groupes autorisés
+            $newPost->allowed_groups = $allowedGroupsJson; // Add allowed groups.
             $newPost->save();
             // dump($post['post_content']);
             // die();
-            // Récupérer l'ID du post enregistré
+            // Fetch the saved post ID.
             $postId = $newPost->id;
             // dump(pSQL($post['post_content'], true));
             // die();
             // dump($cleanedContent);
             // die();
-            // Mise à jour directe du contenu dans la base de données
+            // Update the content directly in the database.
             // Db::getInstance()->execute('
             //     UPDATE ' . _DB_PREFIX_ . 'ever_blog_post_lang
             //     SET content = "' . pSQL($post['post_content'], true) . '", excerpt = "' . pSQL($cleanedExcerpt) . '"
@@ -611,15 +605,15 @@ class EverPsBlog extends Module
             // );
             $this->getBlogTaxonomyService()->insert($defaultCategoryId, $postId, 'category');
             $newPost->save();
-            // Insérer la catégorie par défaut "Non classé" pour chaque post
+            // Insert the default "Uncategorized" category for each post.
 
-            // Insérer les autres catégories associées au post
+            // Insert the other categories attached to the post.
             $postCategories = Db::getInstance()->executeS('SELECT * FROM aw_blog_post_cat WHERE post_id = ' . (int)$post['post_id']);
             foreach ($postCategories as $postCategory) {
                 $this->getBlogTaxonomyService()->insert($postCategory['cat_id'], $postId, 'category');
             }
 
-            // Insérer les tags associés au post
+            // Insert the tags attached to the post.
             $postTags = explode(',', $post['tags']);
             foreach ($postTags as $tag) {
                 $existingTag = Db::getInstance()->getRow('SELECT id_ever_tag FROM ' . _DB_PREFIX_ . 'ever_blog_tag_lang WHERE title = "' . pSQL($tag) . '"');
@@ -639,7 +633,7 @@ class EverPsBlog extends Module
             function ($matches) {
                 $imgTag = $matches[1];
                 $caption = trim(strip_tags($matches[2]));
-                // Ajouter class img-fluid et figure-img à l'image
+                // Add img-fluid and figure-img classes to the image.
                 $imgTag = preg_replace(
                     '/<img(.*?)class=["\']?([^"\']*)["\']?/i',
                     '<img$1class="$2 img-fluid figure-img"',
@@ -742,188 +736,188 @@ class EverPsBlog extends Module
             if (!Tools::getValue('EVERPSBLOG_ROUTE')
                 || !Validate::isLinkRewrite(Tools::getValue('EVERPSBLOG_ROUTE'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Blog route" is not valid');
+                $this->postErrors[] = $this->transAdmin('Error : The field "Blog route" is not valid');
             }
             if (!Tools::getValue('EVERPSBLOG_EXCERPT')
                 || !Validate::isInt(Tools::getValue('EVERPSBLOG_EXCERPT'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Excerpt length" is not valid');
+                $this->postErrors[] = $this->transAdmin('Error : The field "Excerpt length" is not valid');
             }
             if (!Tools::getValue('EVERPSBLOG_TITLE_LENGTH')
                 || !Validate::isInt(Tools::getValue('EVERPSBLOG_TITLE_LENGTH'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Title length" is not valid');
+                $this->postErrors[] = $this->transAdmin('Error : The field "Title length" is not valid');
             }
             if (Tools::getValue('EVERBLOG_SHOW_POST_COUNT')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_SHOW_POST_COUNT'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Show post count" is not valid');
+                $this->postErrors[] = $this->transAdmin('Error : The field "Show post count" is not valid');
             }
             if (Tools::getValue('EVERBLOG_TINYMCE')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_TINYMCE'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Extends TinyMCE" is not valid');
+                $this->postErrors[] = $this->transAdmin('Error : The field "Extends TinyMCE" is not valid');
             }
             if (Tools::getValue('EVERBLOG_SHOW_HOME')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_SHOW_HOME'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Show post on homepage" is not valid');
+                $this->postErrors[] = $this->transAdmin('Error : The field "Show post on homepage" is not valid');
             }
             if (!Tools::getValue('EVERPSBLOG_PAGINATION')
                 && !Validate::isUnsignedInt(Tools::getValue('EVERPSBLOG_PAGINATION'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Posts per page" is not valid');
+                $this->postErrors[] = $this->transAdmin('Error : The field "Posts per page" is not valid');
             }
             if (!Tools::getValue('EVERPSBLOG_HOME_NBR')
                 && !Validate::isUnsignedInt(Tools::getValue('EVERPSBLOG_HOME_NBR'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Posts for home" is not valid');
+                $this->postErrors[] = $this->transAdmin('Error : The field "Posts for home" is not valid');
             }
             if (!Tools::getValue('EVERPSBLOG_PRODUCT_NBR')
                 && !Validate::isUnsignedInt(Tools::getValue('EVERPSBLOG_PRODUCT_NBR'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Posts for product" is not valid');
+                $this->postErrors[] = $this->transAdmin('Error : The field "Posts for product" is not valid');
             }
             if (!Tools::getValue('EVERBLOG_ADMIN_EMAIL')
                 || !Validate::isUnsignedInt(Tools::getValue('EVERBLOG_ADMIN_EMAIL'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Admin email" is not valid');
+                $this->postErrors[] = $this->transAdmin('Error : The field "Admin email" is not valid');
             }
             if (Tools::getValue('EVERBLOG_ALLOW_COMMENTS')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_ALLOW_COMMENTS'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Allow comments" is not valid');
+                $this->postErrors[] = $this->transAdmin('Error : The field "Allow comments" is not valid');
             }
             if (Tools::getValue('EVERBLOG_CHECK_COMMENTS')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_CHECK_COMMENTS'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Check comments" is not valid');
+                $this->postErrors[] = $this->transAdmin('Error : The field "Check comments" is not valid');
             }
             if (Tools::getValue('EVERBLOG_RSS')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_RSS'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Use RSS feed" is not valid');
+                $this->postErrors[] = $this->transAdmin('Error : The field "Use RSS feed" is not valid');
             }
             if (Tools::getValue('EVERBLOG_SHOW_AUTHOR')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_SHOW_AUTHOR'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Show author" is not valid');
+                $this->postErrors[] = $this->transAdmin('Error : The field "Show author" is not valid');
             }
             if (Tools::getValue('EVERBLOG_DEFAULT_AUTHOR_NAME')
                 && !Validate::isGenericName(Tools::getValue('EVERBLOG_DEFAULT_AUTHOR_NAME'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Default author name" is not valid');
+                $this->postErrors[] = $this->transAdmin('Error : The field "Default author name" is not valid');
             }
             if (Tools::getValue('EVERBLOG_BANNED_USERS')
                 && !Validate::isGenericName(Tools::getValue('EVERBLOG_BANNED_USERS'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Banned users" is not valid');
+                $this->postErrors[] = $this->transAdmin('Error : The field "Banned users" is not valid');
             }
             if (Tools::getValue('EVERBLOG_BANNED_IP')
                 && !Validate::isGenericName(Tools::getValue('EVERBLOG_BANNED_IP'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Banned IP" is not valid');
+                $this->postErrors[] = $this->transAdmin('Error : The field "Banned IP" is not valid');
             }
             if (Tools::getValue('EVERBLOG_ONLY_LOGGED_COMMENT')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_ONLY_LOGGED_COMMENT'))
             ) {
-                $this->postErrors[] = $this->l('Error : The field "Only logged can comment" is not valid');
+                $this->postErrors[] = $this->transAdmin('Error : The field "Only logged can comment" is not valid');
             }
             if (Tools::getValue('EVERBLOG_EMPTY_TRASH')
                 && !Validate::isUnsignedInt(Tools::getValue('EVERBLOG_EMPTY_TRASH'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Empty trash" is not valid'
                 );
             }
             if (!Tools::getValue('EVERPSBLOG_TYPE')
                 && !Validate::isString(Tools::getValue('EVERPSBLOG_TYPE'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Default blog type" is not valid'
                 );
             }
             if (Tools::getValue('EVERBLOG_ANIMATE')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_ANIMATE'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Use cool CSS" is not valid'
                 );
             }
             if (Tools::getValue('EVERBLOG_RELATED_POST')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_RELATED_POST'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Show related posts on product page" is not valid'
                 );
             }
             if (Tools::getValue('EVERBLOG_SHOW_RELATED_POSTS')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_SHOW_RELATED_POSTS'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Show related posts on post page" is not valid'
                 );
             }
             if (Tools::getValue('EVERBLOG_SHOW_FEAT_CAT')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_SHOW_FEAT_CAT'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Show featured category image" is not valid'
                 );
             }
             if (Tools::getValue('EVERBLOG_SHOW_FEAT_TAG')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_SHOW_FEAT_TAG'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Show featured tag image" is not valid'
                 );
             }
             if (Tools::getValue('EVERBLOG_SHOW_FEAT_POST')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_SHOW_FEAT_POST'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Show featured post image" is not valid'
                 );
             }
             if (Tools::getValue('EVERBLOG_SHOW_POST_TAGS')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_SHOW_POST_TAGS'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Show tags on posts" is not valid'
                 );
             }
             if (Tools::getValue('EVERBLOG_ARCHIVE_COLUMNS')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_ARCHIVE_COLUMNS'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Show archives on columns" is not valid'
                 );
             }
             if (Tools::getValue('EVERBLOG_PRODUCT_COLUMNS')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_PRODUCT_COLUMNS'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Show products on columns" is not valid'
                 );
             }
             if (Tools::getValue('EVERBLOG_TAG_COLUMNS')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_TAG_COLUMNS'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Show tags on columns" is not valid'
                 );
             }
             if (Tools::getValue('EVERBLOG_CATEG_COLUMNS')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_CATEG_COLUMNS'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Show categories on columns" is not valid'
                 );
             }
             if (Tools::getValue('EVERBLOG_CAT_FEATURED')
                 && !Validate::isUnsignedInt(Tools::getValue('EVERBLOG_CAT_FEATURED'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Featured category" is not valid'
                 );
             }
@@ -932,35 +926,35 @@ class EverPsBlog extends Module
                 if (Tools::getValue('EVERBLOG_TITLE_'.$lang['id_lang'])
                     && !Validate::isString(Tools::getValue('EVERBLOG_TITLE_'.$lang['id_lang']))
                 ) {
-                    $this->postErrors[] = $this->l(
+                    $this->postErrors[] = $this->transAdmin(
                         'Error : Blog title is invalid'
                     );
                 }
                 if (Tools::getValue('EVERBLOG_META_DESC_'.$lang['id_lang'])
                     && !Validate::isCleanHtml(Tools::getValue('EVERBLOG_META_DESC_'.$lang['id_lang']))
                 ) {
-                    $this->postErrors[] = $this->l(
+                    $this->postErrors[] = $this->transAdmin(
                         'Error : Blog meta description is invalid'
                     );
                 }
                 if (Tools::getValue('EVERBLOG_TOP_TEXT_'.$lang['id_lang'])
                     && !Validate::isCleanHtml(Tools::getValue('EVERBLOG_TOP_TEXT_'.$lang['id_lang']))
                 ) {
-                    $this->postErrors[] = $this->l(
+                    $this->postErrors[] = $this->transAdmin(
                         'Error : Blog top text is invalid'
                     );
                 }
                 if (Tools::getValue('EVERBLOG_BOTTOM_TEXT_'.$lang['id_lang'])
                     && !Validate::isCleanHtml(Tools::getValue('EVERBLOG_BOTTOM_TEXT_'.$lang['id_lang']))
                 ) {
-                    $this->postErrors[] = $this->l(
+                    $this->postErrors[] = $this->transAdmin(
                         'Error : Blog bottom text is invalid'
                     );
                 }
                 if (Tools::getValue('EVERBLOG_MAIN_TITLE_'.$lang['id_lang'])
                     && !Validate::isString(Tools::getValue('EVERBLOG_MAIN_TITLE_'.$lang['id_lang']))
                 ) {
-                    $this->postErrors[] = $this->l(
+                    $this->postErrors[] = $this->transAdmin(
                         'Error : Blog page title is invalid'
                     );
                 }
@@ -968,7 +962,7 @@ class EverPsBlog extends Module
             if (Tools::getValue('EVERBLOG_HEADER_BG_COLOR')
                 && !Validate::isColor(Tools::getValue('EVERBLOG_HEADER_BG_COLOR'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Blog header background color" is not valid'
                 );
             }
@@ -976,35 +970,35 @@ class EverPsBlog extends Module
             if (Tools::getValue('EVERPSBLOG_BLOG_LAYOUT')
                 && !Validate::isString(Tools::getValue('EVERPSBLOG_BLOG_LAYOUT'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Blog layout" is not valid'
                 );
             }
             if (Tools::getValue('EVERPSBLOG_POST_LAYOUT')
                 && !Validate::isString(Tools::getValue('EVERPSBLOG_POST_LAYOUT'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Post layout" is not valid'
                 );
             }
             if (Tools::getValue('EVERPSBLOG_CAT_LAYOUT')
                 && !Validate::isString(Tools::getValue('EVERPSBLOG_CAT_LAYOUT'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Category layout" is not valid'
                 );
             }
             if (Tools::getValue('EVERPSBLOG_AUTHOR_LAYOUT')
                 && !Validate::isString(Tools::getValue('EVERPSBLOG_AUTHOR_LAYOUT'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Author layout" is not valid'
                 );
             }
             if (Tools::getValue('EVERPSBLOG_TAG_LAYOUT')
                 && !Validate::isString(Tools::getValue('EVERPSBLOG_TAG_LAYOUT'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Tag layout" is not valid'
                 );
             }
@@ -1013,7 +1007,7 @@ class EverPsBlog extends Module
                 && !empty($_FILES['wordpress_xml']['tmp_name'])
             ) {
                 if (pathinfo($_FILES['wordpress_xml']['name'], PATHINFO_EXTENSION) != 'xml') {
-                    $this->postErrors[] = $this->l(
+                    $this->postErrors[] = $this->transAdmin(
                         'Error : The field "Tag layout" is not valid'
                     );
                 } else {
@@ -1023,59 +1017,59 @@ class EverPsBlog extends Module
             if (Tools::getValue('EVERBLOG_IMPORT_POST_STATE')
                 && !Validate::isString(Tools::getValue('EVERBLOG_IMPORT_POST_STATE'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Default post status on import from WordPress xml file" is not valid'
                 );
             }
             if (Tools::getValue('EVERBLOG_IMPORT_AUTHORS')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_IMPORT_AUTHORS'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Import authors from WordPress xml file" is not valid'
                 );
             }
             if (Tools::getValue('EVERBLOG_IMPORT_CATS')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_IMPORT_CATS'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Import categories from WordPress xml file" is not valid'
                 );
             }
             if (Tools::getValue('EVERBLOG_IMPORT_TAGS')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_IMPORT_TAGS'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Import tags from WordPress xml file" is not valid'
                 );
             }
             if (Tools::getValue('EVERBLOG_ENABLE_AUTHORS')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_ENABLE_AUTHORS'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Enable authors from WordPress xml file" is not valid'
                 );
             }
             if (Tools::getValue('EVERBLOG_ENABLE_CATS')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_ENABLE_CATS'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Enable categories from WordPress xml file" is not valid'
                 );
             }
             if (Tools::getValue('EVERBLOG_ENABLE_TAGS')
                 && !Validate::isBool(Tools::getValue('EVERBLOG_ENABLE_TAGS'))
             ) {
-                $this->postErrors[] = $this->l(
+                $this->postErrors[] = $this->transAdmin(
                     'Error : The field "Enable tags from WordPress xml file" is not valid'
                 );
             }
             if (Tools::isSubmit('submitWooImport')) {
                 if (Tools::getValue('EVER_WOO_API_URL') && !Validate::isUrl(Tools::getValue('EVER_WOO_API_URL'))) {
-                    $this->postErrors[] = $this->l('Error : The field "API URL" is not valid');
+                    $this->postErrors[] = $this->transAdmin('Error : The field "API URL" is not valid');
                 }
             } elseif (Tools::isSubmit('submitWpImport')) {
                 if (Tools::getValue('EVER_WP_API_URL') && !Validate::isUrl(Tools::getValue('EVER_WP_API_URL'))) {
-                    $this->postErrors[] = $this->l('Error : The field "API URL" is not valid');
+                    $this->postErrors[] = $this->transAdmin('Error : The field "API URL" is not valid');
                 }
             }
         }
@@ -1174,7 +1168,7 @@ class EverPsBlog extends Module
             _PS_MODULE_DIR_ . '/' . $this->name . '/views/css/custom.css',
             Tools::getValue('EVERBLOG_CSS')
         );
-        $this->postSuccess[] = $this->l('All settings have been saved');
+        $this->postSuccess[] = $this->transAdmin('All settings have been saved');
     }
 
     protected function getConfigFormValues()
@@ -1322,145 +1316,145 @@ class EverPsBlog extends Module
         $default_snippet = [
             [
                 'snippet' => 'Article',
-                'name' => $this->l('Simple article'),
+                'name' => $this->transAdmin('Simple article'),
             ],
             [
                 'snippet' => 'NewsArticle',
-                'name' => $this->l('News article'),
+                'name' => $this->transAdmin('News article'),
             ],
         ];
         $layouts = [
             [
                 'layout' => 'layouts/layout-full-width.tpl',
-                'name' => $this->l('Full width'),
+                'name' => $this->transAdmin('Full width'),
             ],
             [
                 'layout' => 'layouts/layout-left-column.tpl',
-                'name' => $this->l('Left column'),
+                'name' => $this->transAdmin('Left column'),
             ],
             [
                 'layout' => 'layouts/layout-right-column.tpl',
-                'name' => $this->l('Right column'),
+                'name' => $this->transAdmin('Right column'),
             ],
             [
                 'layout' => 'layouts/layout-both-columns.tpl',
-                'name' => $this->l('Both columns'),
+                'name' => $this->transAdmin('Both columns'),
             ],
         ];
         $trash_days = [
             [
                 'id_trash' => 0,
-                'name' => $this->l('Do not empty trash'),
+                'name' => $this->transAdmin('Do not empty trash'),
             ],
             [
                 'id_trash' => 1,
-                'name' => $this->l('One day'),
+                'name' => $this->transAdmin('One day'),
             ],
             [
                 'id_trash' => 2,
-                'name' => $this->l('Two days'),
+                'name' => $this->transAdmin('Two days'),
             ],
             [
                 'id_trash' => 3,
-                'name' => $this->l('Three days'),
+                'name' => $this->transAdmin('Three days'),
             ],
             [
                 'id_trash' => 4,
-                'name' => $this->l('Four days'),
+                'name' => $this->transAdmin('Four days'),
             ],
             [
                 'id_trash' => 5,
-                'name' => $this->l('Five days'),
+                'name' => $this->transAdmin('Five days'),
             ],
             [
                 'id_trash' => 6,
-                'name' => $this->l('Six days'),
+                'name' => $this->transAdmin('Six days'),
             ],
             [
                 'id_trash' => 7,
-                'name' => $this->l('One week'),
+                'name' => $this->transAdmin('One week'),
             ],
         ];
         $css_files = [
             [
                 'id_file' => 'default',
-                'name' => $this->l('default.css file'),
+                'name' => $this->transAdmin('default.css file'),
             ],
             [
                 'id_file' => 'red',
-                'name' => $this->l('red.css file'),
+                'name' => $this->transAdmin('red.css file'),
             ],
             [
                 'id_file' => 'green',
-                'name' => $this->l('green.css file'),
+                'name' => $this->transAdmin('green.css file'),
             ],
             [
                 'id_file' => 'yellow',
-                'name' => $this->l('yellow.css file'),
+                'name' => $this->transAdmin('yellow.css file'),
             ],
             [
                 'id_file' => 'white',
-                'name' => $this->l('white.css file'),
+                'name' => $this->transAdmin('white.css file'),
             ],
         ];
         $post_status = [
             [
                 'id_status' => 'draft',
-                'name' => $this->l('draft'),
+                'name' => $this->transAdmin('draft'),
             ],
             [
                 'id_status' => 'pending',
-                'name' => $this->l('pending'),
+                'name' => $this->transAdmin('pending'),
             ],
             [
                 'id_status' => 'published',
-                'name' => $this->l('published'),
+                'name' => $this->transAdmin('published'),
             ],
             [
                 'id_status' => 'trash',
-                'name' => $this->l('trash'),
+                'name' => $this->transAdmin('trash'),
             ],
             [
                 'id_status' => 'planned',
-                'name' => $this->l('planned'),
+                'name' => $this->transAdmin('planned'),
             ],
         ];
         $form_fields = [];
         $form_fields[] = [
             'form' => [
                 'legend' => [
-                    'title' => $this->l('Blog default Settings'),
+                    'title' => $this->transAdmin('Blog default Settings'),
                     'icon' => 'icon-smile',
                 ],
                 'input' => [
                     [
                         'type' => 'text',
-                        'label' => $this->l('Blog base route'),
+                        'label' => $this->transAdmin('Blog base route'),
                         'name' => 'EVERPSBLOG_ROUTE',
-                        'desc' => $this->l('Leaving empty will set "blog"'),
-                        'hint' => $this->l('Use a keyword associated to your shop'),
+                        'desc' => $this->transAdmin('Leaving empty will set "blog"'),
+                        'hint' => $this->transAdmin('Use a keyword associated to your shop'),
                     ],
                     [
                         'type' => 'text',
-                        'label' => $this->l('Post content excerpt'),
+                        'label' => $this->transAdmin('Post content excerpt'),
                         'name' => 'EVERPSBLOG_EXCERPT',
-                        'desc' => $this->l('Post excerpt length for content on listing'),
-                        'hint' => $this->l('Please set post content excerpt'),
+                        'desc' => $this->transAdmin('Post excerpt length for content on listing'),
+                        'hint' => $this->transAdmin('Please set post content excerpt'),
                         'required' => true,
                     ],
                     [
                         'type' => 'text',
-                        'label' => $this->l('Post title length'),
+                        'label' => $this->transAdmin('Post title length'),
                         'name' => 'EVERPSBLOG_TITLE_LENGTH',
-                        'desc' => $this->l('Post title length for content on listing'),
-                        'hint' => $this->l('Please set post title length'),
+                        'desc' => $this->transAdmin('Post title length for content on listing'),
+                        'hint' => $this->transAdmin('Please set post title length'),
                         'required' => true,
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Extends TinyMCE on blog management ?'),
-                        'desc' => $this->l('Set yes to extends TinyMCE on blog management pages'),
-                        'hint' => $this->l('Else TinyMCE will be default'),
+                        'label' => $this->transAdmin('Extends TinyMCE on blog management ?'),
+                        'desc' => $this->transAdmin('Set yes to extends TinyMCE on blog management pages'),
+                        'hint' => $this->transAdmin('Else TinyMCE will be default'),
                         'required' => false,
                         'name' => 'EVERBLOG_TINYMCE',
                         'is_bool' => true,
@@ -1468,20 +1462,20 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Show post views count ?'),
-                        'desc' => $this->l('Set yes to show views count'),
-                        'hint' => $this->l('Else will only be shown on admin'),
+                        'label' => $this->transAdmin('Show post views count ?'),
+                        'desc' => $this->transAdmin('Set yes to show views count'),
+                        'hint' => $this->transAdmin('Else will only be shown on admin'),
                         'required' => false,
                         'name' => 'EVERBLOG_SHOW_POST_COUNT',
                         'is_bool' => true,
@@ -1489,20 +1483,20 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Show tags on posts ?'),
-                        'desc' => $this->l('Display tags on post pages'),
-                        'hint' => $this->l('Set no to hide tags on posts'),
+                        'label' => $this->transAdmin('Show tags on posts ?'),
+                        'desc' => $this->transAdmin('Display tags on post pages'),
+                        'hint' => $this->transAdmin('Set no to hide tags on posts'),
                         'required' => false,
                         'name' => 'EVERBLOG_SHOW_POST_TAGS',
                         'is_bool' => true,
@@ -1510,20 +1504,20 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Show post on homepage ?'),
-                        'desc' => $this->l('Set yes to show posts on homepage'),
-                        'hint' => $this->l('Else posts won\'t be shown on homepage'),
+                        'label' => $this->transAdmin('Show post on homepage ?'),
+                        'desc' => $this->transAdmin('Set yes to show posts on homepage'),
+                        'hint' => $this->transAdmin('Else posts won\'t be shown on homepage'),
                         'required' => false,
                         'name' => 'EVERBLOG_SHOW_HOME',
                         'is_bool' => true,
@@ -1531,44 +1525,44 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'text',
-                        'label' => $this->l('Number of posts for home'),
+                        'label' => $this->transAdmin('Number of posts for home'),
                         'name' => 'EVERPSBLOG_HOME_NBR',
-                        'desc' => $this->l('Leaving empty will set 4 posts'),
-                        'hint' => $this->l('Posts are 4 per row'),
+                        'desc' => $this->transAdmin('Leaving empty will set 4 posts'),
+                        'hint' => $this->transAdmin('Posts are 4 per row'),
                         'required' => true,
                     ],
                     [
                         'type' => 'text',
-                        'label' => $this->l('Number of posts for product'),
+                        'label' => $this->transAdmin('Number of posts for product'),
                         'name' => 'EVERPSBLOG_PRODUCT_NBR',
-                        'desc' => $this->l('Leaving empty will set 4 posts'),
-                        'hint' => $this->l('Posts are 4 per row'),
+                        'desc' => $this->transAdmin('Leaving empty will set 4 posts'),
+                        'hint' => $this->transAdmin('Posts are 4 per row'),
                         'required' => true,
                     ],
                     [
                         'type' => 'text',
-                        'label' => $this->l('Posts per page'),
+                        'label' => $this->transAdmin('Posts per page'),
                         'name' => 'EVERPSBLOG_PAGINATION',
-                        'desc' => $this->l('Leaving empty will set 10 posts per page'),
-                        'hint' => $this->l('Will add pagination'),
+                        'desc' => $this->transAdmin('Leaving empty will set 10 posts per page'),
+                        'hint' => $this->transAdmin('Will add pagination'),
                         'required' => true,
                     ],
                     [
                         'type' => 'select',
-                        'label' => $this->l('Admin email'),
-                        'desc' => $this->l('Will receive new comments notification by email'),
-                        'hint' => $this->l('You can set a new account on your shop'),
+                        'label' => $this->transAdmin('Admin email'),
+                        'desc' => $this->transAdmin('Will receive new comments notification by email'),
+                        'hint' => $this->transAdmin('You can set a new account on your shop'),
                         'required' => true,
                         'name' => 'EVERBLOG_ADMIN_EMAIL',
                         'options' => [
@@ -1579,9 +1573,9 @@ class EverPsBlog extends Module
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Allow comments on posts ?'),
-                        'desc' => $this->l('Set yes to allow comments'),
-                        'hint' => $this->l('You can check them before publishing'),
+                        'label' => $this->transAdmin('Allow comments on posts ?'),
+                        'desc' => $this->transAdmin('Set yes to allow comments'),
+                        'hint' => $this->transAdmin('You can check them before publishing'),
                         'required' => false,
                         'name' => 'EVERBLOG_ALLOW_COMMENTS',
                         'is_bool' => true,
@@ -1589,20 +1583,20 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Check comments on posts before they are published ?'),
-                        'desc' => $this->l('Set yes to check comments before publishing'),
-                        'hint' => $this->l('In order to avoid spam'),
+                        'label' => $this->transAdmin('Check comments on posts before they are published ?'),
+                        'desc' => $this->transAdmin('Set yes to check comments before publishing'),
+                        'hint' => $this->transAdmin('In order to avoid spam'),
                         'required' => false,
                         'name' => 'EVERBLOG_CHECK_COMMENTS',
                         'is_bool' => false,
@@ -1610,20 +1604,20 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Allow only registered customers to comment ?'),
-                        'desc' => $this->l('Set yes to allow only registered customers to comment'),
-                        'hint' => $this->l('Else everyone will be able to comment'),
+                        'label' => $this->transAdmin('Allow only registered customers to comment ?'),
+                        'desc' => $this->transAdmin('Set yes to allow only registered customers to comment'),
+                        'hint' => $this->transAdmin('Else everyone will be able to comment'),
                         'required' => false,
                         'name' => 'EVERBLOG_ONLY_LOGGED_COMMENT',
                         'is_bool' => false,
@@ -1631,20 +1625,20 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'select',
-                        'label' => $this->l('Empty trash'),
-                        'desc' => $this->l('Please choose auto empty trash in days'),
-                        'hint' => $this->l('Will auto delete trashed posts on CRON task'),
+                        'label' => $this->transAdmin('Empty trash'),
+                        'desc' => $this->transAdmin('Please choose auto empty trash in days'),
+                        'hint' => $this->transAdmin('Will auto delete trashed posts on CRON task'),
                         'required' => true,
                         'name' => 'EVERBLOG_EMPTY_TRASH',
                         'options' => [
@@ -1656,29 +1650,29 @@ class EverPsBlog extends Module
                     ],
                     [
                         'type' => 'text',
-                        'label' => $this->l('Default blog SEO title'),
+                        'label' => $this->transAdmin('Default blog SEO title'),
                         'name' => 'EVERBLOG_TITLE',
-                        'desc' => $this->l('Max 65 characters for SEO'),
-                        'hint' => $this->l('Will impact SEO'),
+                        'desc' => $this->transAdmin('Max 65 characters for SEO'),
+                        'hint' => $this->transAdmin('Will impact SEO'),
                         'cols' => 36,
                         'rows' => 4,
                         'lang' => true,
                     ],
                     [
                         'type' => 'textarea',
-                        'label' => $this->l('Default blog SEO meta description'),
+                        'label' => $this->transAdmin('Default blog SEO meta description'),
                         'name' => 'EVERBLOG_META_DESC',
-                        'desc' => $this->l('Max 165 characters for SEO'),
-                        'hint' => $this->l('Will impact SEO'),
+                        'desc' => $this->transAdmin('Max 165 characters for SEO'),
+                        'hint' => $this->transAdmin('Will impact SEO'),
                         'cols' => 36,
                         'rows' => 4,
                         'lang' => true,
                     ],
                     [
                         'type' => 'select',
-                        'label' => $this->l('Default blog type'),
-                        'desc' => $this->l('Will be used for structured metadatas'),
-                        'hint' => $this->l('Select blog type depending on your posts'),
+                        'label' => $this->transAdmin('Default blog type'),
+                        'desc' => $this->transAdmin('Will be used for structured metadatas'),
+                        'hint' => $this->transAdmin('Select blog type depending on your posts'),
                         'required' => true,
                         'name' => 'EVERPSBLOG_TYPE',
                         'options' => [
@@ -1689,10 +1683,10 @@ class EverPsBlog extends Module
                     ],
                     [
                         'type' => 'textarea',
-                        'label' => $this->l('Default blog top text'),
+                        'label' => $this->transAdmin('Default blog top text'),
                         'name' => 'EVERBLOG_TOP_TEXT',
-                        'desc' => $this->l('Will be shown on blog top default page'),
-                        'hint' => $this->l('Explain your blog purpose'),
+                        'desc' => $this->transAdmin('Will be shown on blog top default page'),
+                        'hint' => $this->transAdmin('Explain your blog purpose'),
                         'cols' => 36,
                         'rows' => 4,
                         'lang' => true,
@@ -1700,10 +1694,10 @@ class EverPsBlog extends Module
                     ],
                     [
                         'type' => 'textarea',
-                        'label' => $this->l('Default blog bottom text'),
+                        'label' => $this->transAdmin('Default blog bottom text'),
                         'name' => 'EVERBLOG_BOTTOM_TEXT',
-                        'desc' => $this->l('Will be shown on blog bottom default page'),
-                        'hint' => $this->l('Explain your blog purpose'),
+                        'desc' => $this->transAdmin('Will be shown on blog bottom default page'),
+                        'hint' => $this->transAdmin('Explain your blog purpose'),
                         'cols' => 36,
                         'rows' => 4,
                         'lang' => true,
@@ -1711,17 +1705,17 @@ class EverPsBlog extends Module
                     ],
                     [
                         'type' => 'text',
-                        'label' => $this->l('Blog page title'),
+                        'label' => $this->transAdmin('Blog page title'),
                         'name' => 'EVERBLOG_MAIN_TITLE',
-                        'desc' => $this->l('Main H1 title displayed on blog page'),
-                        'hint' => $this->l('Leave empty to use default translation'),
+                        'desc' => $this->transAdmin('Main H1 title displayed on blog page'),
+                        'hint' => $this->transAdmin('Leave empty to use default translation'),
                         'lang' => true,
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Use RSS feed ?'),
-                        'desc' => $this->l('Will add a link to RSS feed on blog and each tag, category, author'),
-                        'hint' => $this->l('Else feed wont be used'),
+                        'label' => $this->transAdmin('Use RSS feed ?'),
+                        'desc' => $this->transAdmin('Will add a link to RSS feed on blog and each tag, category, author'),
+                        'hint' => $this->transAdmin('Else feed wont be used'),
                         'required' => false,
                         'name' => 'EVERBLOG_RSS',
                         'is_bool' => false,
@@ -1729,20 +1723,20 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Show author ?'),
-                        'desc' => $this->l('Will show author name and avatar on posts'),
-                        'hint' => $this->l('Else author name and avatar will be hidden'),
+                        'label' => $this->transAdmin('Show author ?'),
+                        'desc' => $this->transAdmin('Will show author name and avatar on posts'),
+                        'hint' => $this->transAdmin('Else author name and avatar will be hidden'),
                         'required' => false,
                         'name' => 'EVERBLOG_SHOW_AUTHOR',
                         'is_bool' => false,
@@ -1750,65 +1744,65 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'text',
-                        'label' => $this->l('Default author name'),
+                        'label' => $this->transAdmin('Default author name'),
                         'name' => 'EVERBLOG_DEFAULT_AUTHOR_NAME',
-                        'desc' => $this->l('Displayed when a post has no linked author'),
-                        'hint' => $this->l('Leave empty to fallback to shop name'),
+                        'desc' => $this->transAdmin('Displayed when a post has no linked author'),
+                        'hint' => $this->transAdmin('Leave empty to fallback to shop name'),
                     ],
                     [
                         'type' => 'textarea',
-                        'label' => $this->l('Banned users'),
+                        'label' => $this->transAdmin('Banned users'),
                         'name' => 'EVERBLOG_BANNED_USERS',
-                        'desc' => $this->l('Add banned users typing their emails, one per line'),
-                        'hint' => $this->l('Unwanted users won\'t be able to post comments'),
+                        'desc' => $this->transAdmin('Add banned users typing their emails, one per line'),
+                        'hint' => $this->transAdmin('Unwanted users won\'t be able to post comments'),
                         'cols' => 36,
                         'rows' => 4,
                     ],
                     [
                         'type' => 'textarea',
-                        'label' => $this->l('Banned IP'),
+                        'label' => $this->transAdmin('Banned IP'),
                         'name' => 'EVERBLOG_BANNED_IP',
-                        'desc' => $this->l('Add banned users typing their IP addresses, one per line'),
-                        'hint' => $this->l('Unwanted users won\'t be able to post comments'),
+                        'desc' => $this->transAdmin('Add banned users typing their IP addresses, one per line'),
+                        'hint' => $this->transAdmin('Unwanted users won\'t be able to post comments'),
                         'cols' => 36,
                         'rows' => 4,
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Show parent categories list on left/right columns ?'),
-                        'desc' => $this->l('Set yes show a list of all parent categories on left or right columns'),
-                        'hint' => $this->l('Will show ordered parent categories on left/right columns'),
+                        'label' => $this->transAdmin('Show parent categories list on left/right columns ?'),
+                        'desc' => $this->transAdmin('Set yes show a list of all parent categories on left or right columns'),
+                        'hint' => $this->transAdmin('Will show ordered parent categories on left/right columns'),
                         'name' => 'EVERBLOG_CATEG_COLUMNS',
                         'is_bool' => true,
                         'values' => [
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Show tags list on left/right columns ?'),
-                        'desc' => $this->l('Set yes to activate cool stuff'),
-                        'hint' => $this->l('Set yes show a tags cloud on left or right columns'),
+                        'label' => $this->transAdmin('Show tags list on left/right columns ?'),
+                        'desc' => $this->transAdmin('Set yes to activate cool stuff'),
+                        'hint' => $this->transAdmin('Set yes show a tags cloud on left or right columns'),
                         'required' => false,
                         'name' => 'EVERBLOG_TAG_COLUMNS',
                         'is_bool' => true,
@@ -1816,20 +1810,20 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Show archives list on left/right columns ?'),
-                        'desc' => $this->l('Set yes show links for monthly posts on left or right columns'),
-                        'hint' => $this->l('Will show yearly and monthly posts'),
+                        'label' => $this->transAdmin('Show archives list on left/right columns ?'),
+                        'desc' => $this->transAdmin('Set yes show links for monthly posts on left or right columns'),
+                        'hint' => $this->transAdmin('Will show yearly and monthly posts'),
                         'required' => false,
                         'name' => 'EVERBLOG_ARCHIVE_COLUMNS',
                         'is_bool' => true,
@@ -1837,20 +1831,20 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Show related products on columns ?'),
-                        'desc' => $this->l('Set yes to show products linked to the post'),
-                        'hint' => $this->l('Will display related products in left or right columns'),
+                        'label' => $this->transAdmin('Show related products on columns ?'),
+                        'desc' => $this->transAdmin('Set yes to show products linked to the post'),
+                        'hint' => $this->transAdmin('Will display related products in left or right columns'),
                         'required' => false,
                         'name' => 'EVERBLOG_PRODUCT_COLUMNS',
                         'is_bool' => true,
@@ -1858,20 +1852,20 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Show related posts on products pages ?'),
-                        'desc' => $this->l('Set yes show related posts on product pages footer'),
-                        'hint' => $this->l('Will show related posts on product page footer'),
+                        'label' => $this->transAdmin('Show related posts on products pages ?'),
+                        'desc' => $this->transAdmin('Set yes show related posts on product pages footer'),
+                        'hint' => $this->transAdmin('Will show related posts on product page footer'),
                         'required' => false,
                         'name' => 'EVERBLOG_RELATED_POST',
                         'is_bool' => true,
@@ -1879,20 +1873,20 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Show related posts below each article ?'),
-                        'desc' => $this->l('Set yes to show related posts at the bottom of article pages'),
-                        'hint' => $this->l('Will show related posts block under article content'),
+                        'label' => $this->transAdmin('Show related posts below each article ?'),
+                        'desc' => $this->transAdmin('Set yes to show related posts at the bottom of article pages'),
+                        'hint' => $this->transAdmin('Will show related posts block under article content'),
                         'required' => false,
                         'name' => 'EVERBLOG_SHOW_RELATED_POSTS',
                         'is_bool' => true,
@@ -1900,101 +1894,101 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Show featured images on categories ?'),
-                        'desc' => $this->l('Set yes to show each category featured image'),
-                        'hint' => $this->l('Else category featured image won\'t be shown'),
+                        'label' => $this->transAdmin('Show featured images on categories ?'),
+                        'desc' => $this->transAdmin('Set yes to show each category featured image'),
+                        'hint' => $this->transAdmin('Else category featured image won\'t be shown'),
                         'name' => 'EVERBLOG_SHOW_FEAT_CAT',
                         'is_bool' => true,
                         'values' => [
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Show featured images on tags ?'),
-                        'desc' => $this->l('Set yes to show each tag featured image'),
-                        'hint' => $this->l('Else tag featured image won\'t be shown'),
+                        'label' => $this->transAdmin('Show featured images on tags ?'),
+                        'desc' => $this->transAdmin('Set yes to show each tag featured image'),
+                        'hint' => $this->transAdmin('Else tag featured image won\'t be shown'),
                         'name' => 'EVERBLOG_SHOW_FEAT_TAG',
                         'is_bool' => true,
                         'values' => [
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Show featured images on posts ?'),
-                        'desc' => $this->l('Set yes to show each post featured image'),
-                        'hint' => $this->l('Else post featured image won\'t be shown'),
+                        'label' => $this->transAdmin('Show featured images on posts ?'),
+                        'desc' => $this->transAdmin('Set yes to show each post featured image'),
+                        'hint' => $this->transAdmin('Else post featured image won\'t be shown'),
                         'name' => 'EVERBLOG_SHOW_FEAT_POST',
                         'is_bool' => true,
                         'values' => [
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Activate cool CSS animations ?'),
-                        'desc' => $this->l('Set yes to activate cool stuff'),
-                        'hint' => $this->l('Will add animations on posts, images, etc'),
+                        'label' => $this->transAdmin('Activate cool CSS animations ?'),
+                        'desc' => $this->transAdmin('Set yes to activate cool stuff'),
+                        'hint' => $this->transAdmin('Will add animations on posts, images, etc'),
                         'name' => 'EVERBLOG_ANIMATE',
                         'is_bool' => true,
                         'values' => [
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'text',
-                        'label' => $this->l('Featured category on blog default page'),
+                        'label' => $this->transAdmin('Featured category on blog default page'),
                         'name' => 'EVERBLOG_CAT_FEATURED',
-                        'desc' => $this->l('Featured category'),
-                        'hint' => $this->l('Will show category products on blog page'),
+                        'desc' => $this->transAdmin('Featured category'),
+                        'hint' => $this->transAdmin('Will show category products on blog page'),
                         'cols' => 36,
                         'rows' => 4,
                     ],
@@ -2005,27 +1999,27 @@ class EverPsBlog extends Module
                         'type' => 'submit',
                         'class' => 'btn btn-default pull-right',
                         'icon' => 'process-icon-refresh',
-                        'title' => $this->l('Generate sitemaps'),
+                        'title' => $this->transAdmin('Generate sitemaps'),
                     ],
                 ],
                 'submit' => [
                     'name' => 'submit',
-                    'title' => $this->l('Save'),
+                    'title' => $this->transAdmin('Save'),
                 ],
             ],
         ];
         $form_fields[] = [
             'form' => [
                 'legend' => [
-                    'title' => $this->l('Blog layout settings'),
+                    'title' => $this->transAdmin('Blog layout settings'),
                     'icon' => 'icon-smile',
                 ],
                 'input' => [
                     [
                         'type' => 'select',
-                        'label' => $this->l('Default blog layout'),
-                        'desc' => $this->l('Will add or remove columns from blog page'),
-                        'hint' => $this->l('You can add or remove modules from Prestashop positions'),
+                        'label' => $this->transAdmin('Default blog layout'),
+                        'desc' => $this->transAdmin('Will add or remove columns from blog page'),
+                        'hint' => $this->transAdmin('You can add or remove modules from Prestashop positions'),
                         'required' => true,
                         'name' => 'EVERPSBLOG_BLOG_LAYOUT',
                         'options' => [
@@ -2036,9 +2030,9 @@ class EverPsBlog extends Module
                     ],
                     [
                         'type' => 'select',
-                        'label' => $this->l('Default post layout'),
-                        'desc' => $this->l('Will add or remove columns from post page'),
-                        'hint' => $this->l('You can add or remove modules from Prestashop positions'),
+                        'label' => $this->transAdmin('Default post layout'),
+                        'desc' => $this->transAdmin('Will add or remove columns from post page'),
+                        'hint' => $this->transAdmin('You can add or remove modules from Prestashop positions'),
                         'required' => true,
                         'name' => 'EVERPSBLOG_POST_LAYOUT',
                         'options' => [
@@ -2049,9 +2043,9 @@ class EverPsBlog extends Module
                     ],
                     [
                         'type' => 'select',
-                        'label' => $this->l('Default category layout'),
-                        'desc' => $this->l('Will add or remove columns from category page'),
-                        'hint' => $this->l('You can add or remove modules from Prestashop positions'),
+                        'label' => $this->transAdmin('Default category layout'),
+                        'desc' => $this->transAdmin('Will add or remove columns from category page'),
+                        'hint' => $this->transAdmin('You can add or remove modules from Prestashop positions'),
                         'required' => true,
                         'name' => 'EVERPSBLOG_CAT_LAYOUT',
                         'options' => [
@@ -2062,9 +2056,9 @@ class EverPsBlog extends Module
                     ],
                     [
                         'type' => 'select',
-                        'label' => $this->l('Default author layout'),
-                        'desc' => $this->l('Will add or remove columns from author page'),
-                        'hint' => $this->l('You can add or remove modules from Prestashop positions'),
+                        'label' => $this->transAdmin('Default author layout'),
+                        'desc' => $this->transAdmin('Will add or remove columns from author page'),
+                        'hint' => $this->transAdmin('You can add or remove modules from Prestashop positions'),
                         'required' => true,
                         'name' => 'EVERPSBLOG_AUTHOR_LAYOUT',
                         'options' => [
@@ -2075,9 +2069,9 @@ class EverPsBlog extends Module
                     ],
                     [
                         'type' => 'select',
-                        'label' => $this->l('Default tag layout'),
-                        'desc' => $this->l('Will add or remove columns from tag page'),
-                        'hint' => $this->l('You can add or remove modules from Prestashop positions'),
+                        'label' => $this->transAdmin('Default tag layout'),
+                        'desc' => $this->transAdmin('Will add or remove columns from tag page'),
+                        'hint' => $this->transAdmin('You can add or remove modules from Prestashop positions'),
                         'required' => true,
                         'name' => 'EVERPSBLOG_TAG_LAYOUT',
                         'options' => [
@@ -2089,22 +2083,22 @@ class EverPsBlog extends Module
                 ],
                 'submit' => [
                     'name' => 'submit',
-                    'title' => $this->l('Save'),
+                    'title' => $this->transAdmin('Save'),
                 ],
             ],
         ];
         $form_fields[] = [
             'form' => [
                 'legend' => [
-                    'title' => $this->l('WordPress XML import settings'),
+                    'title' => $this->transAdmin('WordPress XML import settings'),
                     'icon' => 'icon-smile',
                 ],
                 'input' => [
                     [
                         'type' => 'select',
-                        'label' => $this->l('Default post state on XML import'),
-                        'desc' => $this->l('Will set default post state on XML import'),
-                        'hint' => $this->l('Please select default post state on XML file import'),
+                        'label' => $this->transAdmin('Default post state on XML import'),
+                        'desc' => $this->transAdmin('Will set default post state on XML import'),
+                        'hint' => $this->transAdmin('Please select default post state on XML file import'),
                         'required' => true,
                         'name' => 'EVERBLOG_IMPORT_POST_STATE',
                         'options' => [
@@ -2115,9 +2109,9 @@ class EverPsBlog extends Module
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Import WordPress authors from xml file ?'),
-                        'desc' => $this->l('Set yes to import WordPress authors'),
-                        'hint' => $this->l('Else no authors will be imported'),
+                        'label' => $this->transAdmin('Import WordPress authors from xml file ?'),
+                        'desc' => $this->transAdmin('Set yes to import WordPress authors'),
+                        'hint' => $this->transAdmin('Else no authors will be imported'),
                         'required' => false,
                         'name' => 'EVERBLOG_IMPORT_AUTHORS',
                         'is_bool' => true,
@@ -2125,20 +2119,20 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Import WordPress categories from xml file ?'),
-                        'desc' => $this->l('Set yes to import WordPress categories'),
-                        'hint' => $this->l('Else no categories will be imported'),
+                        'label' => $this->transAdmin('Import WordPress categories from xml file ?'),
+                        'desc' => $this->transAdmin('Set yes to import WordPress categories'),
+                        'hint' => $this->transAdmin('Else no categories will be imported'),
                         'required' => false,
                         'name' => 'EVERBLOG_IMPORT_CATS',
                         'is_bool' => true,
@@ -2146,20 +2140,20 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Import WordPress tags from xml file ?'),
-                        'desc' => $this->l('Set yes to import WordPress tags'),
-                        'hint' => $this->l('Else no tags will be imported'),
+                        'label' => $this->transAdmin('Import WordPress tags from xml file ?'),
+                        'desc' => $this->transAdmin('Set yes to import WordPress tags'),
+                        'hint' => $this->transAdmin('Else no tags will be imported'),
                         'required' => false,
                         'name' => 'EVERBLOG_IMPORT_TAGS',
                         'is_bool' => true,
@@ -2167,20 +2161,20 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Enable WordPress authors from xml file ?'),
-                        'desc' => $this->l('Set yes to enable WordPress authors'),
-                        'hint' => $this->l('Else no authors will be enabled'),
+                        'label' => $this->transAdmin('Enable WordPress authors from xml file ?'),
+                        'desc' => $this->transAdmin('Set yes to enable WordPress authors'),
+                        'hint' => $this->transAdmin('Else no authors will be enabled'),
                         'required' => false,
                         'name' => 'EVERBLOG_ENABLE_AUTHORS',
                         'is_bool' => true,
@@ -2188,20 +2182,20 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Enable WordPress categories from xml file ?'),
-                        'desc' => $this->l('Set yes to enable WordPress categories'),
-                        'hint' => $this->l('Else no categories will be enabled'),
+                        'label' => $this->transAdmin('Enable WordPress categories from xml file ?'),
+                        'desc' => $this->transAdmin('Set yes to enable WordPress categories'),
+                        'hint' => $this->transAdmin('Else no categories will be enabled'),
                         'required' => false,
                         'name' => 'EVERBLOG_ENABLE_CATS',
                         'is_bool' => true,
@@ -2209,20 +2203,20 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'switch',
-                        'label' => $this->l('Enable WordPress tags from xml file ?'),
-                        'desc' => $this->l('Set yes to enable WordPress tags'),
-                        'hint' => $this->l('Else no tags will be enabled'),
+                        'label' => $this->transAdmin('Enable WordPress tags from xml file ?'),
+                        'desc' => $this->transAdmin('Set yes to enable WordPress tags'),
+                        'hint' => $this->transAdmin('Else no tags will be enabled'),
                         'required' => false,
                         'name' => 'EVERBLOG_ENABLE_TAGS',
                         'is_bool' => true,
@@ -2230,40 +2224,40 @@ class EverPsBlog extends Module
                             [
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes'),
+                                'label' => $this->transAdmin('Yes'),
                             ],
                             [
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No'),
+                                'label' => $this->transAdmin('No'),
                             ],
                         ],
                     ],
                     [
                         'type' => 'file',
-                        'label' => $this->l('Import WordPress XML file'),
-                        'desc' => $this->l('Import WordPress XML posts file'),
-                        'hint' => $this->l('Will import posts from WordPress XML file'),
+                        'label' => $this->transAdmin('Import WordPress XML file'),
+                        'desc' => $this->transAdmin('Import WordPress XML posts file'),
+                        'hint' => $this->transAdmin('Will import posts from WordPress XML file'),
                         'name' => 'wordpress_xml',
                         'required' => false,
                     ],
                 ],
                 'submit' => [
                     'name' => 'submit',
-                    'title' => $this->l('Save and import'),
+                    'title' => $this->transAdmin('Save and import'),
                 ],
             ],
         ];
         $form_fields[] = [
             'form' => [
                 'legend' => [
-                    'title' => $this->l('WordPress REST import settings'),
+                    'title' => $this->transAdmin('WordPress REST import settings'),
                     'icon' => 'icon-cloud-download',
                 ],
                 'input' => [
                     [
                         'type' => 'text',
-                        'label' => $this->l('API URL'),
+                        'label' => $this->transAdmin('API URL'),
                         'name' => 'EVER_WP_API_URL',
                         'required' => false,
                     ],
@@ -2273,7 +2267,7 @@ class EverPsBlog extends Module
                         'name' => 'submitWpImport',
                         'type' => 'submit',
                         'class' => 'btn btn-default pull-right',
-                        'title' => $this->l('Import WordPress posts'),
+                        'title' => $this->transAdmin('Import WordPress posts'),
                     ],
                 ],
             ],
@@ -2281,25 +2275,25 @@ class EverPsBlog extends Module
         $form_fields[] = [
             'form' => [
                 'legend' => [
-                    'title' => $this->l('WooCommerce API import settings'),
+                    'title' => $this->transAdmin('WooCommerce API import settings'),
                     'icon' => 'icon-cloud-download',
                 ],
                 'input' => [
                     [
                         'type' => 'text',
-                        'label' => $this->l('API URL'),
+                        'label' => $this->transAdmin('API URL'),
                         'name' => 'EVER_WOO_API_URL',
                         'required' => false,
                     ],
                     [
                         'type' => 'text',
-                        'label' => $this->l('Consumer key'),
+                        'label' => $this->transAdmin('Consumer key'),
                         'name' => 'EVER_WOO_CK',
                         'required' => false,
                     ],
                     [
                         'type' => 'text',
-                        'label' => $this->l('Consumer secret'),
+                        'label' => $this->transAdmin('Consumer secret'),
                         'name' => 'EVER_WOO_CS',
                         'required' => false,
                     ],
@@ -2309,7 +2303,7 @@ class EverPsBlog extends Module
                         'name' => 'submitWooImport',
                         'type' => 'submit',
                         'class' => 'btn btn-default pull-right',
-                        'title' => $this->l('Import WooCommerce posts'),
+                        'title' => $this->transAdmin('Import WooCommerce posts'),
                     ],
                 ],
             ],
@@ -2317,15 +2311,15 @@ class EverPsBlog extends Module
         $form_fields[] = [
             'form' => [
                 'legend' => [
-                    'title' => $this->l('Design settings'),
+                    'title' => $this->transAdmin('Design settings'),
                     'icon' => 'icon-smile',
                 ],
                 'input' => [
                     [
                         'type' => 'select',
-                        'label' => $this->l('Custom CSS file'),
-                        'desc' => $this->l('You can change here default CSS file'),
-                        'hint' => $this->l('By changing CSS file, you will change blog colors'),
+                        'label' => $this->transAdmin('Custom CSS file'),
+                        'desc' => $this->transAdmin('You can change here default CSS file'),
+                        'hint' => $this->transAdmin('By changing CSS file, you will change blog colors'),
                         'required' => true,
                         'name' => 'EVERBLOG_CSS_FILE',
                         'options' => [
@@ -2337,23 +2331,23 @@ class EverPsBlog extends Module
                     ],
                     [
                         'type' => 'color',
-                        'label' => $this->l('Blog header background color'),
-                        'desc' => $this->l('Background color of the header banner on blog, category, tag, author and search pages'),
-                        'hint' => $this->l('Pick the color used behind the main title on blog listing pages'),
+                        'label' => $this->transAdmin('Blog header background color'),
+                        'desc' => $this->transAdmin('Background color of the header banner on blog, category, tag, author and search pages'),
+                        'hint' => $this->transAdmin('Pick the color used behind the main title on blog listing pages'),
                         'name' => 'EVERBLOG_HEADER_BG_COLOR',
                         'required' => false,
                     ],
                     [
                         'type' => 'textarea',
-                        'label' => $this->l('Custom CSS for blog'),
-                        'desc' => $this->l('Add here your custom CSS rules'),
-                        'hint' => $this->l('Webdesigners here can manage CSS rules for blog'),
+                        'label' => $this->transAdmin('Custom CSS for blog'),
+                        'desc' => $this->transAdmin('Add here your custom CSS rules'),
+                        'hint' => $this->transAdmin('Webdesigners here can manage CSS rules for blog'),
                         'name' => 'EVERBLOG_CSS',
                     ],
                 ],
                 'submit' =>[
                     'name' => 'submit',
-                    'title' => $this->l('Save'),
+                    'title' => $this->transAdmin('Save'),
                 ],
             ],
         ];
@@ -2795,7 +2789,7 @@ class EverPsBlog extends Module
         return Mail::send(
             (int) $this->context->language->id,
             'pending',
-            $this->l('Review on pending posts'),
+            $this->transAdmin('Review on pending posts'),
             [
                 '{shop_name}' => Configuration::get('PS_SHOP_NAME'),
                 '{shop_logo}' => _PS_IMG_DIR_ . Configuration::get('PS_LOGO'),
@@ -3051,8 +3045,8 @@ public function emptyTrash($id_shop)
 
     public function hookActionObjectEverPsBlogCategoryDeleteAfter($params)
     {
-        if ((int) $params['object']->id == (int) Configuration::get('EVERBLOG_UNCLASSED_ID')) {
-            $shopId = (int) Context::getContext()->shop->id;
+        $shopId = (int) Context::getContext()->shop->id;
+        if ((int) $params['object']->id == $this->getBlogInstallService()->getUnclassedCategoryId($shopId)) {
             $rootCategoryId = $this->getBlogInstallService()->getRootCategoryId($shopId);
             if ($rootCategoryId > 0) {
                 $this->getBlogInstallService()->recreateUnclassedCategory(
@@ -3147,8 +3141,8 @@ public function emptyTrash($id_shop)
         if (!$id_shop) {
             $id_shop = (int) $this->context->shop->id;
         }
-        $result = (bool) $this->getBlogSitemapService()->generate($this->context, (int) $id_shop);
-        $this->postSuccess[] = $this->l('All XML sitemaps have been generated');
+        $result = (bool) $this->getBlogSitemapService()->refreshForShop((int) $id_shop);
+        $this->postSuccess[] = $this->transAdmin('All XML sitemaps have been generated');
         if ((bool) $cron === true) {
             return $result;
         }
@@ -3156,21 +3150,17 @@ public function emptyTrash($id_shop)
 
     public function getSitemapIndexes()
     {
-        return $this->getBlogSitemapService()->getSitemapIndexes();
+        return $this->getBlogSitemapService()->getSitemapIndexes((int) $this->context->shop->id);
     }
 
     public function hookActionAdminMetaAfterWriteRobotsFile($params)
     {
-        $indexes = $this->getSitemapIndexes();
         // Panda theme uses random int on css file parameter
-        $allowSitemap = 'Disallow: /modules/stthemeeditor/views/css' . "\r\n";
+        $allowSitemap = 'User-agent: *' . "\r\n";
+        $allowSitemap .= 'Disallow: /modules/stthemeeditor/views/css' . "\r\n";
         $allowSitemap .= "\n";
-        if ($indexes) {
-            foreach ($indexes as $index) {
-                $allowSitemap .= 'Sitemap: '
-                . $index
-                . "\r\n";
-            }
+        foreach ($this->getBlogSitemapService()->getRobotsDirectives() as $directive) {
+            $allowSitemap .= $directive . "\r\n";
         }
         fwrite($params['write_fd'], "#Rules from everpsblog\n");
         fwrite($params['write_fd'], $allowSitemap);
@@ -3414,7 +3404,7 @@ public function emptyTrash($id_shop)
                 // Copy images
                 $dom = new DOMDocument();
                 libxml_use_internal_errors(true);
-                // Injecte une déclaration UTF-8 pour que DOMDocument n'interprète pas comme Latin1
+                // Inject a UTF-8 declaration so DOMDocument does not interpret content as Latin1.
                 $content = '<?xml encoding="UTF-8">' . $el->content;
 
                 $dom->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
@@ -3473,7 +3463,7 @@ public function emptyTrash($id_shop)
                         $featured_url = (string) $wp->attachment_url;
                     }
                 }
-                // Et ensuite : corriger les entités HTML et les encodages tordus
+                // Then fix HTML entities and malformed encodings.
                 $post_content = html_entity_decode($post_content, ENT_QUOTES | ENT_HTML5, 'UTF-8');
                 $post_content = mb_convert_encoding($post_content, 'UTF-8', 'UTF-8');
                 $post_content = str_replace('<?xml encoding="UTF-8">', '', $post_content);
@@ -3564,9 +3554,9 @@ public function emptyTrash($id_shop)
         }
         if ((bool) $result === true) {
             $this->generateBlogSitemap();
-            $this->postSuccess[] = $this->l('WordPress posts have been imported');
+            $this->postSuccess[] = $this->transAdmin('WordPress posts have been imported');
         } else {
-            $this->postErrors[] = $this->l('An error has occured while importing WordPress file');
+            $this->postErrors[] = $this->transAdmin('An error has occured while importing WordPress file');
         }
     }
 
@@ -3803,9 +3793,9 @@ public function emptyTrash($id_shop)
         $this->saveRedirects($redirects);
         if ($result) {
             $this->generateBlogSitemap();
-            $this->postSuccess[] = $this->l('WooCommerce posts have been imported');
+            $this->postSuccess[] = $this->transAdmin('WooCommerce posts have been imported');
         } else {
-            $this->postErrors[] = $this->l('An error occured while importing WooCommerce posts');
+            $this->postErrors[] = $this->transAdmin('An error occured while importing WooCommerce posts');
         }
     }
 
@@ -3842,7 +3832,7 @@ public function emptyTrash($id_shop)
                     $content = $this->replaceAndDownloadImages($content);
                     $content = $this->removeJavascript($content);
 
-                    // Décodage double si nécessaire
+                    // Double decode when needed.
                     $content = html_entity_decode($content, ENT_QUOTES | ENT_HTML5, 'UTF-8');
                     $content = html_entity_decode($content, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
@@ -4041,9 +4031,9 @@ public function emptyTrash($id_shop)
         $this->saveRedirects($redirects);
         if ($result) {
             $this->generateBlogSitemap();
-            $this->postSuccess[] = $this->l('WordPress posts have been imported');
+            $this->postSuccess[] = $this->transAdmin('WordPress posts have been imported');
         } else {
-            $this->postErrors[] = $this->l('An error occured while importing WordPress posts');
+            $this->postErrors[] = $this->transAdmin('An error occured while importing WordPress posts');
         }
     }
 
@@ -4135,7 +4125,7 @@ public function emptyTrash($id_shop)
         return (new \PrestaShop\Module\Everpsblog\Service\DatabaseIntegrityService())->checkAndFix();
 
         $db = Db::getInstance();
-        // Ajoute les colonnes manquantes à la table ever_blog_post
+        // Add missing columns to the ever_blog_post table.
         $columnsToAdd = [
             'id_ever_post' => 'int(10) unsigned NOT NULL auto_increment',
             'id_shop' => 'int(10) unsigned NOT NULL',
@@ -4168,7 +4158,7 @@ public function emptyTrash($id_shop)
                 }
             }
         }
-        // Ajoute les colonnes manquantes à la table ps_ever_blog_post_lang
+        // Add missing columns to the ps_ever_blog_post_lang table.
         $columnsToAdd = [
             'title' => 'varchar(255) NOT NULL',
             'meta_title' => 'varchar(255) DEFAULT NULL',
@@ -4189,7 +4179,7 @@ public function emptyTrash($id_shop)
                 }
             }
         }
-        // Ajoute les colonnes manquantes à la table ever_blog_category
+        // Add missing columns to the ever_blog_category table.
         $columnsToAdd = [
             'id_ever_category' => 'int(10) unsigned NOT NULL auto_increment',
             'id_parent_category' => 'int(10) DEFAULT NULL',
@@ -4216,7 +4206,7 @@ public function emptyTrash($id_shop)
                 }
             }
         }
-        // Ajoute les colonnes manquantes à la table ps_ever_blog_category_lang
+        // Add missing columns to the ps_ever_blog_category_lang table.
         $columnsToAdd = [
             'id_ever_category' => 'int(10) unsigned NOT NULL',
             'title' => 'varchar(255) NOT NULL',
@@ -4238,7 +4228,7 @@ public function emptyTrash($id_shop)
                 }
             }
         }
-        // Ajoute les colonnes manquantes à la table ever_blog_tag
+        // Add missing columns to the ever_blog_tag table.
         $columnsToAdd = [
             'id_ever_tag' => 'int(10) unsigned NOT NULL auto_increment',
             'id_shop' => 'int(10) unsigned NOT NULL',
@@ -4263,7 +4253,7 @@ public function emptyTrash($id_shop)
                 }
             }
         }
-        // Ajoute les colonnes manquantes à la table ps_ever_blog_tag_lang
+        // Add missing columns to the ps_ever_blog_tag_lang table.
         $columnsToAdd = [
             'id_ever_tag' => 'int(10) unsigned NOT NULL',
             'title' => 'varchar(255) NOT NULL',
@@ -4285,7 +4275,7 @@ public function emptyTrash($id_shop)
                 }
             }
         }
-        // Ajoute les colonnes manquantes à la table ever_blog_author
+        // Add missing columns to the ever_blog_author table.
         $columnsToAdd = [
             'id_ever_author' => 'int(10) unsigned NOT NULL auto_increment',
             'id_employee' => 'int(10) unsigned NOT NULL',
@@ -4315,7 +4305,7 @@ public function emptyTrash($id_shop)
                 }
             }
         }
-        // Ajoute les colonnes manquantes à la table ps_ever_blog_author_lang
+        // Add missing columns to the ps_ever_blog_author_lang table.
         $columnsToAdd = [
             'id_ever_author' => 'int(10) unsigned NOT NULL',
             'meta_title' => 'varchar(255) DEFAULT NULL',

@@ -19,6 +19,6 @@
 <a class="col-lg-4 col-md-6 col-sm-6 col-12" href="{$link->getModuleLink('everpsblog','customercomments')|escape:'htmlall':'UTF-8'}">
     <span class="link-item">
         <i class="fto-doc-text-inv mar_r4 fs_lg material-icons hvr-wobble-to-bottom-right">notifications_active</i>
-        {l s='My comments' mod='everpsblog'}
+        {l s='My comments' d='Modules.Everpsblog.Shop'}
     </span>
 </a>

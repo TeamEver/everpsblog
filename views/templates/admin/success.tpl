@@ -16,5 +16,5 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 <div class="alert alert-success">
-    {l s='All settings have been saved !' mod='everpsblog'}
+    {l s='All settings have been saved !' d='Modules.Everpsblog.Admin'}
 </div>

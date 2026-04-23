@@ -13,35 +13,35 @@ class PostRequestValidator extends AbstractRequestValidator
         $requestData = $this->normalizePostStatusAndDate($requestData);
 
         $authorId = (int) ($requestData['id_author'] ?? 0);
-        if ($authorId > 0 && !$this->existsInModuleTable('ever_blog_author', 'id_ever_author', $authorId)) {
-            $this->addFieldError('id_author', sprintf('Auteur introuvable (id: %d).', $authorId));
+        if ($authorId > 0 && !$this->existsInCurrentShopModuleTable('ever_blog_author', 'id_ever_author', $authorId, 'ever_blog_author_shop')) {
+            $this->addFieldError('id_author', $this->transAdmin('Author not found (id: %id%).', ['%id%' => $authorId]));
         }
 
         $defaultCategoryId = (int) ($requestData['id_default_category'] ?? 0);
-        if ($defaultCategoryId > 0 && !$this->existsInModuleTable('ever_blog_category', 'id_ever_category', $defaultCategoryId)) {
-            $this->addFieldError('id_default_category', sprintf('Catégorie introuvable (id: %d).', $defaultCategoryId));
+        if ($defaultCategoryId > 0 && !$this->existsInCurrentShopModuleTable('ever_blog_category', 'id_ever_category', $defaultCategoryId, 'ever_blog_category_shop')) {
+            $this->addFieldError('id_default_category', $this->transAdmin('Category not found (id: %id%).', ['%id%' => $defaultCategoryId]));
         }
 
         $postCategories = $this->normalizeIntCollection($requestData['post_categories'] ?? []);
         foreach ($postCategories as $categoryId) {
-            if (!$this->existsInModuleTable('ever_blog_category', 'id_ever_category', $categoryId)) {
-                $this->addFieldError('post_categories', sprintf('Catégorie introuvable (id: %d).', $categoryId));
+            if (!$this->existsInCurrentShopModuleTable('ever_blog_category', 'id_ever_category', $categoryId, 'ever_blog_category_shop')) {
+                $this->addFieldError('post_categories', $this->transAdmin('Category not found (id: %id%).', ['%id%' => $categoryId]));
             }
         }
         $requestData['post_categories'] = $postCategories;
 
         $postTags = $this->normalizeIntCollection($requestData['post_tags'] ?? []);
         foreach ($postTags as $tagId) {
-            if (!$this->existsInModuleTable('ever_blog_tag', 'id_ever_tag', $tagId)) {
-                $this->addFieldError('post_tags', sprintf('Tag introuvable (id: %d).', $tagId));
+            if (!$this->existsInCurrentShopModuleTable('ever_blog_tag', 'id_ever_tag', $tagId, 'ever_blog_tag_shop')) {
+                $this->addFieldError('post_tags', $this->transAdmin('Tag not found (id: %id%).', ['%id%' => $tagId]));
             }
         }
         $requestData['post_tags'] = $postTags;
 
         $postProducts = $this->normalizeIntCollection($requestData['post_products'] ?? []);
         foreach ($postProducts as $productId) {
-            if (!$this->existsInPrestashopTable('product', 'id_product', $productId)) {
-                $this->addFieldError('post_products', sprintf('Produit introuvable (id: %d).', $productId));
+            if (!$this->existsInCurrentShopPrestashopTable('product', 'id_product', $productId, 'product_shop')) {
+                $this->addFieldError('post_products', $this->transAdmin('Product not found (id: %id%).', ['%id%' => $productId]));
             }
         }
         $requestData['post_products'] = $postProducts;

@@ -11,6 +11,7 @@ use PrestaShop\Module\Everpsblog\Form\Type\Admin\AuthorType;
 use PrestaShop\Module\Everpsblog\Grid\Data\AuthorGridDataFactory;
 use PrestaShop\Module\Everpsblog\Grid\Definition\AuthorGridDefinitionFactory;
 use PrestaShop\Module\Everpsblog\Service\BlogImageService;
+use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
 use PrestaShop\Module\Everpsblog\Service\ImageUploader;
 use Symfony\Component\Form\FormError;
@@ -29,6 +30,7 @@ class AuthorController extends AbstractDomainController
     private $authorWriteRepository;
     private $blogImageService;
     private $imageUploader;
+    private $blogSitemapService;
 
     public function __construct(
         ContextStateService $contextStateService,
@@ -39,7 +41,8 @@ class AuthorController extends AbstractDomainController
         AuthorFormDataProvider $formDataProvider,
         AuthorWriteRepository $authorWriteRepository,
         BlogImageService $blogImageService,
-        ImageUploader $imageUploader
+        ImageUploader $imageUploader,
+        BlogSitemapService $blogSitemapService
     ) {
         parent::__construct($contextStateService);
         $this->commandBus = $commandBus;
@@ -50,6 +53,7 @@ class AuthorController extends AbstractDomainController
         $this->authorWriteRepository = $authorWriteRepository;
         $this->blogImageService = $blogImageService;
         $this->imageUploader = $imageUploader;
+        $this->blogSitemapService = $blogSitemapService;
     }
 
     public function indexAction(Request $request): Response
@@ -93,9 +97,10 @@ class AuthorController extends AbstractDomainController
                         $this->deleteAuthorImage((int) $savedAuthorId);
                     }
                     $this->handleAuthorImageUpload($form->get('author_image_file')->getData(), (int) $savedAuthorId);
+                    $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService);
                     $submitAction = (string) $request->request->get('_submit_action', 'save');
 
-                    $this->addFlash('success', $isEdit ? 'Auteur mis à jour.' : 'Auteur créé.');
+                    $this->addFlash('success', $isEdit ? $this->transAdmin('Author updated.') : $this->transAdmin('Author created.'));
 
                     if ('save_and_stay' === $submitAction) {
                         return $this->redirectToRoute('everpsblog_admin_author_edit', ['authorId' => $savedAuthorId]);
@@ -103,7 +108,7 @@ class AuthorController extends AbstractDomainController
 
                     return $this->redirectToRoute('everpsblog_admin_author');
                 } catch (\Throwable $exception) {
-                    $message = sprintf('Impossible d\'enregistrer l\'auteur : %s', $this->describeException($exception));
+                    $message = $this->transAdmin('Unable to save author: %error%', ['%error%' => $this->describeException($exception)]);
                     $form->addError(new FormError($message));
                     $this->addFlash('error', $message);
                     \PrestaShopLogger::addLog(
@@ -125,8 +130,8 @@ class AuthorController extends AbstractDomainController
             'createUrl' => $this->generateUrl('everpsblog_admin_author_form'),
             'navigationLinks' => $this->getAdminNavigationLinks(),
             'qcdPageBuilderTargets' => $this->buildQcdPageBuilderTargets('everpsblog_author', $authorId, [
-                'content' => 'Editer la biographie avec Page Builder',
-                'bottom_content' => 'Editer le bas de page avec Page Builder',
+                'content' => $this->transAdmin('Edit biography with Page Builder'),
+                'bottom_content' => $this->transAdmin('Edit bottom content with Page Builder'),
             ]),
         ]);
     }
@@ -136,8 +141,9 @@ class AuthorController extends AbstractDomainController
         $this->validateCsrfToken($request, 'everpsblog_author_create');
 
         $authorId = $this->commandBus->handle($this->commandAssembler->assembleCreate($request->request->all()));
+        $sitemapsRefreshed = $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService, false);
 
-        return new JsonResponse(['id_ever_author' => $authorId], JsonResponse::HTTP_CREATED);
+        return new JsonResponse(['id_ever_author' => $authorId, 'sitemaps_refreshed' => $sitemapsRefreshed], JsonResponse::HTTP_CREATED);
     }
 
     public function updateAction(int $authorId, Request $request): JsonResponse
@@ -145,8 +151,9 @@ class AuthorController extends AbstractDomainController
         $this->validateCsrfToken($request, 'everpsblog_author_update_' . $authorId);
 
         $updatedAuthorId = $this->commandBus->handle($this->commandAssembler->assembleUpdate($authorId, $request->request->all()));
+        $sitemapsRefreshed = $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService, false);
 
-        return new JsonResponse(['id_ever_author' => $updatedAuthorId], JsonResponse::HTTP_OK);
+        return new JsonResponse(['id_ever_author' => $updatedAuthorId, 'sitemaps_refreshed' => $sitemapsRefreshed], JsonResponse::HTTP_OK);
     }
 
     /**
@@ -176,6 +183,7 @@ class AuthorController extends AbstractDomainController
         try {
             $this->commandBus->handle(new DeleteAuthorCommand($authorId, $reassignTo));
             $this->deleteAuthorImage($authorId);
+            $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService, false);
         } catch (\RuntimeException $exception) {
             // Reassignment required – surface a 409 with the candidate list so the UI can prompt.
             $otherAuthors = $this->authorWriteRepository->listOtherAuthors($authorId);
@@ -204,12 +212,12 @@ class AuthorController extends AbstractDomainController
             $extension = 'jpg';
         }
         if (!in_array($extension, ['jpg', 'png', 'gif', 'webp'], true)) {
-            throw new \RuntimeException('Format d\'image non pris en charge.');
+            throw new \RuntimeException($this->transAdmin('Unsupported image format.'));
         }
 
         $targetDirectory = rtrim(_PS_IMG_DIR_, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'author';
         if (!is_dir($targetDirectory) && !@mkdir($targetDirectory, 0755, true) && !is_dir($targetDirectory)) {
-            throw new \RuntimeException('Impossible de creer le dossier de destination des images auteur.');
+            throw new \RuntimeException($this->transAdmin('Unable to create the author image destination directory.'));
         }
 
         $this->deleteAuthorImageFiles($authorId);
@@ -227,7 +235,7 @@ class AuthorController extends AbstractDomainController
         $image->image_type = 'author';
         $image->image_link = 'img/author/' . $targetFileName;
         if (!(bool) $image->save()) {
-            throw new \RuntimeException('Impossible d\'enregistrer la reference de l\'image auteur.');
+            throw new \RuntimeException($this->transAdmin('Unable to save the author image reference.'));
         }
 
         $this->blogImageService->clearCache();
@@ -321,8 +329,11 @@ class AuthorController extends AbstractDomainController
         $escapedUrl = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
 
         return sprintf(
-            '<span class="ever-featured-image-preview"><img src="%1$s" alt="Image auteur actuelle" loading="lazy"><span>Image actuelle : <a href="%1$s" target="_blank" rel="noopener noreferrer">ouvrir dans un nouvel onglet</a></span></span>',
-            $escapedUrl
+            '<span class="ever-featured-image-preview"><img src="%1$s" alt="%2$s" loading="lazy"><span>%3$s: <a href="%1$s" target="_blank" rel="noopener noreferrer">%4$s</a></span></span>',
+            $escapedUrl,
+            htmlspecialchars($this->transAdmin('Current author image'), ENT_QUOTES, 'UTF-8'),
+            htmlspecialchars($this->transAdmin('Current image'), ENT_QUOTES, 'UTF-8'),
+            htmlspecialchars($this->transAdmin('open in a new tab'), ENT_QUOTES, 'UTF-8')
         );
     }
 

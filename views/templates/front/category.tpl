@@ -42,7 +42,7 @@
         {/if}
     {/if}
     {if isset($allow_feed) && $allow_feed}
-    <link rel="alternate" type="application/rss+xml" title="{$page.meta.title|escape:'htmlall':'UTF-8'} {if isset($pagination) && $pagination.current_page > 0}{l s='(page' mod='everpsblog'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' mod='everpsblog'}{/if}" href="{$feed_url|escape:'htmlall':'UTF-8'}" />
+    <link rel="alternate" type="application/rss+xml" title="{$page.meta.title|escape:'htmlall':'UTF-8'} {if isset($pagination) && $pagination.current_page > 0}{l s='(page' d='Modules.Everpsblog.Shop'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' d='Modules.Everpsblog.Shop'}{/if}" href="{$feed_url|escape:'htmlall':'UTF-8'}" />
     {/if}
     <script type="application/ld+json">
     {
@@ -56,8 +56,8 @@
     "image": [
       "{$featured_image|escape:'htmlall':'UTF-8'}"
      ],
-    "datePublished": "{$category->date_add|escape:'htmlall':'UTF-8'}",
-    "dateModified": "{$category->date_upd|escape:'htmlall':'UTF-8'}",
+    "datePublished": "{$category->date_add|date_format:'%Y-%m-%d'|escape:'htmlall':'UTF-8'}",
+    "dateModified": "{$category->date_upd|date_format:'%Y-%m-%d'|escape:'htmlall':'UTF-8'}",
     "author": {
       "@type": "Person",
       "name": "{$shop.name|escape:'htmlall':'UTF-8'}"
@@ -81,7 +81,7 @@
         <div class="everpsblog-category-hero-overlay">
             <h1 class="m-0 everpsblog-blog-header__title everpsblog-category-title">{$category->title|escape:'htmlall':'UTF-8'}</h1>
             {if isset($children_categories) && $children_categories && !empty($children_categories)}
-            <div class="everpsblog-subcategories everpsblog-blog-header__categories d-flex flex-wrap justify-content-center gap-2 mt-4" role="navigation" aria-label="{l s='Sous-catégories' mod='everpsblog'}">
+            <div class="everpsblog-subcategories everpsblog-blog-header__categories d-flex flex-wrap justify-content-center gap-2 mt-4" role="navigation" aria-label="{l s='Subcategories' d='Modules.Everpsblog.Shop'}">
                 <a href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category'=>$category->id_ever_category, 'link_rewrite'=>$category->link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn everpsblog-top-category-btn everpsblog-subcategory-btn active" title="{$category->title|escape:'htmlall':'UTF-8'}">{$category->title|escape:'htmlall':'UTF-8'}</a>
                 {foreach from=$children_categories item=item}
                     {if !$item->is_root_category}
@@ -99,14 +99,14 @@
     </div>
     {if isset($allow_feed) && $allow_feed}
     <div class="text-center mb-3">
-        <a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' mod='everpsblog'} {$category->title|escape:'htmlall':'UTF-8'}</a>
+        <a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' d='Modules.Everpsblog.Shop'} {$category->title|escape:'htmlall':'UTF-8'}</a>
     </div>
     {/if}
 </div>
 {if isset($paginated) && !$paginated}
 <div class="container">
     <div class="row categoryinfos d-none">
-        {$category->date_add|escape:'htmlall':'UTF-8'}
+        {$category->date_add|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}
     </div>
     <div class="row categorycontent">
         {$category->content nofilter}
@@ -137,6 +137,6 @@
 {/if}
 {hook h="displayAfterEverCategory" everblogcategory=$category}
 {else}
-<div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>
+<div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' d='Modules.Everpsblog.Shop'}</div>
 {/if}
 {/block}

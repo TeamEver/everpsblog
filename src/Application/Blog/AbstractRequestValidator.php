@@ -53,6 +53,11 @@ abstract class AbstractRequestValidator
         $this->globalErrors[] = $message;
     }
 
+    protected function transAdmin(string $message, array $parameters = []): string
+    {
+        return \Context::getContext()->getTranslator()->trans($message, $parameters, 'Modules.Everpsblog.Admin');
+    }
+
     protected function throwIfInvalid(): void
     {
         if (!empty($this->fieldErrors) || !empty($this->globalErrors)) {
@@ -80,7 +85,7 @@ abstract class AbstractRequestValidator
         $defaultLangField = $fieldPrefix . $this->getDefaultLanguageId();
         $title = trim((string) ($requestData[$defaultLangField] ?? ''));
         if ('' === $title) {
-            $this->addFieldError($defaultLangField, 'Ce champ est obligatoire (langue par défaut).');
+            $this->addFieldError($defaultLangField, $this->transAdmin('This field is required (default language).'));
         }
     }
 
@@ -97,16 +102,16 @@ abstract class AbstractRequestValidator
             $title = trim((string) ($requestData[$titleFallbackPrefix . $langId] ?? ''));
 
             if (Tools::strlen($metaTitle) > self::META_TITLE_MAX_LENGTH) {
-                $this->addFieldError($metaTitleField, sprintf('Maximum %d caractères.', self::META_TITLE_MAX_LENGTH));
+                $this->addFieldError($metaTitleField, $this->transAdmin('Maximum %limit% characters.', ['%limit%' => self::META_TITLE_MAX_LENGTH]));
             }
 
             if (Tools::strlen($metaDescription) > self::META_DESCRIPTION_MAX_LENGTH) {
-                $this->addFieldError($metaDescriptionField, sprintf('Maximum %d caractères.', self::META_DESCRIPTION_MAX_LENGTH));
+                $this->addFieldError($metaDescriptionField, $this->transAdmin('Maximum %limit% characters.', ['%limit%' => self::META_DESCRIPTION_MAX_LENGTH]));
             }
 
             $normalizedSlug = Tools::str2url($slug ?: ($title ?: $metaTitle));
             if ('' !== $normalizedSlug && Tools::strlen($normalizedSlug) > self::SLUG_MAX_LENGTH) {
-                $this->addFieldError($slugField, sprintf('Slug trop long (maximum %d caractères).', self::SLUG_MAX_LENGTH));
+                $this->addFieldError($slugField, $this->transAdmin('Slug is too long (maximum %limit% characters).', ['%limit%' => self::SLUG_MAX_LENGTH]));
                 continue;
             }
 
@@ -138,7 +143,7 @@ abstract class AbstractRequestValidator
 
         $publicationDate = $this->parseDate($dateValue);
         if (null === $publicationDate) {
-            $this->addFieldError($dateField, 'Format de date invalide.');
+            $this->addFieldError($dateField, $this->transAdmin('Invalid date format.'));
 
             return $requestData;
         }
@@ -158,10 +163,10 @@ abstract class AbstractRequestValidator
 
         if ($publicationDate > $now && 'published' === $status) {
             $requestData[$statusField] = 'planned';
-            $this->addGlobalError('Le statut a été ajusté à "planned" car la date de publication est dans le futur.');
+            $this->addGlobalError($this->transAdmin('Status was changed to "planned" because the publication date is in the future.'));
         } elseif ($publicationDate <= $now && 'planned' === $status) {
             $requestData[$statusField] = 'published';
-            $this->addGlobalError('Le statut a été ajusté à "published" car la date de publication est passée.');
+            $this->addGlobalError($this->transAdmin('Status was changed to "published" because the publication date is in the past.'));
         } else {
             $requestData[$statusField] = $status;
         }
@@ -182,6 +187,38 @@ abstract class AbstractRequestValidator
         return false !== $connection->fetchOne($sql, ['id' => $id]);
     }
 
+    protected function existsInCurrentShopModuleTable(string $table, string $idColumn, int $id, string $shopTable): bool
+    {
+        if ($id <= 0) {
+            return false;
+        }
+
+        $shopId = (int) \Context::getContext()->shop->id;
+        if ($shopId <= 0) {
+            return $this->existsInModuleTable($table, $idColumn, $id);
+        }
+
+        /** @var Connection $connection */
+        $connection = $this->entityManager->getConnection();
+        $sql = sprintf(
+            'SELECT 1
+             FROM `%s%s` t
+             LEFT JOIN `%s%s` ts ON ts.`%s` = t.`%s`
+             WHERE t.`%s` = :id
+                AND (t.`id_shop` = :shop_id OR ts.`id_shop` = :shop_id)
+             LIMIT 1',
+            _DB_PREFIX_,
+            $table,
+            _DB_PREFIX_,
+            $shopTable,
+            $idColumn,
+            $idColumn,
+            $idColumn
+        );
+
+        return false !== $connection->fetchOne($sql, ['id' => $id, 'shop_id' => $shopId]);
+    }
+
     protected function existsInPrestashopTable(string $table, string $idColumn, int $id): bool
     {
         if ($id <= 0) {
@@ -193,6 +230,37 @@ abstract class AbstractRequestValidator
         $sql = sprintf('SELECT 1 FROM %s%s WHERE %s = :id LIMIT 1', _DB_PREFIX_, $table, $idColumn);
 
         return false !== $connection->fetchOne($sql, ['id' => $id]);
+    }
+
+    protected function existsInCurrentShopPrestashopTable(string $table, string $idColumn, int $id, string $shopTable): bool
+    {
+        if ($id <= 0) {
+            return false;
+        }
+
+        $shopId = (int) \Context::getContext()->shop->id;
+        if ($shopId <= 0) {
+            return $this->existsInPrestashopTable($table, $idColumn, $id);
+        }
+
+        /** @var Connection $connection */
+        $connection = $this->entityManager->getConnection();
+        $sql = sprintf(
+            'SELECT 1
+             FROM `%s%s` t
+             INNER JOIN `%s%s` ts ON ts.`%s` = t.`%s` AND ts.`id_shop` = :shop_id
+             WHERE t.`%s` = :id
+             LIMIT 1',
+            _DB_PREFIX_,
+            $table,
+            _DB_PREFIX_,
+            $shopTable,
+            $idColumn,
+            $idColumn,
+            $idColumn
+        );
+
+        return false !== $connection->fetchOne($sql, ['id' => $id, 'shop_id' => $shopId]);
     }
 
     /**

@@ -45,14 +45,6 @@ class EverPsBlogcustomercommentsModuleFrontController extends AbstractFrontContr
         }
     }
 
-    public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
-    {
-        return $this->context->getTranslator()->trans(
-            $string,
-            [],
-            'Modules.Everpsblog.customercomments'
-        );
-    }
 
     public function initContent()
     {
@@ -61,8 +53,8 @@ class EverPsBlogcustomercommentsModuleFrontController extends AbstractFrontContr
         }
         parent::initContent();
         $page = $this->context->controller->getTemplateVarPage();
-        $page['meta']['title'] = $this->l('Your comments');
-        $page['meta']['description'] = $this->l('Find all your comments on our blog');
+        $page['meta']['title'] = $this->transShop('Your comments');
+        $page['meta']['description'] = $this->transShop('Find all your comments on our blog');
         $this->context->smarty->assign('page', $page);
         $animate = Configuration::get(
             'EVERBLOG_ANIMATE'
@@ -115,7 +107,7 @@ class EverPsBlogcustomercommentsModuleFrontController extends AbstractFrontContr
         $breadcrumb = parent::getBreadcrumbLinks();
         $breadcrumb['links'][] = $this->addMyAccountToBreadcrumb();
         $breadcrumb['links'][] = [
-            'title' => $this->l('My blog comments'),
+            'title' => $this->transShop('My blog comments'),
             'url' => $this->context->link->getModuleLink(
                 'everpsblog',
                 'customercomments'

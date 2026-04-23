@@ -19,31 +19,31 @@
         <div class="panel-body">
                 <div class="row">
                         <div class="col-md-6">
-                                <h3 class="everpsblog-section-title">{l s='Getting started' mod='everpsblog'}</h3>
+                                <h3 class="everpsblog-section-title">{l s='Getting started' d='Modules.Everpsblog.Admin'}</h3>
                                 <ol class="everpsblog-step-list">
-                                        <li>{l s='Complete all fields marked with an asterisk to ensure the blog runs smoothly.' mod='everpsblog'}</li>
-                                        <li>{l s='Set the blog path to define the public URL and add the link to your menus if needed.' mod='everpsblog'}</li>
-                                        <li>{l s='Adjust the excerpt and title lengths to control how your articles appear in lists.' mod='everpsblog'}</li>
+                                        <li>{l s='Complete all fields marked with an asterisk to ensure the blog runs smoothly.' d='Modules.Everpsblog.Admin'}</li>
+                                        <li>{l s='Set the blog path to define the public URL and add the link to your menus if needed.' d='Modules.Everpsblog.Admin'}</li>
+                                        <li>{l s='Adjust the excerpt and title lengths to control how your articles appear in lists.' d='Modules.Everpsblog.Admin'}</li>
                                 </ol>
                         </div>
                         <div class="col-md-6">
-                                <h3 class="everpsblog-section-title">{l s='Best practices' mod='everpsblog'}</h3>
+                                <h3 class="everpsblog-section-title">{l s='Best practices' d='Modules.Everpsblog.Admin'}</h3>
                                 <ul class="everpsblog-advice-list">
-                                        <li>{l s='Fill the multilingual fields such as the blog title, meta description and intro/outro texts for each language enabled in your shop.' mod='everpsblog'}</li>
-                                        <li>{l s='Keep your design consistent by adding custom CSS in the dedicated field or in your theme override.' mod='everpsblog'}</li>
-                                        <li>{l s='Remember to define titles, friendly URLs and meta descriptions for posts, categories, tags and authors.' mod='everpsblog'}</li>
+                                        <li>{l s='Fill the multilingual fields such as the blog title, meta description and intro/outro texts for each language enabled in your shop.' d='Modules.Everpsblog.Admin'}</li>
+                                        <li>{l s='Keep your design consistent by adding custom CSS in the dedicated field or in your theme override.' d='Modules.Everpsblog.Admin'}</li>
+                                        <li>{l s='Remember to define titles, friendly URLs and meta descriptions for posts, categories, tags and authors.' d='Modules.Everpsblog.Admin'}</li>
                                 </ul>
                         </div>
                 </div>
                 <div class="row everpsblog-onboarding-footer">
                         <div class="col-sm-8">
                                 <div class="alert alert-info">
-                                        <strong>{l s='Automation tip:' mod='everpsblog'}</strong> {l s='Set up the cron tasks listed above to publish planned posts, clean the trash and keep notifications up to date.' mod='everpsblog'}
+                                        <strong>{l s='Automation tip:' d='Modules.Everpsblog.Admin'}</strong> {l s='Set up the cron tasks listed above to publish planned posts, clean the trash and keep notifications up to date.' d='Modules.Everpsblog.Admin'}
                                 </div>
                         </div>
                         <div class="col-sm-4 text-right text-end everpsblog-doc-link">
                                 <a href="https://www.team-ever.com/prestashop-1-7-un-module-de-blog-gratuit/" target="_blank" class="btn btn-default btn-secondary" rel="noopener">
-                                        <i class="icon icon-book"></i> {l s='Open the full documentation' mod='everpsblog'}
+                                        <i class="icon icon-book"></i> {l s='Open the full documentation' d='Modules.Everpsblog.Admin'}
                                 </a>
                         </div>
                 </div>

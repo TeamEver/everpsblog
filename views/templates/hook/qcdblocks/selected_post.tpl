@@ -27,12 +27,12 @@
                         {if isset($attributes.show_excerpt) && $attributes.show_excerpt && !empty($post.excerpt)}
                             <p class="card-text text-muted">{$post.excerpt|strip_tags|truncate:260:'…'|escape:'htmlall':'UTF-8'}</p>
                         {/if}
-                        <a href="{$post.url|escape:'htmlall':'UTF-8'}" class="btn btn-outline-primary mt-auto align-self-start">{l s='Lire l\'article' mod='everpsblog'}</a>
+                        <a href="{$post.url|escape:'htmlall':'UTF-8'}" class="btn btn-outline-primary mt-auto align-self-start">{l s='Read the article' d='Modules.Everpsblog.Shop'}</a>
                     </div>
                 </div>
             </div>
         </article>
     {else}
-        <p class="text-muted mb-0">{l s='Aucun article sélectionné.' mod='everpsblog'}</p>
+        <p class="text-muted mb-0">{l s='No selected post.' d='Modules.Everpsblog.Shop'}</p>
     {/if}
 </section>

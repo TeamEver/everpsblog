@@ -10,19 +10,19 @@ final class CategoryGridDefinitionFactory
     {
         return new GridDefinition(
             'category',
-            'Categorys',
-[
-            ['id' => 'id_ever_category', 'name' => 'ID'],
-            ['id' => 'title', 'name' => 'Titre'],
-            ['id' => 'active', 'name' => 'Actif']
-        ],
-[
-            'q' => 'Recherche',
-            'title' => 'Titre'
-        ],
-[
-            ['id' => 'delete', 'name' => 'Supprimer sélection']
-        ]
+            'Categories',
+            [
+                ['id' => 'id_ever_category', 'name' => 'ID'],
+                ['id' => 'title', 'name' => 'Title'],
+                ['id' => 'active', 'name' => 'Active'],
+            ],
+            [
+                'q' => 'Search',
+                'title' => 'Title',
+            ],
+            [
+                ['id' => 'delete', 'name' => 'Delete selected'],
+            ]
         );
     }
 }

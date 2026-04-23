@@ -4,17 +4,17 @@ namespace PrestaShop\Module\Everpsblog\Service;
 
 class BlogSortOrderService
 {
-    private function getModule()
+    private function transShop(string $message): string
     {
-        return \Module::getInstanceByName('everpsblog');
+        return \Context::getContext()->getTranslator()->trans($message, [], 'Modules.Everpsblog.Shop');
     }
 
     public function getSortOrders()
     {
         $sortOrders = [
-            ['label' => $this->getModule()->l('Most viewed'), 'order_by' => 'count', 'order_way' => 'desc'],
-            ['label' => $this->getModule()->l('Most recent'), 'order_by' => 'date_add', 'order_way' => 'desc'],
-            ['label' => $this->getModule()->l('The oldest'), 'order_by' => 'date_add', 'order_way' => 'asc'],
+            ['label' => $this->transShop('Most viewed'), 'order_by' => 'count', 'order_way' => 'desc'],
+            ['label' => $this->transShop('Most recent'), 'order_by' => 'date_add', 'order_way' => 'desc'],
+            ['label' => $this->transShop('The oldest'), 'order_by' => 'date_add', 'order_way' => 'asc'],
         ];
 
         foreach ($sortOrders as &$sortOrder) {

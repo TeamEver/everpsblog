@@ -20,7 +20,7 @@
                         {if isset($attributes.show_image) && $attributes.show_image && !empty($post.thumb)}
                             <a href="{$post.url|escape:'htmlall':'UTF-8'}" class="text-decoration-none position-relative">
                                 <img src="{$post.thumb|escape:'htmlall':'UTF-8'}" alt="{$post.title|escape:'htmlall':'UTF-8'}" class="card-img-top" loading="lazy">
-                                <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">{l s='À la une' mod='everpsblog'}</span>
+                                <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">{l s='Featured' d='Modules.Everpsblog.Shop'}</span>
                             </a>
                         {/if}
                         <div class="card-body">
@@ -36,6 +36,6 @@
             {/foreach}
         </div>
     {else}
-        <p class="text-muted mb-0">{l s='Aucun article mis en avant.' mod='everpsblog'}</p>
+        <p class="text-muted mb-0">{l s='No featured post.' d='Modules.Everpsblog.Shop'}</p>
     {/if}
 </section>

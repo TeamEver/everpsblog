@@ -20,8 +20,8 @@
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">{l s='Image preview' mod='everpsblog'}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{l s='Close' mod='everpsblog'}"></button>
+                <h5 class="modal-title">{l s='Image preview' d='Modules.Everpsblog.Shop'}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{l s='Close' d='Modules.Everpsblog.Shop'}"></button>
             </div>
             <div class="modal-body text-center">
                 <img src="" alt="" class="img-fluid" />

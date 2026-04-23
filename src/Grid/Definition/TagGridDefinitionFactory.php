@@ -11,20 +11,20 @@ final class TagGridDefinitionFactory
         return new GridDefinition(
             'tag',
             'Tags',
-[
-            ['id' => 'id_ever_tag', 'name' => '#', 'type' => 'id'],
-            ['id' => 'title', 'name' => 'Titre', 'type' => 'text'],
-            ['id' => 'link_rewrite', 'name' => 'Slug', 'type' => 'text'],
-            ['id' => 'count', 'name' => 'Vues', 'type' => 'number'],
-            ['id' => 'active', 'name' => 'Actif', 'type' => 'status']
-        ],
-[
-            'q' => 'Recherche',
-            'title' => 'Titre'
-        ],
-[
-            ['id' => 'delete', 'name' => 'Supprimer sélection']
-        ]
+            [
+                ['id' => 'id_ever_tag', 'name' => '#', 'type' => 'id'],
+                ['id' => 'title', 'name' => 'Title', 'type' => 'text'],
+                ['id' => 'link_rewrite', 'name' => 'Slug', 'type' => 'text'],
+                ['id' => 'count', 'name' => 'Views', 'type' => 'number'],
+                ['id' => 'active', 'name' => 'Active', 'type' => 'status'],
+            ],
+            [
+                'q' => 'Search',
+                'title' => 'Title',
+            ],
+            [
+                ['id' => 'delete', 'name' => 'Delete selected'],
+            ]
         );
     }
 }

@@ -133,14 +133,6 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
         $this->blog_path = str_replace('\\', '/', _PS_MODULE_DIR_).'everpsblog/views/templates/front';
     }
 
-    public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
-    {
-        return Context::getContext()->getTranslator()->trans(
-            $string,
-            [],
-            'Modules.Everpsblog.blog'
-        );
-    }
 
     public function initContent()
     {
@@ -203,8 +195,8 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
         $meta_desc = $everblog_desc[(int) Context::getContext()->language->id];
         $page = $this->context->controller->getTemplateVarPage();
         if (Tools::getValue('page')) {
-            $meta_title = $this->l('Page : ') . Tools::getValue('page') . ' | ' . $meta_title;
-            $meta_description = $this->l('Page : ') . Tools::getValue('page') . ' | ' . $meta_desc;
+            $meta_title = $this->transShop('Page : ') . Tools::getValue('page') . ' | ' . $meta_title;
+            $meta_description = $this->transShop('Page : ') . Tools::getValue('page') . ' | ' . $meta_desc;
         }
         $page['meta']['title'] = $meta_title;
         $page['meta']['description'] = $meta_desc;
@@ -334,7 +326,7 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
     {
         $breadcrumb = parent::getBreadcrumbLinks();
         $breadcrumb['links'][] = [
-            'title' => $this->l('Blog'),
+            'title' => $this->transShop('Blog'),
             'url' => $this->context->link->getModuleLink(
                 $this->module->name,
                 'blog'

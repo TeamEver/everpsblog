@@ -32,6 +32,6 @@
             {/foreach}
         </div>
     {else}
-        <p class="text-muted mb-0">{l s='Aucun article à afficher.' mod='everpsblog'}</p>
+        <p class="text-muted mb-0">{l s='No post to display.' d='Modules.Everpsblog.Shop'}</p>
     {/if}
 </section>

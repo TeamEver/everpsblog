@@ -70,14 +70,6 @@ class EverPsBlogtagModuleFrontController extends AbstractFrontController
         $this->incrementFrontTaxonomyCount('ever_blog_tag', 'id_ever_tag', (int) $this->tag->id);
     }
 
-    public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
-    {
-        return Context::getContext()->getTranslator()->trans(
-            $string,
-            [],
-            'Modules.Everpsblog.tag'
-        );
-    }
 
     public function initContent()
     {
@@ -116,8 +108,8 @@ class EverPsBlogtagModuleFrontController extends AbstractFrontController
                 $page['meta']['robots'] = 'noindex, follow';
             }
             if (Tools::getValue('page')) {
-                $meta_title = $this->l('Page : ') . Tools::getValue('page') . ' | ' . $this->tag->meta_title;
-                $meta_description = $this->l('Page : ') . Tools::getValue('page') . ' | ' . $this->tag->meta_description;
+                $meta_title = $this->transShop('Page : ') . Tools::getValue('page') . ' | ' . $this->tag->meta_title;
+                $meta_description = $this->transShop('Page : ') . Tools::getValue('page') . ' | ' . $this->tag->meta_description;
             } else {
                 $meta_title = $this->tag->meta_title;
                 $meta_description = $this->tag->meta_description;
@@ -215,7 +207,7 @@ class EverPsBlogtagModuleFrontController extends AbstractFrontController
     {
         $breadcrumb = parent::getBreadcrumbLinks();
         $breadcrumb['links'][] = array(
-            'title' => $this->l('Blog'),
+            'title' => $this->transShop('Blog'),
             'url' => $this->context->link->getModuleLink(
                 'everpsblog',
                 'blog'

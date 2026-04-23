@@ -65,6 +65,6 @@
         <div class="everpsblogcontent rte" id="everpsblog-post-content-{$post_id|escape:'htmlall':'UTF-8'}">
             {$post_summary|strip_tags|truncate:300:'...'|escape:'htmlall':'UTF-8'}
         </div>
-        <a href="{$post_link|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'}" title="{$post_title|escape:'htmlall':'UTF-8'}">&gt;&gt; {l s='Read more' mod='everpsblog'}</a>
+        <a href="{$post_link|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'}" title="{$post_title|escape:'htmlall':'UTF-8'}">&gt;&gt; {l s='Read more' d='Modules.Everpsblog.Shop'}</a>
     </div>
 </div>

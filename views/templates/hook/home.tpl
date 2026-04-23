@@ -18,9 +18,9 @@
 {if isset($everpsblog) && $everpsblog|@count}
     <div class="bloghome container">
         <div class="row bloghometitle">
-            <a href="{$blogUrl|escape:'htmlall':'UTF-8'}" title="{l s='Latest posts from the blog' mod='everpsblog'}">
+            <a href="{$blogUrl|escape:'htmlall':'UTF-8'}" title="{l s='Latest posts from the blog' d='Modules.Everpsblog.Shop'}">
                 <h2 class="h2 products-section-title text-uppercase text-center">
-                    {l s='Latest posts from the blog' mod='everpsblog'}
+                    {l s='Latest posts from the blog' d='Modules.Everpsblog.Shop'}
                 </h2>
             </a>
         </div>
@@ -52,7 +52,7 @@
                                             <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
                                                 {if isset($item->excerpt) && !empty($item->excerpt)}{$item->excerpt|escape:'htmlall':'UTF-8'}{else}{$item->content|escape:'htmlall':'UTF-8'}{/if}
                                             </div>
-                                            <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'}" title="{l s='Read more' mod='everpsblog'} {$item->title|escape:'htmlall':'UTF-8'}">&gt;&gt; {l s='Read more' mod='everpsblog'}</a>
+                                            <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'}" title="{l s='Read more' d='Modules.Everpsblog.Shop'} {$item->title|escape:'htmlall':'UTF-8'}">&gt;&gt; {l s='Read more' d='Modules.Everpsblog.Shop'}</a>
                                         </div>
                                     </div>
                         {if $smarty.foreach.homecarousel.index % 4 == 3 || $smarty.foreach.homecarousel.last}
@@ -63,11 +63,11 @@
                 </div>
                 <a class="carousel-control-prev" role="button" data-bs-target="#{$carousel_id|escape:'htmlall':'UTF-8'}" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">{l s='Previous' mod='everpsblog'}</span>
+                    <span class="visually-hidden">{l s='Previous' d='Modules.Everpsblog.Shop'}</span>
                 </a>
                 <a class="carousel-control-next" role="button" data-bs-target="#{$carousel_id|escape:'htmlall':'UTF-8'}" data-bs-slide="next">
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">{l s='Next' mod='everpsblog'}</span>
+                    <span class="visually-hidden">{l s='Next' d='Modules.Everpsblog.Shop'}</span>
                 </a>
             </div>
         {else}
@@ -93,14 +93,14 @@
                             <div class="everpsblogcontent rte" id="everpsblog-post-content-{$item->id_ever_post|escape:'htmlall':'UTF-8'}">
                                 {if isset($item->excerpt) && !empty($item->excerpt)}{$item->excerpt|escape:'htmlall':'UTF-8'}{else}{$item->content|escape:'htmlall':'UTF-8'}{/if}
                             </div>
-                            <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'}" title="{l s='Read more' mod='everpsblog'} {$item->title|escape:'htmlall':'UTF-8'}">&gt;&gt; {l s='Read more' mod='everpsblog'}</a>
+                            <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}" class="{$blogcolor|escape:'htmlall':'UTF-8'}" title="{l s='Read more' d='Modules.Everpsblog.Shop'} {$item->title|escape:'htmlall':'UTF-8'}">&gt;&gt; {l s='Read more' d='Modules.Everpsblog.Shop'}</a>
                         </div>
                     </div>
                 {/foreach}
             </div>
         {/if}
         <div class="text-center">
-            <a href="{$blogUrl|escape:'htmlall':'UTF-8'}" title="{l s='See all posts from the blog' mod='everpsblog'}" class="btn btn-primary text-white">{l s='See all posts from the blog' mod='everpsblog'}</a>
+            <a href="{$blogUrl|escape:'htmlall':'UTF-8'}" title="{l s='See all posts from the blog' d='Modules.Everpsblog.Shop'}" class="btn btn-primary text-white">{l s='See all posts from the blog' d='Modules.Everpsblog.Shop'}</a>
         </div>
     </div>
 {/if}

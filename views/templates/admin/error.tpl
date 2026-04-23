@@ -16,7 +16,7 @@
  *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *}
 {* <div>
-	<h3>{l s='An error occurred' mod='everpsblog'}:</h3>
+	<h3>{l s='An error occurred' d='Modules.Everpsblog.Admin'}:</h3>
 	<ul class="alert alert-danger">
 		{foreach from=$errors item='error'}
 			<li>{$error|escape:'htmlall':'UTF-8'}</li>

@@ -11,13 +11,13 @@
             {if !empty($attributes.title)}
                 {$attributes.title|escape:'htmlall':'UTF-8'}
             {elseif !empty($attributes.tag.title)}
-                {l s='Articles du tag' mod='everpsblog'} « {$attributes.tag.title|escape:'htmlall':'UTF-8'} »
+                {l s='Tag posts' d='Modules.Everpsblog.Shop'} "{$attributes.tag.title|escape:'htmlall':'UTF-8'}"
             {else}
-                {l s='Articles liés au tag' mod='everpsblog'}
+                {l s='Posts linked to this tag' d='Modules.Everpsblog.Shop'}
             {/if}
         </h2>
         {if !empty($attributes.tag.url)}
-            <a class="btn btn-sm btn-outline-primary" href="{$attributes.tag.url|escape:'htmlall':'UTF-8'}">{l s='Voir le tag' mod='everpsblog'}</a>
+            <a class="btn btn-sm btn-outline-primary" href="{$attributes.tag.url|escape:'htmlall':'UTF-8'}">{l s='View tag' d='Modules.Everpsblog.Shop'}</a>
         {/if}
     </header>
     {if !empty($attributes.posts)}
@@ -43,6 +43,6 @@
             {/foreach}
         </div>
     {else}
-        <p class="text-muted mb-0">{l s='Aucun article pour ce tag.' mod='everpsblog'}</p>
+        <p class="text-muted mb-0">{l s='No post for this tag.' d='Modules.Everpsblog.Shop'}</p>
     {/if}
 </section>

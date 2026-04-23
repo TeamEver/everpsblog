@@ -192,7 +192,7 @@ services:
     class: PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\PostCommandDataBuilder
     arguments:
       - '@=service("prestashop.adapter.legacy.context").getContext().shop.id'
-      - '@=service("prestashop.adapter.legacy.configuration").get("EVERBLOG_UNCLASSED_ID")'
+      - 0
       - '@prestashop.module.everpsblog.blog.install_service'
 
   prestashop.module.everpsblog.blog.assembler.post_command:
@@ -260,17 +260,27 @@ services:
     class: PrestaShop\Module\Everpsblog\Service\BlogSitemapService
     public: true
 
+  PrestaShop\Module\Everpsblog\Service\BlogSitemapService:
+    alias: prestashop.module.everpsblog.service.blog_sitemap
+
   PrestaShop\Module\Everpsblog\Service\WordPressRestImporter:
     arguments:
       - '@prestashop.module.everpsblog.service.blog_image'
       - '@prestashop.module.everpsblog.service.blog_sitemap'
       - '@prestashop.module.everpsblog.service.blog_redirect'
+      - '@prestashop.module.everpsblog.blog.install_service'
 
   prestashop.module.everpsblog.service.blog_redirect:
     class: PrestaShop\Module\Everpsblog\Service\BlogRedirectService
 
   PrestaShop\Module\Everpsblog\Service\BlogRedirectService:
     alias: prestashop.module.everpsblog.service.blog_redirect
+
+  prestashop.module.everpsblog.service.module_translation_catalog:
+    class: PrestaShop\Module\Everpsblog\Service\ModuleTranslationCatalogService
+
+  PrestaShop\Module\Everpsblog\Service\ModuleTranslationCatalogService:
+    alias: prestashop.module.everpsblog.service.module_translation_catalog
 
   prestashop.module.everpsblog.service.database_integrity:
     class: PrestaShop\Module\Everpsblog\Service\DatabaseIntegrityService

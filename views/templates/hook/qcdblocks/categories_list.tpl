@@ -20,6 +20,6 @@
             {/foreach}
         </ul>
     {else}
-        <p class="text-muted mb-0">{l s='Aucune catégorie disponible.' mod='everpsblog'}</p>
+        <p class="text-muted mb-0">{l s='No category available.' d='Modules.Everpsblog.Shop'}</p>
     {/if}
 </section>

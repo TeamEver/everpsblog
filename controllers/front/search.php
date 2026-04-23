@@ -39,14 +39,6 @@ class EverPsBlogsearchModuleFrontController extends AbstractFrontController
         parent::init();
     }
 
-    public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
-    {
-        return Context::getContext()->getTranslator()->trans(
-            $string,
-            [],
-            'Modules.Everpsblog.search'
-        );
-    }
 
     public function initContent()
     {
@@ -69,7 +61,7 @@ class EverPsBlogsearchModuleFrontController extends AbstractFrontController
         );
         $postsViewModel = PostViewModel::listFromLegacy($posts);
         $page = $this->context->controller->getTemplateVarPage();
-        $page['meta']['title'] = $this->l('Search results for') . ' ' . $this->query;
+        $page['meta']['title'] = $this->transShop('Search results for') . ' ' . $this->query;
         $page['meta']['description'] = $page['meta']['title'];
         $page['meta']['robots'] = 'noindex, follow';
         $this->context->smarty->assign('page', $page);
@@ -100,11 +92,11 @@ class EverPsBlogsearchModuleFrontController extends AbstractFrontController
     {
         $breadcrumb = parent::getBreadcrumbLinks();
         $breadcrumb['links'][] = [
-            'title' => $this->l('Blog'),
+            'title' => $this->transShop('Blog'),
             'url' => $this->context->link->getModuleLink('everpsblog', 'blog'),
         ];
         $breadcrumb['links'][] = [
-            'title' => $this->l('Search results'),
+            'title' => $this->transShop('Search results'),
             'url' => $this->context->link->getModuleLink('everpsblog', 'search', ['keyword' => $this->query]),
         ];
         return $breadcrumb;

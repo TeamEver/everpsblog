@@ -23,108 +23,108 @@ class ConfigurationType extends AbstractType
     {
         $builder
             ->add('route', TextType::class, [
-                'label' => 'Route du blog',
+                'label' => 'Blog route',
                 'constraints' => [
                     new NotBlank(),
                     new Length(['max' => 64]),
                 ],
             ])
             ->add('allow_comments', CheckboxType::class, [
-                'label' => 'Autoriser les commentaires',
+                'label' => 'Allow comments',
                 'required' => false,
             ])
             ->add('check_comments', CheckboxType::class, [
-                'label' => 'Modération des commentaires',
+                'label' => 'Moderate comments',
                 'required' => false,
             ])
             ->add('posts_per_page', IntegerType::class, [
-                'label' => 'Articles par page',
+                'label' => 'Posts per page',
                 'constraints' => [new GreaterThan(['value' => 0])],
             ])
             ->add('home_posts', IntegerType::class, [
-                'label' => 'Articles sur la page d\'accueil',
+                'label' => 'Posts on homepage',
                 'constraints' => [new GreaterThan(['value' => 0])],
             ])
             ->add('product_posts', IntegerType::class, [
-                'label' => 'Articles sur la fiche produit',
+                'label' => 'Posts on product page',
                 'constraints' => [new GreaterThan(['value' => 0])],
             ])
             ->add('excerpt_length', IntegerType::class, [
-                'label' => 'Longueur de l\'extrait',
+                'label' => 'Excerpt length',
                 'constraints' => [new GreaterThan(['value' => 0])],
             ])
             ->add('title_length', IntegerType::class, [
-                'label' => 'Longueur du titre',
+                'label' => 'Title length',
                 'constraints' => [new GreaterThan(['value' => 0])],
             ])
             ->add('header_bg_color', TextType::class, [
-                'label' => 'Couleur du header du blog',
+                'label' => 'Blog header color',
                 'required' => false,
-                'help' => 'Couleur appliquee au bandeau principal des pages blog, categorie, tag, auteur et recherche.',
+                'help' => 'Color applied to the main banner on blog, category, tag, author and search pages.',
                 'attr' => [
                     'type' => 'color',
                 ],
                 'constraints' => [
                     new Regex([
                         'pattern' => '/^#[0-9a-fA-F]{6}$/',
-                        'message' => 'La couleur doit etre au format hexadecimal, par exemple #0a0f54.',
+                        'message' => 'The color must use hexadecimal format, for example #0a0f54.',
                     ]),
                 ],
             ])
             ->add('wordpress_api_url', TextType::class, [
-                'label' => 'URL du site WordPress',
+                'label' => 'WordPress site URL',
                 'required' => false,
-                'help' => 'Exemple : https://example.com ou https://example.com/wp-json/wp/v2',
+                'help' => 'Example: https://example.com or https://example.com/wp-json/wp/v2',
                 'constraints' => [
                     new Length(['max' => 255]),
                     new Url(),
                 ],
             ])
             ->add('wordpress_api_user', TextType::class, [
-                'label' => 'Identifiant REST WordPress',
+                'label' => 'WordPress REST username',
                 'required' => false,
-                'help' => 'Facultatif pour importer les articles publics. Requis pour les contenus non publics.',
+                'help' => 'Optional for public post imports. Required for non-public content.',
                 'constraints' => [
                     new Length(['max' => 255]),
                 ],
             ])
             ->add('wordpress_api_password', PasswordType::class, [
-                'label' => 'Mot de passe d\'application WordPress',
+                'label' => 'WordPress application password',
                 'required' => false,
                 'always_empty' => false,
-                'help' => 'Utilisez un mot de passe d\'application WordPress, pas le mot de passe principal.',
+                'help' => 'Use a WordPress application password, not the main account password.',
                 'constraints' => [
                     new Length(['max' => 255]),
                 ],
             ])
             ->add('wordpress_import_post_status', ChoiceType::class, [
-                'label' => 'Statut des articles importes',
+                'label' => 'Imported post status',
                 'choices' => [
-                    'Publie' => 'published',
-                    'Brouillon' => 'draft',
+                    'Published' => 'published',
+                    'Draft' => 'draft',
                 ],
             ])
             ->add('wordpress_enable_authors', CheckboxType::class, [
-                'label' => 'Activer les auteurs importes',
+                'label' => 'Enable imported authors',
                 'required' => false,
             ])
             ->add('wordpress_enable_categories', CheckboxType::class, [
-                'label' => 'Activer les categories importees',
+                'label' => 'Enable imported categories',
                 'required' => false,
             ])
             ->add('wordpress_enable_tags', CheckboxType::class, [
-                'label' => 'Activer les tags importes',
+                'label' => 'Enable imported tags',
                 'required' => false,
             ]);
 
         foreach (\Language::getLanguages(false) as $lang) {
             $idLang = (int) $lang['id_lang'];
             $isoCode = strtoupper((string) ($lang['iso_code'] ?? ''));
-            $suffix = $isoCode ? sprintf(' (%s)', $isoCode) : sprintf(' (langue #%d)', $idLang);
+            $suffix = $isoCode ? sprintf(' (%s)', $isoCode) : sprintf(' (language #%d)', $idLang);
 
             $builder
                 ->add(sprintf('top_text_%d', $idLang), TextareaType::class, [
-                    'label' => 'Texte haut de page blog' . $suffix,
+                    'label' => 'Blog top text' . $suffix,
                     'required' => false,
                     'attr' => [
                         'data-ever-richtext' => '1',
@@ -132,7 +132,7 @@ class ConfigurationType extends AbstractType
                     ],
                 ])
                 ->add(sprintf('bottom_text_%d', $idLang), TextareaType::class, [
-                    'label' => 'Texte bas de page blog' . $suffix,
+                    'label' => 'Blog bottom text' . $suffix,
                     'required' => false,
                     'attr' => [
                         'data-ever-richtext' => '1',
@@ -147,6 +147,7 @@ class ConfigurationType extends AbstractType
     {
         $resolver->setDefaults([
             'csrf_token_id' => 'everpsblog_configuration',
+            'translation_domain' => 'Modules.Everpsblog.Admin',
         ]);
     }
 }

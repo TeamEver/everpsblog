@@ -13,6 +13,9 @@ class WordPressRestImporter
     /** @var BlogRedirectService */
     private $blogRedirectService;
 
+    /** @var BlogInstallService */
+    private $blogInstallService;
+
     /** @var array<int, int> */
     private $categoryCache = [];
 
@@ -28,11 +31,13 @@ class WordPressRestImporter
     public function __construct(
         BlogImageService $blogImageService,
         BlogSitemapService $blogSitemapService,
-        BlogRedirectService $blogRedirectService
+        BlogRedirectService $blogRedirectService,
+        BlogInstallService $blogInstallService
     ) {
         $this->blogImageService = $blogImageService;
         $this->blogSitemapService = $blogSitemapService;
         $this->blogRedirectService = $blogRedirectService;
+        $this->blogInstallService = $blogInstallService;
     }
 
     public function import(string $siteUrl, string $username, string $password, int $shopId, int $defaultLangId): array
@@ -92,7 +97,7 @@ class WordPressRestImporter
         } while (true);
 
         $this->blogImageService->clearCache();
-        $this->blogSitemapService->generate(\Context::getContext(), $shopId);
+        $this->blogSitemapService->refreshForShop($shopId);
         $stats['redirects'] = $this->redirectsSaved;
 
         return $stats;
@@ -607,20 +612,24 @@ class WordPressRestImporter
 
     private function getFallbackCategoryId(int $shopId): int
     {
-        $unclassedId = (int) \Configuration::get('EVERBLOG_UNCLASSED_ID');
+        $rootId = $this->blogInstallService->ensureRootCategory($shopId);
+        $unclassedId = $this->blogInstallService->ensureUnclassedCategory($shopId, $rootId);
         if ($unclassedId > 0) {
             return $unclassedId;
         }
 
-        $rootId = $this->getRootCategoryId($shopId);
         if ($rootId > 0) {
             return $rootId;
         }
 
         return (int) \Db::getInstance()->getValue(
-            'SELECT id_ever_category FROM `' . _DB_PREFIX_ . 'ever_blog_category`
-             WHERE id_shop = ' . (int) $shopId . '
-             ORDER BY is_root_category ASC, id_ever_category ASC'
+            'SELECT c.id_ever_category
+             FROM `' . _DB_PREFIX_ . 'ever_blog_category` c
+             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category_shop` cs
+                ON cs.id_ever_category = c.id_ever_category
+             WHERE c.is_root_category = 0
+                AND (c.id_shop = ' . (int) $shopId . ' OR cs.id_shop = ' . (int) $shopId . ')
+             ORDER BY c.id_ever_category ASC'
         );
     }
 

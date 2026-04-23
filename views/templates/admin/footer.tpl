@@ -17,17 +17,17 @@
 *}
 <div class="panel everfooter">
     <div class="panel-heading">
-        <i class="icon icon-smile"></i> {l s='Ever Blog' mod='everpsblog'}
+        <i class="icon icon-smile"></i> {l s='Ever Blog' d='Modules.Everpsblog.Admin'}
     </div>
     <div class="panel-body">
         <a href="#evertop" id="everbottom">
            <img id="everlogo" src="{$image_dir|escape:'htmlall':'UTF-8'}/ever.png" style="float:left;max-width: 120px;">
         </a>
         <p>
-            {l s='Click on our logo to go top !' mod='everpsblog'}
+            {l s='Click on our logo to go top !' d='Modules.Everpsblog.Admin'}
         </p>
         <p>
-            {l s='Feel free to ask some custom actions !' mod='everpsblog'}
+            {l s='Feel free to ask some custom actions !' d='Modules.Everpsblog.Admin'}
         </p>
     </div>
 </div>

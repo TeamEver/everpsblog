@@ -12,9 +12,17 @@ class CategoryRequestValidator extends AbstractRequestValidator
         $requestData = $this->normalizeSeoFields($requestData);
 
         $parentCategoryId = (int) ($requestData['id_parent_category'] ?? 0);
-        if ($parentCategoryId > 0 && !$this->existsInModuleTable('ever_blog_category', 'id_ever_category', $parentCategoryId)) {
-            $this->addFieldError('id_parent_category', sprintf('Catégorie parente introuvable (id: %d).', $parentCategoryId));
+        if ($parentCategoryId > 0 && !$this->existsInCurrentShopModuleTable('ever_blog_category', 'id_ever_category', $parentCategoryId, 'ever_blog_category_shop')) {
+            $this->addFieldError('id_parent_category', $this->transAdmin('Parent category not found (id: %id%).', ['%id%' => $parentCategoryId]));
         }
+
+        $categoryProducts = $this->normalizeIntCollection($requestData['category_products'] ?? []);
+        foreach ($categoryProducts as $productId) {
+            if (!$this->existsInCurrentShopPrestashopTable('product', 'id_product', $productId, 'product_shop')) {
+                $this->addFieldError('category_products', $this->transAdmin('Product not found (id: %id%).', ['%id%' => $productId]));
+            }
+        }
+        $requestData['category_products'] = $categoryProducts;
 
         $this->throwIfInvalid();
 

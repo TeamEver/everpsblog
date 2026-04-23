@@ -9,6 +9,7 @@ use PrestaShop\Module\Everpsblog\Form\DataProvider\CategoryFormDataProvider;
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\CategoryType;
 use PrestaShop\Module\Everpsblog\Grid\Data\CategoryGridDataFactory;
 use PrestaShop\Module\Everpsblog\Grid\Definition\CategoryGridDefinitionFactory;
+use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,8 +23,9 @@ class CategoryController extends AbstractDomainController
     private $definitionFactory;
     private $dataFactory;
     private $formDataProvider;
+    private $blogSitemapService;
 
-    public function __construct(ContextStateService $contextStateService, CommandBusInterface $commandBus, CategoryCommandAssembler $commandAssembler, CategoryGridDefinitionFactory $definitionFactory, CategoryGridDataFactory $dataFactory, CategoryFormDataProvider $formDataProvider)
+    public function __construct(ContextStateService $contextStateService, CommandBusInterface $commandBus, CategoryCommandAssembler $commandAssembler, CategoryGridDefinitionFactory $definitionFactory, CategoryGridDataFactory $dataFactory, CategoryFormDataProvider $formDataProvider, BlogSitemapService $blogSitemapService)
     {
         parent::__construct($contextStateService);
         $this->commandBus = $commandBus;
@@ -31,6 +33,7 @@ class CategoryController extends AbstractDomainController
         $this->definitionFactory = $definitionFactory;
         $this->dataFactory = $dataFactory;
         $this->formDataProvider = $formDataProvider;
+        $this->blogSitemapService = $blogSitemapService;
     }
 
     public function indexAction(Request $request): Response
@@ -68,9 +71,10 @@ class CategoryController extends AbstractDomainController
                     $savedCategoryId = $isEdit
                         ? $this->commandBus->handle($this->commandAssembler->assembleUpdate((int) $categoryId, $data))
                         : $this->commandBus->handle($this->commandAssembler->assembleCreate($data));
+                    $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService);
                     $submitAction = (string) $request->request->get('_submit_action', 'save');
 
-                    $this->addFlash('success', $isEdit ? 'Catégorie mise à jour.' : 'Catégorie créée.');
+                    $this->addFlash('success', $isEdit ? $this->transAdmin('Category updated.') : $this->transAdmin('Category created.'));
 
                     if ('save_and_stay' === $submitAction) {
                         return $this->redirectToRoute('everpsblog_admin_category_edit', ['categoryId' => $savedCategoryId]);
@@ -78,7 +82,7 @@ class CategoryController extends AbstractDomainController
 
                     return $this->redirectToRoute('everpsblog_admin_category');
                 } catch (\Throwable $exception) {
-                    $message = sprintf('Impossible d\'enregistrer la catégorie : %s', $this->describeException($exception));
+                    $message = $this->transAdmin('Unable to save category: %error%', ['%error%' => $this->describeException($exception)]);
                     $form->addError(new FormError($message));
                     $this->addFlash('error', $message);
                     \PrestaShopLogger::addLog(
@@ -100,8 +104,8 @@ class CategoryController extends AbstractDomainController
             'createUrl' => $this->generateUrl('everpsblog_admin_category_form'),
             'navigationLinks' => $this->getAdminNavigationLinks(),
             'qcdPageBuilderTargets' => $this->buildQcdPageBuilderTargets('everpsblog_category', $categoryId, [
-                'content' => 'Editer le contenu avec Page Builder',
-                'bottom_content' => 'Editer le bas de page avec Page Builder',
+                'content' => $this->transAdmin('Edit content with Page Builder'),
+                'bottom_content' => $this->transAdmin('Edit bottom content with Page Builder'),
             ]),
         ]);
     }
@@ -111,8 +115,9 @@ class CategoryController extends AbstractDomainController
         $this->validateCsrfToken($request, 'everpsblog_category_create');
 
         $categoryId = $this->commandBus->handle($this->commandAssembler->assembleCreate($request->request->all()));
+        $sitemapsRefreshed = $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService, false);
 
-        return new JsonResponse(['id_ever_category' => $categoryId], JsonResponse::HTTP_CREATED);
+        return new JsonResponse(['id_ever_category' => $categoryId, 'sitemaps_refreshed' => $sitemapsRefreshed], JsonResponse::HTTP_CREATED);
     }
 
     public function updateAction(int $categoryId, Request $request): JsonResponse
@@ -120,8 +125,9 @@ class CategoryController extends AbstractDomainController
         $this->validateCsrfToken($request, 'everpsblog_category_update_' . $categoryId);
 
         $updatedCategoryId = $this->commandBus->handle($this->commandAssembler->assembleUpdate($categoryId, $request->request->all()));
+        $sitemapsRefreshed = $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService, false);
 
-        return new JsonResponse(['id_ever_category' => $updatedCategoryId], JsonResponse::HTTP_OK);
+        return new JsonResponse(['id_ever_category' => $updatedCategoryId, 'sitemaps_refreshed' => $sitemapsRefreshed], JsonResponse::HTTP_OK);
     }
 
     public function deleteAction(int $categoryId, Request $request): JsonResponse
@@ -129,6 +135,7 @@ class CategoryController extends AbstractDomainController
         $this->validateCsrfToken($request, 'everpsblog_category_delete_' . $categoryId);
 
         $this->commandBus->handle(new DeleteCategoryCommand($categoryId));
+        $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService, false);
 
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }

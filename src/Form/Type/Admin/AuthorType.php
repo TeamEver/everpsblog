@@ -25,13 +25,13 @@ final class AuthorType extends AbstractType
         $builder
             ->add('id_employee', ChoiceType::class, [
                 'required' => false,
-                'label' => 'Employé lié',
-                'placeholder' => 'Aucun employé lié',
+                'label' => 'Linked employee',
+                'placeholder' => 'No linked employee',
                 'choices' => $this->getEmployeeChoices(),
             ])
             ->add('nickhandle', TextType::class, [
                 'required' => false,
-                'label' => 'Pseudo',
+                'label' => 'Nickname',
                 'constraints' => [new Length(['max' => 255])],
             ])
             ->add('twitter', TextType::class, [
@@ -51,7 +51,7 @@ final class AuthorType extends AbstractType
             ])
             ->add('active', CheckboxType::class, [
                 'required' => false,
-                'label' => 'Actif',
+                'label' => 'Active',
             ])
             ->add('indexable', CheckboxType::class, [
                 'required' => false,
@@ -63,23 +63,23 @@ final class AuthorType extends AbstractType
             ])
             ->add('sitemap', CheckboxType::class, [
                 'required' => false,
-                'label' => 'Inclure dans le sitemap',
+                'label' => 'Include in sitemap',
             ])
             ->add('count', IntegerType::class, [
                 'required' => false,
-                'label' => 'Compteur',
+                'label' => 'Counter',
                 'disabled' => true,
             ])
             ->add('allowed_groups', ChoiceType::class, [
                 'required' => false,
-                'label' => 'Groupes autorisés',
+                'label' => 'Allowed groups',
                 'choices' => $this->getGroupChoices(),
                 'multiple' => true,
                 'expanded' => true,
             ])
             ->add('author_products', ChoiceType::class, [
                 'required' => false,
-                'label' => 'Produits liés',
+                'label' => 'Linked products',
                 'choices' => $this->getProductChoices(),
                 'multiple' => true,
                 'expanded' => false,
@@ -88,7 +88,7 @@ final class AuthorType extends AbstractType
             ->add('author_image_file', FileType::class, [
                 'required' => false,
                 'mapped' => false,
-                'label' => 'Image auteur',
+                'label' => 'Author image',
                 'help' => $options['author_image_help'],
                 'help_html' => true,
             ])
@@ -96,17 +96,17 @@ final class AuthorType extends AbstractType
                 'required' => false,
                 'mapped' => false,
                 'disabled' => !$options['has_author_image'],
-                'label' => 'Supprimer l\'image auteur actuelle',
+                'label' => 'Delete current author image',
                 'help' => $options['has_author_image']
-                    ? 'Cochez puis enregistrez pour supprimer l\'image actuelle.'
-                    : 'Aucune image auteur n\'est encore associee a cet auteur.',
+                    ? 'Check this box and save to delete the current image.'
+                    : 'No author image is associated with this author yet.',
             ])
         ;
 
         foreach (\Language::getLanguages(false) as $lang) {
             $idLang = (int) $lang['id_lang'];
             $isoCode = strtoupper((string) ($lang['iso_code'] ?? ''));
-            $suffix = $isoCode ? sprintf(' (%s)', $isoCode) : sprintf(' (langue #%d)', $idLang);
+            $suffix = $isoCode ? sprintf(' (%s)', $isoCode) : sprintf(' (language #%d)', $idLang);
 
             $builder
                 ->add(sprintf('meta_title_%d', $idLang), TextType::class, [
@@ -126,22 +126,22 @@ final class AuthorType extends AbstractType
                         new Length(['max' => self::SLUG_MAX_LENGTH]),
                         new Regex([
                             'pattern' => '/^[a-z0-9]+(?:-[a-z0-9]+)*$/i',
-                            'message' => 'Le slug doit contenir uniquement des lettres, chiffres et tirets.',
+                            'message' => 'The slug must contain only letters, numbers and hyphens.',
                         ]),
                     ],
                 ])
                 ->add(sprintf('excerpt_%d', $idLang), TextareaType::class, [
                     'required' => false,
-                    'label' => 'Resume' . $suffix,
+                    'label' => 'Excerpt' . $suffix,
                     'constraints' => [new Length(['max' => 255])],
                 ])
                 ->add(sprintf('content_%d', $idLang), TextareaType::class, [
                     'required' => false,
-                    'label' => 'Contenu' . $suffix,
+                    'label' => 'Content' . $suffix,
                 ])
                 ->add(sprintf('bottom_content_%d', $idLang), TextareaType::class, [
                     'required' => false,
-                    'label' => 'Contenu bas de page' . $suffix,
+                    'label' => 'Bottom content' . $suffix,
                 ])
             ;
         }
@@ -166,7 +166,7 @@ final class AuthorType extends AbstractType
             }
 
             $label = trim((string) ($row['fullname'] ?? ''));
-            $choices[$label ?: sprintf('Employé #%d', $id)] = $id;
+            $choices[$label ?: sprintf('Employee #%d', $id)] = $id;
         }
 
         return $choices;
@@ -180,6 +180,7 @@ final class AuthorType extends AbstractType
         $rows = \Db::getInstance()->executeS(
             'SELECT p.id_product, pl.name
             FROM `' . _DB_PREFIX_ . 'product` p
+            INNER JOIN `' . _DB_PREFIX_ . 'product_shop` ps ON (ps.id_product = p.id_product AND ps.id_shop = ' . (int) \Context::getContext()->shop->id . ')
             LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl ON (pl.id_product = p.id_product AND pl.id_lang = ' . (int) \Context::getContext()->language->id . ' AND pl.id_shop = ' . (int) \Context::getContext()->shop->id . ')
             ORDER BY p.id_product DESC
             LIMIT 500'
@@ -193,7 +194,7 @@ final class AuthorType extends AbstractType
             }
 
             $label = trim((string) ($row['name'] ?? ''));
-            $choices[$label ?: sprintf('Produit #%d', $id)] = $id;
+            $choices[$label ?: sprintf('Product #%d', $id)] = $id;
         }
 
         return $choices;
@@ -214,7 +215,7 @@ final class AuthorType extends AbstractType
             }
 
             $label = trim((string) ($group['name'] ?? ''));
-            $choices[$label ?: sprintf('Groupe #%d', $id)] = $id;
+            $choices[$label ?: sprintf('Group #%d', $id)] = $id;
         }
 
         return $choices;
@@ -225,6 +226,7 @@ final class AuthorType extends AbstractType
         $resolver->setDefaults([
             'author_image_help' => '',
             'has_author_image' => false,
+            'translation_domain' => 'Modules.Everpsblog.Admin',
         ]);
         $resolver->setAllowedTypes('author_image_help', 'string');
         $resolver->setAllowedTypes('has_author_image', 'bool');

@@ -22,14 +22,14 @@
     <!-- Twitter Card data -->
     <meta name="twitter:card" content="summary">
     {* <meta name="twitter:site" content="@publisher_handle"> *}
-    <meta name="twitter:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'} {if isset($pagination) && $pagination.current_page > 0}{l s='(page' mod='everpsblog'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' mod='everpsblog'}{/if}">
+    <meta name="twitter:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'} {if isset($pagination) && $pagination.current_page > 0}{l s='(page' d='Modules.Everpsblog.Shop'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' d='Modules.Everpsblog.Shop'}{/if}">
     <meta name="twitter:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
     {* <meta name="twitter:creator" content="@author_handle"> *}
     <meta name="twitter:image" content="{$shop.logo|escape:'htmlall':'UTF-8'}">
     <!-- Open Graph Card data -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{$urls.current_url|escape:'htmlall':'UTF-8'}">
-    <meta property="og:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'} {if isset($pagination) && $pagination.current_page > 0}{l s='(page' mod='everpsblog'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' mod='everpsblog'}{/if}">
+    <meta property="og:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'} {if isset($pagination) && $pagination.current_page > 0}{l s='(page' d='Modules.Everpsblog.Shop'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' d='Modules.Everpsblog.Shop'}{/if}">
     <meta property="og:site_name" content="{$shop.name|escape:'htmlall':'UTF-8'}">
     <meta property="og:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
     <meta property="og:image" content="{$shop.logo|escape:'htmlall':'UTF-8'}">
@@ -42,7 +42,7 @@
         {/if}
     {/if}
     {if isset($allow_feed) && $allow_feed}
-    <link rel="alternate" type="application/rss+xml" title="{$page.meta.title|escape:'htmlall':'UTF-8'} {if isset($pagination) && $pagination.current_page > 0}{l s='(page' mod='everpsblog'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' mod='everpsblog'}{/if}" href="{$feed_url|escape:'htmlall':'UTF-8'}" />
+    <link rel="alternate" type="application/rss+xml" title="{$page.meta.title|escape:'htmlall':'UTF-8'} {if isset($pagination) && $pagination.current_page > 0}{l s='(page' d='Modules.Everpsblog.Shop'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' d='Modules.Everpsblog.Shop'}{/if}" href="{$feed_url|escape:'htmlall':'UTF-8'}" />
     {/if}
     <script type="application/ld+json">
     {
@@ -56,8 +56,8 @@
     "image": [
       "{$shop.logo|escape:'htmlall':'UTF-8'}"
      ],
-    "datePublished": "{$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'|escape:'htmlall':'UTF-8'}",
-    "dateModified": "{$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'|escape:'htmlall':'UTF-8'}",
+    "datePublished": "{$smarty.now|date_format:'%Y-%m-%d'|escape:'htmlall':'UTF-8'}",
+    "dateModified": "{$smarty.now|date_format:'%Y-%m-%d'|escape:'htmlall':'UTF-8'}",
     "author": {
       "@type": "Person",
       "name": "{$shop.name|escape:'htmlall':'UTF-8'}"
@@ -81,7 +81,7 @@
             {if isset($blog_page_title) && $blog_page_title}
                 {$blog_page_title|escape:'htmlall':'UTF-8'}
             {else}
-                {l s='Our blog' mod='everpsblog'}
+                {l s='Our blog' d='Modules.Everpsblog.Shop'}
             {/if}
         </h1>
         {if !isset($pagination) || $pagination.current_page <= 1}
@@ -109,9 +109,9 @@
 </script>
 {/if}
 {if isset($allow_feed) && $allow_feed}
-<a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' mod='everpsblog'} {$page.meta.title|escape:'htmlall':'UTF-8'}</a>
+<a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' d='Modules.Everpsblog.Shop'} {$page.meta.title|escape:'htmlall':'UTF-8'}</a>
 {/if}
-<span class="paginated float-end d-none">{if isset($pagination) && $pagination.current_page > 0}{l s='(page' mod='everpsblog'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' mod='everpsblog'}{/if}</span>
+<span class="paginated float-end d-none">{if isset($pagination) && $pagination.current_page > 0}{l s='(page' d='Modules.Everpsblog.Shop'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' d='Modules.Everpsblog.Shop'}{/if}</span>
 {if isset($paginated) && !$paginated}
 {if isset($default_blog_top_text) && $default_blog_top_text}
 <div class="row mt-2">
@@ -129,14 +129,14 @@
 {/if}
 
 {if isset($post_number) && $post_number > 0}
-<div class="row mt-2" id="everpsblog-posts" data-empty-text="{l s='No posts match your filters yet.' mod='everpsblog'}">
+<div class="row mt-2" id="everpsblog-posts" data-empty-text="{l s='No posts match your filters yet.' d='Modules.Everpsblog.Shop'}">
 {hook h="displayBeforeEverLoop"}
 {foreach from=$posts item=item}
 {include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
 {/foreach}
 </div>
 {else}
-<div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>
+<div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' d='Modules.Everpsblog.Shop'}</div>
 {/if}
 {if isset($post_number) && $post_number > 0 && isset($pagination.should_be_displayed) && $pagination.should_be_displayed}
 <div class="row">
@@ -154,7 +154,7 @@
 {/if}
 {if isset($everhome_products) && $everhome_products}
 <section id="products" class="mt-2">
-  <h2 class="text-center">{l s='Our best products' mod='everpsblog'}</h2>
+  <h2 class="text-center">{l s='Our best products' d='Modules.Everpsblog.Shop'}</h2>
   <div class="products row">
     {foreach from=$everhome_products item="product"}
       {include file="catalog/_partials/miniatures/product.tpl" product=$product productClasses="col-12"}

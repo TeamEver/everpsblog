@@ -80,14 +80,6 @@ class EverPsBlogcategoryModuleFrontController extends AbstractFrontController
         }
     }
 
-    public function l($string, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
-    {
-        return $this->context->getTranslator()->trans(
-            $string,
-            [],
-            'Modules.Everpsblog.category'
-        );
-    }
 
     public function initContent()
     {
@@ -130,8 +122,8 @@ class EverPsBlogcategoryModuleFrontController extends AbstractFrontController
             // SEO opti on pagination; thx FoP ! Awesome channel !
             $page['meta']['robots'] = $seo_index . ', ' . $seo_follow;
             if (Tools::getValue('page')) {
-                $meta_title = $this->l('Page : ') . Tools::getValue('page') . ' | ' . $this->category->meta_title;
-                $meta_description = $this->l('Page : ') . Tools::getValue('page') . ' | ' . $this->category->meta_description;
+                $meta_title = $this->transShop('Page : ') . Tools::getValue('page') . ' | ' . $this->category->meta_title;
+                $meta_description = $this->transShop('Page : ') . Tools::getValue('page') . ' | ' . $this->category->meta_description;
             } else {
                 $meta_title = $this->category->meta_title;
                 $meta_description = $this->category->meta_description;
@@ -241,7 +233,7 @@ class EverPsBlogcategoryModuleFrontController extends AbstractFrontController
     {
         $breadcrumb = parent::getBreadcrumbLinks();
         $breadcrumb['links'][] = [
-            'title' => $this->l('Blog'),
+            'title' => $this->transShop('Blog'),
             'url' => $this->context->link->getModuleLink(
                 $this->module->name,
                 'blog'

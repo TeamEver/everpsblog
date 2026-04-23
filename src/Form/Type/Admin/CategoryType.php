@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Regex;
 
@@ -23,13 +24,13 @@ final class CategoryType extends AbstractType
         $builder
             ->add('id_parent_category', ChoiceType::class, [
                 'required' => false,
-                'label' => 'Catégorie parente',
-                'placeholder' => 'Aucune (racine)',
+                'label' => 'Parent category',
+                'placeholder' => 'None (root)',
                 'choices' => $this->getParentCategoryChoices(),
             ])
             ->add('is_root_category', CheckboxType::class, [
                 'required' => false,
-                'label' => 'Catégorie racine',
+                'label' => 'Root category',
             ])
             ->add('active', CheckboxType::class, [
                 'required' => false,
@@ -45,23 +46,23 @@ final class CategoryType extends AbstractType
             ])
             ->add('sitemap', CheckboxType::class, [
                 'required' => false,
-                'label' => 'Inclure dans le sitemap',
+                'label' => 'Include in sitemap',
             ])
             ->add('count', IntegerType::class, [
                 'required' => false,
-                'label' => 'Compteur',
+                'label' => 'Counter',
                 'disabled' => true,
             ])
             ->add('allowed_groups', ChoiceType::class, [
                 'required' => false,
-                'label' => 'Groupes autorisés',
+                'label' => 'Allowed groups',
                 'choices' => $this->getGroupChoices(),
                 'multiple' => true,
                 'expanded' => true,
             ])
             ->add('category_products', ChoiceType::class, [
                 'required' => false,
-                'label' => 'Produits liés',
+                'label' => 'Linked products',
                 'choices' => $this->getProductChoices(),
                 'multiple' => true,
                 'expanded' => false,
@@ -72,12 +73,12 @@ final class CategoryType extends AbstractType
         foreach (\Language::getLanguages(false) as $lang) {
             $idLang = (int) $lang['id_lang'];
             $isoCode = strtoupper((string) ($lang['iso_code'] ?? ''));
-            $suffix = $isoCode ? sprintf(' (%s)', $isoCode) : sprintf(' (langue #%d)', $idLang);
+            $suffix = $isoCode ? sprintf(' (%s)', $isoCode) : sprintf(' (language #%d)', $idLang);
 
             $builder
                 ->add(sprintf('title_%d', $idLang), TextType::class, [
                     'required' => false,
-                    'label' => 'Titre' . $suffix,
+                    'label' => 'Title' . $suffix,
                     'constraints' => [new Length(['max' => 255])],
                 ])
                 ->add(sprintf('meta_title_%d', $idLang), TextType::class, [
@@ -97,17 +98,17 @@ final class CategoryType extends AbstractType
                         new Length(['max' => self::SLUG_MAX_LENGTH]),
                         new Regex([
                             'pattern' => '/^[a-z0-9]+(?:-[a-z0-9]+)*$/i',
-                            'message' => 'Le slug doit contenir uniquement des lettres, chiffres et tirets.',
+                            'message' => 'The slug must contain only letters, numbers and hyphens.',
                         ]),
                     ],
                 ])
                 ->add(sprintf('content_%d', $idLang), TextareaType::class, [
                     'required' => false,
-                    'label' => 'Contenu' . $suffix,
+                    'label' => 'Content' . $suffix,
                 ])
                 ->add(sprintf('bottom_content_%d', $idLang), TextareaType::class, [
                     'required' => false,
-                    'label' => 'Contenu bas de page' . $suffix,
+                    'label' => 'Bottom content' . $suffix,
                 ])
             ;
         }
@@ -118,10 +119,13 @@ final class CategoryType extends AbstractType
      */
     private function getParentCategoryChoices(): array
     {
+        $idShop = (int) \Context::getContext()->shop->id;
         $rows = \Db::getInstance()->executeS(
-            'SELECT c.id_ever_category, cl.title
+            'SELECT DISTINCT c.id_ever_category, cl.title
             FROM `' . _DB_PREFIX_ . 'ever_blog_category` c
+            LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category_shop` cs ON (cs.id_ever_category = c.id_ever_category)
             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category_lang` cl ON (cl.id_ever_category = c.id_ever_category AND cl.id_lang = ' . (int) \Context::getContext()->language->id . ')
+            WHERE c.id_shop = ' . $idShop . ' OR cs.id_shop = ' . $idShop . '
             ORDER BY c.id_ever_category ASC'
         ) ?: [];
 
@@ -133,7 +137,7 @@ final class CategoryType extends AbstractType
             }
 
             $label = trim((string) ($row['title'] ?? ''));
-            $choices[$label ?: sprintf('Catégorie #%d', $id)] = $id;
+            $choices[$label ?: sprintf('Category #%d', $id)] = $id;
         }
 
         return $choices;
@@ -147,6 +151,7 @@ final class CategoryType extends AbstractType
         $rows = \Db::getInstance()->executeS(
             'SELECT p.id_product, pl.name
             FROM `' . _DB_PREFIX_ . 'product` p
+            INNER JOIN `' . _DB_PREFIX_ . 'product_shop` ps ON (ps.id_product = p.id_product AND ps.id_shop = ' . (int) \Context::getContext()->shop->id . ')
             LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl ON (pl.id_product = p.id_product AND pl.id_lang = ' . (int) \Context::getContext()->language->id . ' AND pl.id_shop = ' . (int) \Context::getContext()->shop->id . ')
             ORDER BY p.id_product DESC
             LIMIT 500'
@@ -160,7 +165,7 @@ final class CategoryType extends AbstractType
             }
 
             $label = trim((string) ($row['name'] ?? ''));
-            $choices[$label ?: sprintf('Produit #%d', $id)] = $id;
+            $choices[$label ?: sprintf('Product #%d', $id)] = $id;
         }
 
         return $choices;
@@ -181,9 +186,16 @@ final class CategoryType extends AbstractType
             }
 
             $label = trim((string) ($group['name'] ?? ''));
-            $choices[$label ?: sprintf('Groupe #%d', $id)] = $id;
+            $choices[$label ?: sprintf('Group #%d', $id)] = $id;
         }
 
         return $choices;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'translation_domain' => 'Modules.Everpsblog.Admin',
+        ]);
     }
 }

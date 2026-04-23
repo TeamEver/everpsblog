@@ -68,7 +68,7 @@ class CommentController extends AbstractDomainController
                         : $this->commandBus->handle($this->commandAssembler->assembleCreate((array) $form->getData()));
                     $submitAction = (string) $request->request->get('_submit_action', 'save');
 
-                    $this->addFlash('success', $isEdit ? 'Commentaire mis à jour.' : 'Commentaire créé.');
+                    $this->addFlash('success', $isEdit ? $this->transAdmin('Comment updated.') : $this->transAdmin('Comment created.'));
 
                     if ('save_and_stay' === $submitAction) {
                         return $this->redirectToRoute('everpsblog_admin_comment_edit', ['commentId' => $savedCommentId]);
@@ -76,7 +76,7 @@ class CommentController extends AbstractDomainController
 
                     return $this->redirectToRoute('everpsblog_admin_comment');
                 } catch (\Throwable $exception) {
-                    $message = sprintf('Impossible d\'enregistrer le commentaire : %s', $this->describeException($exception));
+                    $message = $this->transAdmin('Unable to save comment: %error%', ['%error%' => $this->describeException($exception)]);
                     $form->addError(new FormError($message));
                     $this->addFlash('error', $message);
                     \PrestaShopLogger::addLog(

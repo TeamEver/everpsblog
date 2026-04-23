@@ -15,23 +15,24 @@ class PostCommandDataBuilder
     /** @var BlogInstallService|null */
     private $blogInstallService;
 
-    public function __construct(int $shopId, int $unclassedCategoryId, ?BlogInstallService $blogInstallService = null)
+    public function __construct(int $shopId, ?int $unclassedCategoryId = 0, ?BlogInstallService $blogInstallService = null)
     {
         $this->shopId = $shopId;
-        $this->unclassedCategoryId = $unclassedCategoryId;
+        $this->unclassedCategoryId = (int) $unclassedCategoryId;
         $this->blogInstallService = $blogInstallService;
     }
 
     public function buildFromRequestData(array $data): PostCommandData
     {
         $rootCategoryId = $this->resolveRootCategoryId();
+        $unclassedCategoryId = $this->resolveUnclassedCategoryId($rootCategoryId);
         $dateAdd = $this->normalizeDateAdd($data['date_add'] ?? '');
 
         return new PostCommandData(
             $this->shopId,
             (int) ($data['id_author'] ?? 0),
             (int) ($data['id_default_category'] ?? 0),
-            $this->unclassedCategoryId,
+            $unclassedCategoryId,
             $rootCategoryId,
             (string) ($data['post_status'] ?? 'draft'),
             isset($data['psswd']) ? (string) $data['psswd'] : null,
@@ -55,6 +56,11 @@ class PostCommandDataBuilder
             if ($rootId > 0) {
                 return $rootId;
             }
+
+            $rootId = $this->blogInstallService->ensureRootCategory($this->shopId);
+            if ($rootId > 0) {
+                return $rootId;
+            }
         }
 
         $db = \Db::getInstance();
@@ -64,6 +70,43 @@ class PostCommandDataBuilder
         );
 
         return $rootId > 0 ? $rootId : 0;
+    }
+
+    private function resolveUnclassedCategoryId(int $rootCategoryId): int
+    {
+        if (null !== $this->blogInstallService) {
+            $unclassedId = $this->blogInstallService->getUnclassedCategoryId($this->shopId);
+            if ($unclassedId > 0) {
+                $this->unclassedCategoryId = $unclassedId;
+
+                return $unclassedId;
+            }
+
+            $unclassedId = $this->blogInstallService->ensureUnclassedCategory($this->shopId, $rootCategoryId);
+            if ($unclassedId > 0) {
+                $this->unclassedCategoryId = $unclassedId;
+
+                return $unclassedId;
+            }
+        }
+
+        if ($this->unclassedCategoryId > 0 && $this->categoryBelongsToCurrentShop($this->unclassedCategoryId)) {
+            return $this->unclassedCategoryId;
+        }
+
+        return 0;
+    }
+
+    private function categoryBelongsToCurrentShop(int $categoryId): bool
+    {
+        return (bool) \Db::getInstance()->getValue(
+            'SELECT c.id_ever_category
+             FROM `' . _DB_PREFIX_ . 'ever_blog_category` c
+             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category_shop` cs
+                ON cs.id_ever_category = c.id_ever_category
+             WHERE c.id_ever_category = ' . (int) $categoryId . '
+                AND (c.id_shop = ' . (int) $this->shopId . ' OR cs.id_shop = ' . (int) $this->shopId . ')'
+        );
     }
 
     private function buildTranslations(array $data): array

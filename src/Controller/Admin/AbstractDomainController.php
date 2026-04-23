@@ -2,6 +2,7 @@
 
 namespace PrestaShop\Module\Everpsblog\Controller\Admin;
 
+use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 
@@ -23,6 +24,11 @@ abstract class AbstractDomainController extends FrameworkBundleAdminController
     protected function getContextLangId(): int
     {
         return $this->contextStateService->getLanguageId();
+    }
+
+    protected function transAdmin(string $message, array $parameters = []): string
+    {
+        return $this->trans($message, $parameters, 'Modules.Everpsblog.Admin');
     }
 
     /**
@@ -51,13 +57,42 @@ abstract class AbstractDomainController extends FrameworkBundleAdminController
     protected function getAdminNavigationLinks(): array
     {
         return [
-            ['key' => 'post', 'label' => 'Articles', 'url' => $this->generateUrl('everpsblog_admin_post')],
-            ['key' => 'category', 'label' => 'Catégories', 'url' => $this->generateUrl('everpsblog_admin_category')],
+            ['key' => 'post', 'label' => 'Posts', 'url' => $this->generateUrl('everpsblog_admin_post')],
+            ['key' => 'category', 'label' => 'Categories', 'url' => $this->generateUrl('everpsblog_admin_category')],
             ['key' => 'tag', 'label' => 'Tags', 'url' => $this->generateUrl('everpsblog_admin_tag')],
-            ['key' => 'author', 'label' => 'Auteurs', 'url' => $this->generateUrl('everpsblog_admin_author')],
-            ['key' => 'comment', 'label' => 'Commentaires', 'url' => $this->generateUrl('everpsblog_admin_comment')],
+            ['key' => 'author', 'label' => 'Authors', 'url' => $this->generateUrl('everpsblog_admin_author')],
+            ['key' => 'comment', 'label' => 'Comments', 'url' => $this->generateUrl('everpsblog_admin_comment')],
             ['key' => 'configuration', 'label' => 'Configuration', 'url' => $this->generateUrl('everpsblog_admin_dashboard')],
         ];
+    }
+
+    protected function refreshSitemapsAfterBackOfficeChange(BlogSitemapService $blogSitemapService, bool $flashWarning = true): bool
+    {
+        try {
+            $refreshed = (bool) $blogSitemapService->refreshForShop($this->getContextShopId());
+            if (!$refreshed && $flashWarning) {
+                $this->addFlash('warning', $this->transAdmin('Sitemaps were regenerated, but robots.txt could not be updated.'));
+            }
+
+            return $refreshed;
+        } catch (\Throwable $exception) {
+            \PrestaShopLogger::addLog(
+                '[everpsblog][AdminSitemapRefresh] ' . $exception->getMessage()
+                    . ' @ ' . $exception->getFile() . ':' . $exception->getLine(),
+                3
+            );
+            if ($flashWarning) {
+                $this->addFlash(
+                    'warning',
+                    $this->transAdmin(
+                        'Sitemaps could not be regenerated: %error%',
+                        ['%error%' => $this->describeException($exception)]
+                    )
+                );
+            }
+
+            return false;
+        }
     }
 
     /**

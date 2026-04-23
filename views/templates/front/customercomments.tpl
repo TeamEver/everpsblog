@@ -22,10 +22,10 @@
 {if isset($cust_comments) && $cust_comments}
 <div class="content">
     <div class="row">
-        <p>{l s='Here is a list of all your comments on our blog.' mod='everpsblog'}</p>
+        <p>{l s='Here is a list of all your comments on our blog.' d='Modules.Everpsblog.Shop'}</p>
         <p>
             <a href="{$blogUrl|escape:'htmlall':'UTF-8'}">
-                {l s='You can comment whenever on our blog.' mod='everpsblog'}
+                {l s='You can comment whenever on our blog.' d='Modules.Everpsblog.Shop'}
             </a>
         </p>
     </div>
@@ -40,12 +40,12 @@
                 </div>
                 <div class="col-12">
                     <div class="everpsblogcontent rte" id="everpsblog-post-content-{$comment.comment->id|escape:'htmlall':'UTF-8'}">
-                        <p>{l s='Your comment' mod='everpsblog'}</p>
+                        <p>{l s='Your comment' d='Modules.Everpsblog.Shop'}</p>
                         {$comment.comment->comment nofilter}
                     </div>
                 </div>
             </a>
-            <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $comment.post->id , 'link_rewrite' => $comment.post->link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary btn-blog-primary">{l s='See post' mod='everpsblog'}</a>
+            <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $comment.post->id , 'link_rewrite' => $comment.post->link_rewrite])|escape:'htmlall':'UTF-8'}" class="btn btn-primary btn-blog-primary">{l s='See post' d='Modules.Everpsblog.Shop'}</a>
         </div>
 {/foreach}
     </div>
@@ -53,14 +53,14 @@
 {else}
 <div class="content">
     <div class="row">
-        <p>{l s='There\'s no comments on your account. Feel free to comment our posts on our blog !' mod='everpsblog'}</p>
+        <p>{l s='There\'s no comments on your account. Feel free to comment our posts on our blog !' d='Modules.Everpsblog.Shop'}</p>
         <p>
             <a href="{$blogUrl|escape:'htmlall':'UTF-8'}">
-                {l s='You can comment whenever on our blog.' mod='everpsblog'}
+                {l s='You can comment whenever on our blog.' d='Modules.Everpsblog.Shop'}
             </a>
         </p>
     </div>
 </div>
 {/if}
-<a href="{$link->getPageLink('my-account', true)|escape:'htmlall':'UTF-8'}" title="{l s='Back to my account' mod='everpsblog'}" class="account" rel="nofollow"><span>{l s='Back to my account' mod='everpsblog'}</span></a>
+<a href="{$link->getPageLink('my-account', true)|escape:'htmlall':'UTF-8'}" title="{l s='Back to my account' d='Modules.Everpsblog.Shop'}" class="account" rel="nofollow"><span>{l s='Back to my account' d='Modules.Everpsblog.Shop'}</span></a>
 {/block}

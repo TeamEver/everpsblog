@@ -52,7 +52,12 @@ class PostRulesApplier
         $defaultCategoryId = (int) $payload['default_category_id'];
 
         if (!$defaultCategoryId) {
-            return (int) $payload['unclassed_category_id'];
+            $unclassedCategoryId = (int) $payload['unclassed_category_id'];
+            if ($unclassedCategoryId <= 0) {
+                throw new InvalidArgumentException('Default category cannot be resolved for current shop.');
+            }
+
+            return $unclassedCategoryId;
         }
 
         if ($defaultCategoryId === (int) $payload['root_category_id']) {

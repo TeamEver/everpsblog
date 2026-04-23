@@ -7,86 +7,25 @@ class BlogInstallService
     /**
      * Seed the Root + Unclassed categories for every shop.
      *
-     * @param object $module Legacy module to translate strings with l().
+     * @param object|null $module Legacy compatibility argument.
      *
      * @return bool
      */
     public function seedRootAndUnclassedCategories($module)
     {
-        $db = \Db::getInstance();
-        $now = date('Y-m-d H:i:s');
-
         foreach (\Shop::getShops() as $shop) {
             $shopId = (int) $shop['id_shop'];
 
-            // Skip shops where a root category already exists (idempotent install)
-            $rootId = (int) $db->getValue(
-                'SELECT id_ever_category FROM `' . _DB_PREFIX_ . 'ever_blog_category`
-                 WHERE is_root_category = 1 AND id_shop = ' . $shopId
-            );
-
+            $rootId = $this->ensureRootCategory($shopId);
             if ($rootId <= 0) {
-                $rootId = $this->insertCategory(
-                    $db,
-                    [
-                        'id_parent_category' => 0,
-                        'id_shop' => $shopId,
-                        'date_add' => $now,
-                        'date_upd' => $now,
-                        'indexable' => 1,
-                        'follow' => 1,
-                        'sitemap' => 1,
-                        'active' => 1,
-                        'is_root_category' => 1,
-                    ],
-                    [
-                        'title' => 'Root',
-                        'content' => 'Root',
-                        'link_rewrite' => 'root',
-                    ]
-                );
-
-                if ($rootId <= 0) {
-                    return false;
-                }
+                return false;
             }
 
-            $unclassedConfigured = (int) \Configuration::get('EVERBLOG_UNCLASSED_ID');
-            $unclassedExists = false;
-            if ($unclassedConfigured > 0) {
-                $unclassedExists = (bool) $db->getValue(
-                    'SELECT id_ever_category FROM `' . _DB_PREFIX_ . 'ever_blog_category`
-                     WHERE id_ever_category = ' . $unclassedConfigured
-                );
-            }
-
-            if (!$unclassedExists) {
-                $unclassedTitle = method_exists($module, 'l') ? (string) $module->l('Unclassed') : 'Unclassed';
-                $unclassedId = $this->insertCategory(
-                    $db,
-                    [
-                        'id_parent_category' => $rootId,
-                        'id_shop' => $shopId,
-                        'date_add' => $now,
-                        'date_upd' => $now,
-                        'indexable' => 1,
-                        'follow' => 1,
-                        'sitemap' => 1,
-                        'active' => 1,
-                        'is_root_category' => 0,
-                    ],
-                    [
-                        'title' => $unclassedTitle,
-                        'content' => '',
-                        'link_rewrite' => \Tools::str2url($unclassedTitle) ?: 'unclassed',
-                    ]
-                );
-
+            if ($this->getUnclassedCategoryId($shopId) <= 0) {
+                $unclassedId = $this->ensureUnclassedCategory($shopId, $rootId, $module);
                 if ($unclassedId <= 0) {
                     return false;
                 }
-
-                \Configuration::updateValue('EVERBLOG_UNCLASSED_ID', $unclassedId);
             }
         }
 
@@ -96,7 +35,7 @@ class BlogInstallService
     /**
      * Recreate the Unclassed category when it has been deleted.
      *
-     * @param object $module Legacy module to translate strings with l().
+     * @param object|null $module Legacy compatibility argument.
      * @param int    $shopId
      * @param int    $rootCategoryId
      *
@@ -104,10 +43,24 @@ class BlogInstallService
      */
     public function recreateUnclassedCategory($module, $shopId, $rootCategoryId)
     {
+        return $this->ensureUnclassedCategory((int) $shopId, (int) $rootCategoryId, $module);
+    }
+
+    public function ensureUnclassedCategory(int $shopId, int $rootCategoryId, $module = null): int
+    {
         $db = \Db::getInstance();
         $now = date('Y-m-d H:i:s');
 
-        $unclassedTitle = method_exists($module, 'l') ? (string) $module->l('Unclassed') : 'Unclassed';
+        $existingId = $this->getUnclassedCategoryId($shopId);
+        if ($existingId > 0) {
+            return $existingId;
+        }
+
+        if ($rootCategoryId <= 0) {
+            return 0;
+        }
+
+        $unclassedTitle = $this->transAdmin('Unclassed');
         $unclassedId = $this->insertCategory(
             $db,
             [
@@ -132,7 +85,7 @@ class BlogInstallService
             return 0;
         }
 
-        \Configuration::updateValue('EVERBLOG_UNCLASSED_ID', $unclassedId);
+        \Configuration::updateValue('EVERBLOG_UNCLASSED_ID', $unclassedId, false, null, $shopId);
 
         return $unclassedId;
     }
@@ -148,6 +101,98 @@ class BlogInstallService
             'SELECT id_ever_category FROM `' . _DB_PREFIX_ . 'ever_blog_category`
              WHERE is_root_category = 1 AND id_shop = ' . (int) $shopId
         );
+    }
+
+    public function ensureRootCategory(int $shopId): int
+    {
+        $rootId = $this->getRootCategoryId($shopId);
+        if ($rootId > 0) {
+            return $rootId;
+        }
+
+        $now = date('Y-m-d H:i:s');
+
+        return $this->insertCategory(
+            \Db::getInstance(),
+            [
+                'id_parent_category' => 0,
+                'id_shop' => $shopId,
+                'date_add' => $now,
+                'date_upd' => $now,
+                'indexable' => 1,
+                'follow' => 1,
+                'sitemap' => 1,
+                'active' => 1,
+                'is_root_category' => 1,
+            ],
+            [
+                'title' => 'Root',
+                'content' => 'Root',
+                'link_rewrite' => 'root',
+            ]
+        );
+    }
+
+    public function getUnclassedCategoryId(int $shopId): int
+    {
+        $db = \Db::getInstance();
+        $configuredId = (int) \Configuration::get('EVERBLOG_UNCLASSED_ID', null, null, $shopId);
+        if ($configuredId > 0 && $this->categoryBelongsToShop($configuredId, $shopId)) {
+            return $configuredId;
+        }
+
+        $globalConfiguredId = (int) \Configuration::get('EVERBLOG_UNCLASSED_ID');
+        if ($globalConfiguredId > 0 && $this->categoryBelongsToShop($globalConfiguredId, $shopId)) {
+            \Configuration::updateValue('EVERBLOG_UNCLASSED_ID', $globalConfiguredId, false, null, $shopId);
+
+            return $globalConfiguredId;
+        }
+
+        $unclassedId = (int) $db->getValue(
+            'SELECT c.id_ever_category
+             FROM `' . _DB_PREFIX_ . 'ever_blog_category` c
+             INNER JOIN `' . _DB_PREFIX_ . 'ever_blog_category` root
+                ON root.id_ever_category = c.id_parent_category
+                AND root.is_root_category = 1
+                AND root.id_shop = ' . (int) $shopId . '
+             INNER JOIN `' . _DB_PREFIX_ . 'ever_blog_category_lang` cl
+                ON cl.id_ever_category = c.id_ever_category
+             WHERE c.is_root_category = 0
+                AND c.id_shop = ' . (int) $shopId . '
+                AND cl.link_rewrite IN ("unclassed", "non-classe")
+             ORDER BY c.id_ever_category ASC'
+        );
+
+        if ($unclassedId > 0) {
+            \Configuration::updateValue('EVERBLOG_UNCLASSED_ID', $unclassedId, false, null, $shopId);
+        }
+
+        return $unclassedId;
+    }
+
+    private function categoryBelongsToShop(int $categoryId, int $shopId): bool
+    {
+        if ($categoryId <= 0 || $shopId <= 0) {
+            return false;
+        }
+
+        return (bool) \Db::getInstance()->getValue(
+            'SELECT c.id_ever_category
+             FROM `' . _DB_PREFIX_ . 'ever_blog_category` c
+             LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category_shop` cs
+                ON cs.id_ever_category = c.id_ever_category
+             WHERE c.id_ever_category = ' . (int) $categoryId . '
+                AND (c.id_shop = ' . (int) $shopId . ' OR cs.id_shop = ' . (int) $shopId . ')'
+        );
+    }
+
+    private function transAdmin(string $message): string
+    {
+        try {
+            return \Context::getContext()->getTranslator()->trans($message, [], 'Modules.Everpsblog.Admin');
+        } catch (\Throwable $exception) {
+            return $message;
+        }
     }
 
     /**

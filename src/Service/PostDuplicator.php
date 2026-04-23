@@ -111,9 +111,9 @@ final class PostDuplicator
             }
 
             $metaTitle = trim((string) ($translation['meta_title'] ?? ''));
-            // NB : on passe $null_values = false pour que Db::insert() conserve les
-            // chaînes vides (PrestaShop convertirait sinon `''` en SQL NULL, ce qui
-            // violerait le NOT NULL sur la colonne `content`).
+            // Pass $null_values = false so Db::insert() keeps
+            // Empty strings (PrestaShop would otherwise convert `''` to SQL NULL, which
+            // would violate the NOT NULL constraint on the `content` column).
             \Db::getInstance()->insert('ever_blog_post_lang', [
                 'id_ever_post' => $newPostId,
                 'id_lang' => (int) ($translation['id_lang'] ?? 0),

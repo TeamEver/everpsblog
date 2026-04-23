@@ -42,7 +42,7 @@
         {/if}
     {/if}
     {if isset($allow_feed) && $allow_feed}
-    <link rel="alternate" type="application/rss+xml" title="{$page.meta.title|escape:'htmlall':'UTF-8'} {if isset($pagination) && $pagination.current_page > 0}{l s='(page' mod='everpsblog'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' mod='everpsblog'}{/if}" href="{$feed_url|escape:'htmlall':'UTF-8'}" />
+    <link rel="alternate" type="application/rss+xml" title="{$page.meta.title|escape:'htmlall':'UTF-8'} {if isset($pagination) && $pagination.current_page > 0}{l s='(page' d='Modules.Everpsblog.Shop'} {$pagination.current_page|escape:'htmlall':'UTF-8'}/{$pagination.pages_count|escape:'htmlall':'UTF-8'}{l s=')' d='Modules.Everpsblog.Shop'}{/if}" href="{$feed_url|escape:'htmlall':'UTF-8'}" />
     {/if}
 {/block}
 
@@ -64,7 +64,7 @@
     </div>
     {if isset($allow_feed) && $allow_feed}
     <div class="text-center mb-3">
-        <a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' mod='everpsblog'} {$tag->title|escape:'htmlall':'UTF-8'}</a>
+        <a class="rss-link" href="{$feed_url|escape:'htmlall':'UTF-8'}" target="_blank">{l s='RSS feed for' d='Modules.Everpsblog.Shop'} {$tag->title|escape:'htmlall':'UTF-8'}</a>
     </div>
     {/if}
     {if isset($paginated) && !$paginated}
@@ -92,7 +92,7 @@
     </div>
     {/if}
     {else}
-    <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' mod='everpsblog'}</div>
+    <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' d='Modules.Everpsblog.Shop'}</div>
     {/if}
 </div>
 {hook h="displayAfterEverTag" everblogtag=$tag}

@@ -542,11 +542,6 @@ body#module-everpsblog-category .breadcrumb span {
     background: #dce8df;
 }
 
-body#module-everpsblog-post .breadcrumb__wrapper {
-    background: linear-gradient(90deg, #0a0f54 0%, #0a0f54 50%, #0a0f54 100%);
-    background-position: center;
-}
-
 #module-everpsblog-post .everpsblog-post-hero {
     position: relative;
     background: linear-gradient(90deg, #0a0f54 0%, #0a0f54 50%, #0a0f54 100%);
