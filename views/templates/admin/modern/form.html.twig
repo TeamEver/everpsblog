@@ -1,5 +1,14 @@
 {% extends '@PrestaShop/Admin/layout.html.twig' %}
 
+{% block form_help %}
+  {% if help is not empty %}
+    {% set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' form-text text-muted')|trim}) %}
+    <small id="{{ id }}_help"{{ block('attributes') }}>
+      {{- help_html is same as(false) ? help|trans(help_translation_parameters, translation_domain) : help|trans(help_translation_parameters, translation_domain)|raw -}}
+    </small>
+  {% endif %}
+{% endblock %}
+
 {% block stylesheets %}
   {{ parent() }}
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
@@ -422,6 +431,7 @@
 {% endblock %}
 
 {% block content %}
+  {% form_theme form _self %}
   {% set contentFields = [] %}
   {% set seoFields = [] %}
   {% set publicationFields = [] %}
@@ -780,6 +790,12 @@
       Array.prototype.forEach.call(root.querySelectorAll('.ever-featured-image-preview img'), function (imageNode) {
         imageNode.addEventListener('click', function () {
           openPreviewModal(imageNode.getAttribute('data-ever-preview-src') || imageNode.getAttribute('src'), imageNode.getAttribute('alt') || '');
+        });
+      });
+
+      Array.prototype.forEach.call(root.querySelectorAll('.ever-image-preview-trigger'), function (triggerNode) {
+        triggerNode.addEventListener('click', function () {
+          openPreviewModal(triggerNode.getAttribute('data-ever-preview-src'), triggerNode.getAttribute('data-ever-preview-alt') || '');
         });
       });
 

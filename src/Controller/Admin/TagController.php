@@ -182,7 +182,7 @@ class TagController extends AbstractDomainController
             $this->getContextShopId(),
             'tag_banner',
             $this->transAdmin('Current banner image'),
-            $this->transAdmin('open in a new tab')
+            $this->transAdmin('Open preview')
         );
     }
 }

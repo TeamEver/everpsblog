@@ -355,11 +355,11 @@ class AuthorController extends AbstractDomainController
         $escapedUrl = htmlspecialchars($previewUrl, ENT_QUOTES, 'UTF-8');
 
         return sprintf(
-            '<span class="ever-featured-image-preview"><img src="%1$s" data-ever-preview-src="%1$s" alt="%2$s" loading="lazy"><span>%3$s: <a href="%1$s" target="_blank" rel="noopener noreferrer">%4$s</a></span></span>',
+            '<span class="ever-featured-image-preview"><img src="%1$s" data-ever-preview-src="%1$s" alt="%2$s" loading="lazy"><span>%3$s: <button type="button" class="btn btn-link p-0 ever-image-preview-trigger" data-ever-preview-src="%1$s" data-ever-preview-alt="%2$s">%4$s</button></span></span>',
             $escapedUrl,
             htmlspecialchars($this->transAdmin('Current author image'), ENT_QUOTES, 'UTF-8'),
             htmlspecialchars($this->transAdmin('Current image'), ENT_QUOTES, 'UTF-8'),
-            htmlspecialchars($this->transAdmin('open in a new tab'), ENT_QUOTES, 'UTF-8')
+            htmlspecialchars($this->transAdmin('Open preview'), ENT_QUOTES, 'UTF-8')
         );
     }
 
@@ -375,7 +375,7 @@ class AuthorController extends AbstractDomainController
             $this->getContextShopId(),
             'author_banner',
             $this->transAdmin('Current banner image'),
-            $this->transAdmin('open in a new tab')
+            $this->transAdmin('Open preview')
         );
     }
 

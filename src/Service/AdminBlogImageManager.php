@@ -103,7 +103,7 @@ class AdminBlogImageManager
         $previewUrl = $this->appendTimestampToUrl($url);
 
         return sprintf(
-            '<span class="ever-featured-image-preview"><img src="%1$s" data-ever-preview-src="%1$s" alt="%2$s" loading="lazy"><span>%2$s: <a href="%1$s" target="_blank" rel="noopener noreferrer">%3$s</a></span></span>',
+            '<span class="ever-featured-image-preview"><img src="%1$s" data-ever-preview-src="%1$s" alt="%2$s" loading="lazy"><span>%2$s: <button type="button" class="btn btn-link p-0 ever-image-preview-trigger" data-ever-preview-src="%1$s" data-ever-preview-alt="%2$s">%3$s</button></span></span>',
             htmlspecialchars($previewUrl, ENT_QUOTES, 'UTF-8'),
             htmlspecialchars($label, ENT_QUOTES, 'UTF-8'),
             htmlspecialchars($openLabel, ENT_QUOTES, 'UTF-8')

@@ -200,7 +200,7 @@ class CategoryController extends AbstractDomainController
             $this->getContextShopId(),
             'category_banner',
             $this->transAdmin('Current banner image'),
-            $this->transAdmin('open in a new tab')
+            $this->transAdmin('Open preview')
         );
     }
 }
