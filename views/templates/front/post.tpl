@@ -189,6 +189,44 @@
             </div>
         </div>
     </div>
+    {if isset($show_post_author_box) && $show_post_author_box && isset($author) && isset($author->id) && $author->id}
+    <section class="container everpsblog-post-author-box" itemprop="author" itemscope itemtype="https://schema.org/Person">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <div class="row align-items-center everpsblog-post-author-box__row">
+                    {if isset($has_author_image) && $has_author_image && isset($author_cover) && $author_cover}
+                    <div class="col-12 col-md-4 mb-3 mb-md-0">
+                        <a href="{$author->url|escape:'htmlall':'UTF-8'}" class="everpsblog-post-author-box__image-link" title="{$author->nickhandle|escape:'htmlall':'UTF-8'}">
+                            <img src="{$author_cover|escape:'htmlall':'UTF-8'}" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'}" class="everpsblog-post-author-box__image" itemprop="image" loading="lazy">
+                        </a>
+                    </div>
+                    <div class="col-12 col-md-8">
+                    {else}
+                    <div class="col-12">
+                    {/if}
+                        <h2 class="everpsblog-post-author-box__name h4 mb-2">
+                            <a href="{$author->url|escape:'htmlall':'UTF-8'}" itemprop="url" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
+                                <span itemprop="name">{$author->nickhandle|escape:'htmlall':'UTF-8'}</span>
+                            </a>
+                        </h2>
+                        {if isset($author_summary) && $author_summary}
+                        <p class="everpsblog-post-author-box__summary mb-3" itemprop="description">{$author_summary|escape:'htmlall':'UTF-8'}</p>
+                        {/if}
+                        {if isset($author_social_links) && $author_social_links}
+                        <div class="everpsblog-post-author-box__social-list d-flex flex-wrap">
+                            {foreach from=$author_social_links item=author_social_link}
+                            <a class="everpsblog-post-author-box__social everpsblog-post-author-box__social--{$author_social_link.network|escape:'htmlall':'UTF-8'}" href="{$author_social_link.url|escape:'htmlall':'UTF-8'}" target="_blank" rel="nofollow noopener noreferrer" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} - {$author_social_link.label|escape:'htmlall':'UTF-8'}">
+                                {$author_social_link.label|escape:'htmlall':'UTF-8'}
+                            </a>
+                            {/foreach}
+                        </div>
+                        {/if}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {/if}
 </div>
 {if !isset($post->password_protected)}
 <div class="container">

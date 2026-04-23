@@ -188,6 +188,77 @@
     background-color: transparent;
     border: 0;
 }
+#module-everpsblog-post .everpsblog-post-author-box__image-link {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #f4f6f8;
+}
+#module-everpsblog-post .everpsblog-post-author-box__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+#module-everpsblog-post .everpsblog-post-author-box__name {
+    font-weight: 700;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+#module-everpsblog-post .everpsblog-post-author-box__name a {
+    color: inherit;
+    text-decoration: none;
+}
+#module-everpsblog-post .everpsblog-post-author-box__name a:hover,
+#module-everpsblog-post .everpsblog-post-author-box__name a:focus {
+    text-decoration: underline;
+}
+#module-everpsblog-post .everpsblog-post-author-box__summary {
+    color: #4f5965;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+#module-everpsblog-post .everpsblog-post-author-box__social-list {
+    gap: .5rem;
+}
+#module-everpsblog-post .everpsblog-post-author-box__social {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.25rem;
+    padding: .45rem .75rem;
+    border: 1px solid #d6dbe1;
+    border-radius: 6px;
+    color: #27313d;
+    background: #fff;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+    white-space: nowrap;
+}
+#module-everpsblog-post .everpsblog-post-author-box__social:hover,
+#module-everpsblog-post .everpsblog-post-author-box__social:focus {
+    border-color: #0a0f54;
+    color: #0a0f54;
+    text-decoration: none;
+}
+@media (max-width: 767.98px) {
+    #module-everpsblog-post .everpsblog-post-author-box {
+        text-align: center;
+    }
+    #module-everpsblog-post .everpsblog-post-author-box__image-link {
+        aspect-ratio: 16 / 9;
+    }
+    #module-everpsblog-post .everpsblog-post-author-box__social-list {
+        justify-content: center;
+    }
+    #module-everpsblog-post .everpsblog-post-author-box__social {
+        flex: 1 1 auto;
+        max-width: 100%;
+    }
+}
 #module-everpsblog-post .taggedIn a{
     /*float:left;*/
     margin:0 0 7px 20px;

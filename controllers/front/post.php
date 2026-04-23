@@ -36,6 +36,8 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
     protected $post;
     protected $blog;
     protected $author;
+    protected $author_cover;
+    protected $authorHasImage = false;
     protected $default_category;
     public $controller_name = 'post';
 
@@ -149,12 +151,23 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 'blog'
             );
         }
-        // Get author cover if exists, else get shop logo
-        $this->author_cover = $this->getBlogImageService()->getBlogImageUrl(
-            (int) $this->author->id,
-            (int) $this->context->shop->id,
-            'author'
-        );
+        $authorImage = false;
+        $this->author_cover = '';
+        if ((int) $this->author->id > 0) {
+            $authorImage = $this->getBlogImageService()->getBlogImage(
+                (int) $this->author->id,
+                (int) $this->context->shop->id,
+                'author'
+            );
+            $this->authorHasImage = Validate::isLoadedObject($authorImage);
+            if ($this->authorHasImage) {
+                $this->author_cover = $this->getBlogImageService()->getBlogImageUrl(
+                    (int) $this->author->id,
+                    (int) $this->context->shop->id,
+                    'author'
+                );
+            }
+        }
         $this->post_tags = $this->getBlogTaxonomyService()->getPostTagsTaxonomies(
             (int) $this->post->id
         );
@@ -475,6 +488,26 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 (int) $this->context->shop->id,
                 'post_banner'
             ) : '';
+            $authorSummary = '';
+            if (!empty($this->author->excerpt)) {
+                $authorSummary = (string) $this->author->excerpt;
+            } elseif (!empty($this->author->meta_description)) {
+                $authorSummary = (string) $this->author->meta_description;
+            }
+            $authorSocialLinks = [];
+            foreach ([
+                'facebook' => 'Facebook',
+                'linkedin' => 'LinkedIn',
+                'twitter' => 'X / Twitter',
+            ] as $network => $label) {
+                if (!empty($this->author->{$network})) {
+                    $authorSocialLinks[] = [
+                        'network' => $network,
+                        'label' => $label,
+                        'url' => (string) $this->author->{$network},
+                    ];
+                }
+            }
             $postViewModel = PostViewModel::fromLegacy($this->post);
             $this->context->smarty->assign([
                 'show_author' => (bool) Configuration::get('EVERBLOG_SHOW_AUTHOR'),
@@ -485,6 +518,10 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 'has_post_banner' => $hasPostBanner,
                 'show_featured_post' => $showFeaturedPost,
                 'author_cover' => $this->author_cover,
+                'has_author_image' => $this->authorHasImage,
+                'show_post_author_box' => (int) $this->author->id > 0,
+                'author_summary' => $authorSummary,
+                'author_social_links' => $authorSocialLinks,
                 'author' => $this->author,
                 'default_category' => $this->default_category,
                 'social_share_links' => $social_share_links,
@@ -619,13 +656,27 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
     private function getAuthorForFront($idAuthor, $idLang, $idShop)
     {
         $sql = new DbQuery();
-        $sql->select('a.*, a.id_ever_author AS id, al.meta_title, al.meta_description, al.link_rewrite, al.content, al.bottom_content');
+        $excerptSelect = $this->authorExcerptColumnExists() ? 'al.excerpt' : '"" AS excerpt';
+        $sql->select('a.*, a.id_ever_author AS id, al.meta_title, al.meta_description, al.link_rewrite, ' . $excerptSelect . ', al.content, al.bottom_content');
         $sql->from('ever_blog_author', 'a');
         $sql->innerJoin('ever_blog_author_lang', 'al', 'al.id_ever_author = a.id_ever_author AND al.id_lang = ' . (int) $idLang);
         $sql->innerJoin('ever_blog_author_shop', 'ass', 'ass.id_ever_author = a.id_ever_author AND ass.id_shop = ' . (int) $idShop);
         $sql->where('a.id_ever_author = ' . (int) $idAuthor);
 
         return $this->arrayToObject(Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql));
+    }
+
+    private function authorExcerptColumnExists()
+    {
+        static $exists = null;
+
+        if (null === $exists) {
+            $exists = (bool) Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+                'DESCRIBE `' . _DB_PREFIX_ . 'ever_blog_author_lang` `excerpt`'
+            );
+        }
+
+        return $exists;
     }
 
     private function getTagForFront($idTag, $idLang, $idShop)
