@@ -124,6 +124,7 @@ class BlogSitemapService
                 LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_post_shop` ps
                     ON ps.id_ever_post = p.id_ever_post
                 WHERE p.post_status = "published"
+                    AND TRIM(COALESCE(pl.title, "")) != ""
                     AND (p.id_shop = ' . (int) $shopId . ' OR ps.id_shop = ' . (int) $shopId . ')';
         $rows = \Db::getInstance()->executeS($sql) ?: [];
 
