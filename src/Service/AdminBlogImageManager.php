@@ -100,12 +100,21 @@ class AdminBlogImageManager
             return '';
         }
 
+        $previewUrl = $this->appendTimestampToUrl($url);
+
         return sprintf(
-            '<span class="ever-featured-image-preview"><img src="%1$s" alt="%2$s" loading="lazy"><span>%2$s: <a href="%1$s" target="_blank" rel="noopener noreferrer">%3$s</a></span></span>',
-            htmlspecialchars($url, ENT_QUOTES, 'UTF-8'),
+            '<span class="ever-featured-image-preview"><img src="%1$s" data-ever-preview-src="%1$s" alt="%2$s" loading="lazy"><span>%2$s: <a href="%1$s" target="_blank" rel="noopener noreferrer">%3$s</a></span></span>',
+            htmlspecialchars($previewUrl, ENT_QUOTES, 'UTF-8'),
             htmlspecialchars($label, ENT_QUOTES, 'UTF-8'),
             htmlspecialchars($openLabel, ENT_QUOTES, 'UTF-8')
         );
+    }
+
+    private function appendTimestampToUrl(string $url): string
+    {
+        $separator = false === strpos($url, '?') ? '?' : '&';
+
+        return $url . $separator . 't=' . time();
     }
 
     private function deleteFiles(int $elementId, string $imageType): void

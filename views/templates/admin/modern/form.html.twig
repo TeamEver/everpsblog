@@ -174,12 +174,54 @@
     }
     .ever-featured-image-preview img {
       display: block;
-      max-width: 220px;
+      max-width: 320px;
+      max-height: 180px;
       height: auto;
       border: 1px solid var(--ever-border);
       border-radius: 10px;
       margin-bottom: .45rem;
       background: #fff;
+      cursor: zoom-in;
+    }
+
+    .ever-image-preview-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(17, 24, 39, .75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1060;
+      padding: 1.5rem;
+    }
+
+    .ever-image-preview-modal.is-open {
+      display: flex;
+    }
+
+    .ever-image-preview-modal img {
+      display: block;
+      max-width: min(1100px, 92vw);
+      max-height: 88vh;
+      border-radius: 10px;
+      box-shadow: 0 35px 80px -40px rgba(0, 0, 0, .9);
+      background: #fff;
+    }
+
+    .ever-image-preview-modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      border: 0;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .95);
+      color: #111827;
+      font-size: 1.2rem;
+      line-height: 1;
+      font-weight: 700;
+      cursor: pointer;
     }
 
     .ever-admin-form .form-control-label,
@@ -708,6 +750,49 @@
 
       root.addEventListener('input', function () {
         refreshLangValidation();
+      });
+
+      var previewModal = document.createElement('div');
+      previewModal.className = 'ever-image-preview-modal';
+      previewModal.setAttribute('aria-hidden', 'true');
+      previewModal.innerHTML = '<button type="button" class="ever-image-preview-modal-close" aria-label="Close">&times;</button><img src="" alt="">';
+      document.body.appendChild(previewModal);
+
+      var previewImage = previewModal.querySelector('img');
+
+      function closePreviewModal() {
+        previewModal.classList.remove('is-open');
+        previewModal.setAttribute('aria-hidden', 'true');
+        previewImage.setAttribute('src', '');
+      }
+
+      function openPreviewModal(src, alt) {
+        if (!src) {
+          return;
+        }
+
+        previewImage.setAttribute('src', src);
+        previewImage.setAttribute('alt', alt || '');
+        previewModal.classList.add('is-open');
+        previewModal.setAttribute('aria-hidden', 'false');
+      }
+
+      Array.prototype.forEach.call(root.querySelectorAll('.ever-featured-image-preview img'), function (imageNode) {
+        imageNode.addEventListener('click', function () {
+          openPreviewModal(imageNode.getAttribute('data-ever-preview-src') || imageNode.getAttribute('src'), imageNode.getAttribute('alt') || '');
+        });
+      });
+
+      previewModal.addEventListener('click', function (event) {
+        if (event.target === previewModal || event.target.classList.contains('ever-image-preview-modal-close')) {
+          closePreviewModal();
+        }
+      });
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+          closePreviewModal();
+        }
       });
     })();
   </script>

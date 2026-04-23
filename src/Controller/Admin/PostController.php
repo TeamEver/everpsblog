@@ -557,13 +557,21 @@ class PostController extends AbstractDomainController
         if ('' === $url) {
             return '';
         }
+        $previewUrl = $this->appendTimestampToUrl($url);
 
         return sprintf(
-            '%s: <a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
-            $label,
-            htmlspecialchars($url, ENT_QUOTES, 'UTF-8'),
-            htmlspecialchars($url, ENT_QUOTES, 'UTF-8')
+            '<span class="ever-featured-image-preview"><img src="%1$s" data-ever-preview-src="%1$s" alt="%2$s" loading="lazy"><span>%2$s: <a href="%1$s" target="_blank" rel="noopener noreferrer">%3$s</a></span></span>',
+            htmlspecialchars($previewUrl, ENT_QUOTES, 'UTF-8'),
+            htmlspecialchars($label, ENT_QUOTES, 'UTF-8'),
+            htmlspecialchars($this->transAdmin('open in a new tab'), ENT_QUOTES, 'UTF-8')
         );
+    }
+
+    private function appendTimestampToUrl(string $url): string
+    {
+        $separator = false === strpos($url, '?') ? '?' : '&';
+
+        return $url . $separator . 't=' . time();
     }
 
 }
