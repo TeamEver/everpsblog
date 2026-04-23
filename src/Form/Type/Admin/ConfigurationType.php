@@ -57,6 +57,12 @@ class ConfigurationType extends AbstractType
                 'label' => 'Title length',
                 'constraints' => [new GreaterThan(['value' => 0])],
             ])
+            ->add('default_author_id', ChoiceType::class, [
+                'label' => 'Default author for orphan posts',
+                'required' => false,
+                'placeholder' => 'No default author',
+                'choices' => (array) ($options['author_choices'] ?? []),
+            ])
             ->add('header_bg_color', TextType::class, [
                 'label' => 'Blog header color',
                 'required' => false,
@@ -148,6 +154,7 @@ class ConfigurationType extends AbstractType
         $resolver->setDefaults([
             'csrf_token_id' => 'everpsblog_configuration',
             'translation_domain' => 'Modules.Everpsblog.Admin',
+            'author_choices' => [],
         ]);
     }
 }

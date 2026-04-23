@@ -148,6 +148,7 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERBLOG_SHOW_POST_TAGS', 1)
             && Configuration::updateValue('EVERBLOG_SHOW_AUTHOR', 1)
             && Configuration::updateValue('EVERBLOG_DEFAULT_AUTHOR_NAME', Configuration::get('PS_SHOP_NAME'))
+            && Configuration::updateValue('EVERBLOG_DEFAULT_AUTHOR_ID', 0)
             && Configuration::updateValue('EVERBLOG_SITEMAP_NUMBER', 5000)
             && Configuration::updateValue('EVERBLOG_MAIN_TITLE', (function () {
                 $title = [];
@@ -173,6 +174,7 @@ class EverPsBlog extends Module
         );
         Configuration::deleteByName('EVERBLOG_CATEG_COLUMNS');
         Configuration::deleteByName('EVERBLOG_SHOW_POST_TAGS');
+        Configuration::deleteByName('EVERBLOG_DEFAULT_AUTHOR_ID');
         return parent::uninstall()
             && $this->uninstallModuleTab('AdminEverPsBlog')
             && $this->uninstallModuleTab('AdminEverPsBlogPost')
