@@ -2425,12 +2425,7 @@ class EverPsBlog extends Module
                 . '#module-everpsblog-category .everpsblog-blog-header__inner,'
                 . '#module-everpsblog-tag .everpsblog-blog-header__inner,'
                 . '#module-everpsblog-author .everpsblog-blog-header__inner,'
-                . '#module-everpsblog-search .everpsblog-blog-header__inner,'
-                . 'body#module-everpsblog-blog .breadcrumb__wrapper,'
-                . 'body#module-everpsblog-category .breadcrumb__wrapper,'
-                . 'body#module-everpsblog-tag .breadcrumb__wrapper,'
-                . 'body#module-everpsblog-author .breadcrumb__wrapper,'
-                . 'body#module-everpsblog-search .breadcrumb__wrapper'
+                . '#module-everpsblog-search .everpsblog-blog-header__inner'
                 . '{background:' . $header_bg_color . ' !important;}'
                 . '</style>';
         }

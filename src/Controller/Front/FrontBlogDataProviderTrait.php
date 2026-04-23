@@ -188,6 +188,9 @@ trait FrontBlogDataProviderTrait
             $sql->innerJoin('ever_blog_category_lang', 'cl', 'cl.id_ever_category = c.id_ever_category AND cl.id_lang = ' . (int) $idLang);
             $sql->innerJoin('ever_blog_category_shop', 'cs', 'cs.id_ever_category = c.id_ever_category AND cs.id_shop = ' . (int) $idShop);
             $sql->where('c.id_parent_category = ' . (int) $idParentCategory);
+            $sql->where('c.id_ever_category != ' . (int) $idParentCategory);
+            $sql->where('COALESCE(c.is_root_category, 0) = 0');
+            $sql->where('c.active = 1');
             $sql->orderBy('cl.title ASC');
 
             return $this->frontRowsToObjects(\Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql));
@@ -201,6 +204,9 @@ trait FrontBlogDataProviderTrait
             $sql->select('COUNT(*)');
             $sql->from('ever_blog_category');
             $sql->where('id_parent_category = ' . (int) $idCategory);
+            $sql->where('id_ever_category != ' . (int) $idCategory);
+            $sql->where('COALESCE(is_root_category, 0) = 0');
+            $sql->where('active = 1');
 
             return (int) \Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($sql) > 0;
         });

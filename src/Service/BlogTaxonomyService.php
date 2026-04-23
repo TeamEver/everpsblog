@@ -119,30 +119,39 @@ class BlogTaxonomyService
         }
 
         $taxonomies = [];
-        $rootCategoryId = (int) \Db::getInstance()->getValue(
-            'SELECT id_ever_category FROM `' . _DB_PREFIX_ . 'ever_blog_category`
-             WHERE is_root_category = 1'
-        );
+        $visited = [(int) $categoryId => true];
 
         $sql = new \DbQuery();
         $sql->select('id_parent_category');
         $sql->from('ever_blog_category');
         $sql->where('id_ever_category = ' . (int) $categoryId);
-        $sql->where('active = ' . (int) $active);
-        $taxonomy = (int) \Db::getInstance()->getValue($sql);
+        $parentId = (int) \Db::getInstance()->getValue($sql);
 
-        if ($taxonomy > 0) {
-            $taxonomies[] = $taxonomy;
+        while ($parentId > 0 && empty($visited[$parentId])) {
+            $visited[$parentId] = true;
+
             $parentSql = new \DbQuery();
-            $parentSql->select('id_parent_category');
+            $parentSql->select('id_ever_category, id_parent_category, active, is_root_category');
             $parentSql->from('ever_blog_category');
-            $parentSql->where('id_ever_category = ' . (int) $taxonomy);
-            $parentOfTaxonomy = (int) \Db::getInstance()->getValue($parentSql);
-            if ($parentOfTaxonomy > 0 && $rootCategoryId !== $parentOfTaxonomy) {
-                $taxonomies[] = $parentOfTaxonomy;
+            $parentSql->where('id_ever_category = ' . (int) $parentId);
+            $parentCategory = \Db::getInstance()->getRow($parentSql);
+
+            if (!is_array($parentCategory) || empty($parentCategory['id_ever_category'])) {
+                break;
             }
+
+            if ((int) ($parentCategory['is_root_category'] ?? 0) === 1) {
+                break;
+            }
+
+            if ((int) ($parentCategory['active'] ?? 0) === (int) $active) {
+                $taxonomies[] = (int) $parentCategory['id_ever_category'];
+            }
+
+            $parentId = (int) ($parentCategory['id_parent_category'] ?? 0);
         }
 
+        $taxonomies = array_reverse($taxonomies);
         $item->set($taxonomies);
         $this->cache->save($item);
 

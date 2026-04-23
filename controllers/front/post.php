@@ -517,51 +517,38 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 'blog'
             ),
         ];
-        if ((int) $this->post->id_default_category > 1) {
-            $parent_category = $this->getCategoryForFront(
-                (int) $this->post->id_default_category,
-                (int) $this->context->language->id,
-                (int) $this->context->shop->id
-            );
-            $breadcrumb['links'][] = [
-                'title' => $parent_category->title,
-                'url' => $this->context->link->getModuleLink(
-                    'everpsblog',
-                    'category',
-                    [
-                        'id_ever_category' => $parent_category->id,
-                        'link_rewrite' => $parent_category->link_rewrite,
-                    ]
-                ),
-            ];
-            if ((bool) $this->categoryHasChildren((int) $parent_category->id) === true) {
-                $children_categories = $this->getChildrenCategoriesForFront(
-                    (int) $this->post->id_default_category,
+        $defaultCategoryId = (int) ($this->post->id_default_category ?? 0);
+        if ($defaultCategoryId > 0) {
+            $breadcrumbCategoryIds = $this->getBlogTaxonomyService()->getCategoryParentsTaxonomy($defaultCategoryId);
+            $breadcrumbCategoryIds[] = $defaultCategoryId;
+            $breadcrumbCategoryIds = array_values(array_unique(array_map('intval', $breadcrumbCategoryIds)));
+
+            foreach ($breadcrumbCategoryIds as $categoryId) {
+                $category = $this->getCategoryForFront(
+                    (int) $categoryId,
                     (int) $this->context->language->id,
                     (int) $this->context->shop->id
                 );
-                if ($children_categories) {
-                    foreach ($children_categories as $cat) {
-                        if ((bool) $cat->is_root_category === false
-                            && (int) $cat->id > 0
-                            && !empty($cat->title)
-                            && (bool) $cat->active === true
-                            && in_array($cat->id, $this->post_categories)
-                        ) {
-                            $breadcrumb['links'][] = [
-                                'title' => $cat->title,
-                                'url' => $this->context->link->getModuleLink(
-                                    'everpsblog',
-                                    'category',
-                                    [
-                                        'id_ever_category' => $cat->id,
-                                        'link_rewrite' => $cat->link_rewrite,
-                                    ]
-                                ),
-                            ];
-                        }
-                    }
+
+                if (!empty($category->is_root_category)
+                    || (int) ($category->id ?? 0) <= 0
+                    || empty($category->title)
+                    || (bool) ($category->active ?? false) !== true
+                ) {
+                    continue;
                 }
+
+                $breadcrumb['links'][] = [
+                    'title' => $category->title,
+                    'url' => $this->context->link->getModuleLink(
+                        'everpsblog',
+                        'category',
+                        [
+                            'id_ever_category' => (int) $category->id,
+                            'link_rewrite' => $category->link_rewrite,
+                        ]
+                    ),
+                ];
             }
         }
         $breadcrumb['links'][] = [
