@@ -71,10 +71,6 @@ final class PostType extends AbstractType
             ->add('follow', CheckboxType::class, [
                 'required' => false,
                 'label' => 'Follow',
-            ])
-            ->add('sitemap', CheckboxType::class, [
-                'required' => false,
-                'label' => 'Include in sitemap',
             ]);
 
         foreach (\Language::getLanguages(false) as $lang) {

@@ -9,6 +9,7 @@ use PrestaShop\Module\Everpsblog\Form\DataProvider\TagFormDataProvider;
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\TagType;
 use PrestaShop\Module\Everpsblog\Grid\Data\TagGridDataFactory;
 use PrestaShop\Module\Everpsblog\Grid\Definition\TagGridDefinitionFactory;
+use PrestaShop\Module\Everpsblog\Service\AdminBlogImageManager;
 use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
 use Symfony\Component\Form\FormError;
@@ -24,8 +25,9 @@ class TagController extends AbstractDomainController
     private $dataFactory;
     private $formDataProvider;
     private $blogSitemapService;
+    private $adminBlogImageManager;
 
-    public function __construct(ContextStateService $contextStateService, CommandBusInterface $commandBus, TagCommandAssembler $commandAssembler, TagGridDefinitionFactory $definitionFactory, TagGridDataFactory $dataFactory, TagFormDataProvider $formDataProvider, BlogSitemapService $blogSitemapService)
+    public function __construct(ContextStateService $contextStateService, CommandBusInterface $commandBus, TagCommandAssembler $commandAssembler, TagGridDefinitionFactory $definitionFactory, TagGridDataFactory $dataFactory, TagFormDataProvider $formDataProvider, BlogSitemapService $blogSitemapService, AdminBlogImageManager $adminBlogImageManager)
     {
         parent::__construct($contextStateService);
         $this->commandBus = $commandBus;
@@ -34,6 +36,7 @@ class TagController extends AbstractDomainController
         $this->dataFactory = $dataFactory;
         $this->formDataProvider = $formDataProvider;
         $this->blogSitemapService = $blogSitemapService;
+        $this->adminBlogImageManager = $adminBlogImageManager;
     }
 
     public function indexAction(Request $request): Response
@@ -52,12 +55,16 @@ class TagController extends AbstractDomainController
     {
         $isEdit = null !== $tagId;
         $csrfTokenId = $isEdit ? 'everpsblog_tag_update_' . $tagId : 'everpsblog_tag_create';
+        $bannerImageHelp = $isEdit ? $this->buildBannerImageHelp((int) $tagId) : '';
+        $hasBannerImage = $isEdit ? $this->hasBannerImage((int) $tagId) : false;
 
         $form = $this->createForm(TagType::class, $this->formDataProvider->getData($tagId), [
             'method' => Request::METHOD_POST,
             'action' => $isEdit
                 ? $this->generateUrl('everpsblog_admin_tag_edit', ['tagId' => $tagId])
                 : $this->generateUrl('everpsblog_admin_tag_form'),
+            'banner_image_help' => $bannerImageHelp,
+            'has_banner_image' => $hasBannerImage,
         ]);
         $form->handleRequest($request);
 
@@ -69,6 +76,10 @@ class TagController extends AbstractDomainController
                     $savedTagId = $isEdit
                         ? $this->commandBus->handle($this->commandAssembler->assembleUpdate((int) $tagId, (array) $form->getData()))
                         : $this->commandBus->handle($this->commandAssembler->assembleCreate((array) $form->getData()));
+                    if ((bool) $form->get('delete_banner_image')->getData()) {
+                        $this->deleteBannerImage((int) $savedTagId);
+                    }
+                    $this->handleBannerImageUpload($form->get('banner_image_file')->getData(), (int) $savedTagId);
                     $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService);
                     $submitAction = (string) $request->request->get('_submit_action', 'save');
 
@@ -133,6 +144,7 @@ class TagController extends AbstractDomainController
         $this->validateCsrfToken($request, 'everpsblog_tag_delete_' . $tagId);
 
         $this->commandBus->handle(new DeleteTagCommand($tagId));
+        $this->deleteBannerImage($tagId);
         $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService, false);
 
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
@@ -145,5 +157,31 @@ class TagController extends AbstractDomainController
         if (!$this->isCsrfTokenValid($tokenId, $token)) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
+    }
+
+    private function handleBannerImageUpload($uploadedImage, int $tagId): void
+    {
+        $this->adminBlogImageManager->upload($uploadedImage, $tagId, $this->getContextShopId(), 'tag_banner');
+    }
+
+    private function deleteBannerImage(int $tagId): void
+    {
+        $this->adminBlogImageManager->delete($tagId, $this->getContextShopId(), 'tag_banner');
+    }
+
+    private function hasBannerImage(int $tagId): bool
+    {
+        return $this->adminBlogImageManager->hasImage($tagId, $this->getContextShopId(), 'tag_banner');
+    }
+
+    private function buildBannerImageHelp(int $tagId): string
+    {
+        return $this->adminBlogImageManager->buildImageHelp(
+            $tagId,
+            $this->getContextShopId(),
+            'tag_banner',
+            $this->transAdmin('Current banner image'),
+            $this->transAdmin('open in a new tab')
+        );
     }
 }

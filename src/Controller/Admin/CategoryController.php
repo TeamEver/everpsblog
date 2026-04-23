@@ -9,6 +9,7 @@ use PrestaShop\Module\Everpsblog\Form\DataProvider\CategoryFormDataProvider;
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\CategoryType;
 use PrestaShop\Module\Everpsblog\Grid\Data\CategoryGridDataFactory;
 use PrestaShop\Module\Everpsblog\Grid\Definition\CategoryGridDefinitionFactory;
+use PrestaShop\Module\Everpsblog\Service\AdminBlogImageManager;
 use PrestaShop\Module\Everpsblog\Service\BlogInstallService;
 use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
@@ -26,8 +27,9 @@ class CategoryController extends AbstractDomainController
     private $formDataProvider;
     private $blogSitemapService;
     private $blogInstallService;
+    private $adminBlogImageManager;
 
-    public function __construct(ContextStateService $contextStateService, CommandBusInterface $commandBus, CategoryCommandAssembler $commandAssembler, CategoryGridDefinitionFactory $definitionFactory, CategoryGridDataFactory $dataFactory, CategoryFormDataProvider $formDataProvider, BlogSitemapService $blogSitemapService, BlogInstallService $blogInstallService)
+    public function __construct(ContextStateService $contextStateService, CommandBusInterface $commandBus, CategoryCommandAssembler $commandAssembler, CategoryGridDefinitionFactory $definitionFactory, CategoryGridDataFactory $dataFactory, CategoryFormDataProvider $formDataProvider, BlogSitemapService $blogSitemapService, BlogInstallService $blogInstallService, AdminBlogImageManager $adminBlogImageManager)
     {
         parent::__construct($contextStateService);
         $this->commandBus = $commandBus;
@@ -37,6 +39,7 @@ class CategoryController extends AbstractDomainController
         $this->formDataProvider = $formDataProvider;
         $this->blogSitemapService = $blogSitemapService;
         $this->blogInstallService = $blogInstallService;
+        $this->adminBlogImageManager = $adminBlogImageManager;
     }
 
     public function indexAction(Request $request): Response
@@ -61,12 +64,16 @@ class CategoryController extends AbstractDomainController
         }
 
         $csrfTokenId = $isEdit ? 'everpsblog_category_update_' . $categoryId : 'everpsblog_category_create';
+        $bannerImageHelp = $isEdit ? $this->buildBannerImageHelp((int) $categoryId) : '';
+        $hasBannerImage = $isEdit ? $this->hasBannerImage((int) $categoryId) : false;
 
         $form = $this->createForm(CategoryType::class, $this->formDataProvider->getData($categoryId), [
             'method' => Request::METHOD_POST,
             'action' => $isEdit
                 ? $this->generateUrl('everpsblog_admin_category_edit', ['categoryId' => $categoryId])
                 : $this->generateUrl('everpsblog_admin_category_form'),
+            'banner_image_help' => $bannerImageHelp,
+            'has_banner_image' => $hasBannerImage,
         ]);
         $form->handleRequest($request);
 
@@ -80,6 +87,10 @@ class CategoryController extends AbstractDomainController
                     $savedCategoryId = $isEdit
                         ? $this->commandBus->handle($this->commandAssembler->assembleUpdate((int) $categoryId, $data))
                         : $this->commandBus->handle($this->commandAssembler->assembleCreate($data));
+                    if ((bool) $form->get('delete_banner_image')->getData()) {
+                        $this->deleteBannerImage((int) $savedCategoryId);
+                    }
+                    $this->handleBannerImageUpload($form->get('banner_image_file')->getData(), (int) $savedCategoryId);
                     $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService);
                     $submitAction = (string) $request->request->get('_submit_action', 'save');
 
@@ -145,6 +156,7 @@ class CategoryController extends AbstractDomainController
 
         try {
             $this->commandBus->handle(new DeleteCategoryCommand($categoryId));
+            $this->deleteBannerImage($categoryId);
             $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService, false);
         } catch (\RuntimeException $exception) {
             return new JsonResponse(
@@ -163,5 +175,31 @@ class CategoryController extends AbstractDomainController
         if (!$this->isCsrfTokenValid($tokenId, $token)) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
+    }
+
+    private function handleBannerImageUpload($uploadedImage, int $categoryId): void
+    {
+        $this->adminBlogImageManager->upload($uploadedImage, $categoryId, $this->getContextShopId(), 'category_banner');
+    }
+
+    private function deleteBannerImage(int $categoryId): void
+    {
+        $this->adminBlogImageManager->delete($categoryId, $this->getContextShopId(), 'category_banner');
+    }
+
+    private function hasBannerImage(int $categoryId): bool
+    {
+        return $this->adminBlogImageManager->hasImage($categoryId, $this->getContextShopId(), 'category_banner');
+    }
+
+    private function buildBannerImageHelp(int $categoryId): string
+    {
+        return $this->adminBlogImageManager->buildImageHelp(
+            $categoryId,
+            $this->getContextShopId(),
+            'category_banner',
+            $this->transAdmin('Current banner image'),
+            $this->transAdmin('open in a new tab')
+        );
     }
 }

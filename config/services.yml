@@ -299,6 +299,15 @@ services:
   PrestaShop\Module\Everpsblog\Service\ImageUploader:
     alias: prestashop.module.everpsblog.blog.image_uploader
 
+  prestashop.module.everpsblog.service.admin_blog_image_manager:
+    class: PrestaShop\Module\Everpsblog\Service\AdminBlogImageManager
+    arguments:
+      - '@prestashop.module.everpsblog.service.blog_image'
+      - '@prestashop.module.everpsblog.blog.image_uploader'
+
+  PrestaShop\Module\Everpsblog\Service\AdminBlogImageManager:
+    alias: prestashop.module.everpsblog.service.admin_blog_image_manager
+
   PrestaShop\Module\Everpsblog\Service\AdminRouteSigner:
     class: PrestaShop\Module\Everpsblog\Service\AdminRouteSigner
 

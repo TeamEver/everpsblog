@@ -105,7 +105,7 @@
                         <div class="social-sharing social-sharing-hero">
                             <ul>
                             {foreach from=$social_share_links item='social_share_link'}
-                                <li class="{$social_share_link.class|escape:'htmlall':'UTF-8'} icon-gray"><a href="{$social_share_link.url|escape:'htmlall':'UTF-8'}" class="visually-hidden" title="{$social_share_link.label|escape:'htmlall':'UTF-8'}" target="_blank">{$social_share_link.label|escape:'htmlall':'UTF-8'}</a></li>
+                                <li class="{$social_share_link.class|escape:'htmlall':'UTF-8'} icon-gray"><a href="{$social_share_link.url|escape:'htmlall':'UTF-8'}" title="{$social_share_link.label|escape:'htmlall':'UTF-8'}" aria-label="{$social_share_link.label|escape:'htmlall':'UTF-8'}" target="_blank" rel="noopener noreferrer">{$social_share_link.label|escape:'htmlall':'UTF-8'}</a></li>
                             {/foreach}
                             </ul>
                         </div>

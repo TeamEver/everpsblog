@@ -167,6 +167,17 @@ class EverPsBlogauthorModuleFrontController extends AbstractFrontController
                 (int) $this->context->shop->id,
                 'author'
             );
+            $authorBannerImage = $this->getBlogImageService()->getBlogImage(
+                (int) $this->author->id,
+                (int) $this->context->shop->id,
+                'author_banner'
+            );
+            $hasAuthorBanner = \Validate::isLoadedObject($authorBannerImage);
+            $authorBannerUrl = $hasAuthorBanner ? $this->getBlogImageService()->getBlogImageUrl(
+                (int) $this->author->id,
+                (int) $this->context->shop->id,
+                'author_banner'
+            ) : '';
             $feed_url = $this->context->link->getModuleLink(
                 $this->module_name,
                 'feed',
@@ -184,6 +195,8 @@ class EverPsBlogauthorModuleFrontController extends AbstractFrontController
                 'allow_feed' => (bool) Configuration::get('EVERBLOG_RSS'),
                 'feed_url' => $feed_url,
                 'featured_image' => $file_url,
+                'author_banner_image' => $authorBannerUrl,
+                'has_author_banner' => $hasAuthorBanner,
                 'show_featured_post' => true,
                 'posts' => $postsViewModel,
                 'posts_legacy' => $posts,

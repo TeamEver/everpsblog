@@ -11,12 +11,10 @@ class BlogSitemapService
     {
         $languages = \Language::getLanguages(true, (int) $shopId);
         $result = true;
+        $this->removeLegacyTaxonomySitemapFiles((int) $shopId);
 
         foreach ($languages as $language) {
             $idLang = (int) $language['id_lang'];
-            $result = $this->processSitemapAuthor($shopId, $idLang) && $result;
-            $result = $this->processSitemapTag($shopId, $idLang) && $result;
-            $result = $this->processSitemapCategory($shopId, $idLang) && $result;
             $result = $this->processSitemapPost($shopId, $idLang) && $result;
         }
 
@@ -125,8 +123,7 @@ class BlogSitemapService
                     ON pl.id_ever_post = p.id_ever_post AND pl.id_lang = ' . (int) $idLang . '
                 LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_post_shop` ps
                     ON ps.id_ever_post = p.id_ever_post
-                WHERE p.sitemap = 1
-                    AND p.post_status = "published"
+                WHERE p.post_status = "published"
                     AND (p.id_shop = ' . (int) $shopId . ' OR ps.id_shop = ' . (int) $shopId . ')';
         $rows = \Db::getInstance()->executeS($sql) ?: [];
 
@@ -148,106 +145,10 @@ class BlogSitemapService
         return $this->writeSitemapFiles($filename, $items);
     }
 
-    private function processSitemapAuthor($shopId, $idLang)
-    {
-        $filename = 'blogauthor_' . (int) $shopId . '_lang_' . \Language::getIsoById((int) $idLang);
-        $sql = 'SELECT DISTINCT a.id_ever_author, a.date_upd, a.allowed_groups, a.active, al.link_rewrite
-                FROM `' . _DB_PREFIX_ . 'ever_blog_author` a
-                INNER JOIN `' . _DB_PREFIX_ . 'ever_blog_author_lang` al
-                    ON al.id_ever_author = a.id_ever_author AND al.id_lang = ' . (int) $idLang . '
-                LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_author_shop` ash
-                    ON ash.id_ever_author = a.id_ever_author
-                WHERE a.sitemap = 1
-                    AND a.active = 1
-                    AND (a.id_shop = ' . (int) $shopId . ' OR ash.id_shop = ' . (int) $shopId . ')';
-        $rows = \Db::getInstance()->executeS($sql) ?: [];
-
-        $items = [];
-        $link = new \Link();
-        foreach ($rows as $row) {
-            if ($this->isRestrictedFromSitemap($row['allowed_groups'] ?? null) || !(int) $row['active']) {
-                continue;
-            }
-            $items[] = [
-                'url' => $link->getModuleLink('everpsblog', 'author', [
-                    'id_ever_author' => (int) $row['id_ever_author'],
-                    'link_rewrite' => (string) $row['link_rewrite'],
-                ], true, (int) $idLang, (int) $shopId),
-                'date' => (string) $row['date_upd'],
-            ];
-        }
-
-        return $this->writeSitemapFiles($filename, $items);
-    }
-
-    private function processSitemapTag($shopId, $idLang)
-    {
-        $filename = 'blogtag_' . (int) $shopId . '_lang_' . \Language::getIsoById((int) $idLang);
-        $sql = 'SELECT DISTINCT t.id_ever_tag, t.date_upd, t.allowed_groups, t.active, tl.link_rewrite
-                FROM `' . _DB_PREFIX_ . 'ever_blog_tag` t
-                INNER JOIN `' . _DB_PREFIX_ . 'ever_blog_tag_lang` tl
-                    ON tl.id_ever_tag = t.id_ever_tag AND tl.id_lang = ' . (int) $idLang . '
-                LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_tag_shop` ts
-                    ON ts.id_ever_tag = t.id_ever_tag
-                WHERE t.sitemap = 1
-                    AND t.active = 1
-                    AND (t.id_shop = ' . (int) $shopId . ' OR ts.id_shop = ' . (int) $shopId . ')';
-        $rows = \Db::getInstance()->executeS($sql) ?: [];
-
-        $items = [];
-        $link = new \Link();
-        foreach ($rows as $row) {
-            if ($this->isRestrictedFromSitemap($row['allowed_groups'] ?? null) || !(int) $row['active']) {
-                continue;
-            }
-            $items[] = [
-                'url' => $link->getModuleLink('everpsblog', 'tag', [
-                    'id_ever_tag' => (int) $row['id_ever_tag'],
-                    'link_rewrite' => (string) $row['link_rewrite'],
-                ], true, (int) $idLang, (int) $shopId),
-                'date' => (string) $row['date_upd'],
-            ];
-        }
-
-        return $this->writeSitemapFiles($filename, $items);
-    }
-
-    private function processSitemapCategory($shopId, $idLang)
-    {
-        $filename = 'blogcategory_' . (int) $shopId . '_lang_' . \Language::getIsoById((int) $idLang);
-        $sql = 'SELECT DISTINCT c.id_ever_category, c.date_upd, c.allowed_groups, c.active, c.is_root_category, cl.link_rewrite
-                FROM `' . _DB_PREFIX_ . 'ever_blog_category` c
-                INNER JOIN `' . _DB_PREFIX_ . 'ever_blog_category_lang` cl
-                    ON cl.id_ever_category = c.id_ever_category AND cl.id_lang = ' . (int) $idLang . '
-                LEFT JOIN `' . _DB_PREFIX_ . 'ever_blog_category_shop` cs
-                    ON cs.id_ever_category = c.id_ever_category
-                WHERE c.sitemap = 1
-                    AND c.active = 1
-                    AND (c.id_shop = ' . (int) $shopId . ' OR cs.id_shop = ' . (int) $shopId . ')';
-        $rows = \Db::getInstance()->executeS($sql) ?: [];
-
-        $items = [];
-        $link = new \Link();
-        foreach ($rows as $row) {
-            if ($this->isRestrictedFromSitemap($row['allowed_groups'] ?? null) || !(int) $row['active'] || (int) $row['is_root_category']) {
-                continue;
-            }
-            $items[] = [
-                'url' => $link->getModuleLink('everpsblog', 'category', [
-                    'id_ever_category' => (int) $row['id_ever_category'],
-                    'link_rewrite' => (string) $row['link_rewrite'],
-                ], true, (int) $idLang, (int) $shopId),
-                'date' => (string) $row['date_upd'],
-            ];
-        }
-
-        return $this->writeSitemapFiles($filename, $items);
-    }
-
     private function writeSitemapFiles($filename, array $items)
     {
         $chunkSize = max(1, (int) \Configuration::get('EVERBLOG_SITEMAP_NUMBER'));
-        $shopId = (int) preg_replace('/^blog(?:post|author|tag|category)_([0-9]+)_.+$/', '$1', $filename);
+        $shopId = (int) preg_replace('/^blogpost_([0-9]+)_.+$/', '$1', $filename);
         $domain = $this->getShopBaseUrl($shopId);
         $path = _PS_ROOT_DIR_ . '/';
         $this->removeExistingSitemapFiles($path, $filename);
@@ -297,16 +198,27 @@ class BlogSitemapService
         return true;
     }
 
+    private function removeLegacyTaxonomySitemapFiles(int $shopId): void
+    {
+        foreach (['blogauthor', 'blogtag', 'blogcategory'] as $prefix) {
+            foreach ((array) glob(_PS_ROOT_DIR_ . '/' . $prefix . '_' . (int) $shopId . '_lang_*.xml') as $file) {
+                if (is_file($file)) {
+                    @unlink($file);
+                }
+            }
+        }
+    }
+
     private function isModuleSitemapIndex(string $filename, ?int $shopId = null): bool
     {
         $shopPattern = null !== $shopId ? (string) (int) $shopId : '[0-9]+';
 
-        return (bool) preg_match('/^blog(post|author|tag|category)_' . $shopPattern . '_lang_.+-indexable\.xml$/', $filename);
+        return (bool) preg_match('/^blogpost_' . $shopPattern . '_lang_.+-indexable\.xml$/', $filename);
     }
 
     private function extractShopIdFromSitemapFilename(string $filename): int
     {
-        if (preg_match('/^blog(?:post|author|tag|category)_([0-9]+)_lang_.+-indexable\.xml$/', $filename, $matches)) {
+        if (preg_match('/^blogpost_([0-9]+)_lang_.+-indexable\.xml$/', $filename, $matches)) {
             return (int) $matches[1];
         }
 

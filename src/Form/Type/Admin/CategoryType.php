@@ -5,6 +5,7 @@ namespace PrestaShop\Module\Everpsblog\Form\Type\Admin;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -40,14 +41,26 @@ final class CategoryType extends AbstractType
                 'required' => false,
                 'label' => 'Follow',
             ])
-            ->add('sitemap', CheckboxType::class, [
-                'required' => false,
-                'label' => 'Include in sitemap',
-            ])
             ->add('count', IntegerType::class, [
                 'required' => false,
                 'label' => 'Counter',
                 'disabled' => true,
+            ])
+            ->add('banner_image_file', FileType::class, [
+                'required' => false,
+                'mapped' => false,
+                'label' => 'Banner image',
+                'help' => $options['banner_image_help'],
+                'help_html' => true,
+            ])
+            ->add('delete_banner_image', CheckboxType::class, [
+                'required' => false,
+                'mapped' => false,
+                'disabled' => !$options['has_banner_image'],
+                'label' => 'Delete current banner image',
+                'help' => $options['has_banner_image']
+                    ? 'Check this box and save to delete the current banner image.'
+                    : 'No banner image is associated with this category yet.',
             ])
             ->add('allowed_groups', ChoiceType::class, [
                 'required' => false,
@@ -192,7 +205,11 @@ final class CategoryType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'banner_image_help' => '',
+            'has_banner_image' => false,
             'translation_domain' => 'Modules.Everpsblog.Admin',
         ]);
+        $resolver->setAllowedTypes('banner_image_help', 'string');
+        $resolver->setAllowedTypes('has_banner_image', 'bool');
     }
 }

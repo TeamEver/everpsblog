@@ -61,10 +61,6 @@ final class AuthorType extends AbstractType
                 'required' => false,
                 'label' => 'Follow',
             ])
-            ->add('sitemap', CheckboxType::class, [
-                'required' => false,
-                'label' => 'Include in sitemap',
-            ])
             ->add('count', IntegerType::class, [
                 'required' => false,
                 'label' => 'Counter',
@@ -100,6 +96,22 @@ final class AuthorType extends AbstractType
                 'help' => $options['has_author_image']
                     ? 'Check this box and save to delete the current image.'
                     : 'No author image is associated with this author yet.',
+            ])
+            ->add('banner_image_file', FileType::class, [
+                'required' => false,
+                'mapped' => false,
+                'label' => 'Banner image',
+                'help' => $options['banner_image_help'],
+                'help_html' => true,
+            ])
+            ->add('delete_banner_image', CheckboxType::class, [
+                'required' => false,
+                'mapped' => false,
+                'disabled' => !$options['has_banner_image'],
+                'label' => 'Delete current banner image',
+                'help' => $options['has_banner_image']
+                    ? 'Check this box and save to delete the current banner image.'
+                    : 'No banner image is associated with this author yet.',
             ])
         ;
 
@@ -226,9 +238,13 @@ final class AuthorType extends AbstractType
         $resolver->setDefaults([
             'author_image_help' => '',
             'has_author_image' => false,
+            'banner_image_help' => '',
+            'has_banner_image' => false,
             'translation_domain' => 'Modules.Everpsblog.Admin',
         ]);
         $resolver->setAllowedTypes('author_image_help', 'string');
         $resolver->setAllowedTypes('has_author_image', 'bool');
+        $resolver->setAllowedTypes('banner_image_help', 'string');
+        $resolver->setAllowedTypes('has_banner_image', 'bool');
     }
 }

@@ -25,14 +25,14 @@
     <meta name="twitter:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
     <meta name="twitter:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
     {* <meta name="twitter:creator" content="@category_handle"> *}
-    <meta name="twitter:image" content="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$category->id|escape:'htmlall':'UTF-8'}.jpg">
+    <meta name="twitter:image" content="{if isset($has_category_banner) && $has_category_banner}{$category_banner_image|escape:'htmlall':'UTF-8'}{else}{$featured_image|escape:'htmlall':'UTF-8'}{/if}">
     <!-- Open Graph Card data -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{$urls.current_url|escape:'htmlall':'UTF-8'}">
     <meta property="og:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
     <meta property="og:site_name" content="{$shop.name|escape:'htmlall':'UTF-8'}">
     <meta property="og:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
-    <meta property="og:image" content="{$blogImg_dir|escape:'htmlall':'UTF-8'}categories/category_image_{$category->id|escape:'htmlall':'UTF-8'}.jpg">
+    <meta property="og:image" content="{if isset($has_category_banner) && $has_category_banner}{$category_banner_image|escape:'htmlall':'UTF-8'}{else}{$featured_image|escape:'htmlall':'UTF-8'}{/if}">
     {if isset($hreflang_links) && $hreflang_links}
         {foreach from=$hreflang_links item=hreflang_link}
             <link rel="alternate" hreflang="{$hreflang_link.hreflang|escape:'htmlall':'UTF-8'}" href="{$hreflang_link.href|escape:'htmlall':'UTF-8'}">
@@ -54,7 +54,7 @@
     },
     "headline": "{$category->title|escape:'htmlall':'UTF-8'}",
     "image": [
-      "{$featured_image|escape:'htmlall':'UTF-8'}"
+      "{if isset($has_category_banner) && $has_category_banner}{$category_banner_image|escape:'htmlall':'UTF-8'}{else}{$featured_image|escape:'htmlall':'UTF-8'}{/if}"
      ],
     "datePublished": "{$category->date_add|date_format:'%Y-%m-%d'|escape:'htmlall':'UTF-8'}",
     "dateModified": "{$category->date_upd|date_format:'%Y-%m-%d'|escape:'htmlall':'UTF-8'}",
@@ -77,9 +77,14 @@
 {block name="page_content"}
 {hook h="displayBeforeEverCategory" everblogcategory=$category}
 <div class="everpsblog-blog-header everpsblog-category-header container-fluid px-0 mb-4">
-    <div class="everpsblog-blog-header__inner everpsblog-category-hero text-center py-5"{if isset($show_featured_cat) && $show_featured_cat && isset($featured_image) && $featured_image} style="background-image:url('{$featured_image|escape:'htmlall':'UTF-8'}'); background-size: cover; background-position: center;"{elseif isset($everpsblog_header_bg_color) && $everpsblog_header_bg_color} style="background: {$everpsblog_header_bg_color|escape:'htmlall':'UTF-8'};"{/if}>
+    <div class="everpsblog-blog-header__inner everpsblog-category-hero text-center py-5"{if isset($everpsblog_header_bg_color) && $everpsblog_header_bg_color} style="background: {$everpsblog_header_bg_color|escape:'htmlall':'UTF-8'};"{/if}>
         <div class="everpsblog-category-hero-overlay">
             <h1 class="m-0 everpsblog-blog-header__title everpsblog-category-title">{$category->title|escape:'htmlall':'UTF-8'}</h1>
+            {if isset($has_category_banner) && $has_category_banner && isset($category_banner_image) && $category_banner_image}
+            <div class="everpsblog-taxonomy-banner">
+                <img src="{$category_banner_image|escape:'htmlall':'UTF-8'}" alt="{$category->title|escape:'htmlall':'UTF-8'}" title="{$category->title|escape:'htmlall':'UTF-8'}">
+            </div>
+            {/if}
             {if isset($children_categories) && $children_categories && !empty($children_categories)}
             <div class="everpsblog-subcategories everpsblog-blog-header__categories d-flex flex-wrap justify-content-center gap-2 mt-4" role="navigation" aria-label="{l s='Subcategories' d='Modules.Everpsblog.Shop'}">
                 {foreach from=$children_categories item=item}

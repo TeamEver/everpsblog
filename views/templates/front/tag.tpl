@@ -25,14 +25,14 @@
     <meta name="twitter:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
     <meta name="twitter:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
     {* <meta name="twitter:creator" content="@author_handle"> *}
-    <meta name="twitter:image" content="{$blogImg_dir|escape:'htmlall':'UTF-8'}tags/tag_image_{$tag->id|escape:'htmlall':'UTF-8'}.jpg">
+    <meta name="twitter:image" content="{if isset($has_tag_banner) && $has_tag_banner}{$tag_banner_image|escape:'htmlall':'UTF-8'}{else}{$featured_image|escape:'htmlall':'UTF-8'}{/if}">
     <!-- Open Graph Card data -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{$urls.current_url|escape:'htmlall':'UTF-8'}">
     <meta property="og:title" content="{$page.meta.title|escape:'htmlall':'UTF-8'}">
     <meta property="og:site_name" content="{$shop.name|escape:'htmlall':'UTF-8'}">
     <meta property="og:description" content="{$page.meta.description|escape:'htmlall':'UTF-8'}">
-    <meta property="og:image" content="{$blogImg_dir|escape:'htmlall':'UTF-8'}tags/tag_image_{$tag->id|escape:'htmlall':'UTF-8'}.jpg">
+    <meta property="og:image" content="{if isset($has_tag_banner) && $has_tag_banner}{$tag_banner_image|escape:'htmlall':'UTF-8'}{else}{$featured_image|escape:'htmlall':'UTF-8'}{/if}">
     {if isset($hreflang_links) && $hreflang_links}
         {foreach from=$hreflang_links item=hreflang_link}
             <link rel="alternate" hreflang="{$hreflang_link.hreflang|escape:'htmlall':'UTF-8'}" href="{$hreflang_link.href|escape:'htmlall':'UTF-8'}">
@@ -50,12 +50,14 @@
 {hook h="displayBeforeEverTag" everblogtag=$tag}
 <div class="everpsblog-blog-header container-fluid px-0 mb-4">
     <div class="everpsblog-blog-header__inner text-center py-5"{if isset($everpsblog_header_bg_color) && $everpsblog_header_bg_color} style="background: {$everpsblog_header_bg_color|escape:'htmlall':'UTF-8'};"{/if}>
-        {if isset($paginated) && !$paginated && isset($show_featured_tag) && $show_featured_tag}
-        <div class="tag-header mb-3">
-            <img src="{$featured_image|escape:'htmlall':'UTF-8'}" class="img img-fluid mx-auto d-block" alt="{$tag->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}" title="{$tag->title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}">
+        <div class="everpsblog-taxonomy-hero-overlay">
+            <h1 class="m-0 everpsblog-blog-header__title">{$tag->title|escape:'htmlall':'UTF-8'}</h1>
+            {if isset($has_tag_banner) && $has_tag_banner && isset($tag_banner_image) && $tag_banner_image}
+            <div class="everpsblog-taxonomy-banner">
+                <img src="{$tag_banner_image|escape:'htmlall':'UTF-8'}" alt="{$tag->title|escape:'htmlall':'UTF-8'}" title="{$tag->title|escape:'htmlall':'UTF-8'}">
+            </div>
+            {/if}
         </div>
-        {/if}
-        <h1 class="m-0 everpsblog-blog-header__title">{$tag->title|escape:'htmlall':'UTF-8'}</h1>
     </div>
 </div>
 <div class="container my-4">

@@ -39,7 +39,7 @@ class PostCommandDataBuilder
             $dateAdd,
             (int) ($data['indexable'] ?? 0),
             (int) ($data['follow'] ?? 0),
-            (int) ($data['sitemap'] ?? 0),
+            (int) ($data['sitemap'] ?? 1),
             (int) ($data['starred'] ?? 0),
             $this->toArray($data['post_categories'] ?? []),
             $this->toArray($data['allowed_groups'] ?? []),

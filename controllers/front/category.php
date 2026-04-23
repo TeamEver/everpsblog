@@ -175,6 +175,17 @@ class EverPsBlogcategoryModuleFrontController extends AbstractFrontController
                 (int) $this->context->shop->id,
                 'category'
             );
+            $categoryBannerImage = $this->getBlogImageService()->getBlogImage(
+                (int) $this->category->id,
+                (int) $this->context->shop->id,
+                'category_banner'
+            );
+            $hasCategoryBanner = \Validate::isLoadedObject($categoryBannerImage);
+            $categoryBannerUrl = $hasCategoryBanner ? $this->getBlogImageService()->getBlogImageUrl(
+                (int) $this->category->id,
+                (int) $this->context->shop->id,
+                'category_banner'
+            ) : '';
             $feed_url = $this->context->link->getModuleLink(
                 $this->module->name,
                 'feed',
@@ -193,6 +204,8 @@ class EverPsBlogcategoryModuleFrontController extends AbstractFrontController
                 'allow_feed' => (bool) Configuration::get('EVERBLOG_RSS'),
                 'feed_url' => $feed_url,
                 'featured_image' => $file_url,
+                'category_banner_image' => $categoryBannerUrl,
+                'has_category_banner' => $hasCategoryBanner,
                 'paginated' => Tools::getValue('page'),
                 'post_number' => (int) $this->post_number,
                 'pagination' => $pagination,

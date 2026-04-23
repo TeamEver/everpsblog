@@ -152,6 +152,17 @@ class EverPsBlogtagModuleFrontController extends AbstractFrontController
                 (int) $this->context->shop->id,
                 'tag'
             );
+            $tagBannerImage = $this->getBlogImageService()->getBlogImage(
+                (int) $this->tag->id,
+                (int) $this->context->shop->id,
+                'tag_banner'
+            );
+            $hasTagBanner = \Validate::isLoadedObject($tagBannerImage);
+            $tagBannerUrl = $hasTagBanner ? $this->getBlogImageService()->getBlogImageUrl(
+                (int) $this->tag->id,
+                (int) $this->context->shop->id,
+                'tag_banner'
+            ) : '';
             $feed_url = $this->context->link->getModuleLink(
                 $this->module->name,
                 'feed',
@@ -169,6 +180,8 @@ class EverPsBlogtagModuleFrontController extends AbstractFrontController
                 'allow_feed' => (bool)Configuration::get('EVERBLOG_RSS'),
                 'feed_url' => $feed_url,
                 'featured_image' => $file_url,
+                'tag_banner_image' => $tagBannerUrl,
+                'has_tag_banner' => $hasTagBanner,
                 'paginated' => Tools::getValue('page'),
                 'post_number' => (int) $this->post_number,
                 'pagination' => $pagination,

@@ -10,6 +10,7 @@ use PrestaShop\Module\Everpsblog\Form\DataProvider\AuthorFormDataProvider;
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\AuthorType;
 use PrestaShop\Module\Everpsblog\Grid\Data\AuthorGridDataFactory;
 use PrestaShop\Module\Everpsblog\Grid\Definition\AuthorGridDefinitionFactory;
+use PrestaShop\Module\Everpsblog\Service\AdminBlogImageManager;
 use PrestaShop\Module\Everpsblog\Service\BlogImageService;
 use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
@@ -31,6 +32,7 @@ class AuthorController extends AbstractDomainController
     private $blogImageService;
     private $imageUploader;
     private $blogSitemapService;
+    private $adminBlogImageManager;
 
     public function __construct(
         ContextStateService $contextStateService,
@@ -42,7 +44,8 @@ class AuthorController extends AbstractDomainController
         AuthorWriteRepository $authorWriteRepository,
         BlogImageService $blogImageService,
         ImageUploader $imageUploader,
-        BlogSitemapService $blogSitemapService
+        BlogSitemapService $blogSitemapService,
+        AdminBlogImageManager $adminBlogImageManager
     ) {
         parent::__construct($contextStateService);
         $this->commandBus = $commandBus;
@@ -54,6 +57,7 @@ class AuthorController extends AbstractDomainController
         $this->blogImageService = $blogImageService;
         $this->imageUploader = $imageUploader;
         $this->blogSitemapService = $blogSitemapService;
+        $this->adminBlogImageManager = $adminBlogImageManager;
     }
 
     public function indexAction(Request $request): Response
@@ -74,6 +78,8 @@ class AuthorController extends AbstractDomainController
         $csrfTokenId = $isEdit ? 'everpsblog_author_update_' . $authorId : 'everpsblog_author_create';
         $authorImageHelp = $isEdit ? $this->buildAuthorImageHelp((int) $authorId) : '';
         $hasAuthorImage = $isEdit ? $this->hasAuthorImage((int) $authorId) : false;
+        $bannerImageHelp = $isEdit ? $this->buildBannerImageHelp((int) $authorId) : '';
+        $hasBannerImage = $isEdit ? $this->hasBannerImage((int) $authorId) : false;
 
         $form = $this->createForm(AuthorType::class, $this->formDataProvider->getData($authorId), [
             'method' => Request::METHOD_POST,
@@ -82,6 +88,8 @@ class AuthorController extends AbstractDomainController
                 : $this->generateUrl('everpsblog_admin_author_form'),
             'author_image_help' => $authorImageHelp,
             'has_author_image' => $hasAuthorImage,
+            'banner_image_help' => $bannerImageHelp,
+            'has_banner_image' => $hasBannerImage,
         ]);
         $form->handleRequest($request);
 
@@ -96,7 +104,11 @@ class AuthorController extends AbstractDomainController
                     if ((bool) $form->get('delete_author_image')->getData()) {
                         $this->deleteAuthorImage((int) $savedAuthorId);
                     }
+                    if ((bool) $form->get('delete_banner_image')->getData()) {
+                        $this->deleteBannerImage((int) $savedAuthorId);
+                    }
                     $this->handleAuthorImageUpload($form->get('author_image_file')->getData(), (int) $savedAuthorId);
+                    $this->handleBannerImageUpload($form->get('banner_image_file')->getData(), (int) $savedAuthorId);
                     $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService);
                     $submitAction = (string) $request->request->get('_submit_action', 'save');
 
@@ -183,6 +195,7 @@ class AuthorController extends AbstractDomainController
         try {
             $this->commandBus->handle(new DeleteAuthorCommand($authorId, $reassignTo));
             $this->deleteAuthorImage($authorId);
+            $this->deleteBannerImage($authorId);
             $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService, false);
         } catch (\RuntimeException $exception) {
             // Reassignment required – surface a 409 with the candidate list so the UI can prompt.
@@ -239,6 +252,16 @@ class AuthorController extends AbstractDomainController
         }
 
         $this->blogImageService->clearCache();
+    }
+
+    private function handleBannerImageUpload($uploadedImage, int $authorId): void
+    {
+        $this->adminBlogImageManager->upload($uploadedImage, $authorId, $this->getContextShopId(), 'author_banner');
+    }
+
+    private function deleteBannerImage(int $authorId): void
+    {
+        $this->adminBlogImageManager->delete($authorId, $this->getContextShopId(), 'author_banner');
     }
 
     private function deleteAuthorImage(int $authorId): void
@@ -334,6 +357,22 @@ class AuthorController extends AbstractDomainController
             htmlspecialchars($this->transAdmin('Current author image'), ENT_QUOTES, 'UTF-8'),
             htmlspecialchars($this->transAdmin('Current image'), ENT_QUOTES, 'UTF-8'),
             htmlspecialchars($this->transAdmin('open in a new tab'), ENT_QUOTES, 'UTF-8')
+        );
+    }
+
+    private function hasBannerImage(int $authorId): bool
+    {
+        return $this->adminBlogImageManager->hasImage($authorId, $this->getContextShopId(), 'author_banner');
+    }
+
+    private function buildBannerImageHelp(int $authorId): string
+    {
+        return $this->adminBlogImageManager->buildImageHelp(
+            $authorId,
+            $this->getContextShopId(),
+            'author_banner',
+            $this->transAdmin('Current banner image'),
+            $this->transAdmin('open in a new tab')
         );
     }
 

@@ -282,7 +282,7 @@
 
 {% block ever_blog_language_switch %}
   {% if everBlogLanguages is not empty %}
-    <div class="ever-lang-box d-flex flex-wrap align-items-center justify-content-between">
+    <div class="ever-lang-box d-flex flex-wrap align-items-center justify-content-start">
       <div class="small text-muted mr-2">{{ 'Editing language:'|trans({}, 'Modules.Everpsblog.Admin') }}</div>
       <div class="btn-group btn-group-sm" role="group" aria-label="{{ 'Language selector'|trans({}, 'Modules.Everpsblog.Admin') }}">
         {% for lang in everBlogLanguages %}
@@ -325,8 +325,9 @@
     <div class="tab-pane fade" id="ever-pane-seo" role="tabpanel">
       {% for field in everBlogSections.seo %}
         {% set fieldName = field.vars.name %}
-        {% set fieldLangParts = fieldName|split('_') %}
-        {% set fieldLangId = fieldLangParts|last matches '/^\d+$/' ? fieldLangParts|last : null %}
+        {% set fieldLangIdFromName = field.vars.name|split('_')|last %}
+        {% set fieldLangIdFromId = field.vars.id|split('_')|last %}
+        {% set fieldLangId = fieldLangIdFromName matches '/^\d+$/' ? fieldLangIdFromName : (fieldLangIdFromId matches '/^\d+$/' ? fieldLangIdFromId : null) %}
         <div class="ever-seo-field {% if fieldName starts with 'meta_title_' %}ever-meta-title{% elseif fieldName starts with 'meta_description_' %}ever-meta-description{% elseif fieldName starts with 'link_rewrite_' %}ever-slug-field{% endif %}"{% if fieldLangId %} data-lang-id="{{ fieldLangId }}"{% endif %}>
           {{ form_row(field) }}
           {% if fieldName starts with 'meta_title_' %}
@@ -416,7 +417,7 @@
         {% set contentFields = contentFields|merge([child]) %}
       {% elseif fieldName starts with 'meta_title_' or fieldName starts with 'meta_description_' or fieldName starts with 'link_rewrite_' %}
         {% set seoFields = seoFields|merge([child]) %}
-      {% elseif fieldName in ['post_status', 'date_add', 'id_author', 'starred', 'psswd', 'featured_image_file', 'delete_featured_image', 'banner_image_file', 'delete_banner_image', 'author_image_file', 'delete_author_image', 'active', 'indexable', 'follow', 'sitemap', 'id_parent_category', 'is_root_category', 'id_employee', 'twitter', 'facebook', 'linkedin', 'count'] %}
+      {% elseif fieldName in ['post_status', 'date_add', 'id_author', 'starred', 'psswd', 'featured_image_file', 'delete_featured_image', 'banner_image_file', 'delete_banner_image', 'author_image_file', 'delete_author_image', 'active', 'indexable', 'follow', 'id_parent_category', 'is_root_category', 'id_employee', 'twitter', 'facebook', 'linkedin', 'count'] %}
         {% set publicationFields = publicationFields|merge([child]) %}
       {% elseif fieldName in ['id_default_category', 'post_categories', 'post_tags', 'post_products', 'allowed_groups', 'category_products', 'tag_products', 'author_products'] %}
         {% set relationFields = relationFields|merge([child]) %}
@@ -439,8 +440,22 @@
   {% endfor %}
 
   {% set everBlogLanguages = [] %}
+  {% set everBlogLanguageLabels = {} %}
+  {% for field in contentFields|merge(seoFields)|merge(publicationFields)|merge(relationFields) %}
+    {% set fieldNameParts = field.vars.name|split('_') %}
+    {% set fieldIdParts = field.vars.id|split('_') %}
+    {% set maybeLangIdFromName = fieldNameParts|last %}
+    {% set maybeLangIdFromId = fieldIdParts|last %}
+    {% set maybeLangId = maybeLangIdFromName matches '/^\\d+$/' ? maybeLangIdFromName : (maybeLangIdFromId matches '/^\\d+$/' ? maybeLangIdFromId : null) %}
+    {% if maybeLangId %}
+      {% set labelParts = field.vars.label|default('')|split('(') %}
+      {% set labelSuffix = labelParts|length > 1 ? (labelParts|last|split(')')|first) : '' %}
+      {% set languageLabel = labelSuffix ? labelSuffix|upper : 'Language #%id%'|trans({'%id%': maybeLangId}, 'Modules.Everpsblog.Admin') %}
+      {% set everBlogLanguageLabels = everBlogLanguageLabels|merge({ (maybeLangId): languageLabel }) %}
+    {% endif %}
+  {% endfor %}
   {% for langId in langIds %}
-    {% set everBlogLanguages = everBlogLanguages|merge([{ id: langId, label: 'Language #%id%'|trans({'%id%': langId}, 'Modules.Everpsblog.Admin') }]) %}
+    {% set everBlogLanguages = everBlogLanguages|merge([{ id: langId, label: everBlogLanguageLabels[langId]|default('Language #%id%'|trans({'%id%': langId}, 'Modules.Everpsblog.Admin')) }]) %}
   {% endfor %}
 
   {% set everBlogSections = {
@@ -610,7 +625,6 @@
       var langSwitchers = root.querySelectorAll('.ever-lang-switch');
       var langErrorItems = root.querySelectorAll('.ever-lang-error-item');
       var fieldsWithLang = root.querySelectorAll('[name]');
-      var seoFieldBlocks = root.querySelectorAll('.ever-seo-field[data-lang-id]');
 
       function setActiveLang(langId) {
         Array.prototype.forEach.call(langSwitchers, function (btn) {
@@ -618,20 +632,21 @@
         });
 
         Array.prototype.forEach.call(fieldsWithLang, function (field) {
-          if (field.closest('.ever-seo-field[data-lang-id]')) {
+          var lang = detectLangForField(field);
+          var seoWrapper = field.closest('.ever-seo-field');
+          var wrapper = seoWrapper || field.closest('.form-group, .form-control-group, .mb-3') || field.parentNode;
+          if (!lang || !wrapper) {
             return;
           }
 
-          var lang = detectLangForField(field);
-          var wrapper = field.closest('.form-group, .form-control-group, .mb-3') || field.parentNode;
-          if (!lang || !wrapper) {
-            return;
+          if (seoWrapper && !seoWrapper.getAttribute('data-lang-id')) {
+            seoWrapper.setAttribute('data-lang-id', lang);
           }
 
           wrapper.style.display = lang === langId ? '' : 'none';
         });
 
-        Array.prototype.forEach.call(seoFieldBlocks, function (block) {
+        Array.prototype.forEach.call(root.querySelectorAll('.ever-seo-field[data-lang-id]'), function (block) {
           block.style.display = block.getAttribute('data-lang-id') === langId ? '' : 'none';
         });
       }

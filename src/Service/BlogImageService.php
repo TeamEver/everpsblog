@@ -26,7 +26,7 @@ class BlogImageService
 
     public function getImageTypes()
     {
-        return ['post', 'post_banner', 'category', 'tag', 'author'];
+        return ['post', 'post_banner', 'category', 'category_banner', 'tag', 'tag_banner', 'author', 'author_banner'];
     }
 
     public function createImageModel()
