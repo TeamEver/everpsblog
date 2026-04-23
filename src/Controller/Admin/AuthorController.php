@@ -351,10 +351,11 @@ class AuthorController extends AbstractDomainController
         }
 
         $url = (string) $this->blogImageService->getBlogImageUrl($authorId, $shopId, 'author');
-        $escapedUrl = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+        $previewUrl = $this->appendTimestampToUrl($url);
+        $escapedUrl = htmlspecialchars($previewUrl, ENT_QUOTES, 'UTF-8');
 
         return sprintf(
-            '<span class="ever-featured-image-preview"><img src="%1$s" alt="%2$s" loading="lazy"><span>%3$s: <a href="%1$s" target="_blank" rel="noopener noreferrer">%4$s</a></span></span>',
+            '<span class="ever-featured-image-preview"><img src="%1$s" data-ever-preview-src="%1$s" alt="%2$s" loading="lazy"><span>%3$s: <a href="%1$s" target="_blank" rel="noopener noreferrer">%4$s</a></span></span>',
             $escapedUrl,
             htmlspecialchars($this->transAdmin('Current author image'), ENT_QUOTES, 'UTF-8'),
             htmlspecialchars($this->transAdmin('Current image'), ENT_QUOTES, 'UTF-8'),
@@ -407,5 +408,12 @@ class AuthorController extends AbstractDomainController
         if (!$this->isCsrfTokenValid($tokenId, $token)) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
+    }
+
+    private function appendTimestampToUrl(string $url): string
+    {
+        $separator = false === strpos($url, '?') ? '?' : '&';
+
+        return $url . $separator . 't=' . time();
     }
 }
