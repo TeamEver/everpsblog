@@ -35,19 +35,42 @@
 #module-everpsblog-tag .everpsblog-blog-header,
 #module-everpsblog-author .everpsblog-blog-header,
 #module-everpsblog-search .everpsblog-blog-header {
+    position: relative;
     width: 99.6vw;
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
+    overflow: hidden;
+    background-color: #0a0f54;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
 }
+
+.everpsblog-blog-header--has-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(10, 15, 84, 0.28) 0%, rgba(10, 15, 84, 0.55) 100%);
+}
+
 #module-everpsblog-blog .everpsblog-blog-header__inner,
 #module-everpsblog-category .everpsblog-blog-header__inner,
 #module-everpsblog-tag .everpsblog-blog-header__inner,
 #module-everpsblog-author .everpsblog-blog-header__inner,
 #module-everpsblog-search .everpsblog-blog-header__inner {
+    position: relative;
+    z-index: 1;
     width: 100%;
     padding-left: 1rem;
     padding-right: 1rem;
-    background: #0a0f54;
+    background: transparent;
+}
+
+.everpsblog-blog-header--has-banner .everpsblog-blog-header__inner {
+    min-height: clamp(260px, 34vw, 420px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 #module-everpsblog-blog .everpsblog-blog-header__title,
 #module-everpsblog-category .everpsblog-blog-header__title,
@@ -477,10 +500,7 @@ body#module-everpsblog-post .product-miniature .product-miniature{
 
 #module-everpsblog-category .everpsblog-category-hero {
     position: relative;
-    background: linear-gradient(90deg, #0a0f54 0%, #0a0f54 50%, #0a0f54 100%);
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat;
+    background: transparent;
     overflow: hidden;
 }
 
@@ -624,19 +644,6 @@ body#module-everpsblog-post .product-miniature .product-miniature{
 #module-everpsblog-author .everpsblog-taxonomy-hero-overlay {
     max-width: 1120px;
     margin: auto;
-}
-
-#module-everpsblog-category .everpsblog-taxonomy-banner,
-#module-everpsblog-tag .everpsblog-taxonomy-banner,
-#module-everpsblog-author .everpsblog-taxonomy-banner {
-    width: 100%;
-    margin-top: 1.5rem;
-    min-height: 260px;
-    max-height: 420px;
-    height: clamp(260px, 34vw, 420px);
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat;
 }
 
 #module-everpsblog-post .everpsblog-post-title {

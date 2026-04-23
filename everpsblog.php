@@ -158,6 +158,7 @@ class EverPsBlog extends Module
                 return $title;
             })())
             && Configuration::updateValue('EVERBLOG_HEADER_BG_COLOR', '#0a0f54')
+            && Configuration::updateValue('EVERBLOG_HEADER_TITLE_COLOR', '#ffffff')
             && $this->checkAndFixDatabase()
             && $this->checkHooks()
             && $this->checkObligatoryHooks();
@@ -777,14 +778,26 @@ class EverPsBlog extends Module
             if (!$header_bg_color || !Validate::isColor($header_bg_color)) {
                 $header_bg_color = '#0a0f54';
             }
+            $header_title_color = Configuration::get('EVERBLOG_HEADER_TITLE_COLOR');
+            if (!$header_title_color || !Validate::isColor($header_title_color)) {
+                $header_title_color = '#ffffff';
+            }
             $this->context->smarty->assign('everpsblog_header_bg_color', $header_bg_color);
+            $this->context->smarty->assign('everpsblog_header_title_color', $header_title_color);
             $dynamic_header_css = '<style>'
-                . '#module-everpsblog-blog .everpsblog-blog-header__inner,'
-                . '#module-everpsblog-category .everpsblog-blog-header__inner,'
-                . '#module-everpsblog-tag .everpsblog-blog-header__inner,'
-                . '#module-everpsblog-author .everpsblog-blog-header__inner,'
-                . '#module-everpsblog-search .everpsblog-blog-header__inner'
-                . '{background:' . $header_bg_color . ' !important;}'
+                . '#module-everpsblog-blog .everpsblog-blog-header,'
+                . '#module-everpsblog-category .everpsblog-blog-header,'
+                . '#module-everpsblog-tag .everpsblog-blog-header,'
+                . '#module-everpsblog-author .everpsblog-blog-header,'
+                . '#module-everpsblog-search .everpsblog-blog-header'
+                . '{background-color:' . $header_bg_color . ' !important;}'
+                . '#module-everpsblog-blog .everpsblog-blog-header__title,'
+                . '#module-everpsblog-category .everpsblog-blog-header__title,'
+                . '#module-everpsblog-tag .everpsblog-blog-header__title,'
+                . '#module-everpsblog-author .everpsblog-blog-header__title,'
+                . '#module-everpsblog-search .everpsblog-blog-header__title,'
+                . '#module-everpsblog-post .everpsblog-post-title'
+                . '{color:' . $header_title_color . ' !important;}'
                 . '</style>';
         }
         $this->context->controller->addCSS(

@@ -73,13 +73,10 @@ final class AuthorType extends AbstractType
                 'multiple' => true,
                 'expanded' => true,
             ])
-            ->add('author_products', ChoiceType::class, [
+            ->add('author_products', ProductAutocompleteType::class, [
                 'required' => false,
                 'label' => 'Linked products',
-                'choices' => $this->getProductChoices(),
-                'multiple' => true,
-                'expanded' => false,
-                'attr' => ['data-ever-tagify' => '1'],
+                'help' => 'Search by product name, reference or ID to link products without loading the whole catalogue.',
             ])
             ->add('author_image_file', FileType::class, [
                 'required' => false,
@@ -179,34 +176,6 @@ final class AuthorType extends AbstractType
 
             $label = trim((string) ($row['fullname'] ?? ''));
             $choices[$label ?: sprintf('Employee #%d', $id)] = $id;
-        }
-
-        return $choices;
-    }
-
-    /**
-     * @return array<string, int>
-     */
-    private function getProductChoices(): array
-    {
-        $rows = \Db::getInstance()->executeS(
-            'SELECT p.id_product, pl.name
-            FROM `' . _DB_PREFIX_ . 'product` p
-            INNER JOIN `' . _DB_PREFIX_ . 'product_shop` ps ON (ps.id_product = p.id_product AND ps.id_shop = ' . (int) \Context::getContext()->shop->id . ')
-            LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl ON (pl.id_product = p.id_product AND pl.id_lang = ' . (int) \Context::getContext()->language->id . ' AND pl.id_shop = ' . (int) \Context::getContext()->shop->id . ')
-            ORDER BY p.id_product DESC
-            LIMIT 500'
-        ) ?: [];
-
-        $choices = [];
-        foreach ($rows as $row) {
-            $id = (int) ($row['id_product'] ?? 0);
-            if ($id <= 0) {
-                continue;
-            }
-
-            $label = trim((string) ($row['name'] ?? ''));
-            $choices[$label ?: sprintf('Product #%d', $id)] = $id;
         }
 
         return $choices;

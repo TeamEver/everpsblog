@@ -19,16 +19,18 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:creativeCommons="http://backend.userland.com/creativeCommonsRssModule" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" version="2.0">
 <channel>
     <title>{$feed_obj->title|escape:'htmlall':'UTF-8'}</title>
-    {* <atom:link href="{$feed_url}" rel="self" type="application/rss+xml" /> *}
-    <link>/</link>
-    <description>{$feed_obj->content nofilter}</description>
+    <atom:link href="{$feed_url|escape:'htmlall':'UTF-8'}" rel="self" type="application/rss+xml" />
+    <link>{$feed_obj->feed_link|escape:'htmlall':'UTF-8'}</link>
+    <description>{$feed_obj->feed_description|escape:'htmlall':'UTF-8'}</description>
     <language>{$locale|escape:'htmlall':'UTF-8'}</language>
     {foreach from=$posts item=item}
     <item>
        <title>{$item->title|escape:'htmlall':'UTF-8'}</title>
-       <link><![CDATA[{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $item->id_ever_post , 'link_rewrite' => $item->link_rewrite])|escape:'htmlall':'UTF-8'}]]></link>
-       <pubDate>{$item->date_add|escape:'htmlall':'UTF-8'}</pubDate>
-       <content:encoded><![CDATA[{$item->content nofilter}]]></content:encoded>
+       <link>{$item->feed_link|escape:'htmlall':'UTF-8'}</link>
+       <guid isPermaLink="true">{$item->feed_link|escape:'htmlall':'UTF-8'}</guid>
+       <pubDate>{$item->feed_pub_date|escape:'htmlall':'UTF-8'}</pubDate>
+       <description>{$item->feed_description|escape:'htmlall':'UTF-8'}</description>
+       <content:encoded><![CDATA[{$item->feed_content nofilter}]]></content:encoded>
     </item>
     {/foreach}
 </channel>

@@ -82,6 +82,20 @@ class ConfigurationType extends AbstractType
                     ]),
                 ],
             ])
+            ->add('header_title_color', TextType::class, [
+                'label' => 'Blog header title color',
+                'required' => false,
+                'help' => 'Color applied to the titles displayed inside blog, post, category, tag, author and search headers.',
+                'attr' => [
+                    'type' => 'color',
+                ],
+                'constraints' => [
+                    new Regex([
+                        'pattern' => '/^#[0-9a-fA-F]{6}$/',
+                        'message' => 'The color must use hexadecimal format, for example #ffffff.',
+                    ]),
+                ],
+            ])
             ->add('wordpress_api_url', TextType::class, [
                 'label' => 'WordPress site URL',
                 'required' => false,

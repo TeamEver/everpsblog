@@ -10,3 +10,48 @@
     {% endif %}
   {% endif %}
 {% endblock %}
+
+{% block ever_product_autocomplete_row %}
+  {% set row_attr = row_attr|merge({class: (row_attr.class|default('') ~ ' form-group')|trim}) %}
+  <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
+    {{ form_label(form) }}
+    {{ form_errors(form) }}
+    {{ form_widget(form) }}
+    {{ form_help(form) }}
+  </div>
+{% endblock %}
+
+{% block ever_product_autocomplete_widget %}
+  {% set placeholder = autocomplete_placeholder|trans({}, translation_domain) %}
+  {% set loadingText = autocomplete_loading_text|trans({}, translation_domain) %}
+  {% set emptyText = autocomplete_empty_text|trans({}, translation_domain) %}
+  {% set minLengthText = autocomplete_min_length_text|trans({'%count%': autocomplete_min_length}, translation_domain) %}
+  {% set removeText = autocomplete_remove_text|trans({}, translation_domain) %}
+
+  {{ block('hidden_widget') }}
+
+  <div
+    class="ever-product-autocomplete"
+    data-ever-product-autocomplete="1"
+    data-input-id="{{ id }}"
+    data-search-url="{{ product_search_url|e('html_attr') }}"
+    data-placeholder="{{ placeholder|e('html_attr') }}"
+    data-loading-text="{{ loadingText|e('html_attr') }}"
+    data-empty-text="{{ emptyText|e('html_attr') }}"
+    data-min-length-text="{{ minLengthText|e('html_attr') }}"
+    data-remove-text="{{ removeText|e('html_attr') }}"
+    data-min-length="{{ autocomplete_min_length }}"
+    data-selected-products="{{ selected_products|json_encode|e('html_attr') }}"
+  >
+    <div class="ever-product-autocomplete__selected" data-role="selected"></div>
+    <label class="sr-only" for="{{ id }}_search">{{ placeholder }}</label>
+    <input
+      type="search"
+      id="{{ id }}_search"
+      class="form-control ever-product-autocomplete__input"
+      placeholder="{{ placeholder }}"
+      autocomplete="off"
+    >
+    <div class="ever-product-autocomplete__results" data-role="results" hidden></div>
+  </div>
+{% endblock %}

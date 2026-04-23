@@ -45,6 +45,7 @@ class ConfigurationController extends AbstractDomainController
             'title_length' => (int) \Configuration::get('EVERPSBLOG_TITLE_LENGTH'),
             'default_author_id' => (int) \Configuration::get('EVERBLOG_DEFAULT_AUTHOR_ID'),
             'header_bg_color' => $this->getHeaderBackgroundColor(),
+            'header_title_color' => $this->getHeaderTitleColor(),
             'wordpress_api_url' => (string) \Configuration::get('EVER_WP_API_URL'),
             'wordpress_api_user' => (string) \Configuration::get('EVER_WP_API_USER'),
             'wordpress_api_password' => (string) \Configuration::get('EVER_WP_API_PASSWORD'),
@@ -74,7 +75,8 @@ class ConfigurationController extends AbstractDomainController
             \Configuration::updateValue('EVERPSBLOG_EXCERPT', (int) $formData['excerpt_length']);
             \Configuration::updateValue('EVERPSBLOG_TITLE_LENGTH', (int) $formData['title_length']);
             \Configuration::updateValue('EVERBLOG_DEFAULT_AUTHOR_ID', (int) $formData['default_author_id']);
-            \Configuration::updateValue('EVERBLOG_HEADER_BG_COLOR', $this->normalizeHeaderBackgroundColor((string) ($formData['header_bg_color'] ?? '')));
+            \Configuration::updateValue('EVERBLOG_HEADER_BG_COLOR', $this->normalizeHexColor((string) ($formData['header_bg_color'] ?? ''), '#0a0f54'));
+            \Configuration::updateValue('EVERBLOG_HEADER_TITLE_COLOR', $this->normalizeHexColor((string) ($formData['header_title_color'] ?? ''), '#ffffff'));
             \Configuration::updateValue('EVERBLOG_TOP_TEXT', $this->extractLocalizedFormData($formData, 'top_text'), true);
             \Configuration::updateValue('EVERBLOG_BOTTOM_TEXT', $this->extractLocalizedFormData($formData, 'bottom_text'), true);
             \Configuration::updateValue('EVER_WP_API_URL', trim((string) $formData['wordpress_api_url']));
@@ -316,14 +318,19 @@ class ConfigurationController extends AbstractDomainController
 
     private function getHeaderBackgroundColor(): string
     {
-        return $this->normalizeHeaderBackgroundColor((string) \Configuration::get('EVERBLOG_HEADER_BG_COLOR'));
+        return $this->normalizeHexColor((string) \Configuration::get('EVERBLOG_HEADER_BG_COLOR'), '#0a0f54');
     }
 
-    private function normalizeHeaderBackgroundColor(string $color): string
+    private function getHeaderTitleColor(): string
+    {
+        return $this->normalizeHexColor((string) \Configuration::get('EVERBLOG_HEADER_TITLE_COLOR'), '#ffffff');
+    }
+
+    private function normalizeHexColor(string $color, string $default): string
     {
         $color = trim($color);
 
-        return (bool) preg_match('/^#[0-9a-fA-F]{6}$/', $color) ? $color : '#0a0f54';
+        return (bool) preg_match('/^#[0-9a-fA-F]{6}$/', $color) ? $color : $default;
     }
 
     private function getBooleanConfiguration(string $key, bool $default): bool

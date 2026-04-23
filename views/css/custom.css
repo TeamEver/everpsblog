@@ -9,3 +9,24 @@
 .everpsblog-search button[type="submit"] {
     border-radius: 0 .6rem .6rem 0;
 }
+
+/* Force X branding even if the active theme still styles .twitter buttons. */
+.social-sharing .x:before,
+.social-sharing li.x:before,
+.social-sharing li.x a:before {
+    content: "";
+    background-image: url(../img/x.svg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.social-sharing a.x.icon-gray,
+.social-sharing .x.icon-gray,
+.social-sharing li.x.icon-gray,
+.social-sharing li.x.icon-gray a {
+    background-image: url(../img/x.svg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}

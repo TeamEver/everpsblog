@@ -461,8 +461,8 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 'url' => 'https://www.facebook.com/sharer.php?u=' . $page['canonical'],
             ];
             $social_share_links['twitter'] = [
-                'label' => $this->transShop('Tweet'),
-                'class' => 'twitter',
+                'label' => $this->transShop('Share on X'),
+                'class' => 'x',
                 'url' => 'https://twitter.com/intent/tweet?text=' . $this->post->title . ' ' . $page['canonical'],
             ];
             $postImage = $this->getBlogImageService()->getBlogImage(
@@ -498,11 +498,11 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
             foreach ([
                 'facebook' => 'Facebook',
                 'linkedin' => 'LinkedIn',
-                'twitter' => 'X / Twitter',
+                'twitter' => 'X',
             ] as $network => $label) {
                 if (!empty($this->author->{$network})) {
                     $authorSocialLinks[] = [
-                        'network' => $network,
+                        'network' => $network === 'twitter' ? 'x' : $network,
                         'label' => $label,
                         'url' => (string) $this->author->{$network},
                     ];

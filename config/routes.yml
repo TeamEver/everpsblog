@@ -30,6 +30,14 @@ everpsblog_admin_tinymce_upload:
     _legacy_controller: AdminEverPsBlog
     _legacy_link: AdminEverPsBlog
 
+everpsblog_admin_product_autocomplete:
+  path: /everpsblog/product/autocomplete
+  methods: [GET]
+  defaults:
+    _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\ProductAutocompleteController::searchAction'
+    _legacy_controller: AdminEverPsBlog
+    _legacy_link: AdminEverPsBlog
+
 everpsblog_admin_post:
   path: /everpsblog/post
   methods: [GET]

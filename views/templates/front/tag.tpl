@@ -48,13 +48,10 @@
 
 {block name="page_content"}
 {hook h="displayBeforeEverTag" everblogtag=$tag}
-<div class="everpsblog-blog-header container-fluid px-0 mb-4">
-    <div class="everpsblog-blog-header__inner text-center py-5"{if isset($everpsblog_header_bg_color) && $everpsblog_header_bg_color} style="background: {$everpsblog_header_bg_color|escape:'htmlall':'UTF-8'};"{/if}>
+<div class="everpsblog-blog-header container-fluid px-0 mb-4{if isset($has_tag_banner) && $has_tag_banner && isset($tag_banner_image) && $tag_banner_image} everpsblog-blog-header--has-banner{/if}"{if isset($has_tag_banner) && $has_tag_banner && isset($tag_banner_image) && $tag_banner_image} style="background-image: url('{$tag_banner_image|escape:'htmlall':'UTF-8'}');"{/if}>
+    <div class="everpsblog-blog-header__inner text-center py-5">
         <div class="everpsblog-taxonomy-hero-overlay">
             <h1 class="m-0 everpsblog-blog-header__title">{$tag->title|escape:'htmlall':'UTF-8'}</h1>
-            {if isset($has_tag_banner) && $has_tag_banner && isset($tag_banner_image) && $tag_banner_image}
-            <div class="everpsblog-taxonomy-banner" style="background-image: url('{$tag_banner_image|escape:'htmlall':'UTF-8'}');" aria-label="{$tag->title|escape:'htmlall':'UTF-8'}"></div>
-            {/if}
         </div>
     </div>
 </div>

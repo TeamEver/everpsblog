@@ -20,7 +20,7 @@
 
 {block name='content'}
 <div class="everpsblog-blog-header container-fluid px-0 mb-4">
-    <div class="everpsblog-blog-header__inner text-center py-5"{if isset($everpsblog_header_bg_color) && $everpsblog_header_bg_color} style="background: {$everpsblog_header_bg_color|escape:'htmlall':'UTF-8'};"{/if}>
+    <div class="everpsblog-blog-header__inner text-center py-5">
         <h1 class="m-0 everpsblog-blog-header__title">{l s='Search results for' d='Modules.Everpsblog.Shop'} "{$query|escape:'htmlall':'UTF-8'}"</h1>
     </div>
 </div>

@@ -78,16 +78,10 @@
 {hook h="displayBeforeEverAuthor" everblogauthor=$author}
 <div class="content" itemscope="itemscope" itemtype="http://schema.org/Blog">
     <div itemscope="itemscope" itemtype="http://schema.org/BlogAuthoring" itemprop="blogAuthor">
-        <div class="everpsblog-blog-header container-fluid px-0 mb-4">
-            <div class="everpsblog-blog-header__inner text-center py-5"{if isset($everpsblog_header_bg_color) && $everpsblog_header_bg_color} style="background: {$everpsblog_header_bg_color|escape:'htmlall':'UTF-8'};"{/if}>
+        <div class="everpsblog-blog-header container-fluid px-0 mb-4{if isset($has_author_banner) && $has_author_banner && isset($author_banner_image) && $author_banner_image} everpsblog-blog-header--has-banner{/if}"{if isset($has_author_banner) && $has_author_banner && isset($author_banner_image) && $author_banner_image} style="background-image: url('{$author_banner_image|escape:'htmlall':'UTF-8'}');"{/if}>
+            <div class="everpsblog-blog-header__inner text-center py-5">
                 <div class="everpsblog-taxonomy-hero-overlay">
                     <h1 itemprop="headline" class="m-0 everpsblog-blog-header__title">{$author->nickhandle|escape:'htmlall':'UTF-8'}</h1>
-                    {if isset($has_author_banner) && $has_author_banner && isset($author_banner_image) && $author_banner_image}
-                    <div class="everpsblog-taxonomy-banner" style="background-image: url('{$author_banner_image|escape:'htmlall':'UTF-8'}');" aria-label="{$author->nickhandle|escape:'htmlall':'UTF-8'}"></div>
-                    {/if}
-                    {if isset($author->excerpt) && $author->excerpt}
-                        <p class="everpsblog-author-excerpt mt-2 mb-0">{$author->excerpt nofilter}</p>
-                    {/if}
                 </div>
             </div>
         </div>
@@ -102,6 +96,38 @@
             {/if}
         </div>
     </div>
+    {if isset($show_author_intro) && $show_author_intro}
+    <section class="container mb-4" itemprop="author" itemscope itemtype="https://schema.org/Person">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    {if isset($has_author_image) && $has_author_image && isset($author_cover) && $author_cover}
+                    <div class="col-12 col-md-3 text-center mb-3 mb-md-0">
+                        <img src="{$author_cover|escape:'htmlall':'UTF-8'}" alt="{$author->nickhandle|escape:'htmlall':'UTF-8'}" class="img-fluid rounded-circle" style="max-width: 180px;" itemprop="image" loading="lazy">
+                    </div>
+                    <div class="col-12 col-md-9">
+                    {else}
+                    <div class="col-12">
+                    {/if}
+                        <p class="h4 mb-3" itemprop="name">{$author->nickhandle|escape:'htmlall':'UTF-8'}</p>
+                        {if isset($author_summary) && $author_summary}
+                        <div class="mb-3" itemprop="description">{$author_summary nofilter}</div>
+                        {/if}
+                        {if isset($author_social_links) && $author_social_links}
+                        <div class="d-flex flex-wrap gap-2">
+                            {foreach from=$author_social_links item=author_social_link}
+                            <a class="btn btn-outline-secondary btn-sm" href="{$author_social_link.url|escape:'htmlall':'UTF-8'}" target="_blank" rel="nofollow noopener noreferrer" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} - {$author_social_link.label|escape:'htmlall':'UTF-8'}">
+                                {$author_social_link.label|escape:'htmlall':'UTF-8'}
+                            </a>
+                            {/foreach}
+                        </div>
+                        {/if}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {/if}
     {if isset($paginated) && !$paginated}
     <div class="container">
         <div class="row authorcontent {if $animated}zoomed{/if}" itemprop="articleBody">
@@ -110,37 +136,14 @@
     </div>
     {/if}
 </div>
-{if isset($paginated) && !$paginated}
-<div class="container">
-    <div class="row">
-        <div class="social-sharing d-flex justify-content-center">
-            <ul>
-            {if isset($author->facebook) && $author->facebook}
-                <li>
-                    <a href="{$author->facebook|escape:'htmlall':'UTF-8'}" target="_blank" rel="nofollow" class="facebook icon-gray" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{l s='Follow me !' d='Modules.Everpsblog.Shop'}</a>
-                </li>
-            {/if}
-            {if isset($author->linkedin) && $author->linkedin}
-                <li>
-                    <a href="{$author->linkedin|escape:'htmlall':'UTF-8'}" target="_blank" rel="nofollow" class="linkedin icon-gray" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{l s='Follow me !' d='Modules.Everpsblog.Shop'}</a>
-                </li>
-            {/if}
-            {if isset($author->twitter) && $author->twitter}
-                <li>
-                    <a href="{$author->twitter|escape:'htmlall':'UTF-8'}" target="_blank" rel="nofollow" class="twitter icon-gray" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{l s='Follow me !' d='Modules.Everpsblog.Shop'}</a>
-                </li>
-            {/if}
-            </ul>
-        </div>
-    </div>
-</div>
-{/if}
 {if isset($post_number) && $post_number > 0}
 <div class="container">
-{hook h="displayBeforeEverLoop"}
-{foreach from=$posts item=item}
-{include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
-{/foreach}
+    <div class="row">
+    {hook h="displayBeforeEverLoop"}
+    {foreach from=$posts item=item}
+    {include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
+    {/foreach}
+    </div>
 </div>
 {if isset($post_number) && $post_number > 0 && isset($pagination.should_be_displayed) && $pagination.should_be_displayed}
 <div class="row">

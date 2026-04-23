@@ -142,6 +142,37 @@ class EverPsBlogauthorModuleFrontController extends AbstractFrontController
             );
             $postsViewModel = PostViewModel::listFromLegacy($posts);
             $authorViewModel = TaxonomyViewModel::fromLegacy($this->author, 'author');
+            $authorImage = $this->getBlogImageService()->getBlogImage(
+                (int) $this->author->id,
+                (int) $this->context->shop->id,
+                'author'
+            );
+            $hasAuthorImage = \Validate::isLoadedObject($authorImage);
+            $authorImageUrl = $hasAuthorImage ? $this->getBlogImageService()->getBlogImageUrl(
+                (int) $this->author->id,
+                (int) $this->context->shop->id,
+                'author'
+            ) : '';
+            $authorSummary = '';
+            if (!empty($this->author->excerpt)) {
+                $authorSummary = (string) $this->author->excerpt;
+            } elseif (!empty($this->author->meta_description)) {
+                $authorSummary = (string) $this->author->meta_description;
+            }
+            $authorSocialLinks = [];
+            foreach ([
+                'facebook' => 'Facebook',
+                'linkedin' => 'LinkedIn',
+                'twitter' => 'X / Twitter',
+            ] as $network => $label) {
+                if (!empty($this->author->{$network})) {
+                    $authorSocialLinks[] = [
+                        'network' => $network,
+                        'label' => $label,
+                        'url' => (string) $this->author->{$network},
+                    ];
+                }
+            }
             $linkedProductViewData = $this->getFrontLinkedProductViewData(
                 $this->author->author_products ?? [],
                 (int) $this->context->language->id,
@@ -158,8 +189,8 @@ class EverPsBlogauthorModuleFrontController extends AbstractFrontController
                 'url' => 'https://www.facebook.com/sharer.php?u=' . $page['canonical'],
             ];
             $social_share_links['twitter'] = [
-                'label' => $this->transShop('Tweet'),
-                'class' => 'twitter',
+                'label' => $this->transShop('Share on X'),
+                'class' => 'x',
                 'url' => 'https://twitter.com/intent/tweet?text=' . $this->author->nickhandle . ' ' . $page['canonical'],
             ];
             $file_url = $this->getBlogImageService()->getBlogImageUrl(
@@ -200,6 +231,11 @@ class EverPsBlogauthorModuleFrontController extends AbstractFrontController
                 'show_featured_post' => true,
                 'posts' => $postsViewModel,
                 'posts_legacy' => $posts,
+                'author_cover' => $authorImageUrl,
+                'has_author_image' => $hasAuthorImage,
+                'author_summary' => $authorSummary,
+                'author_social_links' => $authorSocialLinks,
+                'show_author_intro' => $hasAuthorImage || '' !== trim($authorSummary) || !empty($authorSocialLinks),
                 'paginated' => Tools::getValue('page'),
                 'post_number' => (int) $this->post_number,
                 'pagination' => $pagination,

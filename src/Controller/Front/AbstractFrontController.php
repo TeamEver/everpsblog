@@ -121,14 +121,20 @@ abstract class AbstractFrontController extends \ModuleFrontController
 
     private function assignHeaderConfiguration(): void
     {
-        $color = trim((string) \Configuration::get('EVERBLOG_HEADER_BG_COLOR'));
-        if (!preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
-            $color = '#0a0f54';
-        }
+        $backgroundColor = $this->normalizeHexColor((string) \Configuration::get('EVERBLOG_HEADER_BG_COLOR'), '#0a0f54');
+        $titleColor = $this->normalizeHexColor((string) \Configuration::get('EVERBLOG_HEADER_TITLE_COLOR'), '#ffffff');
 
         $this->context->smarty->assign([
-            'everpsblog_header_bg_color' => $color,
+            'everpsblog_header_bg_color' => $backgroundColor,
+            'everpsblog_header_title_color' => $titleColor,
         ]);
+    }
+
+    private function normalizeHexColor(string $color, string $default): string
+    {
+        $color = trim($color);
+
+        return preg_match('/^#[0-9a-fA-F]{6}$/', $color) ? $color : $default;
     }
 
 

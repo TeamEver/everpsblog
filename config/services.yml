@@ -320,6 +320,12 @@ services:
   PrestaShop\Module\Everpsblog\Service\PostDuplicator:
     alias: prestashop.module.everpsblog.service.post_duplicator
 
+  prestashop.module.everpsblog.service.product_autocomplete:
+    class: PrestaShop\Module\Everpsblog\Service\ProductAutocompleteProvider
+
+  PrestaShop\Module\Everpsblog\Service\ProductAutocompleteProvider:
+    alias: prestashop.module.everpsblog.service.product_autocomplete
+
   # ─────────────────────────────────────────────
   # DOCTRINE
   # ─────────────────────────────────────────────
