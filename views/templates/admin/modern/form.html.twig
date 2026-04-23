@@ -1,13 +1,5 @@
 {% extends '@PrestaShop/Admin/layout.html.twig' %}
 
-{% block form_help %}
-  {% if help is not empty %}
-    {% set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' form-text text-muted')|trim}) %}
-    <small id="{{ id }}_help"{{ block('attributes') }}>
-      {{- help_html is same as(false) ? help|trans(help_translation_parameters, translation_domain) : help|trans(help_translation_parameters, translation_domain)|raw -}}
-    </small>
-  {% endif %}
-{% endblock %}
 
 {% block stylesheets %}
   {{ parent() }}
@@ -431,7 +423,6 @@
 {% endblock %}
 
 {% block content %}
-  {% form_theme form _self %}
   {% set contentFields = [] %}
   {% set seoFields = [] %}
   {% set publicationFields = [] %}
