@@ -93,6 +93,7 @@ class EverPsBlog extends Module
         Configuration::updateValue('EVERBLOG_SHOW_HOME', true);
         // Creating root + unclassed categories through application service
         $this->getBlogInstallService()->seedRootAndUnclassedCategories($this);
+        $translationsInstalled = $this->installBundledTranslations();
         // Install
         return parent::install()
             && $this->installModuleTab(
@@ -160,6 +161,7 @@ class EverPsBlog extends Module
             })())
             && Configuration::updateValue('EVERBLOG_HEADER_BG_COLOR', '#0a0f54')
             && Configuration::updateValue('EVERBLOG_HEADER_TITLE_COLOR', '#ffffff')
+            && $translationsInstalled
             && $this->checkAndFixDatabase()
             && $this->checkHooks()
             && $this->checkObligatoryHooks();
@@ -167,6 +169,7 @@ class EverPsBlog extends Module
 
     public function uninstall()
     {
+        $translationsRemoved = $this->uninstallBundledTranslations();
         include dirname(__FILE__).'/install/uninstall.php';
         include dirname(__FILE__).'/install/hooks-uninstall.php';
         // include dirname(__FILE__).'/install/images-uninstall.php';
@@ -177,13 +180,48 @@ class EverPsBlog extends Module
         Configuration::deleteByName('EVERBLOG_CATEG_COLUMNS');
         Configuration::deleteByName('EVERBLOG_SHOW_POST_TAGS');
         Configuration::deleteByName('EVERBLOG_DEFAULT_AUTHOR_ID');
-        return parent::uninstall()
+        return $translationsRemoved
+            && parent::uninstall()
             && $this->uninstallModuleTab('AdminEverPsBlog')
             && $this->uninstallModuleTab('AdminEverPsBlogPost')
             && $this->uninstallModuleTab('AdminEverPsBlogCategory')
             && $this->uninstallModuleTab('AdminEverPsBlogTag')
             && $this->uninstallModuleTab('AdminEverPsBlogComment')
             && $this->uninstallModuleTab('AdminEverPsBlogAuthor');
+    }
+
+    private function installBundledTranslations(): bool
+    {
+        try {
+            $catalog = new \PrestaShop\Module\Everpsblog\Service\ModuleTranslationCatalogService();
+            $catalog->importFromFile(__DIR__ . '/translations/everpsblog-translations-20260424-170745.json');
+
+            return true;
+        } catch (\Throwable $exception) {
+            \PrestaShopLogger::addLog(
+                '[everpsblog] Unable to import bundled translations during module installation: ' . $exception->getMessage(),
+                3
+            );
+
+            return false;
+        }
+    }
+
+    private function uninstallBundledTranslations(): bool
+    {
+        try {
+            $catalog = new \PrestaShop\Module\Everpsblog\Service\ModuleTranslationCatalogService();
+            $catalog->deleteModuleTranslations();
+
+            return true;
+        } catch (\Throwable $exception) {
+            \PrestaShopLogger::addLog(
+                '[everpsblog] Unable to remove bundled translations during module uninstall: ' . $exception->getMessage(),
+                3
+            );
+
+            return false;
+        }
     }
 
     private function installModuleTab($tabClass, $parent, $tabName)

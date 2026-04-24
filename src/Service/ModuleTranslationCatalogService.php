@@ -163,6 +163,40 @@ class ModuleTranslationCatalogService
         return $stats;
     }
 
+    public function importFromFile(string $filePath): array
+    {
+        if (!is_file($filePath)) {
+            return [
+                'imported' => 0,
+                'skipped' => 0,
+            ];
+        }
+
+        $content = file_get_contents($filePath);
+        if (false === $content || '' === trim($content)) {
+            return [
+                'imported' => 0,
+                'skipped' => 0,
+            ];
+        }
+
+        return $this->importFromJson((string) $content);
+    }
+
+    public function deleteModuleTranslations(): int
+    {
+        if (!$this->translationTableExists()) {
+            return 0;
+        }
+
+        \Db::getInstance()->execute(
+            'DELETE FROM `' . _DB_PREFIX_ . 'translation`
+             WHERE LOWER(REPLACE(`domain`, ".", "")) LIKE "moduleseverpsblog%"'
+        );
+
+        return (int) \Db::getInstance()->Affected_Rows();
+    }
+
     private function buildExportPayload(array $translations): array
     {
         return [
