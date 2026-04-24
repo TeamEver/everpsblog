@@ -20,11 +20,21 @@ class Upgrade301MigrationService
     {
         $result = true;
 
-        $result = $this->renameHooks() && $result;
-        $result = $this->ensureAuthorColumn() && $result;
-        $result = $this->ensureTables() && $result;
-        $result = $this->ensureAuthorTab() && $result;
-        $result = $this->migratePostJsonRelations() && $result;
+        if (!$this->renameHooks()) {
+            $result = false;
+        }
+        if (!$this->ensureAuthorColumn()) {
+            $result = false;
+        }
+        if (!$this->ensureTables()) {
+            $result = false;
+        }
+        if (!$this->ensureAuthorTab()) {
+            $result = false;
+        }
+        if (!$this->migratePostJsonRelations()) {
+            $result = false;
+        }
 
         return $result;
     }

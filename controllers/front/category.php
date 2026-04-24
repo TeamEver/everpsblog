@@ -35,12 +35,20 @@ class EverPsBlogcategoryModuleFrontController extends AbstractFrontController
 {
     use FrontBlogDataProviderTrait;
 
+    /** @var \stdClass */
     protected $author;
+    /** @var \stdClass */
     protected $category;
+    /** @var \stdClass */
     protected $tag;
+    /** @var \stdClass */
     protected $post;
+    /** @var \stdClass */
     protected $blog;
+    /** @var int[] */
+    protected $parent_categories = [];
     public $nbr_blogs;
+    public $post_number;
     public $controller_name = 'category';
 
     public function init()

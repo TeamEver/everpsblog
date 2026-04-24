@@ -10,7 +10,7 @@ class UpgradeImageTableMigrationService
 
         $db = \Db::getInstance();
 
-        $result = $db->execute(
+        if (!$db->execute(
             'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ever_blog_image` (
                 `id_ever_image` int(10) unsigned NOT NULL auto_increment,
                 `image_type` varchar(255) DEFAULT NULL,
@@ -19,7 +19,9 @@ class UpgradeImageTableMigrationService
                 `id_shop` int(10) unsigned NOT NULL,
                 PRIMARY KEY (`id_ever_image`)
             ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8'
-        ) && $result;
+        )) {
+            $result = false;
+        }
 
         $shops = $db->executeS('SELECT id_shop FROM `' . _DB_PREFIX_ . 'shop`') ?: [];
         foreach ($shops as $shop) {

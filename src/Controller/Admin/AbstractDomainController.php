@@ -2,6 +2,7 @@
 
 namespace PrestaShop\Module\Everpsblog\Controller\Admin;
 
+use PrestaShop\Module\Everpsblog\Service\BlogScheduledTaskRunner;
 use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
@@ -10,6 +11,8 @@ abstract class AbstractDomainController extends FrameworkBundleAdminController
 {
     /** @var ContextStateService */
     protected $contextStateService;
+    /** @var BlogScheduledTaskRunner|null */
+    private $scheduledTaskRunner;
 
     public function __construct(ContextStateService $contextStateService)
     {
@@ -108,6 +111,8 @@ abstract class AbstractDomainController extends FrameworkBundleAdminController
 
     protected function refreshSitemapsAfterBackOfficeChange(BlogSitemapService $blogSitemapService, bool $flashWarning = true): bool
     {
+        $this->runScheduledTasksAfterBackOfficeSave($flashWarning);
+
         try {
             $refreshed = (bool) $blogSitemapService->refreshForShop($this->getContextShopId());
             if (!$refreshed && $flashWarning) {
@@ -132,6 +137,38 @@ abstract class AbstractDomainController extends FrameworkBundleAdminController
             }
 
             return false;
+        }
+    }
+
+    /**
+     * @return array{trash_removed:int,planned_published:int,pending_notifications_sent:int,sitemaps_refreshed:bool|null}
+     */
+    protected function runScheduledTasksAfterBackOfficeSave(bool $flashWarning = true): array
+    {
+        try {
+            return $this->getScheduledTaskRunner()->runForShop($this->getContextShopId());
+        } catch (\Throwable $exception) {
+            \PrestaShopLogger::addLog(
+                '[everpsblog][AdminScheduledTasks] ' . $exception->getMessage()
+                    . ' @ ' . $exception->getFile() . ':' . $exception->getLine(),
+                3
+            );
+            if ($flashWarning) {
+                $this->addFlash(
+                    'warning',
+                    $this->transAdmin(
+                        'Automatic maintenance tasks could not be executed: %error%',
+                        ['%error%' => $this->describeException($exception)]
+                    )
+                );
+            }
+
+            return [
+                'trash_removed' => 0,
+                'planned_published' => 0,
+                'pending_notifications_sent' => 0,
+                'sitemaps_refreshed' => null,
+            ];
         }
     }
 
@@ -225,6 +262,15 @@ abstract class AbstractDomainController extends FrameworkBundleAdminController
     private function isValidQcdIdentifier(string $value): bool
     {
         return (bool) preg_match('/^[a-z0-9_]{2,64}$/', $value);
+    }
+
+    private function getScheduledTaskRunner(): BlogScheduledTaskRunner
+    {
+        if (null === $this->scheduledTaskRunner) {
+            $this->scheduledTaskRunner = new BlogScheduledTaskRunner();
+        }
+
+        return $this->scheduledTaskRunner;
     }
 
 }

@@ -11,6 +11,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class ImportWordPressCommand extends Command
 {
+    private const EXIT_SUCCESS = 0;
+    private const EXIT_FAILURE = 1;
+
     /** @var WordPressRestImporter */
     private $wordPressRestImporter;
 
@@ -39,21 +42,21 @@ class ImportWordPressCommand extends Command
         if (!\Module::isInstalled('everpsblog')) {
             $io->error('The EverPsBlog module is not installed.');
 
-            return Command::FAILURE;
+            return self::EXIT_FAILURE;
         }
 
         $module = \Module::getInstanceByName('everpsblog');
-        if (!\Validate::isLoadedObject($module) || !$module->active) {
+        if (!$module instanceof \EverPsBlog || !$module->active) {
             $io->error('The EverPsBlog module is not available or not active.');
 
-            return Command::FAILURE;
+            return self::EXIT_FAILURE;
         }
 
         $shopIds = $this->resolveShopIds($input);
-        if (empty($shopIds)) {
+        if (count($shopIds) === 0) {
             $io->warning('No shop found to process.');
 
-            return Command::SUCCESS;
+            return self::EXIT_SUCCESS;
         }
 
         $totals = $this->emptyStats();
@@ -91,20 +94,18 @@ class ImportWordPressCommand extends Command
             }
         }
 
-        if (!empty($shopIds)) {
-            $io->section('Import totals');
-            $this->renderStats($io, $totals);
-        }
+        $io->section('Import totals');
+        $this->renderStats($io, $totals);
 
         if ($failures > 0) {
             $io->warning(sprintf('%d shop import(s) failed or were skipped.', $failures));
 
-            return Command::FAILURE;
+            return self::EXIT_FAILURE;
         }
 
         $io->success('WordPress import completed.');
 
-        return Command::SUCCESS;
+        return self::EXIT_SUCCESS;
     }
 
     private function resolveShopIds(InputInterface $input): array
@@ -135,9 +136,7 @@ class ImportWordPressCommand extends Command
 
         $context = \Context::getContext();
         $context->shop = $shop;
-        $context->id_shop = (int) $shop->id;
         $context->language = new \Language($langId);
-        $context->id_lang = $langId;
     }
 
     private function resolveOptionOrConfiguration(InputInterface $input, string $optionName, string $configurationKey, \Shop $shop): string

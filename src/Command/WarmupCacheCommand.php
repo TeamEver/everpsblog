@@ -13,6 +13,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class WarmupCacheCommand extends Command
 {
+    private const EXIT_SUCCESS = 0;
+    private const EXIT_FAILURE = 1;
+
     /** @var BlogFrontCacheWarmer */
     private $cacheWarmer;
 
@@ -55,14 +58,14 @@ final class WarmupCacheCommand extends Command
         if (!\Module::isInstalled('everpsblog')) {
             $io->error('The EverPsBlog module is not installed.');
 
-            return Command::FAILURE;
+            return self::EXIT_FAILURE;
         }
 
         $module = \Module::getInstanceByName('everpsblog');
-        if (!\Validate::isLoadedObject($module) || !$module->active) {
+        if (!$module instanceof \EverPsBlog || !$module->active) {
             $io->error('The EverPsBlog module is not available or not active.');
 
-            return Command::FAILURE;
+            return self::EXIT_FAILURE;
         }
 
         $pageLimit = max(1, (int) $input->getOption('page-limit'));
@@ -73,10 +76,10 @@ final class WarmupCacheCommand extends Command
             ? [$shopIdOption]
             : array_map('intval', (array) \Shop::getShops(true, null, true));
 
-        if (empty($shopIds)) {
+        if (count($shopIds) === 0) {
             $io->warning('No shop found to process.');
 
-            return Command::SUCCESS;
+            return self::EXIT_SUCCESS;
         }
 
         $context = \Context::getContext();
@@ -84,7 +87,6 @@ final class WarmupCacheCommand extends Command
             $shop = new \Shop((int) $shopId);
             \Shop::setContext(\Shop::CONTEXT_SHOP, (int) $shopId);
             $context->shop = $shop;
-            $context->id_shop = (int) $shopId;
 
             $langIds = $langIdOption > 0 ? [$langIdOption] : $this->resolveShopLanguageIds((int) $shopId);
             if (empty($langIds)) {
@@ -100,7 +102,6 @@ final class WarmupCacheCommand extends Command
                 }
 
                 $context->language = $language;
-                $context->id_lang = (int) $langId;
 
                 $stats = $this->cacheWarmer->warm((int) $shopId, (int) $langId, $pageLimit);
                 $io->text(sprintf(
@@ -117,7 +118,7 @@ final class WarmupCacheCommand extends Command
 
         $io->success('EverPsBlog front cache warmup completed.');
 
-        return Command::SUCCESS;
+        return self::EXIT_SUCCESS;
     }
 
     /**

@@ -18,6 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
@@ -67,6 +68,11 @@ class ConfigurationType extends AbstractType
             ->add('title_length', IntegerType::class, [
                 'label' => 'Title length',
                 'constraints' => [new GreaterThan(['value' => 0])],
+            ])
+            ->add('empty_trash_days', IntegerType::class, [
+                'label' => 'Empty trash after (days)',
+                'help' => 'Posts kept in trash longer than this delay are deleted automatically.',
+                'constraints' => [new GreaterThanOrEqual(['value' => 0])],
             ])
             ->add('default_author_id', ChoiceType::class, [
                 'label' => 'Default author for orphan posts',

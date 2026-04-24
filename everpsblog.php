@@ -37,6 +37,7 @@ class EverPsBlog extends Module
     private $blogCleanerService;
     private $blogSortOrderService;
     private $blogSitemapService;
+    private $blogScheduledTaskRunner;
     private $blogRedirectService;
     private $blogFrontCacheInvalidator;
     private $legacyImportAdapter;
@@ -46,7 +47,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '6.0.9';
+        $this->version = '6.0.10';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -328,6 +329,15 @@ class EverPsBlog extends Module
         }
 
         return $this->blogSitemapService;
+    }
+
+    private function getBlogScheduledTaskRunner()
+    {
+        if (!$this->blogScheduledTaskRunner) {
+            $this->blogScheduledTaskRunner = new \PrestaShop\Module\Everpsblog\Service\BlogScheduledTaskRunner();
+        }
+
+        return $this->blogScheduledTaskRunner;
     }
 
     private function getBlogRedirectService()
@@ -1101,18 +1111,7 @@ class EverPsBlog extends Module
 
     public function hookActionOutputHTMLBefore($params)
     {
-        try {
-            foreach (Shop::getShops() as $shop) {
-                $this->publishPlannedPosts(
-                    (int) $shop['id_shop']
-                );
-                $this->emptyTrash(
-                    (int) $shop['id_shop']
-                );
-            }
-        } catch (Exception $e) {
-            PrestaShopLogger::addLog($this->name . ' : ' . $e->getMessage());
-        }
+        return;
     }
 
     private function getPostRepository()
@@ -1129,134 +1128,17 @@ class EverPsBlog extends Module
 
     public function sendPendingNotification($id_shop)
     {
-        $repo = $this->getPostRepository();
-        if (!$repo) {
-            return false;
-        }
-
-        $email = Configuration::get('EVERBLOG_ADMIN_EMAIL');
-
-        $employeeId = (int) Db::getInstance()->getValue('
-            SELECT id_employee 
-            FROM '._DB_PREFIX_.'employee 
-            WHERE email = "'.pSQL($email).'"
-        ');
-
-        if (!$employeeId) {
-            return false;
-        }
-
-        $employee = new Employee($employeeId);
-
-        $posts = $repo->getPosts(
-            (int) $employee->id_lang,
-            (int) $id_shop,
-            0,
-            null,
-            'pending'
-        );
-
-        if (!$posts) {
-            return true;
-        }
-
-        $post_list = '';
-
-        foreach ($posts as $post) {
-            $title = '';
-
-            foreach ($post->getTranslations() as $translation) {
-                if ($translation->getLangId() == $employee->id_lang) {
-                    $title = $translation->getTitle();
-                    break;
-                }
-            }
-
-            $post_list .= '<p>' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '</p>';
-        }
-
-        $mailDir = $this->module_folder . '/mails/';
-        $shopEmail = Configuration::get('PS_SHOP_EMAIL');
-
-        return Mail::send(
-            (int) $this->context->language->id,
-            'pending',
-            $this->transAdmin('Review on pending posts'),
-            [
-                '{shop_name}' => Configuration::get('PS_SHOP_NAME'),
-                '{shop_logo}' => _PS_IMG_DIR_ . Configuration::get('PS_LOGO'),
-                '{posts}' => $post_list,
-            ],
-            $employee->email,
-            null,
-            $shopEmail,
-            Configuration::get('PS_SHOP_NAME'),
-            null,
-            null,
-            $mailDir
-        );
+        return (bool) $this->getBlogScheduledTaskRunner()->sendPendingNotification((int) $id_shop);
     }
 
-public function emptyTrash($id_shop)
-{
-    $repo = $this->getPostRepository();
-    if (!$repo) {
-        return false;
+    public function emptyTrash($id_shop)
+    {
+        return (bool) $this->getBlogScheduledTaskRunner()->emptyTrash((int) $id_shop);
     }
-
-    $days = (int) Configuration::get('EVERBLOG_EMPTY_TRASH');
-    $limitDate = new \DateTime('-' . $days . ' days');
-
-    $posts = $repo->createQueryBuilder('p')
-        ->andWhere('p.shopId = :shop')
-        ->andWhere('p.status = :status')
-        ->andWhere('p.updatedAt <= :limit')
-        ->setParameter('shop', (int) $id_shop)
-        ->setParameter('status', 'trash')
-        ->setParameter('limit', $limitDate)
-        ->getQuery()
-        ->getResult();
-
-    if (!$posts) {
-        return true;
-    }
-
-    $em = $this->context->controller->getContainer()->get('doctrine.orm.entity_manager');
-
-    foreach ($posts as $post) {
-        $em->remove($post);
-    }
-
-    $em->flush();
-
-    return true;
-}
 
     public function publishPlannedPosts($id_shop)
     {
-        $sql = new DbQuery();
-        $sql->select('p.id_ever_post');
-        $sql->from('ever_blog_post', 'p');
-        $sql->innerJoin('ever_blog_post_shop', 'ps', 'ps.id_ever_post = p.id_ever_post AND ps.id_shop = ' . (int) $id_shop);
-        $sql->where('p.post_status = "planned"');
-        $sql->where('p.date_add <= "' . pSQL(date('Y-m-d H:i:s')) . '"');
-
-        $posts = Db::getInstance()->executeS($sql) ?: [];
-        if (!$posts) {
-            return;
-        }
-
-        foreach ($posts as $planned) {
-            Db::getInstance()->update(
-                'ever_blog_post',
-                [
-                    'post_status' => 'published',
-                ],
-                'id_ever_post = ' . (int) $planned['id_ever_post']
-            );
-        }
-
-        return true;
+        return (bool) $this->getBlogScheduledTaskRunner()->publishPlannedPosts((int) $id_shop);
     }
 
     public function hookActionObjectShopAddAfter($params)
@@ -1610,7 +1492,6 @@ public function emptyTrash($id_shop)
             $this->registerHook('actionObjectProductDeleteAfter');
             $this->registerHook('displayAdminAfterHeader');
             $this->registerHook('actionAdminMetaAfterWriteRobotsFile');
-            $this->registerHook('actionOutputHTMLBefore');
             $this->registerHook('actionRegisterBlock');
         } catch (Exception $e) {
             PrestaShopLogger::addLog($this->name . ' : ' . $e->getMessage());
@@ -1629,7 +1510,6 @@ public function emptyTrash($id_shop)
             $this->registerHook('displayBackOfficeHeader');
             $this->registerHook('displayAdminAfterHeader');
             $this->registerHook('actionAdminMetaAfterWriteRobotsFile');
-            $this->registerHook('actionOutputHTMLBefore');
             $this->registerHook('actionObjectEverPsBlogPostAddAfter');
             $this->registerHook('actionObjectEverPsBlogPostUpdateAfter');
             $this->registerHook('actionObjectEverPsBlogCategoryUpdateAfter');

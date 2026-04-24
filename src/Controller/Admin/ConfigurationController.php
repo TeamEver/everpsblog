@@ -54,6 +54,7 @@ class ConfigurationController extends AbstractDomainController
             'product_posts' => (int) \Configuration::get('EVERPSBLOG_PRODUCT_NBR'),
             'excerpt_length' => (int) \Configuration::get('EVERPSBLOG_EXCERPT'),
             'title_length' => (int) \Configuration::get('EVERPSBLOG_TITLE_LENGTH'),
+            'empty_trash_days' => $this->getEmptyTrashDelayDays(),
             'default_author_id' => (int) \Configuration::get('EVERBLOG_DEFAULT_AUTHOR_ID'),
             'header_bg_color' => $this->getHeaderBackgroundColor(),
             'header_title_color' => $this->getHeaderTitleColor(),
@@ -85,6 +86,7 @@ class ConfigurationController extends AbstractDomainController
             \Configuration::updateValue('EVERPSBLOG_PRODUCT_NBR', (int) $formData['product_posts']);
             \Configuration::updateValue('EVERPSBLOG_EXCERPT', (int) $formData['excerpt_length']);
             \Configuration::updateValue('EVERPSBLOG_TITLE_LENGTH', (int) $formData['title_length']);
+            \Configuration::updateValue('EVERBLOG_EMPTY_TRASH', max(0, (int) $formData['empty_trash_days']));
             \Configuration::updateValue('EVERBLOG_DEFAULT_AUTHOR_ID', (int) $formData['default_author_id']);
             \Configuration::updateValue('EVERBLOG_HEADER_BG_COLOR', $this->normalizeHexColor((string) ($formData['header_bg_color'] ?? ''), '#0a0f54'));
             \Configuration::updateValue('EVERBLOG_HEADER_TITLE_COLOR', $this->normalizeHexColor((string) ($formData['header_title_color'] ?? ''), '#ffffff'));
@@ -114,6 +116,7 @@ class ConfigurationController extends AbstractDomainController
 
             if ($request->request->has('import_wordpress_blog')) {
                 $this->importWordPressBlog($formData);
+                $this->runScheduledTasksAfterBackOfficeSave();
             } else {
                 $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService);
             }
@@ -331,6 +334,16 @@ class ConfigurationController extends AbstractDomainController
     private function getHeaderBackgroundColor(): string
     {
         return $this->normalizeHexColor((string) \Configuration::get('EVERBLOG_HEADER_BG_COLOR'), '#0a0f54');
+    }
+
+    private function getEmptyTrashDelayDays(): int
+    {
+        $value = \Configuration::get('EVERBLOG_EMPTY_TRASH');
+        if (false === $value || null === $value || '' === $value) {
+            return 7;
+        }
+
+        return max(0, (int) $value);
     }
 
     private function getHeaderTitleColor(): string

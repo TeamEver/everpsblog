@@ -28,11 +28,18 @@ class EverPsBlogfeedModuleFrontController extends AbstractFrontController
 {
     use FrontBlogDataProviderTrait;
 
+    /** @var \stdClass */
     protected $feed;
+    /** @var \stdClass */
     protected $category;
+    /** @var \stdClass */
     protected $tag;
+    /** @var \stdClass */
     protected $post;
+    /** @var \stdClass */
     protected $blog;
+    /** @var string[] */
+    protected $allowed_feeds = [];
     public $post_number;
     public $controller_name = 'feed';
 
@@ -140,10 +147,10 @@ class EverPsBlogfeedModuleFrontController extends AbstractFrontController
             default:
                 $feed_obj = new stdClass();
                 // SEO title and meta desc
-                $everblog_title = $this->module::getConfigInMultipleLangs('EVERBLOG_TITLE');
+                $everblog_title = $this->getModuleConfigInMultipleLangs('EVERBLOG_TITLE');
                 $meta_title = $everblog_title[(int) $this->context->language->id];
                 // Default blog text
-                $everblog_top_text = $this->module::getConfigInMultipleLangs('EVERBLOG_TOP_TEXT');
+                $everblog_top_text = $this->getModuleConfigInMultipleLangs('EVERBLOG_TOP_TEXT');
                 $default_blog_top_text = $everblog_top_text[(int) $this->context->language->id];
                 $default_blog_top_text = 
                     $default_blog_top_text;
@@ -167,7 +174,7 @@ class EverPsBlogfeedModuleFrontController extends AbstractFrontController
                 break;
         }
         $this->prepareFeedChannel($feed_obj, $channelLink);
-        $posts = $this->prepareFeedPosts(is_array($posts) ? $posts : []);
+        $posts = $this->prepareFeedPosts($posts);
         $feed_url = $this->context->link->getModuleLink(
             $this->module->name,
             'feed',

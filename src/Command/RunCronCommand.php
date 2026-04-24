@@ -19,6 +19,7 @@
 
 namespace PrestaShop\Module\Everpsblog\Command;
 
+use PrestaShop\Module\Everpsblog\Service\BlogScheduledTaskRunner;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -27,6 +28,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class RunCronCommand extends Command
 {
+    private const EXIT_SUCCESS = 0;
+    private const EXIT_FAILURE = 1;
+
     protected function configure()
     {
         $this
@@ -47,14 +51,14 @@ class RunCronCommand extends Command
         if (!\Module::isInstalled('everpsblog')) {
             $io->error('The EverPsBlog module is not installed.');
 
-            return Command::FAILURE;
+            return self::EXIT_FAILURE;
         }
 
         $module = \Module::getInstanceByName('everpsblog');
-        if (!\Validate::isLoadedObject($module) || !$module->active) {
+        if (!$module instanceof \EverPsBlog || !$module->active) {
             $io->error('The EverPsBlog module is not available or not active.');
 
-            return Command::FAILURE;
+            return self::EXIT_FAILURE;
         }
 
         $module->cron = true;
@@ -68,19 +72,19 @@ class RunCronCommand extends Command
             $shopIds = array_map('intval', (array) \Shop::getShops(true, null, true));
         }
 
-        if (empty($shopIds)) {
+        if (count($shopIds) === 0) {
             $io->warning('No shop found to process.');
 
-            return Command::SUCCESS;
+            return self::EXIT_SUCCESS;
         }
 
         $context = \Context::getContext();
+        $scheduledTaskRunner = new BlogScheduledTaskRunner();
 
         foreach ($shopIds as $idShop) {
             $shop = new \Shop((int) $idShop);
             \Shop::setContext(\Shop::CONTEXT_SHOP, (int) $idShop);
             $context->shop = $shop;
-            $context->id_shop = (int) $idShop;
 
             $langId = (int) \Configuration::get(
                 'PS_LANG_DEFAULT',
@@ -93,7 +97,6 @@ class RunCronCommand extends Command
             }
 
             $context->language = new \Language($langId);
-            $context->id_lang = $langId;
 
             if (!isset($context->employee) || !$context->employee->id) {
                 $employeeId = (int) \Configuration::get('EVERBLOG_ADMIN_EMAIL');
@@ -104,17 +107,25 @@ class RunCronCommand extends Command
 
             $io->section(sprintf('Running cron tasks for shop #%d', $idShop));
 
-            $emptyTrash = (bool) $module->emptyTrash((int) $idShop);
-            $io->text($emptyTrash ? 'Trash emptied successfully.' : 'No trash to empty.');
+            $summary = $scheduledTaskRunner->runForShop((int) $idShop, true, true);
 
-            $planned = (bool) $module->publishPlannedPosts((int) $idShop);
-            $io->text($planned ? 'Planned posts have been published.' : 'No planned posts to publish.');
+            $io->text(
+                (int) $summary['trash_removed'] > 0
+                    ? sprintf('Trash emptied: %d post(s) deleted.', (int) $summary['trash_removed'])
+                    : 'No trash to empty.'
+            );
+            $io->text(
+                (int) $summary['planned_published'] > 0
+                    ? sprintf('Planned posts published: %d.', (int) $summary['planned_published'])
+                    : 'No planned posts to publish.'
+            );
+            $io->text(
+                (int) $summary['pending_notifications_sent'] > 0
+                    ? sprintf('Pending notifications sent for %d post(s).', (int) $summary['pending_notifications_sent'])
+                    : 'No pending notifications to send.'
+            );
 
-            $pending = (bool) $module->sendPendingNotification((int) $idShop);
-            $io->text($pending ? 'Pending notifications have been sent.' : 'No pending notifications to send.');
-
-            $sitemaps = $module->generateBlogSitemap((int) $idShop, true);
-            if ($sitemaps) {
+            if ((bool) $summary['sitemaps_refreshed']) {
                 $io->text('Sitemaps generated successfully.');
             } else {
                 $io->text('Sitemaps generation did not return a positive result.');
@@ -123,6 +134,6 @@ class RunCronCommand extends Command
 
         $io->success('All EverPsBlog cron tasks have been processed.');
 
-        return Command::SUCCESS;
+        return self::EXIT_SUCCESS;
     }
 }

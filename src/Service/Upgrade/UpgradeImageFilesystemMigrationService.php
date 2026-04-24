@@ -96,9 +96,7 @@ class UpgradeImageFilesystemMigrationService
             $path = $dir . $item;
             if (is_dir($path)) {
                 $result = $this->cleanupLegacyFolder($path . '/') && $result;
-                if (is_dir($path)) {
-                    $result = @rmdir($path) && $result;
-                }
+                $result = @rmdir($path) && $result;
 
                 continue;
             }
@@ -107,7 +105,7 @@ class UpgradeImageFilesystemMigrationService
         }
 
         $remaining = scandir($dir);
-        if (is_array($remaining) && count($remaining) === 2) {
+        if (count($remaining) === 2) {
             $result = @rmdir($dir) && $result;
         }
 

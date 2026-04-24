@@ -55,7 +55,7 @@ class ImageUploader
     }
 
     /**
-     * @return resource|\GdImage|null
+     * @return \GdImage|false|null
      */
     private function createImageResource(string $sourcePath, string $mimeType)
     {

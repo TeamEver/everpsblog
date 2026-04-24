@@ -32,11 +32,20 @@ use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 
 class EverPsBlogblogModuleFrontController extends AbstractFrontController
 {
+    /** @var \stdClass */
     protected $author;
+    /** @var \stdClass */
     protected $category;
+    /** @var \stdClass */
     protected $tag;
+    /** @var \stdClass */
     protected $post;
+    /** @var \stdClass */
     protected $blog;
+    /** @var string */
+    protected $blog_path = '';
+    /** @var \Category|null */
+    protected $featured_category;
     public $post_number;
     public $controller_name = 'blog';
 
@@ -208,9 +217,9 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
         // pagination
         $pagination = $this->getTemplateVarPagination($this->post_number);
         // SEO title and meta desc
-        $everblog_title = $this->module::getConfigInMultipleLangs('EVERBLOG_TITLE');
+        $everblog_title = $this->getModuleConfigInMultipleLangs('EVERBLOG_TITLE');
         $meta_title = $everblog_title[(int) Context::getContext()->language->id];
-        $everblog_desc = $this->module::getConfigInMultipleLangs('EVERBLOG_META_DESC');
+        $everblog_desc = $this->getModuleConfigInMultipleLangs('EVERBLOG_META_DESC');
         $meta_desc = $everblog_desc[(int) Context::getContext()->language->id];
         $page = $this->context->controller->getTemplateVarPage();
         if (Tools::getValue('page')) {
@@ -256,9 +265,9 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
             'EVERBLOG_ANIMATE'
         );
         // Default blog text
-        $everblog_top_text = $this->module::getConfigInMultipleLangs('EVERBLOG_TOP_TEXT');
+        $everblog_top_text = $this->getModuleConfigInMultipleLangs('EVERBLOG_TOP_TEXT');
         $default_blog_top_text = $everblog_top_text[(int) Context::getContext()->language->id];
-        $everblog_bottom_text = $this->module::getConfigInMultipleLangs('EVERBLOG_BOTTOM_TEXT');
+        $everblog_bottom_text = $this->getModuleConfigInMultipleLangs('EVERBLOG_BOTTOM_TEXT');
         $default_blog_bottom_text = $everblog_bottom_text[(int) Context::getContext()->language->id];
         $default_blog_top_text = $this->renderQcdBuilderField(
             'everpsblog_configuration',
@@ -272,7 +281,7 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
             'bottom_text',
             (string) $default_blog_bottom_text
         );
-        $everblog_main_title = $this->module::getConfigInMultipleLangs('EVERBLOG_MAIN_TITLE');
+        $everblog_main_title = $this->getModuleConfigInMultipleLangs('EVERBLOG_MAIN_TITLE');
         $blog_page_title = $everblog_main_title[(int) Context::getContext()->language->id];
         Hook::exec('actionBeforeEverBlogInitContent', [
             'blog_post_number' => &$this->post_number,
@@ -316,7 +325,6 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
             'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__ . 'modules/everpsblog/views/img/',
             'animated' => $animate,
             'show_featured_post' => true,
-            'pagination' => $pagination,
             'show_featured_cat' => (bool) Configuration::get('EVERBLOG_SHOW_FEAT_CAT'),
             'facet_url' => $facet_url,
             'sort_orders' => $sortOrders,

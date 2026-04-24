@@ -32,14 +32,34 @@ use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 
 class EverPsBlogpostModuleFrontController extends AbstractFrontController
 {
+    /** @var \stdClass */
     protected $category;
+    /** @var \stdClass */
     protected $tag;
+    /** @var \stdClass */
     protected $post;
+    /** @var \stdClass */
     protected $blog;
+    /** @var \stdClass */
     protected $author;
     protected $author_cover;
     protected $authorHasImage = false;
+    /** @var \stdClass */
     protected $default_category;
+    /** @var string */
+    protected $module_name = '';
+    /** @var string[] */
+    protected $ip_banned = [];
+    /** @var string[] */
+    protected $users_banned = [];
+    /** @var bool */
+    protected $allow_comments = false;
+    /** @var array<int, int|string> */
+    protected $post_tags = [];
+    /** @var array<int, int|string> */
+    protected $post_categories = [];
+    /** @var array<int, int|string> */
+    protected $post_products = [];
     public $controller_name = 'post';
 
     public function init()
@@ -318,7 +338,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
             }
             // Now prepare template and show it
             $ps_products = [];
-            if (isset($this->post_products) && !empty($this->post_products)) {
+            if (!empty($this->post_products)) {
                 $showPrice = true;
                 $assembler = new ProductAssembler($this->context);
                 $presenterFactory = new ProductPresenterFactory($this->context);
@@ -358,7 +378,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
             $count_products = count($ps_products);
             $ps_products_chunks = $count_products > 0 ? array_chunk($ps_products, 4) : [];
             $tags = [];
-            if (isset($this->post_tags) && !empty($this->post_tags)) {
+            if (!empty($this->post_tags)) {
                 foreach ($this->post_tags as $postTagId) {
                     $current_post_tag = $this->getTagForFront(
                         (int) $postTagId,
@@ -630,7 +650,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
         );
     }
 
-    private function getPostForFront($idPost, $idLang, $idShop)
+    private function getPostForFront($idPost, $idLang, $idShop): stdClass
     {
         $sql = new DbQuery();
         $sql->select('p.id_ever_post, p.id_ever_post AS id, p.id_shop, p.id_author, p.id_author AS id_ever_author, p.id_default_category, p.post_status, p.date_add, p.date_upd, p.indexable, p.follow, p.sitemap, p.active, p.allowed_groups, p.post_categories, p.post_tags, p.post_products, p.psswd, p.starred, p.count, p.groups, pl.title AS title, pl.meta_title AS meta_title, pl.meta_description AS meta_description, pl.link_rewrite AS link_rewrite, pl.content AS content, pl.excerpt AS excerpt');
@@ -642,7 +662,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
         return $this->arrayToObject(Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql));
     }
 
-    private function getCategoryForFront($idCategory, $idLang, $idShop)
+    private function getCategoryForFront($idCategory, $idLang, $idShop): stdClass
     {
         return $this->frontCacheRemember(__METHOD__, [$idCategory, $idLang, $idShop], function () use ($idCategory, $idLang, $idShop) {
             $sql = new DbQuery();
@@ -656,7 +676,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
         }, [BlogFrontCacheTags::category((int) $idCategory)]);
     }
 
-    private function getAuthorForFront($idAuthor, $idLang, $idShop)
+    private function getAuthorForFront($idAuthor, $idLang, $idShop): stdClass
     {
         return $this->frontCacheRemember(__METHOD__, [$idAuthor, $idLang, $idShop], function () use ($idAuthor, $idLang, $idShop) {
             $sql = new DbQuery();
@@ -680,7 +700,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
         });
     }
 
-    private function getTagForFront($idTag, $idLang, $idShop)
+    private function getTagForFront($idTag, $idLang, $idShop): stdClass
     {
         return $this->frontCacheRemember(__METHOD__, [$idTag, $idLang, $idShop], function () use ($idTag, $idLang, $idShop) {
             $sql = new DbQuery();
@@ -694,7 +714,10 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
         }, [BlogFrontCacheTags::tag((int) $idTag)]);
     }
 
-    private function getPostsByCategoryForFront($idLang, $idShop, $idCategory, $start = 0, $limit = 5)
+    /**
+     * @return list<stdClass>
+     */
+    private function getPostsByCategoryForFront($idLang, $idShop, $idCategory, $start = 0, $limit = 5): array
     {
         return $this->frontCacheRemember(__METHOD__, [$idLang, $idShop, $idCategory, $start, $limit], function () use ($idLang, $idShop, $idCategory, $start, $limit) {
             $sql = new DbQuery();
@@ -722,7 +745,10 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
         });
     }
 
-    private function getChildrenCategoriesForFront($idParentCategory, $idLang, $idShop)
+    /**
+     * @return list<stdClass>
+     */
+    private function getChildrenCategoriesForFront($idParentCategory, $idLang, $idShop): array
     {
         return $this->frontCacheRemember(__METHOD__, [$idParentCategory, $idLang, $idShop], function () use ($idParentCategory, $idLang, $idShop) {
             $sql = new DbQuery();
@@ -761,7 +787,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
         );
     }
 
-    private function getLatestCommentByEmail($email, $idLang)
+    private function getLatestCommentByEmail($email, $idLang): stdClass
     {
         $sql = new DbQuery();
         $sql->select('*');
@@ -811,7 +837,10 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
         }, [BlogFrontCacheTags::postComments((int) $idPost)]);
     }
 
-    private function getCommentsByPost($idPost, $idLang)
+    /**
+     * @return list<stdClass>
+     */
+    private function getCommentsByPost($idPost, $idLang): array
     {
         return $this->frontCacheRemember(__METHOD__, [$idPost, $idLang], function () use ($idPost, $idLang) {
             $sql = new DbQuery();
@@ -828,7 +857,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
         });
     }
 
-    private function getComment($idComment)
+    private function getComment($idComment): stdClass
     {
         return $this->frontCacheRemember(__METHOD__, [$idComment], function () use ($idComment) {
             $sql = new DbQuery();
@@ -854,7 +883,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
         }, [BlogFrontCacheTags::post((int) $idPost)]);
     }
 
-    private function arrayToObject($row)
+    private function arrayToObject($row): stdClass
     {
         if (!is_array($row)) {
             return new stdClass();
@@ -863,7 +892,10 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
         return (object) $row;
     }
 
-    private function rowsToObjects($rows)
+    /**
+     * @return list<stdClass>
+     */
+    private function rowsToObjects($rows): array
     {
         if (!is_array($rows)) {
             return [];

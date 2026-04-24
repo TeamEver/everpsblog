@@ -9,6 +9,11 @@ if (is_file($rootAutoload)) {
     require_once $rootAutoload;
 }
 
+$moduleMainFile = __DIR__ . '/everpsblog.php';
+if (is_file($moduleMainFile)) {
+    require_once $moduleMainFile;
+}
+
 if (!defined('_PS_ROOT_DIR_')) {
     define('_PS_ROOT_DIR_', $prestashopRoot);
 }
@@ -43,4 +48,8 @@ if (!defined('__PS_BASE_URI__')) {
 
 if (!defined('_PS_VERSION_')) {
     define('_PS_VERSION_', '8.0.0');
+}
+
+if (!defined('_COOKIE_KEY_')) {
+    define('_COOKIE_KEY_', 'phpstan-cookie-key');
 }

@@ -30,11 +30,18 @@ class EverPsBlogauthorModuleFrontController extends AbstractFrontController
 {
     use FrontBlogDataProviderTrait;
 
+    /** @var \stdClass */
     protected $author;
+    /** @var \stdClass */
     protected $category;
+    /** @var \stdClass */
     protected $tag;
+    /** @var \stdClass */
     protected $post;
+    /** @var \stdClass */
     protected $blog;
+    /** @var string */
+    protected $module_name = '';
     public $post_number;
     public $controller_name = 'author';
 

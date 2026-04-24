@@ -9,6 +9,7 @@ use PrestaShop\Module\Everpsblog\Form\DataProvider\CommentFormDataProvider;
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\CommentType;
 use PrestaShop\Module\Everpsblog\Grid\Data\CommentGridDataFactory;
 use PrestaShop\Module\Everpsblog\Grid\Definition\CommentGridDefinitionFactory;
+use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,8 +23,9 @@ class CommentController extends AbstractDomainController
     private $definitionFactory;
     private $dataFactory;
     private $formDataProvider;
+    private $blogSitemapService;
 
-    public function __construct(ContextStateService $contextStateService, CommandBusInterface $commandBus, CommentCommandAssembler $commandAssembler, CommentGridDefinitionFactory $definitionFactory, CommentGridDataFactory $dataFactory, CommentFormDataProvider $formDataProvider)
+    public function __construct(ContextStateService $contextStateService, CommandBusInterface $commandBus, CommentCommandAssembler $commandAssembler, CommentGridDefinitionFactory $definitionFactory, CommentGridDataFactory $dataFactory, CommentFormDataProvider $formDataProvider, BlogSitemapService $blogSitemapService)
     {
         parent::__construct($contextStateService);
         $this->commandBus = $commandBus;
@@ -31,6 +33,7 @@ class CommentController extends AbstractDomainController
         $this->definitionFactory = $definitionFactory;
         $this->dataFactory = $dataFactory;
         $this->formDataProvider = $formDataProvider;
+        $this->blogSitemapService = $blogSitemapService;
     }
 
     public function indexAction(Request $request): Response
@@ -66,6 +69,7 @@ class CommentController extends AbstractDomainController
                     $savedCommentId = $isEdit
                         ? $this->commandBus->handle($this->commandAssembler->assembleUpdate((int) $commentId, (array) $form->getData()))
                         : $this->commandBus->handle($this->commandAssembler->assembleCreate((array) $form->getData()));
+                    $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService);
                     $submitAction = (string) $request->request->get('_submit_action', 'save');
 
                     $this->addFlash('success', $isEdit ? $this->transAdmin('Comment updated.') : $this->transAdmin('Comment created.'));
@@ -106,6 +110,7 @@ class CommentController extends AbstractDomainController
         $this->validateCsrfToken($request, 'everpsblog_comment_create');
 
         $commentId = $this->commandBus->handle($this->commandAssembler->assembleCreate($request->request->all()));
+        $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService, false);
 
         return new JsonResponse(['id_ever_comment' => $commentId], JsonResponse::HTTP_CREATED);
     }
@@ -115,6 +120,7 @@ class CommentController extends AbstractDomainController
         $this->validateCsrfToken($request, 'everpsblog_comment_update_' . $commentId);
 
         $updatedCommentId = $this->commandBus->handle($this->commandAssembler->assembleUpdate($commentId, $request->request->all()));
+        $this->refreshSitemapsAfterBackOfficeChange($this->blogSitemapService, false);
 
         return new JsonResponse(['id_ever_comment' => $updatedCommentId], JsonResponse::HTTP_OK);
     }

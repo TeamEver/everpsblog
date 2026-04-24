@@ -35,12 +35,18 @@ class EverPsBlogtagModuleFrontController extends AbstractFrontController
 {
     use FrontBlogDataProviderTrait;
 
+    /** @var \stdClass */
     protected $author;
+    /** @var \stdClass */
     protected $category;
+    /** @var \stdClass */
     protected $tag;
+    /** @var \stdClass */
     protected $post;
+    /** @var \stdClass */
     protected $blog;
     public $nbr_blogs;
+    public $post_number;
     public $controller_name = 'tags';
 
     public function init()

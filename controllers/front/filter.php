@@ -36,6 +36,8 @@ class EverPsBlogfilterModuleFrontController extends AbstractFrontController
         ]);
 
         $html = $this->context->smarty->fetch('module:everpsblog/views/templates/front/ajax_posts.tpl');
-        die(Tools::jsonEncode(['html' => $html]));
+        $payload = json_encode(['html' => $html]);
+
+        die(false !== $payload ? $payload : '{"html":""}');
     }
 }

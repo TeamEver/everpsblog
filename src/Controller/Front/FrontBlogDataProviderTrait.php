@@ -6,7 +6,7 @@ use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheTags;
 
 trait FrontBlogDataProviderTrait
 {
-    protected function getFrontCategory($idCategory, $idLang, $idShop)
+    protected function getFrontCategory($idCategory, $idLang, $idShop): \stdClass
     {
         return $this->frontCacheRemember(__METHOD__, [$idCategory, $idLang, $idShop], function () use ($idCategory, $idLang, $idShop) {
             $sql = new \DbQuery();
@@ -20,7 +20,7 @@ trait FrontBlogDataProviderTrait
         }, [BlogFrontCacheTags::category((int) $idCategory)]);
     }
 
-    protected function getFrontTag($idTag, $idLang, $idShop)
+    protected function getFrontTag($idTag, $idLang, $idShop): \stdClass
     {
         return $this->frontCacheRemember(__METHOD__, [$idTag, $idLang, $idShop], function () use ($idTag, $idLang, $idShop) {
             $sql = new \DbQuery();
@@ -34,7 +34,7 @@ trait FrontBlogDataProviderTrait
         }, [BlogFrontCacheTags::tag((int) $idTag)]);
     }
 
-    protected function getFrontAuthor($idAuthor, $idLang, $idShop)
+    protected function getFrontAuthor($idAuthor, $idLang, $idShop): \stdClass
     {
         return $this->frontCacheRemember(__METHOD__, [$idAuthor, $idLang, $idShop], function () use ($idAuthor, $idLang, $idShop) {
             $sql = new \DbQuery();
@@ -49,7 +49,7 @@ trait FrontBlogDataProviderTrait
         }, [BlogFrontCacheTags::author((int) $idAuthor)]);
     }
 
-    protected function getFrontPost($idPost, $idLang, $idShop)
+    protected function getFrontPost($idPost, $idLang, $idShop): \stdClass
     {
         return $this->frontCacheRemember(__METHOD__, [$idPost, $idLang, $idShop], function () use ($idPost, $idLang, $idShop) {
             $sql = $this->createFrontPostQuery($idLang, $idShop);
@@ -91,7 +91,10 @@ trait FrontBlogDataProviderTrait
         }, [BlogFrontCacheTags::author((int) $idAuthor)]);
     }
 
-    protected function getFrontPostsByCategory($idLang, $idShop, $idCategory, $start = 0, $limit = null)
+    /**
+     * @return list<\stdClass>
+     */
+    protected function getFrontPostsByCategory($idLang, $idShop, $idCategory, $start = 0, $limit = null): array
     {
         return $this->frontCacheRemember(__METHOD__, [$idLang, $idShop, $idCategory, $start, $limit], function () use ($idLang, $idShop, $idCategory, $start, $limit) {
             $sql = $this->createFrontPostQuery($idLang, $idShop);
@@ -104,7 +107,10 @@ trait FrontBlogDataProviderTrait
         });
     }
 
-    protected function getFrontPostsByTag($idLang, $idShop, $idTag, $start = 0, $limit = null)
+    /**
+     * @return list<\stdClass>
+     */
+    protected function getFrontPostsByTag($idLang, $idShop, $idTag, $start = 0, $limit = null): array
     {
         return $this->frontCacheRemember(__METHOD__, [$idLang, $idShop, $idTag, $start, $limit], function () use ($idLang, $idShop, $idTag, $start, $limit) {
             $sql = $this->createFrontPostQuery($idLang, $idShop);
@@ -117,7 +123,10 @@ trait FrontBlogDataProviderTrait
         });
     }
 
-    protected function getFrontPostsByAuthor($idLang, $idShop, $idAuthor, $start = 0, $limit = null)
+    /**
+     * @return list<\stdClass>
+     */
+    protected function getFrontPostsByAuthor($idLang, $idShop, $idAuthor, $start = 0, $limit = null): array
     {
         return $this->frontCacheRemember(__METHOD__, [$idLang, $idShop, $idAuthor, $start, $limit], function () use ($idLang, $idShop, $idAuthor, $start, $limit) {
             $sql = $this->createFrontPostQuery($idLang, $idShop);
@@ -129,7 +138,10 @@ trait FrontBlogDataProviderTrait
         });
     }
 
-    protected function getFrontLatestPosts($idLang, $idShop, $start = 0, $limit = null)
+    /**
+     * @return list<\stdClass>
+     */
+    protected function getFrontLatestPosts($idLang, $idShop, $start = 0, $limit = null): array
     {
         return $this->frontCacheRemember(__METHOD__, [$idLang, $idShop, $start, $limit], function () use ($idLang, $idShop, $start, $limit) {
             return $this->executeFrontPostsQuery($this->createFrontPostQuery($idLang, $idShop), $start, $limit);
@@ -138,7 +150,10 @@ trait FrontBlogDataProviderTrait
         });
     }
 
-    protected function getFilteredFrontPosts($idLang, $idShop, $idCategory = null, $idTag = null, $start = 0, $limit = null)
+    /**
+     * @return list<\stdClass>
+     */
+    protected function getFilteredFrontPosts($idLang, $idShop, $idCategory = null, $idTag = null, $start = 0, $limit = null): array
     {
         $tags = [BlogFrontCacheTags::BLOG_LISTING];
         if ($idCategory) {
@@ -175,7 +190,10 @@ trait FrontBlogDataProviderTrait
         }, [BlogFrontCacheTags::BLOG_SEARCH]);
     }
 
-    protected function searchFrontPosts($query, $idLang, $idShop, $start = 0, $limit = null)
+    /**
+     * @return list<\stdClass>
+     */
+    protected function searchFrontPosts($query, $idLang, $idShop, $start = 0, $limit = null): array
     {
         return $this->frontCacheRemember(__METHOD__, [$query, $idLang, $idShop, $start, $limit], function () use ($query, $idLang, $idShop, $start, $limit) {
             $sql = $this->createFrontPostQuery($idLang, $idShop);
@@ -187,7 +205,10 @@ trait FrontBlogDataProviderTrait
         });
     }
 
-    protected function getFrontCommentsByEmail($email, $idLang)
+    /**
+     * @return list<\stdClass>
+     */
+    protected function getFrontCommentsByEmail($email, $idLang): array
     {
         return $this->frontCacheRemember(__METHOD__, [$email, $idLang], function () use ($email, $idLang) {
             $sql = new \DbQuery();
@@ -203,7 +224,10 @@ trait FrontBlogDataProviderTrait
         });
     }
 
-    protected function getFrontChildrenCategories($idParentCategory, $idLang, $idShop)
+    /**
+     * @return list<\stdClass>
+     */
+    protected function getFrontChildrenCategories($idParentCategory, $idLang, $idShop): array
     {
         return $this->frontCacheRemember(__METHOD__, [$idParentCategory, $idLang, $idShop], function () use ($idParentCategory, $idLang, $idShop) {
             $sql = new \DbQuery();
@@ -314,7 +338,7 @@ trait FrontBlogDataProviderTrait
         return $products;
     }
 
-    protected function frontRowToObject($row)
+    protected function frontRowToObject($row): \stdClass
     {
         if (!is_array($row)) {
             return new \stdClass();
@@ -323,7 +347,10 @@ trait FrontBlogDataProviderTrait
         return (object) $row;
     }
 
-    protected function frontRowsToObjects($rows)
+    /**
+     * @return list<\stdClass>
+     */
+    protected function frontRowsToObjects($rows): array
     {
         if (!is_array($rows)) {
             return [];
@@ -355,7 +382,10 @@ trait FrontBlogDataProviderTrait
         });
     }
 
-    private function executeFrontPostsQuery(\DbQuery $sql, $start, $limit)
+    /**
+     * @return list<\stdClass>
+     */
+    private function executeFrontPostsQuery(\DbQuery $sql, $start, $limit): array
     {
         $limit = null === $limit ? (int) \Configuration::get('EVERPSBLOG_PAGINATION') : (int) $limit;
         if ($limit <= 0) {
