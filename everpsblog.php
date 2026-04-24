@@ -2896,4 +2896,8 @@ public function emptyTrash($id_shop)
         return $this->display(__FILE__, 'views/templates/hook/shortcode.tpl');
     }
 
+    public function isUsingNewTranslationSystem()
+    {
+        return true;
+    }
 }
