@@ -438,7 +438,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                     $this->post->content = $this->transShop('This post is password protected');
                 }
             } else {
-                // Prepare shortcodes
+                // Render builder content
                 $this->post->content = $this->renderQcdBuilderField(
                     'everpsblog_post',
                     (int) $this->post->id,

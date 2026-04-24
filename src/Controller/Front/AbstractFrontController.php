@@ -145,6 +145,27 @@ abstract class AbstractFrontController extends \ModuleFrontController
         return $this->context->getTranslator()->trans($message, $parameters, 'Modules.Everpsblog.Shop');
     }
 
+    /**
+     * @return \EverPsBlog|null
+     */
+    protected function getEverPsBlogModule(): ?\EverPsBlog
+    {
+        return $this->module instanceof \EverPsBlog ? $this->module : null;
+    }
+
+    /**
+     * @return array<int, mixed>
+     */
+    protected function getModuleConfigInMultipleLangs(string $key): array
+    {
+        $module = $this->getEverPsBlogModule();
+        if (null === $module) {
+            return [];
+        }
+
+        return (array) $module::getConfigInMultipleLangs($key);
+    }
+
     private function assignHeaderConfiguration(): void
     {
         $backgroundColor = $this->normalizeHexColor((string) \Configuration::get('EVERBLOG_HEADER_BG_COLOR'), '#0a0f54');

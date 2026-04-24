@@ -1,0 +1,36 @@
+parameters:
+  level: 5
+  paths:
+    - everpsblog.php
+    - classes
+    - config
+    - controllers
+    - install
+    - src
+    - upgrade
+  excludePaths:
+    - vendor/*
+    - views/*
+    - mails/*
+    - translations/*
+    - docs/*
+  bootstrapFiles:
+    - phpstan-bootstrap.php
+  universalObjectCratesClasses:
+    - stdClass
+    - Module
+    - ObjectModel
+    - Cookie
+    - Order
+    - OrderInvoice
+    - Product
+  dynamicConstantNames:
+    - _DB_PREFIX_
+    - _MYSQL_ENGINE_
+    - _PS_IMG_
+    - _PS_IMG_DIR_
+    - _PS_MODULE_DIR_
+    - _PS_ROOT_DIR_
+    - _PS_USE_SQL_SLAVE_
+    - _PS_VERSION_
+    - __PS_BASE_URI__

@@ -119,7 +119,7 @@ class EverPsBlogauthorModuleFrontController extends AbstractFrontController
             $page['meta']['description'] = $this->author->meta_description;
             $this->context->smarty->assign('page', $page);
             // Now prepare template and show it
-            // Prepare shortcodes
+            // Render builder content
             $this->author->content = $this->renderQcdBuilderField(
                 'everpsblog_author',
                 (int) $this->author->id,

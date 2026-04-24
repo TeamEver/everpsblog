@@ -659,7 +659,7 @@ class EverPsBlog extends Module
 
     public function replaceAndDownloadImages($content)
     {
-        // 1. Convertir les shortcodes [caption] en <figure>
+        // 1. Convertir les legendes WordPress en <figure>
         $content = preg_replace_callback(
             '/\[caption[^\]]*\](<img[^>]+>)(.*?)\[\/caption\]/si',
             function ($matches) {
@@ -1109,9 +1109,6 @@ class EverPsBlog extends Module
                 $this->emptyTrash(
                     (int) $shop['id_shop']
                 );
-            }
-            if (isset($params['html'])) {
-                $params['html'] = $this->parseShortcodes($params['html']);
             }
         } catch (Exception $e) {
             PrestaShopLogger::addLog($this->name . ' : ' . $e->getMessage());
@@ -1899,7 +1896,7 @@ public function emptyTrash($id_shop)
                 $post_content = preg_replace('/<!--(.|\s)*?-->/', '', $post_content);
                 $post_content = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $post_content);
                 $post_content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $post_content);
-                $post_content = $this->cleanWpShortcodes($post_content);
+                $post_content = $this->removeUnsupportedWpMarkup($post_content);
                 $post = $this->getLegacyImportAdapter()->getOrCreatePostByLinkRewrite($post_link_rewrite);
                 // Multilingual fields
                 $id_lang = $this->getIdLangFromWpData($el);
@@ -2020,11 +2017,11 @@ public function emptyTrash($id_shop)
                 $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
                 foreach ($langs as $language) {
                     $content = $this->replaceAndDownloadImages(
-                        $this->cleanWpShortcodes($data->content->rendered)
+                        $this->removeUnsupportedWpMarkup($data->content->rendered)
                     );
                     $content = Tools::purifyHTML($content);
                     $excerpt = $this->replaceAndDownloadImages(
-                        $this->cleanWpShortcodes($data->excerpt->rendered)
+                        $this->removeUnsupportedWpMarkup($data->excerpt->rendered)
                     );
                     $excerpt = Tools::purifyHTML($excerpt);
                     $post->title[$language['id_lang']] = html_entity_decode($data->title->rendered, ENT_QUOTES, 'UTF-8');
@@ -2257,7 +2254,7 @@ public function emptyTrash($id_shop)
                 $id_lang = $this->getIdLangFromWpData($data);
                 $langs = $id_lang ? [ ['id_lang' => $id_lang] ] : Language::getLanguages(false);
                 foreach ($langs as $language) {
-                    $content = $this->cleanWpShortcodes($data->content->rendered);
+                    $content = $this->removeUnsupportedWpMarkup($data->content->rendered);
                     $content = $this->replaceAndDownloadImages($content);
                     $content = $this->removeJavascript($content);
 
@@ -2266,7 +2263,7 @@ public function emptyTrash($id_shop)
                     $content = html_entity_decode($content, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
                     $excerpt = $this->replaceAndDownloadImages(
-                        $this->cleanWpShortcodes($data->excerpt->rendered)
+                        $this->removeUnsupportedWpMarkup($data->excerpt->rendered)
                     );
                     $post->title[$language['id_lang']] = html_entity_decode($data->title->rendered, ENT_QUOTES, 'UTF-8');
                     $post->meta_title[$language['id_lang']] = html_entity_decode($data->title->rendered, ENT_QUOTES, 'UTF-8');
@@ -2772,7 +2769,7 @@ public function emptyTrash($id_shop)
         return $resultsArray;
     }
 
-    private function cleanWpShortcodes($html)
+    private function removeUnsupportedWpMarkup($html)
     {
         return preg_replace('/\[(?!everpsblog)(?:\/)?[\w\-]+(?:\s[^\]]*)?\]/i', '', $html);
     }
@@ -2783,117 +2780,6 @@ public function emptyTrash($id_shop)
         $html = preg_replace("/on\w+=(\"[^\"]*\"|'[^']*'|[^\s>]+)/i", '', $html);
         $html = preg_replace('/javascript:/i', '', $html);
         return $html;
-    }
-
-
-    private function parseShortcodes($html)
-    {
-        return preg_replace_callback('/\[everpsblog([^\]]*)\]/i', function ($m) {
-            $attrs = [];
-            if (preg_match_all('/(\w+)="?([^\s"]+)"?/', trim($m[1]), $attrMatches, PREG_SET_ORDER)) {
-                foreach ($attrMatches as $attr) {
-                    $attrs[strtolower($attr[1])] = $attr[2];
-                }
-            }
-
-            if (isset($attrs['category'])) {
-                $order = isset($attrs['order']) ? strtolower($attrs['order']) : 'desc';
-                $limit = isset($attrs['limit']) ? (int) $attrs['limit'] : null;
-                return $this->renderPostsShortcode((int) $attrs['category'], $order, $limit);
-            }
-
-            if (isset($attrs['latest'])) {
-                $limit = isset($attrs['limit']) ? (int) $attrs['limit'] : (int) $attrs['latest'];
-                if ($limit <= 0) {
-                    $limit = null;
-                }
-                return $this->renderLatestPostsShortcode($limit);
-            }
-
-            if (isset($attrs['product'])) {
-                $limit = isset($attrs['limit']) ? (int) $attrs['limit'] : null;
-                $orderBy = isset($attrs['orderby']) ? $attrs['orderby'] : 'date_add';
-                $orderWay = isset($attrs['orderway']) ? strtoupper($attrs['orderway']) : 'DESC';
-                return $this->renderProductPostsShortcode((int) $attrs['product'], $orderBy, $orderWay, $limit);
-            }
-
-            return '';
-        }, $html);
-    }
-
-    private function renderPostsShortcode($category, $order, $limit)
-    {
-        $orderWay = strtolower($order) === 'asc' ? 'ASC' : 'DESC';
-        $posts = EverPsBlogPost::getPostsByCategory(
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id,
-            (int) $category,
-            0,
-            $limit,
-            'published',
-            false,
-            false,
-            $orderWay
-        );
-        if (!$posts) {
-            return '';
-        }
-        $this->context->smarty->assign([
-            'posts' => $posts,
-            'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
-        ]);
-        return $this->display(__FILE__, 'views/templates/hook/shortcode.tpl');
-    }
-
-    private function renderLatestPostsShortcode($limit)
-    {
-        $posts = EverPsBlogPost::getLatestPosts(
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id,
-            0,
-            $limit
-        );
-        if (!$posts) {
-            return '';
-        }
-        $this->context->smarty->assign([
-            'posts' => $posts,
-            'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
-        ]);
-        return $this->display(__FILE__, 'views/templates/hook/shortcode.tpl');
-    }
-
-    /**
-     * Render posts associated with a product
-     *
-     * @param int $product  Product ID
-     * @param string $orderBy Field used for ordering
-     * @param string $orderWay Order direction ASC|DESC
-     * @param int|null $limit Maximum number of posts
-     *
-     * @return string
-     */
-    private function renderProductPostsShortcode($product, $orderBy, $orderWay, $limit = null)
-    {
-        $orderWay = strtoupper($orderWay) === 'ASC' ? 'ASC' : 'DESC';
-        $posts = EverPsBlogPost::getPostsByProduct(
-            (int) $this->context->language->id,
-            (int) $this->context->shop->id,
-            (int) $product,
-            0,
-            $limit,
-            'published',
-            $orderBy,
-            $orderWay
-        );
-        if (!$posts) {
-            return '';
-        }
-        $this->context->smarty->assign([
-            'posts' => $posts,
-            'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
-        ]);
-        return $this->display(__FILE__, 'views/templates/hook/shortcode.tpl');
     }
 
     public function isUsingNewTranslationSystem()
