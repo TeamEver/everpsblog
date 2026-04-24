@@ -7,6 +7,66 @@ class ModuleTranslationCatalogService
     private const MODULE_NAME = 'everpsblog';
     private const EXPORT_FORMAT = 'everpsblog-translations-v1';
 
+    /**
+     * @param string[] $domains
+     *
+     * @return array<string, array{translation:string,theme:?string}>
+     */
+    public function getTranslationsIndex(int $idLang, array $domains = []): array
+    {
+        if ($idLang <= 0 || !$this->translationTableExists()) {
+            return [];
+        }
+
+        $where = 't.`id_lang` = ' . (int) $idLang;
+        $normalizedDomains = array_values(array_filter(array_map('strval', $domains)));
+        if (!empty($normalizedDomains)) {
+            $escapedDomains = array_map(function (string $domain): string {
+                return '"' . pSQL($domain) . '"';
+            }, $normalizedDomains);
+            $where .= ' AND t.`domain` IN (' . implode(', ', $escapedDomains) . ')';
+        } else {
+            $where .= ' AND LOWER(REPLACE(t.`domain`, ".", "")) LIKE "moduleseverpsblog%"';
+        }
+
+        $rows = \Db::getInstance()->executeS(
+            'SELECT t.`domain`, t.`key`, t.`translation`, t.`theme`
+             FROM `' . _DB_PREFIX_ . 'translation` t
+             WHERE ' . $where
+        ) ?: [];
+
+        $translations = [];
+        foreach ($rows as $row) {
+            $domain = (string) ($row['domain'] ?? '');
+            $key = (string) ($row['key'] ?? '');
+            if ('' === $domain || '' === $key || !$this->isModuleDomain($domain)) {
+                continue;
+            }
+
+            $translations[$domain . "\0" . $key] = [
+                'translation' => (string) ($row['translation'] ?? ''),
+                'theme' => null === ($row['theme'] ?? null) || '' === (string) ($row['theme'] ?? '')
+                    ? null
+                    : (string) $row['theme'],
+            ];
+        }
+
+        return $translations;
+    }
+
+    public function saveTranslation(int $idLang, string $domain, string $key, string $translation, ?string $theme = null): void
+    {
+        if (!$this->translationTableExists()) {
+            throw new \RuntimeException('The PrestaShop translation table is not available.');
+        }
+
+        if ($idLang <= 0 || '' === trim($domain) || '' === trim($key) || !$this->isModuleDomain($domain)) {
+            throw new \InvalidArgumentException('Invalid module translation item.');
+        }
+
+        $this->upsertTranslation($idLang, $domain, $key, $translation, $theme);
+    }
+
     public function export(): array
     {
         if (!$this->translationTableExists()) {
@@ -39,7 +99,9 @@ class ModuleTranslationCatalogService
                 'domain' => (string) $row['domain'],
                 'key' => (string) $row['key'],
                 'translation' => (string) $row['translation'],
-                'theme' => (string) ($row['theme'] ?? ''),
+                'theme' => null === ($row['theme'] ?? null) || '' === (string) ($row['theme'] ?? '')
+                    ? null
+                    : (string) $row['theme'],
             ];
         }
 
@@ -86,7 +148,7 @@ class ModuleTranslationCatalogService
                 $domain = trim((string) ($item['domain'] ?? ''));
                 $key = trim((string) ($item['key'] ?? ''));
                 $translation = (string) ($item['translation'] ?? '');
-                $theme = trim((string) ($item['theme'] ?? ''));
+                $theme = $this->normalizeTheme($item['theme'] ?? null);
 
                 if ('' === $domain || '' === $key || !$this->isModuleDomain($domain)) {
                     ++$stats['skipped'];
@@ -139,20 +201,17 @@ class ModuleTranslationCatalogService
         return $idsByIsoCode;
     }
 
-    private function upsertTranslation(int $idLang, string $domain, string $key, string $translation, string $theme): void
+    private function upsertTranslation(int $idLang, string $domain, string $key, string $translation, ?string $theme): void
     {
         $where = '`id_lang` = ' . (int) $idLang
             . ' AND `domain` = "' . pSQL($domain) . '"'
-            . ' AND `key` = "' . pSQL($key) . '"'
-            . ' AND `theme` = "' . pSQL($theme) . '"';
+            . ' AND `key` = "' . pSQL($key, true) . '"';
 
-        $data = [
-            'id_lang' => $idLang,
-            'domain' => pSQL($domain),
-            'key' => pSQL($key),
-            'translation' => pSQL($translation, true),
-            'theme' => pSQL($theme),
-        ];
+        if (null === $theme) {
+            $where .= ' AND (`theme` IS NULL OR `theme` = "")';
+        } else {
+            $where .= ' AND `theme` = "' . pSQL($theme) . '"';
+        }
 
         $exists = (bool) \Db::getInstance()->getValue(
             'SELECT 1 FROM `' . _DB_PREFIX_ . 'translation` WHERE ' . $where
@@ -166,6 +225,26 @@ class ModuleTranslationCatalogService
             return;
         }
 
-        \Db::getInstance()->insert('translation', $data);
+        $themeValue = null === $theme ? 'NULL' : '"' . pSQL($theme) . '"';
+        \Db::getInstance()->execute(
+            'INSERT INTO `' . _DB_PREFIX_ . 'translation` (`id_lang`, `domain`, `key`, `translation`, `theme`)
+             VALUES (
+                ' . (int) $idLang . ',
+                "' . pSQL($domain) . '",
+                "' . pSQL($key, true) . '",
+                "' . pSQL($translation, true) . '",
+                ' . $themeValue . '
+             )'
+        );
+    }
+
+    /**
+     * @param mixed $theme
+     */
+    private function normalizeTheme($theme): ?string
+    {
+        $theme = is_string($theme) ? trim($theme) : '';
+
+        return '' !== $theme ? $theme : null;
     }
 }

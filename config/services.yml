@@ -291,6 +291,28 @@ services:
   PrestaShop\Module\Everpsblog\Service\ModuleTranslationCatalogService:
     alias: prestashop.module.everpsblog.service.module_translation_catalog
 
+  prestashop.module.everpsblog.service.module_translation_source_extractor:
+    class: PrestaShop\Module\Everpsblog\Service\ModuleTranslationSourceExtractor
+
+  PrestaShop\Module\Everpsblog\Service\ModuleTranslationSourceExtractor:
+    alias: prestashop.module.everpsblog.service.module_translation_source_extractor
+
+  prestashop.module.everpsblog.service.google_translate_free:
+    class: PrestaShop\Module\Everpsblog\Service\GoogleTranslateFreeClient
+
+  PrestaShop\Module\Everpsblog\Service\GoogleTranslateFreeClient:
+    alias: prestashop.module.everpsblog.service.google_translate_free
+
+  prestashop.module.everpsblog.service.module_auto_translation:
+    class: PrestaShop\Module\Everpsblog\Service\ModuleAutoTranslationService
+    arguments:
+      - '@prestashop.module.everpsblog.service.module_translation_source_extractor'
+      - '@prestashop.module.everpsblog.service.google_translate_free'
+      - '@prestashop.module.everpsblog.service.module_translation_catalog'
+
+  PrestaShop\Module\Everpsblog\Service\ModuleAutoTranslationService:
+    alias: prestashop.module.everpsblog.service.module_auto_translation
+
   prestashop.module.everpsblog.service.database_integrity:
     class: PrestaShop\Module\Everpsblog\Service\DatabaseIntegrityService
 

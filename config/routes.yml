@@ -22,6 +22,14 @@ everpsblog_admin_translation_import:
     _legacy_controller: AdminEverPsBlog
     _legacy_link: AdminEverPsBlog
 
+everpsblog_admin_translation_auto:
+  path: /everpsblog/translations/auto
+  methods: [POST]
+  defaults:
+    _controller: 'PrestaShop\Module\Everpsblog\Controller\Admin\ConfigurationController::autoTranslateAction'
+    _legacy_controller: AdminEverPsBlog
+    _legacy_link: AdminEverPsBlog
+
 everpsblog_admin_tinymce_upload:
   path: /everpsblog/media/tinymce/upload
   methods: [POST]

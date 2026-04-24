@@ -232,6 +232,64 @@
       </div>
     </div>
 
+    <div class="ever-card ever-sitemaps-card">
+      <div class="ever-card-head">
+        <h2>{{ 'Automatic module translation'|trans({}, 'Modules.Everpsblog.Admin') }}</h2>
+        <p>{{ 'Translate only the module wording shown in front office and back office. Blog posts, categories, tags, authors and other admin-entered content are excluded.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+      </div>
+      <div class="ever-card-body">
+        <form method="post" action="{{ translationAutoUrl }}">
+          <input type="hidden" name="_token" value="{{ csrf_token('everpsblog_translation_auto') }}">
+          <div class="ever-form-grid">
+            <div>
+              <label for="everpsblog-translation-source">{{ 'Source language'|trans({}, 'Modules.Everpsblog.Admin') }}</label>
+              <select id="everpsblog-translation-source" name="source_language_id" required>
+                {% for language in translationLanguages %}
+                  <option value="{{ language.id }}"{{ language.id == defaultTranslationSourceLanguageId ? ' selected' : '' }}>
+                    {{ language.name }}{% if language.iso_code %} ({{ language.iso_code }}){% endif %}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label for="everpsblog-translation-target">{{ 'Destination language'|trans({}, 'Modules.Everpsblog.Admin') }}</label>
+              <select id="everpsblog-translation-target" name="target_language_id" required>
+                <option value="">{{ 'Choose a language'|trans({}, 'Modules.Everpsblog.Admin') }}</option>
+                {% for language in translationLanguages %}
+                  <option value="{{ language.id }}">
+                    {{ language.name }}{% if language.iso_code %} ({{ language.iso_code }}){% endif %}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label for="everpsblog-translation-scope">{{ 'Scope'|trans({}, 'Modules.Everpsblog.Admin') }}</label>
+              <select id="everpsblog-translation-scope" name="translation_scope" required>
+                <option value="all">{{ 'Front office + Back office'|trans({}, 'Modules.Everpsblog.Admin') }}</option>
+                <option value="shop">{{ 'Front office only'|trans({}, 'Modules.Everpsblog.Admin') }}</option>
+                <option value="admin">{{ 'Back office only'|trans({}, 'Modules.Everpsblog.Admin') }}</option>
+              </select>
+            </div>
+            <div>
+              <label for="everpsblog-translation-overwrite">{{ 'Existing translations'|trans({}, 'Modules.Everpsblog.Admin') }}</label>
+              <label style="display:flex;align-items:center;gap:.5rem;margin:0;">
+                <input id="everpsblog-translation-overwrite" type="checkbox" name="overwrite_existing" value="1">
+                <span>{{ 'Overwrite existing database translations'|trans({}, 'Modules.Everpsblog.Admin') }}</span>
+              </label>
+            </div>
+          </div>
+          <p class="ever-sitemap-note">{{ 'Google Translate is used in free mode without an API key. Generated translations are saved in the database so they can be exported afterwards.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+          <div class="ever-actions" style="padding-left:0;padding-right:0;">
+            <button
+              type="submit"
+              class="ever-btn ever-btn-import"
+              onclick="return confirm('{{ 'Generate and save translated module wordings for the selected language?'|trans({}, 'Modules.Everpsblog.Admin')|e('js') }}');"
+            >{{ 'Translate the module'|trans({}, 'Modules.Everpsblog.Admin') }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <div class="ever-card">
       {{ form_start(configurationForm, {'attr': {'id': 'ever-config-form'}}) }}
       <div class="ever-card-head">

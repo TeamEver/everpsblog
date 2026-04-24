@@ -12,6 +12,7 @@ use PrestaShop\Module\Everpsblog\Form\Type\Admin\ConfigurationType;
 use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
 use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheInvalidator;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
+use PrestaShop\Module\Everpsblog\Service\ModuleAutoTranslationService;
 use PrestaShop\Module\Everpsblog\Service\ModuleTranslationCatalogService;
 use PrestaShop\Module\Everpsblog\Service\WordPressRestImporter;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +26,8 @@ class ConfigurationController extends AbstractDomainController
     private $blogSitemapService;
     /** @var ModuleTranslationCatalogService */
     private $translationCatalogService;
+    /** @var ModuleAutoTranslationService */
+    private $moduleAutoTranslationService;
     /** @var BlogFrontCacheInvalidator */
     private $cacheInvalidator;
 
@@ -33,12 +36,14 @@ class ConfigurationController extends AbstractDomainController
         WordPressRestImporter $wordPressRestImporter,
         BlogSitemapService $blogSitemapService,
         ModuleTranslationCatalogService $translationCatalogService,
+        ModuleAutoTranslationService $moduleAutoTranslationService,
         ?BlogFrontCacheInvalidator $cacheInvalidator = null
     ) {
         parent::__construct($contextStateService);
         $this->wordPressRestImporter = $wordPressRestImporter;
         $this->blogSitemapService = $blogSitemapService;
         $this->translationCatalogService = $translationCatalogService;
+        $this->moduleAutoTranslationService = $moduleAutoTranslationService;
         $this->cacheInvalidator = $cacheInvalidator ?: new BlogFrontCacheInvalidator();
     }
 
@@ -131,6 +136,9 @@ class ConfigurationController extends AbstractDomainController
             'sitemapUrls' => $this->blogSitemapService->getSitemapIndexes($this->getContextShopId()),
             'translationExportUrl' => $this->generateUrl('everpsblog_admin_translation_export'),
             'translationImportUrl' => $this->generateUrl('everpsblog_admin_translation_import'),
+            'translationAutoUrl' => $this->generateUrl('everpsblog_admin_translation_auto'),
+            'translationLanguages' => $this->getTranslationLanguageOptions(),
+            'defaultTranslationSourceLanguageId' => $this->getContextLangId(),
             'qcdPageBuilderTargets' => $this->buildQcdPageBuilderTargets('everpsblog_configuration', 1, [
                 'top_text' => $this->transAdmin('Edit the top blog content with Page Builder'),
                 'bottom_text' => $this->transAdmin('Edit the bottom blog content with Page Builder'),
@@ -146,6 +154,54 @@ class ConfigurationController extends AbstractDomainController
         $response->headers->set('Content-Disposition', 'attachment; filename="everpsblog-translations-' . date('Ymd-His') . '.json"');
 
         return $response;
+    }
+
+    public function autoTranslateAction(Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('everpsblog_translation_auto', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', $this->transAdmin('Invalid security token.'));
+
+            return $this->redirectToRoute('everpsblog_admin_dashboard');
+        }
+
+        $sourceLangId = (int) $request->request->get('source_language_id');
+        $targetLangId = (int) $request->request->get('target_language_id');
+        $scope = (string) ($request->request->get('translation_scope') ?: 'all');
+        $overwriteExisting = $request->request->has('overwrite_existing');
+
+        try {
+            $stats = $this->moduleAutoTranslationService->translateModule(
+                $sourceLangId,
+                $targetLangId,
+                $scope,
+                $overwriteExisting
+            );
+
+            $this->addFlash(
+                'success',
+                $this->transAdmin(
+                    'Module translations generated: %saved% saved, %queued% queued, %existing% kept, %unchanged% unchanged, %detected% source string(s) detected.',
+                    [
+                        '%saved%' => (int) $stats['saved'],
+                        '%queued%' => (int) $stats['queued'],
+                        '%existing%' => (int) $stats['skipped_existing'],
+                        '%unchanged%' => (int) $stats['skipped_unchanged'],
+                        '%detected%' => (int) $stats['detected'],
+                    ]
+                )
+            );
+        } catch (\Throwable $exception) {
+            \PrestaShopLogger::addLog('EverPsBlog module auto-translation failed: ' . $exception->getMessage(), 3);
+            $this->addFlash(
+                'error',
+                $this->transAdmin(
+                    'Unable to generate module translations: %error%',
+                    ['%error%' => $this->describeException($exception)]
+                )
+            );
+        }
+
+        return $this->redirectToRoute('everpsblog_admin_dashboard');
     }
 
     public function importTranslationsAction(Request $request): Response
@@ -189,6 +245,33 @@ class ConfigurationController extends AbstractDomainController
         }
 
         return $this->redirectToRoute('everpsblog_admin_dashboard');
+    }
+
+    /**
+     * @return array<int, array{id:int,iso_code:string,name:string,locale:string}>
+     */
+    private function getTranslationLanguageOptions(): array
+    {
+        $languages = [];
+        foreach (\Language::getLanguages(false) as $language) {
+            $idLang = (int) ($language['id_lang'] ?? 0);
+            if ($idLang <= 0) {
+                continue;
+            }
+
+            $languages[] = [
+                'id' => $idLang,
+                'iso_code' => strtoupper((string) ($language['iso_code'] ?? '')),
+                'name' => (string) ($language['name'] ?? ('Language #' . $idLang)),
+                'locale' => (string) ($language['locale'] ?? ''),
+            ];
+        }
+
+        usort($languages, function (array $left, array $right): int {
+            return strcmp($left['name'], $right['name']);
+        });
+
+        return $languages;
     }
 
     private function getLocalizedBlogContentData(): array
