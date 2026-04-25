@@ -96,6 +96,7 @@ class EverPsBlog extends Module
         $translationsInstalled = $this->installBundledTranslations();
         // Install
         return parent::install()
+            && $this->registerHook('actionObjectLanguageAddAfter')
             && $this->installModuleTab(
                 'AdminEverPsBlog',
                 'IMPROVE',
@@ -204,6 +205,41 @@ class EverPsBlog extends Module
             );
 
             return false;
+        }
+    }
+
+    /**
+     * Ensure bundled module translations are imported when a new language is installed.
+     *
+     * @param array<string, mixed> $params
+     */
+    public function hookActionObjectLanguageAddAfter(array $params): void
+    {
+        $object = $params['object'] ?? null;
+        if (!$object instanceof \Language) {
+            return;
+        }
+
+        $idLang = (int) $object->id;
+        if ($idLang <= 0) {
+            return;
+        }
+
+        try {
+            $catalog = new \PrestaShop\Module\Everpsblog\Service\ModuleTranslationCatalogService();
+            $catalog->importLanguageFromFile(
+                __DIR__ . '/translations/everpsblog-translations-20260424-170745.json',
+                $idLang
+            );
+        } catch (\Throwable $exception) {
+            \PrestaShopLogger::addLog(
+                sprintf(
+                    '[everpsblog] Unable to import bundled translations for language #%d: %s',
+                    $idLang,
+                    $exception->getMessage()
+                ),
+                3
+            );
         }
     }
 
@@ -1531,6 +1567,7 @@ class EverPsBlog extends Module
             $this->registerHook('displayAdminAfterHeader');
             $this->registerHook('actionAdminMetaAfterWriteRobotsFile');
             $this->registerHook('actionRegisterBlock');
+            $this->registerHook('actionObjectLanguageAddAfter');
         } catch (Exception $e) {
             PrestaShopLogger::addLog($this->name . ' : ' . $e->getMessage());
         }
