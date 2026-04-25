@@ -183,6 +183,26 @@ class ModuleTranslationCatalogService
         return $this->importFromJson((string) $content);
     }
 
+    public function importLanguageFromFile(string $filePath, int $idLang): array
+    {
+        if ($idLang <= 0 || !is_file($filePath)) {
+            return [
+                'imported' => 0,
+                'skipped' => 0,
+            ];
+        }
+
+        $content = file_get_contents($filePath);
+        if (false === $content || '' === trim($content)) {
+            return [
+                'imported' => 0,
+                'skipped' => 0,
+            ];
+        }
+
+        return $this->importLanguageFromJson((string) $content, $idLang);
+    }
+
     public function deleteModuleTranslations(): int
     {
         if (!$this->translationTableExists()) {
@@ -195,6 +215,63 @@ class ModuleTranslationCatalogService
         );
 
         return (int) \Db::getInstance()->Affected_Rows();
+    }
+
+    public function importLanguageFromJson(string $json, int $idLang): array
+    {
+        if (!$this->translationTableExists()) {
+            throw new \RuntimeException('The PrestaShop translation table is not available.');
+        }
+
+        if ($idLang <= 0) {
+            throw new \InvalidArgumentException('Invalid language identifier.');
+        }
+
+        $payload = json_decode($json, true);
+        if (!is_array($payload) || ($payload['format'] ?? '') !== self::EXPORT_FORMAT) {
+            throw new \InvalidArgumentException('Invalid Ever Blog translation export file.');
+        }
+
+        $targetLanguage = new \Language($idLang);
+        if (!\Validate::isLoadedObject($targetLanguage)) {
+            throw new \InvalidArgumentException('The target language does not exist.');
+        }
+
+        $targetIsoCode = (string) ($targetLanguage->iso_code ?? '');
+        $translations = $payload['translations'] ?? [];
+        $languagePayload = is_array($translations) ? ($translations[$targetIsoCode] ?? null) : null;
+        $items = is_array($languagePayload) ? ($languagePayload['items'] ?? []) : [];
+
+        $stats = [
+            'imported' => 0,
+            'skipped' => 0,
+        ];
+
+        if (!is_array($items)) {
+            return $stats;
+        }
+
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                ++$stats['skipped'];
+                continue;
+            }
+
+            $domain = trim((string) ($item['domain'] ?? ''));
+            $key = trim((string) ($item['key'] ?? ''));
+            $translation = (string) ($item['translation'] ?? '');
+            $theme = $this->normalizeTheme($item['theme'] ?? null);
+
+            if ('' === $domain || '' === $key || !$this->isModuleDomain($domain)) {
+                ++$stats['skipped'];
+                continue;
+            }
+
+            $this->upsertTranslation($idLang, $domain, $key, $translation, $theme);
+            ++$stats['imported'];
+        }
+
+        return $stats;
     }
 
     private function buildExportPayload(array $translations): array
