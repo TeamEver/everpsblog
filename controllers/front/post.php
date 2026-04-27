@@ -209,7 +209,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
             Tools::redirect('index.php?controller=404');
         }
         if (!Tools::getValue('preview')) {
-            if ((bool) Tools::isSubmit('everpostcomment') === false) {
+            if ((bool) Tools::isSubmit('everpostcomment') === false && !$this->isAdmin()) {
                 $this->updatePostViewCount(
                     (int) $this->post->id,
                     (int) $this->context->shop->id
@@ -785,6 +785,11 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
             WHERE `id_ever_post` = ' . (int) $idPost . '
                 AND `id_shop` = ' . (int) $idShop
         );
+    }
+
+    private function isAdmin()
+    {
+        return !empty((new Cookie('psAdmin'))->id_employee);
     }
 
     private function getLatestCommentByEmail($email, $idLang): stdClass
