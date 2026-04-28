@@ -20,6 +20,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 require_once __DIR__ . '/vendor/autoload.php';
+use PrestaShop\Module\Everpsblog\Service\BlogThemeResolver;
 use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
 use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
@@ -41,6 +42,7 @@ class EverPsBlog extends Module
     private $blogRedirectService;
     private $blogFrontCacheInvalidator;
     private $legacyImportAdapter;
+    private $themeResolver;
     public static $route = [];
 
     public function __construct()
@@ -127,6 +129,7 @@ class EverPsBlog extends Module
                 'AdminEverPsBlog',
                 $this->transAdmin('Authors')
             )
+            && Configuration::updateValue(BlogThemeResolver::CONFIGURATION_KEY, BlogThemeResolver::DEFAULT_THEME)
             && Configuration::updateValue('EVERPSBLOG_ROUTE', 'blog')
             && Configuration::updateValue('EVERBLOG_ADMIN_EMAIL', 1)
             && Configuration::updateValue('EVERBLOG_EMPTY_TRASH', 7)
@@ -183,6 +186,7 @@ class EverPsBlog extends Module
         Configuration::deleteByName('EVERBLOG_SHOW_POST_TAGS');
         Configuration::deleteByName('EVERBLOG_SHOW_AI_SUMMARY_BANNER');
         Configuration::deleteByName('EVERBLOG_DEFAULT_AUTHOR_ID');
+        Configuration::deleteByName(BlogThemeResolver::CONFIGURATION_KEY);
         return $translationsRemoved
             && parent::uninstall()
             && $this->uninstallModuleTab('AdminEverPsBlog')
@@ -397,6 +401,69 @@ class EverPsBlog extends Module
         }
 
         return $this->blogFrontCacheInvalidator;
+    }
+
+    private function getThemeResolver()
+    {
+        if (!$this->themeResolver) {
+            $this->themeResolver = new BlogThemeResolver($this->name, __DIR__);
+        }
+
+        return $this->themeResolver;
+    }
+
+    public function getAvailableThemes()
+    {
+        return $this->getThemeResolver()->getAvailableThemes();
+    }
+
+    public function getThemeChoices()
+    {
+        return $this->getThemeResolver()->getThemeChoices();
+    }
+
+    public function getActiveTheme()
+    {
+        return $this->getThemeResolver()->resolveTheme(
+            (string) Configuration::get(BlogThemeResolver::CONFIGURATION_KEY)
+        );
+    }
+
+    public function getThemeTemplatePath($area, $template)
+    {
+        return $this->getThemeResolver()->getAreaTemplateRelativePath(
+            (string) $area,
+            (string) $template,
+            $this->getActiveTheme()
+        );
+    }
+
+    public function getThemeTemplateResourcePath($area, $template)
+    {
+        return $this->getThemeResolver()->getAreaTemplateResourcePath(
+            (string) $area,
+            (string) $template,
+            $this->getActiveTheme()
+        );
+    }
+
+    public function getThemeAbsolutePath($area = 'front')
+    {
+        return $this->getThemeResolver()->getAreaAbsolutePath(
+            (string) $area,
+            $this->getActiveTheme()
+        );
+    }
+
+    public function assignThemeSmartyVariables()
+    {
+        if (!isset($this->context) || !isset($this->context->smarty)) {
+            return;
+        }
+
+        $this->context->smarty->assign(
+            $this->getThemeResolver()->buildSmartyContext($this->getActiveTheme())
+        );
     }
 
 
@@ -948,6 +1015,7 @@ class EverPsBlog extends Module
 
     public function hookDisplayHeader()
     {
+        $this->assignThemeSmartyVariables();
         $controller_name = Tools::getValue('controller');
         $module_name = Tools::getValue('module');
         $dynamic_header_css = '';
@@ -1015,6 +1083,7 @@ class EverPsBlog extends Module
 
     public function hookDisplayLeftColumn($params)
     {
+        $this->assignThemeSmartyVariables();
         $controller = Tools::getValue('controller');
         $module = Tools::getValue('module');
         $ps_products = [];
@@ -1103,7 +1172,7 @@ class EverPsBlog extends Module
             'blogImg_dir' => $siteUrl . '/modules/everpsblog/views/img/',
             'ps_products' => $ps_products,
         ]);
-        return $this->display(__FILE__, 'views/templates/hook/columns.tpl');
+        return $this->display(__FILE__, $this->getThemeTemplatePath('hook', 'columns.tpl'));
     }
 
     public function hookDisplayRightColumn($params)
@@ -1128,13 +1197,16 @@ class EverPsBlog extends Module
 
     public function hookDisplayHome()
     {
+        $this->assignThemeSmartyVariables();
         $idLang = $this->context->language->id;
         $idShop = $this->context->shop->id;
+        $theme = $this->getActiveTheme();
         $post_number = (int) Configuration::get('EVERPSBLOG_HOME_NBR') > 0
             ? (int) Configuration::get('EVERPSBLOG_HOME_NBR')
             : 4;
-        $cacheId = $this->name . '-hookDisplayBanner-' . $idLang . '-' . $idShop . '-' . $post_number;
-        if (!$this->isCached('home.tpl', $cacheId)) {
+        $templatePath = $this->getThemeTemplatePath('hook', 'home.tpl');
+        $cacheId = $this->name . '-hookDisplayBanner-' . $theme . '-' . $idLang . '-' . $idShop . '-' . $post_number;
+        if (!$this->isCached($templatePath, $cacheId)) {
             $blogUrl = Context::getContext()->link->getModuleLink(
                 $this->name,
                 'blog',
@@ -1183,13 +1255,15 @@ class EverPsBlog extends Module
                 'carousel_id' => $carouselId,
             ]);
         }
-        return $this->display(__FILE__, 'views/templates/hook/home.tpl', $cacheId);
+        return $this->display(__FILE__, $templatePath, $cacheId);
     }
 
     public function hookDisplayCustomerAccount()
     {
         if ((bool) Configuration::get('EVERBLOG_ALLOW_COMMENTS') === true) {
-            return $this->display(__FILE__, 'views/templates/hook/my-account.tpl');
+            $this->assignThemeSmartyVariables();
+
+            return $this->display(__FILE__, $this->getThemeTemplatePath('hook', 'my-account.tpl'));
         }
     }
 
@@ -1200,6 +1274,7 @@ class EverPsBlog extends Module
 
     public function hookDisplayFooterProduct()
     {
+        $this->assignThemeSmartyVariables();
         if ((bool) Configuration::get('EVERBLOG_RELATED_POST') === false) {
             return;
         }
@@ -1246,7 +1321,7 @@ class EverPsBlog extends Module
             'animated' => $animate,
             'show_featured_post' => (bool) Configuration::get('EVERBLOG_SHOW_FEAT_POST'),
         ]);
-        return $this->display(__FILE__, 'views/templates/hook/product.tpl');
+        return $this->display(__FILE__, $this->getThemeTemplatePath('hook', 'product.tpl'));
     }
 
     public function hookDisplayFooter()
@@ -1259,7 +1334,9 @@ class EverPsBlog extends Module
         $controller_name = Tools::getValue('controller');
         $module_name = Tools::getValue('module');
         if ($module_name == 'everpsblog' && $controller_name == 'post') {
-            return $this->display(__FILE__, 'views/templates/hook/footer.tpl');
+            $this->assignThemeSmartyVariables();
+
+            return $this->display(__FILE__, $this->getThemeTemplatePath('hook', 'footer.tpl'));
         }
     }
 

@@ -86,7 +86,7 @@
             </div>
         </div>
         <div class="container my-4">
-            {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
+            {include file="{$everpsblog_theme_front_template_base}/loop/search_form.tpl"}
         </div>
     </div>
     {if isset($show_author_intro) && $show_author_intro}
@@ -134,7 +134,7 @@
     <div class="row">
     {hook h="displayBeforeEverLoop"}
     {foreach from=$posts item=item}
-    {include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
+    {include file="{$everpsblog_theme_front_template_base}/loop/post_array.tpl"}
     {/foreach}
     </div>
 </div>
@@ -154,6 +154,6 @@
     </div>
 </div>
 {/if}
-{include file='module:everpsblog/views/templates/front/loop/linked_products.tpl'}
+{include file="{$everpsblog_theme_front_template_base}/loop/linked_products.tpl"}
 {hook h="displayAfterEverAuthor" everblogauthor=$author}
 {/block}

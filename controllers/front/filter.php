@@ -35,7 +35,7 @@ class EverPsBlogfilterModuleFrontController extends AbstractFrontController
             'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__ . 'modules/everpsblog/views/img/',
         ]);
 
-        $html = $this->context->smarty->fetch('module:everpsblog/views/templates/front/ajax_posts.tpl');
+        $html = $this->context->smarty->fetch($this->getFrontThemeTemplatePath('ajax_posts.tpl'));
         $payload = json_encode(['html' => $html]);
 
         die(false !== $payload ? $payload : '{"html":""}');

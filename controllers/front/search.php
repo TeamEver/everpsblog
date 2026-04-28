@@ -80,7 +80,7 @@ class EverPsBlogsearchModuleFrontController extends AbstractFrontController
             'animated' => Configuration::get('EVERBLOG_ANIMATE'),
             'show_featured_post' => true,
         ]);
-        $this->setTemplate('module:everpsblog/views/templates/front/search.tpl');
+        $this->setTemplate($this->getFrontThemeTemplatePath('search.tpl'));
     }
 
     public function getLayout()

@@ -99,7 +99,7 @@ class EverPsBlogcustomercommentsModuleFrontController extends AbstractFrontContr
                 'blogImg_dir' => Tools::getHttpHost(true) . __PS_BASE_URI__.'/modules/everpsblog/views/img/',
                 'animated' => $animate,
         ]);
-        $this->setTemplate('module:everpsblog/views/templates/front/customercomments.tpl');
+        $this->setTemplate($this->getFrontThemeTemplatePath('customercomments.tpl'));
     }
 
     public function getBreadcrumbLinks()

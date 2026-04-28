@@ -93,7 +93,7 @@
     </div>
 </div>
 <div class="container my-4">
-    {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
+    {include file="{$everpsblog_theme_front_template_base}/loop/search_form.tpl"}
 </div>
 {if isset($paginated) && !$paginated}
 <div class="container">
@@ -110,7 +110,7 @@
     <div class="row">
         {hook h="displayBeforeEverLoop"}
         {foreach from=$posts item=item}
-        {include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
+        {include file="{$everpsblog_theme_front_template_base}/loop/post_array.tpl"}
         {/foreach}
     </div>
 </div>
@@ -130,6 +130,6 @@
 {else}
 <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' d='Modules.Everpsblog.Shop'}</div>
 {/if}
-{include file='module:everpsblog/views/templates/front/loop/linked_products.tpl'}
+{include file="{$everpsblog_theme_front_template_base}/loop/linked_products.tpl"}
 {hook h="displayAfterEverCategory" everblogcategory=$category}
 {/block}

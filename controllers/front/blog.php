@@ -158,7 +158,7 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
     public function init()
     {
         parent::init();
-        $this->blog_path = str_replace('\\', '/', _PS_MODULE_DIR_).'everpsblog/views/templates/front';
+        $this->blog_path = $this->getFrontThemeAbsolutePath();
     }
 
 
@@ -330,7 +330,7 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
             'sort_orders' => $sortOrders,
             'sort_selected' => $sortSelected ? $sortSelected['label'] : null,
         ]);
-        $this->setTemplate('module:everpsblog/views/templates/front/blog.tpl');
+        $this->setTemplate($this->getFrontThemeTemplatePath('blog.tpl'));
     }
 
     public function getLayout()

@@ -203,7 +203,7 @@ class EverPsBlogtagModuleFrontController extends AbstractFrontController
                 'show_featured_tag' => (bool) Configuration::get('EVERBLOG_SHOW_FEAT_TAG'),
                 'linked_products_block_id' => 'tag-' . (int) $this->tag->id,
             ], $linkedProductViewData));
-            $this->setTemplate('module:everpsblog/views/templates/front/tag.tpl');
+            $this->setTemplate($this->getFrontThemeTemplatePath('tag.tpl'));
         } else {
             Tools::redirect('index.php?controller=404');
         }

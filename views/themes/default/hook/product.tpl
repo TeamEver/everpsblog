@@ -26,7 +26,7 @@
     </div>
     <div class="row blogproduct mt-2">
     {foreach from=$everpsblog item=item}
-    {include file='module:everpsblog/views/templates/front/loop/post_product.tpl'}
+    {include file="{$everpsblog_theme_front_template_base}/loop/post_product.tpl"}
     {/foreach}
     </div>
 </section>

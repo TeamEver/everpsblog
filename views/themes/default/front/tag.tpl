@@ -56,7 +56,7 @@
     </div>
 </div>
 <div class="container my-4">
-    {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
+    {include file="{$everpsblog_theme_front_template_base}/loop/search_form.tpl"}
     {if isset($paginated) && !$paginated}
     <div class="row tagcontent">
         {$tag->content nofilter}
@@ -67,7 +67,7 @@
     <div class="row mt-2">
         {hook h="displayBeforeEverLoop"}
         {foreach from=$posts item=item}
-            {include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
+            {include file="{$everpsblog_theme_front_template_base}/loop/post_array.tpl"}
         {/foreach}
     </div>
     {if isset($pagination.should_be_displayed) && $pagination.should_be_displayed}
@@ -85,6 +85,6 @@
     <div class="alert alert-info">{l s='Sorry, there is no post, please come back later !' d='Modules.Everpsblog.Shop'}</div>
     {/if}
 </div>
-{include file='module:everpsblog/views/templates/front/loop/linked_products.tpl'}
+{include file="{$everpsblog_theme_front_template_base}/loop/linked_products.tpl"}
 {hook h="displayAfterEverTag" everblogtag=$tag}
 {/block}

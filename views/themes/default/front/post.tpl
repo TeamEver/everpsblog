@@ -424,13 +424,13 @@ document.addEventListener('DOMContentLoaded', function () {
 {hook h="displayAfterEverComment"}
 {/if}
 {/if}
-{include file='module:everpsblog/views/templates/front/loop/linked_products.tpl' linked_products_block_id=$post->id}
+{include file="{$everpsblog_theme_front_template_base}/loop/linked_products.tpl" linked_products_block_id=$post->id}
 {if isset($related_posts) && $related_posts}
 <section id="related-posts" class="mt-2">
   <h2 class="text-center">{l s='Related posts' d='Modules.Everpsblog.Shop'}</h2>
   <div class="row blogrelated mt-2">
     {foreach from=$related_posts item=item}
-      {include file='module:everpsblog/views/templates/front/loop/post_product.tpl'}
+      {include file="{$everpsblog_theme_front_template_base}/loop/post_product.tpl"}
     {/foreach}
   </div>
 </section>

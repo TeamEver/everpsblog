@@ -96,7 +96,7 @@
     </div>
 </div>
 <div class="container my-4">
-    {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
+    {include file="{$everpsblog_theme_front_template_base}/loop/search_form.tpl"}
 {if isset($facet_url)}
 <script type="text/javascript">
     var facetUrl = '{$facet_url|escape:'javascript'}';
@@ -113,7 +113,7 @@
 {*<div class="row mt-2">
 {foreach from=$evercategory item=item}
     {if !$item.is_root_category}
-    {include file='module:everpsblog/views/templates/front/loop/category_array.tpl'}
+    {include file="{$everpsblog_theme_front_template_base}/loop/category_array.tpl"}
     {/if}
 {/foreach}
 </div>*}
@@ -123,7 +123,7 @@
 <div class="row mt-2" id="everpsblog-posts" data-empty-text="{l s='No posts match your filters yet.' d='Modules.Everpsblog.Shop'}">
 {hook h="displayBeforeEverLoop"}
 {foreach from=$posts item=item}
-{include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
+{include file="{$everpsblog_theme_front_template_base}/loop/post_array.tpl"}
 {/foreach}
 </div>
 {else}

@@ -9,6 +9,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use PrestaShop\Module\Everpsblog\Form\Type\Admin\ConfigurationType;
+use PrestaShop\Module\Everpsblog\Service\BlogThemeResolver;
 use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
 use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheInvalidator;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
@@ -50,6 +51,7 @@ class ConfigurationController extends AbstractDomainController
     public function indexAction(Request $request): Response
     {
         $configurationData = [
+            'theme' => $this->getThemeResolver()->resolveTheme((string) \Configuration::get(BlogThemeResolver::CONFIGURATION_KEY)),
             'route' => (string) \Configuration::get('EVERPSBLOG_ROUTE'),
             'allow_comments' => (bool) \Configuration::get('EVERBLOG_ALLOW_COMMENTS'),
             'check_comments' => (bool) \Configuration::get('EVERBLOG_CHECK_COMMENTS'),
@@ -78,11 +80,16 @@ class ConfigurationController extends AbstractDomainController
             'method' => Request::METHOD_POST,
             'action' => $this->generateUrl('everpsblog_admin_dashboard'),
             'author_choices' => $this->getAuthorChoices(),
+            'theme_choices' => $this->getThemeResolver()->getThemeChoices(),
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $formData = $form->getData();
+            \Configuration::updateValue(
+                BlogThemeResolver::CONFIGURATION_KEY,
+                $this->getThemeResolver()->resolveTheme((string) ($formData['theme'] ?? ''))
+            );
             \Configuration::updateValue('EVERPSBLOG_ROUTE', (string) $formData['route']);
             \Configuration::updateValue('EVERBLOG_ALLOW_COMMENTS', (bool) $formData['allow_comments']);
             \Configuration::updateValue('EVERBLOG_CHECK_COMMENTS', (bool) $formData['check_comments']);
@@ -451,5 +458,10 @@ class ConfigurationController extends AbstractDomainController
         }
 
         return (bool) $value;
+    }
+
+    private function getThemeResolver(): BlogThemeResolver
+    {
+        return new BlogThemeResolver('everpsblog', dirname(__DIR__, 3));
     }
 }

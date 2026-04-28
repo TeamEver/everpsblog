@@ -25,11 +25,11 @@
     </div>
 </div>
 <div class="container my-4">
-    {include file='module:everpsblog/views/templates/front/loop/search_form.tpl'}
+    {include file="{$everpsblog_theme_front_template_base}/loop/search_form.tpl"}
     {if isset($post_number) && $post_number > 0}
     <div class="row mt-2">
         {foreach from=$posts item=item}
-            {include file='module:everpsblog/views/templates/front/loop/post_array.tpl'}
+            {include file="{$everpsblog_theme_front_template_base}/loop/post_array.tpl"}
         {/foreach}
     </div>
     {if isset($pagination.should_be_displayed) && $pagination.should_be_displayed}

@@ -570,7 +570,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 'show_ai_summary_banner' => (bool) $showAiSummaryBanner,
                 'only_logged_comment' => (bool) Configuration::get('EVERBLOG_ONLY_LOGGED_COMMENT'),
             ]);
-            $this->setTemplate('module:everpsblog/views/templates/front/post.tpl');
+            $this->setTemplate($this->getFrontThemeTemplatePath('post.tpl'));
         }
     }
 

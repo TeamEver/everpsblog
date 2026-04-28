@@ -29,6 +29,11 @@ class ConfigurationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('theme', ChoiceType::class, [
+                'label' => 'Front theme',
+                'choices' => (array) ($options['theme_choices'] ?? []),
+                'help' => 'Selects the front-office template set used for blog pages and blog blocks.',
+            ])
             ->add('route', TextType::class, [
                 'label' => 'Blog route',
                 'constraints' => [
@@ -190,6 +195,7 @@ class ConfigurationType extends AbstractType
             'csrf_token_id' => 'everpsblog_configuration',
             'translation_domain' => 'Modules.Everpsblog.Admin',
             'author_choices' => [],
+            'theme_choices' => [],
         ]);
     }
 }

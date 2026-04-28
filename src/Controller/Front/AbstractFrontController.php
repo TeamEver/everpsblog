@@ -8,6 +8,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use PrestaShop\Module\Everpsblog\Service\BlogThemeResolver;
 use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCache;
 use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheInvalidator;
 use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheTags;
@@ -105,6 +106,7 @@ abstract class AbstractFrontController extends \ModuleFrontController
     {
         parent::init();
         $this->assignHeaderConfiguration();
+        $this->assignThemeTemplateConfiguration();
 
         $params = [];
         $controllerName = \Dispatcher::getInstance()->getController();
@@ -182,6 +184,59 @@ abstract class AbstractFrontController extends \ModuleFrontController
         $color = trim($color);
 
         return preg_match('/^#[0-9a-fA-F]{6}$/', $color) ? $color : $default;
+    }
+
+    protected function getFrontThemeTemplatePath(string $template): string
+    {
+        return $this->getThemeTemplateResourcePath('front', $template);
+    }
+
+    protected function getFrontThemeAbsolutePath(): string
+    {
+        $module = $this->getEverPsBlogModule();
+        if (null !== $module && method_exists($module, 'getThemeAbsolutePath')) {
+            return (string) $module->getThemeAbsolutePath('front');
+        }
+
+        return $this->getThemeResolver()->getAreaAbsolutePath(
+            'front',
+            (string) \Configuration::get(BlogThemeResolver::CONFIGURATION_KEY)
+        );
+    }
+
+    protected function getThemeTemplateResourcePath(string $area, string $template): string
+    {
+        $module = $this->getEverPsBlogModule();
+        if (null !== $module && method_exists($module, 'getThemeTemplateResourcePath')) {
+            return (string) $module->getThemeTemplateResourcePath($area, $template);
+        }
+
+        return $this->getThemeResolver()->getAreaTemplateResourcePath(
+            $area,
+            $template,
+            (string) \Configuration::get(BlogThemeResolver::CONFIGURATION_KEY)
+        );
+    }
+
+    private function assignThemeTemplateConfiguration(): void
+    {
+        $module = $this->getEverPsBlogModule();
+        if (null !== $module && method_exists($module, 'assignThemeSmartyVariables')) {
+            $module->assignThemeSmartyVariables();
+
+            return;
+        }
+
+        $this->context->smarty->assign(
+            $this->getThemeResolver()->buildSmartyContext(
+                (string) \Configuration::get(BlogThemeResolver::CONFIGURATION_KEY)
+            )
+        );
+    }
+
+    private function getThemeResolver(): BlogThemeResolver
+    {
+        return new BlogThemeResolver('everpsblog', dirname(__DIR__, 3));
     }
 
 

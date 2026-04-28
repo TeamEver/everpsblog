@@ -231,7 +231,7 @@ class EverPsBlogcategoryModuleFrontController extends AbstractFrontController
                 'sort_selected' => $sortSelected ? $sortSelected['label'] : null,
                 'linked_products_block_id' => 'category-' . (int) $this->category->id,
             ], $linkedProductViewData));
-            $this->setTemplate('module:' . $this->module->name . '/views/templates/front/category.tpl');
+            $this->setTemplate($this->getFrontThemeTemplatePath('category.tpl'));
         } else {
             Tools::redirect('index.php?controller=404');
         }

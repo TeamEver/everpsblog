@@ -192,7 +192,7 @@ class EverPsBlogfeedModuleFrontController extends AbstractFrontController
             'posts' => $posts,
             'locale' => $this->context->language->locale,
         ]);
-        $this->setTemplate('module:everpsblog/views/templates/front/feed.tpl');
+        $this->setTemplate($this->getFrontThemeTemplatePath('feed.tpl'));
     }
 
     private function prepareFeedChannel($feedObj, $channelLink)

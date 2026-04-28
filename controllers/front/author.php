@@ -256,7 +256,7 @@ class EverPsBlogauthorModuleFrontController extends AbstractFrontController
                 'logged' => (bool) $this->context->customer->isLogged(),
                 'linked_products_block_id' => 'author-' . (int) $this->author->id,
             ], $linkedProductViewData));
-            $this->setTemplate('module:everpsblog/views/templates/front/author.tpl');
+            $this->setTemplate($this->getFrontThemeTemplatePath('author.tpl'));
         }
     }
 
