@@ -150,6 +150,7 @@ class EverPsBlog extends Module
             && Configuration::updateValue('EVERBLOG_SHOW_RELATED_POSTS', 0)
             && Configuration::updateValue('EVERBLOG_SHOW_POST_TAGS', 1)
             && Configuration::updateValue('EVERBLOG_SHOW_AUTHOR', 1)
+            && Configuration::updateValue('EVERBLOG_SHOW_AI_SUMMARY_BANNER', 1)
             && Configuration::updateValue('EVERBLOG_DEFAULT_AUTHOR_NAME', Configuration::get('PS_SHOP_NAME'))
             && Configuration::updateValue('EVERBLOG_DEFAULT_AUTHOR_ID', 0)
             && Configuration::updateValue('EVERBLOG_SITEMAP_NUMBER', 5000)
@@ -180,6 +181,7 @@ class EverPsBlog extends Module
         );
         Configuration::deleteByName('EVERBLOG_CATEG_COLUMNS');
         Configuration::deleteByName('EVERBLOG_SHOW_POST_TAGS');
+        Configuration::deleteByName('EVERBLOG_SHOW_AI_SUMMARY_BANNER');
         Configuration::deleteByName('EVERBLOG_DEFAULT_AUTHOR_ID');
         return $translationsRemoved
             && parent::uninstall()

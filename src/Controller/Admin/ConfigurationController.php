@@ -53,6 +53,7 @@ class ConfigurationController extends AbstractDomainController
             'route' => (string) \Configuration::get('EVERPSBLOG_ROUTE'),
             'allow_comments' => (bool) \Configuration::get('EVERBLOG_ALLOW_COMMENTS'),
             'check_comments' => (bool) \Configuration::get('EVERBLOG_CHECK_COMMENTS'),
+            'show_ai_summary_banner' => $this->getBooleanConfiguration('EVERBLOG_SHOW_AI_SUMMARY_BANNER', true),
             'rss_enabled' => $this->getBooleanConfiguration('EVERBLOG_RSS', false),
             'posts_per_page' => (int) \Configuration::get('EVERPSBLOG_PAGINATION'),
             'home_posts' => (int) \Configuration::get('EVERPSBLOG_HOME_NBR'),
@@ -85,6 +86,7 @@ class ConfigurationController extends AbstractDomainController
             \Configuration::updateValue('EVERPSBLOG_ROUTE', (string) $formData['route']);
             \Configuration::updateValue('EVERBLOG_ALLOW_COMMENTS', (bool) $formData['allow_comments']);
             \Configuration::updateValue('EVERBLOG_CHECK_COMMENTS', (bool) $formData['check_comments']);
+            \Configuration::updateValue('EVERBLOG_SHOW_AI_SUMMARY_BANNER', (bool) $formData['show_ai_summary_banner']);
             \Configuration::updateValue('EVERBLOG_RSS', (bool) $formData['rss_enabled']);
             \Configuration::updateValue('EVERPSBLOG_PAGINATION', (int) $formData['posts_per_page']);
             \Configuration::updateValue('EVERPSBLOG_HOME_NBR', (int) $formData['home_posts']);

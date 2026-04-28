@@ -530,6 +530,10 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 }
             }
             $postViewModel = PostViewModel::fromLegacy($this->post);
+            $showAiSummaryBanner = Configuration::get('EVERBLOG_SHOW_AI_SUMMARY_BANNER');
+            if (false === $showAiSummaryBanner) {
+                $showAiSummaryBanner = true;
+            }
             $this->context->smarty->assign([
                 'show_author' => (bool) Configuration::get('EVERBLOG_SHOW_AUTHOR'),
                 'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
@@ -563,6 +567,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 'commentsCount' => (int) $commentsCount,
                 'allow_views_count' => (bool) Configuration::get('EVERBLOG_SHOW_POST_COUNT'),
                 'show_post_tags' => (bool) Configuration::get('EVERBLOG_SHOW_POST_TAGS'),
+                'show_ai_summary_banner' => (bool) $showAiSummaryBanner,
                 'only_logged_comment' => (bool) Configuration::get('EVERBLOG_ONLY_LOGGED_COMMENT'),
             ]);
             $this->setTemplate('module:everpsblog/views/templates/front/post.tpl');
