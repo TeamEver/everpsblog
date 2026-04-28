@@ -197,7 +197,22 @@ class EverPsBlog extends Module
     {
         try {
             $catalog = new \PrestaShop\Module\Everpsblog\Service\ModuleTranslationCatalogService();
-            $catalog->importFromFile(__DIR__ . '/translations/everpsblog-translations-20260424-170745.json');
+            if ($this->hasBundledLanguageTranslationFiles()) {
+                foreach (Language::getLanguages(false) as $language) {
+                    $idLang = (int) ($language['id_lang'] ?? 0);
+                    $isoCode = (string) ($language['iso_code'] ?? '');
+                    if ($idLang <= 0 || '' === trim($isoCode)) {
+                        continue;
+                    }
+
+                    $this->importBundledTranslationsForLanguage($catalog, $idLang, $isoCode);
+                }
+            } else {
+                $legacyFilePath = $this->findLegacyBundledTranslationsFilePath();
+                if (null !== $legacyFilePath) {
+                    $catalog->importFromFile($legacyFilePath);
+                }
+            }
 
             return true;
         } catch (\Throwable $exception) {
@@ -229,9 +244,10 @@ class EverPsBlog extends Module
 
         try {
             $catalog = new \PrestaShop\Module\Everpsblog\Service\ModuleTranslationCatalogService();
-            $catalog->importLanguageFromFile(
-                __DIR__ . '/translations/everpsblog-translations-20260424-170745.json',
-                $idLang
+            $this->importBundledTranslationsForLanguage(
+                $catalog,
+                $idLang,
+                (string) ($object->iso_code ?? '')
             );
         } catch (\Throwable $exception) {
             \PrestaShopLogger::addLog(
@@ -243,6 +259,68 @@ class EverPsBlog extends Module
                 3
             );
         }
+    }
+
+    private function importBundledTranslationsForLanguage(
+        \PrestaShop\Module\Everpsblog\Service\ModuleTranslationCatalogService $catalog,
+        int $idLang,
+        string $isoCode
+    ): void {
+        $filePath = $this->resolveBundledTranslationFilePath($isoCode);
+        if (null === $filePath) {
+            return;
+        }
+
+        $catalog->importLanguageFromFile($filePath, $idLang);
+    }
+
+    private function resolveBundledTranslationFilePath(string $isoCode): ?string
+    {
+        $normalizedIsoCode = preg_replace('/[^a-z0-9_-]/', '', strtolower(trim($isoCode)));
+        if (!is_string($normalizedIsoCode) || '' === $normalizedIsoCode) {
+            return null;
+        }
+
+        $splitFilePath = $this->getBundledTranslationsDirectory() . '/' . $normalizedIsoCode . '.json';
+        if (is_file($splitFilePath)) {
+            return $splitFilePath;
+        }
+
+        $legacyFilePath = $this->findLegacyBundledTranslationsFilePath();
+        if (null !== $legacyFilePath) {
+            return $legacyFilePath;
+        }
+
+        return null;
+    }
+
+    private function hasBundledLanguageTranslationFiles(): bool
+    {
+        $bundledTranslationsDirectory = $this->getBundledTranslationsDirectory();
+        if (!is_dir($bundledTranslationsDirectory)) {
+            return false;
+        }
+
+        $translationFiles = glob($bundledTranslationsDirectory . '/*.json');
+
+        return is_array($translationFiles) && !empty($translationFiles);
+    }
+
+    private function getBundledTranslationsDirectory(): string
+    {
+        return __DIR__ . '/translations/catalog';
+    }
+
+    private function findLegacyBundledTranslationsFilePath(): ?string
+    {
+        $legacyFiles = glob(__DIR__ . '/translations/everpsblog-translations-*.json');
+        if (!is_array($legacyFiles) || empty($legacyFiles)) {
+            return null;
+        }
+
+        rsort($legacyFiles, SORT_STRING);
+
+        return (string) $legacyFiles[0];
     }
 
     private function uninstallBundledTranslations(): bool

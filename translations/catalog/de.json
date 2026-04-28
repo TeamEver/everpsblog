@@ -1,0 +1,2016 @@
+{
+    "format": "everpsblog-translations-v1",
+    "module": "everpsblog",
+    "exported_at": "2026-04-24T17:07:45+02:00",
+    "translations": {
+        "de": {
+            "locale": "de-DE",
+            "items": [
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "%count% orphan post(s) were reassigned to the default author.",
+                    "translation": "%count% verwaiste Beiträge wurden dem Standardautor neu zugewiesen.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "%count% post(s) deleted.",
+                    "translation": "%count%-Beitrag(e) gelöscht.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "%count% post(s) duplicated.",
+                    "translation": "%count%-Beitrag(e) dupliziert.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "%count% post(s) published.",
+                    "translation": "%count%-Beitrag(s) veröffentlicht.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "%s (#%d)",
+                    "translation": "%s (#%d)",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "(%s)",
+                    "translation": "(%S)",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "(language #%d)",
+                    "translation": "(Sprache #%d)",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "A category cannot be its own parent.",
+                    "translation": "Eine Kategorie kann nicht ihr eigenes übergeordnetes Element sein.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Active",
+                    "translation": "Aktiv",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Adds RSS feed links on blog, category, tag and author pages.",
+                    "translation": "Fügt RSS-Feed-Links zu Blog-, Kategorie-, Tag- und Autorenseiten hinzu.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Adjust the blog behavior and save to apply changes.",
+                    "translation": "Passen Sie das Blog-Verhalten an und speichern Sie es, um die Änderungen zu übernehmen.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "All XML sitemaps have been generated",
+                    "translation": "Alle XML-Sitemaps wurden generiert",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Allow comments",
+                    "translation": "Kommentare zulassen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Allowed groups",
+                    "translation": "Erlaubte Gruppen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "An error has occured while importing WordPress file",
+                    "translation": "Beim Importieren der WordPress-Datei ist ein Fehler aufgetreten",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "An error occured while importing WooCommerce posts",
+                    "translation": "Beim Importieren von WooCommerce-Beiträgen ist ein Fehler aufgetreten",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "An error occured while importing WordPress posts",
+                    "translation": "Beim Importieren von WordPress-Beiträgen ist ein Fehler aufgetreten",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "An upgrade is available for Ever Blog. Please check",
+                    "translation": "Für Ever Blog ist ein Upgrade verfügbar. überprüfen Sie bitte",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Approve selected",
+                    "translation": "Ausgewählte genehmigen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Author",
+                    "translation": "Autor",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Author created.",
+                    "translation": "Autor erstellt.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Author image",
+                    "translation": "Bild des Autors",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Author not found (id: %id%).",
+                    "translation": "Autor nicht gefunden (ID: %id%).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Author updated.",
+                    "translation": "Autor aktualisiert.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Authors",
+                    "translation": "Autoren",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Automatic maintenance tasks could not be executed: %error%",
+                    "translation": "Automatische Wartungsaufgaben konnten nicht ausgeführt werden: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Automatic module translation",
+                    "translation": "Automatisches Übersetzungsmodul",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Back office only",
+                    "translation": "Nur Backoffice",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Banner image",
+                    "translation": "Bannerbild",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Blog",
+                    "translation": "Blog",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Blog bottom text",
+                    "translation": "Unterer Text des Blogs",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Blog header color",
+                    "translation": "Farbe der Blog-Kopfzeile",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Blog header title color",
+                    "translation": "Farbe des Blog-Header-Titels",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Blog route",
+                    "translation": "Straßenblog",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Blog top text",
+                    "translation": "Blog-Toptext",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Bottom content",
+                    "translation": "Unten glücklich",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Categories",
+                    "translation": "Kategorien",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Category #%d",
+                    "translation": "Kategorie #%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Category created.",
+                    "translation": "Kategorie erstellt.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Category not found (id: %id%).",
+                    "translation": "Kategorie nicht gefunden (ID: %id%).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Category updated.",
+                    "translation": "Kategorie aktualisiert.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Choose a language",
+                    "translation": "Wählen Sie eine Sprache",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Color applied to the main banner on blog, post, category, tag, author and search pages.",
+                    "translation": "Auf das Hauptbanner auf Blog-, Beitrags-, Kategorie-, Tag-, Autor- und Suchseiten angewendete Farbe.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Color applied to the titles displayed inside blog, post, category, tag, author and search headers.",
+                    "translation": "Farbe wird auf die Titel angewendet, die in Blog-, Beitrags-, Kategorie-, Tag-, Autor- und Suchkopfzeilen angezeigt werden.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Comment",
+                    "translation": "Wie",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Comment created.",
+                    "translation": "Wie geschaffen.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Comment is required.",
+                    "translation": "Kommentar ist erforderlich.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Comment updated.",
+                    "translation": "Kommentar aktualisiert.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Comments",
+                    "translation": "Kommentare",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Configuration",
+                    "translation": "Konfiguration",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Content",
+                    "translation": "Begeistert",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Counter",
+                    "translation": "Schalter",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Current author image",
+                    "translation": "Aktuelles Autorenbild",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Current banner image",
+                    "translation": "Aktuelles Bannerbild",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Current image",
+                    "translation": "Aktuelles Bild",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Default author for orphan posts",
+                    "translation": "Standardautor für verwaiste Beiträge",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Default category",
+                    "translation": "Standardkategorie",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Delete current author image",
+                    "translation": "Aktuelles Autorenbild löschen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Delete current banner image",
+                    "translation": "Aktuelles Bannerbild löschen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Delete current featured image",
+                    "translation": "Aktuelles ausgewähltes Bild löschen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Delete selected",
+                    "translation": "Ausgewählte löschen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Deletion failed for: #%ids%.",
+                    "translation": "Löschvorgang fehlgeschlagen für: #%ids%.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Destination language",
+                    "translation": "Zielsprache",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Do you really want to uninstall this module ?",
+                    "translation": "Möchten Sie dieses Modul wirklich deinstallieren?",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Draft",
+                    "translation": "Entwurf",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Duplicate selected",
+                    "translation": "Duplikat ausgewählt",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Duplication failed for: #%ids%.",
+                    "translation": "Duplizierung fehlgeschlagen für: #%ids%.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Edit biography with Page Builder",
+                    "translation": "Bearbeiten Sie die Biografie mit Page Builder",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Edit bottom content with Page Builder",
+                    "translation": "Bearbeiten Sie den unteren Inhalt mit Page Builder",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Edit content with Page Builder",
+                    "translation": "Bearbeiten Sie Inhalte mit Page Builder",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Edit the bottom blog content with Page Builder",
+                    "translation": "Bearbeiten Sie den unteren Blog-Inhalt mit Page Builder",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Edit the top blog content with Page Builder",
+                    "translation": "Bearbeiten Sie den Top-Blog-Inhalt mit Page Builder",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Employee #%d",
+                    "translation": "Mitarbeiter #%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Employee not found (id: %id%).",
+                    "translation": "Mitarbeiter nicht gefunden (ID: %id%).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Empty trash after (days)",
+                    "translation": "Leeren Sie den Papierkorb nach (Tagen)",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Enable RSS feeds",
+                    "translation": "Aktivieren Sie RSS-Feeds",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Enable imported authors",
+                    "translation": "Importierte Autoren aktivieren",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Enable imported categories",
+                    "translation": "Aktivieren Sie importierte Kategorien",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Enable imported tags",
+                    "translation": "Importierte Tags aktivieren",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Enter the WordPress URL before starting the import.",
+                    "translation": "Geben Sie die WordPress-URL ein, bevor Sie den Import starten.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Ever Blog",
+                    "translation": "Immer bloggen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Ever Blog - Configuration",
+                    "translation": "Ever Blog - Konfiguration",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Ever Blog navigation",
+                    "translation": "Immer Blog-Navigation",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Excerpt",
+                    "translation": "Außer",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Excerpt length",
+                    "translation": "Außer Länge",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Existing translations",
+                    "translation": "Vorhandene Übersetzungen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Export the translations customized for this module and import them on another shop.",
+                    "translation": "Exportieren Sie die für dieses Modul angepassten Übersetzungen und importieren Sie sie in einen anderen Shop.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Export translations",
+                    "translation": "Übersetzungen exportieren",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Facebook",
+                    "translation": "Facebook",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Feature this post",
+                    "translation": "Markieren Sie diesen Beitrag",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Featured image",
+                    "translation": "Ausgewähltes Bild",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Follow",
+                    "translation": "Folgen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Friendly URL",
+                    "translation": "Freundliche URL",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Front office + Back office",
+                    "translation": "Frontoffice + Backoffice",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Front office only",
+                    "translation": "Nur Rezeption",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Generate and save translated module wordings for the selected language?",
+                    "translation": "Übersetzte Modultexte für die ausgewählte Sprache generieren und speichern?",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Global blog settings: routes, comments, pagination and displayed content.",
+                    "translation": "Globale Blog-Einstellungen: Routen, Kommentare, Paginierung und angezeigter Inhalt.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Google Translate is used in free mode without an API key. Generated translations are saved in the database so they can be exported afterwards.",
+                    "translation": "Google Translate wird im kostenlosen Modus ohne API-Schlüssel verwendet. Erstellte Übersetzungen werden in der Datenbank gespeichert, sodass sie anschließend exportiert werden können.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Group #%d",
+                    "translation": "Gruppe #%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "ID",
+                    "translation": "AUSWEIS",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "If the date is in the future and the post is published, it will be planned automatically.",
+                    "translation": "Wenn das Datum in der Zukunft liegt und der Beitrag veröffentlicht wird, wird er automatisch geplant.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Image",
+                    "translation": "Bild",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Import the full WordPress blog",
+                    "translation": "Importieren Sie den vollständigen WordPress-Blog",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Import translations",
+                    "translation": "Übersetzungen importieren",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Imported post status",
+                    "translation": "Importierter Beitragsstatus",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Indexable",
+                    "translation": "Indexierbar",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Invalid date format.",
+                    "translation": "Ungültiges Datumsformat.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Invalid product selection.",
+                    "translation": "Ungültige Produktauswahl.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Invalid security token.",
+                    "translation": "Ungültiges Sicherheitstoken.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Linked employee",
+                    "translation": "Verlinkter Mitarbeiter",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Linked products",
+                    "translation": "Verlinkte Produkte",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "LinkedIn",
+                    "translation": "LinkedIn",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Maximum %limit% characters.",
+                    "translation": "Maximale Anzahl an %limit%-Zeichen.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Meta description",
+                    "translation": "Meta-Beschreibung",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Meta title",
+                    "translation": "Metatitel",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Moderate comments",
+                    "translation": "Moderate Kommentare",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Module URLs to submit to Google Search Console.",
+                    "translation": "Modul-URLs zur Übermittlung an die Google Search Console.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Module settings",
+                    "translation": "Moduleinstellungen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Module translations",
+                    "translation": "Übersetzungsmodul",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Module translations generated: %saved% saved, %queued% queued, %existing% kept, %unchanged% unchanged, %detected% source string(s) detected.",
+                    "translation": "Generierte Modulübersetzungen: %saved% gespeichert, %queued% in die Warteschlange gestellt, %existing% beibehalten, %unchanged% unverändert, %detected%-Quellzeichenfolge(n) erkannt.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Name is required.",
+                    "translation": "Name ist erforderlich.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Nickname",
+                    "translation": "Spitzname",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Nickname is required.",
+                    "translation": "Spitzname ist erforderlich.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "No Ever Blog sitemap has been generated yet. Save a post, category, tag, author or the configuration to regenerate files.",
+                    "translation": "Es wurde noch keine Ever Blog-Sitemap erstellt. Speichern Sie einen Beitrag, eine Kategorie, ein Tag, einen Autor oder die Konfiguration, um Dateien neu zu generieren.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "No default author",
+                    "translation": "Kein Standardautor",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "No linked employee",
+                    "translation": "Kein verknüpfter Mitarbeiter",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "No post was published.",
+                    "translation": "Es wurde kein Beitrag veröffentlicht.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "No product found.",
+                    "translation": "Kein Produkt gefunden.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "None",
+                    "translation": "Keiner",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Open preview",
+                    "translation": "Vorschau öffnen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Optional for public post imports. Required for non-public content.",
+                    "translation": "Optional für öffentliche Postimporte. Erforderlich für nicht öffentliche Inhalte.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Overwrite existing database translations",
+                    "translation": "Vorhandene Datenbankübersetzungen überschreiben",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Parent category",
+                    "translation": "Übergeordnete Kategorie",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Parent category not found (id: %id%).",
+                    "translation": "Übergeordnete Kategorie nicht gefunden (ID: %id%).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Password",
+                    "translation": "Passwort",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Please select a translation export file.",
+                    "translation": "Bitte wählen Sie eine Übersetzungsexportdatei aus.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Please select a valid image file.",
+                    "translation": "Bitte wählen Sie eine gültige Bilddatei aus.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Please select at least one post.",
+                    "translation": "Bitte wählen Sie mindestens einen Beitrag aus.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Post #%post_id% duplicated successfully (copy #%copy_id%).",
+                    "translation": "Beitrag #%post_id% erfolgreich dupliziert (kopieren Sie #%copy_id%).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Post ID",
+                    "translation": "PostID",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Post created.",
+                    "translation": "Beitrag erstellt.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Post not found (id: %id%).",
+                    "translation": "Beitrag nicht gefunden (ID: %id%).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Post updated.",
+                    "translation": "Beitrag aktualisiert.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Posts",
+                    "translation": "Beiträge",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Posts kept in trash longer than this delay are deleted automatically.",
+                    "translation": "Beiträge, die länger als diese Verzögerung im Papierkorb verbleiben, werden automatisch gelöscht.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Posts on homepage",
+                    "translation": "Beiträge auf der Homepage",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Posts on product page",
+                    "translation": "Beiträge auf der Produktseite",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Posts per page",
+                    "translation": "Beiträge pro Seite",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Product not found (id: %id%).",
+                    "translation": "Produkt nicht gefunden (ID: %id%).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Publication",
+                    "translation": "Veröffentlichung",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Publication date",
+                    "translation": "Erscheinungsdatum",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Publish selected",
+                    "translation": "Veröffentlichung ausgewählt",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Published",
+                    "translation": "Veröffentlicht",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Remove",
+                    "translation": "Entfernen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Review on pending posts",
+                    "translation": "Überprüfen Sie ausstehende Beiträge",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Root and Unclassed categories cannot be deleted.",
+                    "translation": "Stammkategorien und nicht klassifizierte Kategorien können nicht gelöscht werden.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Root category is managed automatically and cannot be edited from the back office.",
+                    "translation": "Die Stammkategorie wird automatisch verwaltet und kann nicht im Backoffice bearbeitet werden.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "SEO",
+                    "translation": "SEO",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Save",
+                    "translation": "Speichern",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Scope",
+                    "translation": "Umfang",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Search",
+                    "translation": "Suchen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Search by product name, reference or ID",
+                    "translation": "Suchen Sie nach Produktname, Referenz oder ID",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Search by product name, reference or ID to link products without loading the whole catalogue.",
+                    "translation": "Suchen Sie nach Produktname, Referenz oder ID, um Produkte zu verknüpfen, ohne den gesamten Katalog laden zu müssen.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Searching...",
+                    "translation": "Suche...",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Select a category",
+                    "translation": "Wählen Sie eine Kategorie aus",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Select an author",
+                    "translation": "Wählen Sie einen Autor aus",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Settings saved.",
+                    "translation": "Einstellungen gespeichert.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Simply a blog",
+                    "translation": "Einfach ein Blog",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Sitemaps could not be regenerated: %error%",
+                    "translation": "Sitemaps konnten nicht neu generiert werden: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Sitemaps were regenerated, but robots.txt could not be updated.",
+                    "translation": "Sitemaps wurden neu generiert, aber robots.txt konnte nicht aktualisiert werden.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Slug",
+                    "translation": "Schnecke",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Slug is too long (maximum %limit% characters).",
+                    "translation": "Slug ist zu lang (maximal %limit% Zeichen).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Source language",
+                    "translation": "Ausgangssprache",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Start the full WordPress blog import with the configured REST credentials?",
+                    "translation": "Den vollständigen WordPress-Blog-Import mit den konfigurierten REST-Anmeldeinformationen starten?",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Status",
+                    "translation": "Status",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Status was changed to \"planned\" because the publication date is in the future.",
+                    "translation": "Der Status wurde auf „geplant“ geändert, da das Veröffentlichungsdatum in der Zukunft liegt.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Status was changed to \"published\" because the publication date is in the past.",
+                    "translation": "Der Status wurde in „veröffentlicht“ geändert, da das Veröffentlichungsdatum in der Vergangenheit liegt.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Tag #%d",
+                    "translation": "Tag #%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Tag created.",
+                    "translation": "Tag erstellt.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Tag not found (id: %id%).",
+                    "translation": "Tag nicht gefunden (ID: %id%).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Tag updated.",
+                    "translation": "Tag aktualisiert.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Tags",
+                    "translation": "Schlagworte",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Taxonomy",
+                    "translation": "Taxonomie",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "The color must use hexadecimal format, for example #0a0f54.",
+                    "translation": "Die Farbe muss im Hexadezimalformat vorliegen, zum Beispiel #0a0f54.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "The color must use hexadecimal format, for example #ffffff.",
+                    "translation": "Die Farbe muss im Hexadezimalformat vorliegen, zum Beispiel #ffffff.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "The selected translation file is empty.",
+                    "translation": "Die ausgewählte Übersetzungsdatei ist leer.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "The slug must contain only letters, numbers and hyphens.",
+                    "translation": "Der Slug darf nur Buchstaben, Zahlen und Bindestriche enthalten.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "These URLs are also synchronized in robots.txt with Allow and Sitemap directives.",
+                    "translation": "Diese URLs werden auch in robots.txt mit den Allow- und Sitemap-Anweisungen synchronisiert.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "This field is required (default language).",
+                    "translation": "Dieses Feld ist erforderlich (Standardsprache).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "This field is required.",
+                    "translation": "Dieses Feld ist erforderlich.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Title",
+                    "translation": "Titel",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Title length",
+                    "translation": "Titellänge",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Translate only the module wording shown in front office and back office. Blog posts, categories, tags, authors and other admin-entered content are excluded.",
+                    "translation": "Übersetzen Sie nur den Wortlaut des Moduls, der im Frontoffice und Backoffice angezeigt wird. Blogbeiträge, Kategorien, Tags, Autoren und andere vom Administrator eingegebene Inhalte sind ausgeschlossen.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Translate the module",
+                    "translation": "Übersetzen Sie das Modul",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Translation export file",
+                    "translation": "Übersetzungsexportdatei",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Translations imported: %imported% item(s), %skipped% skipped.",
+                    "translation": "Importierte Übersetzungen: %imported%-Element(e), %skipped% übersprungen.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Trash",
+                    "translation": "Müll",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Twitter",
+                    "translation": "Twitter",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Type at least %count% characters.",
+                    "translation": "Geben Sie mindestens %count% Zeichen ein.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to create the author image destination directory.",
+                    "translation": "Das Zielverzeichnis für das Autorenbild kann nicht erstellt werden.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to create the image destination directory.",
+                    "translation": "Das Image-Zielverzeichnis kann nicht erstellt werden.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to duplicate post #%post_id%: %error%",
+                    "translation": "Beitrag #%post_id% konnte nicht dupliziert werden: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to generate module translations: %error%",
+                    "translation": "Modulübersetzungen können nicht generiert werden: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to import WordPress content: %error%",
+                    "translation": "WordPress-Inhalt kann nicht importiert werden: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to import translations: %error%",
+                    "translation": "Übersetzungen können nicht importiert werden: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to save author: %error%",
+                    "translation": "Der Autor konnte nicht gespeichert werden: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to save category: %error%",
+                    "translation": "Kategorie konnte nicht gespeichert werden: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to save comment: %error%",
+                    "translation": "Kommentar konnte nicht gespeichert werden: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to save post: %error%",
+                    "translation": "Beitrag konnte nicht gespeichert werden: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to save tag: %error%",
+                    "translation": "Tag konnte nicht gespeichert werden: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to save the author image reference.",
+                    "translation": "Die Bildreferenz des Autors konnte nicht gespeichert werden.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to save the image reference.",
+                    "translation": "Die Bildreferenz konnte nicht gespeichert werden.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to upload the image.",
+                    "translation": "Das Bild kann nicht hochgeladen werden.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unclassed",
+                    "translation": "Nicht klassifiziert",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unknown bulk action.",
+                    "translation": "Unbekannte Massenaktion.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unsupported image format.",
+                    "translation": "Nicht unterstütztes Bildformat.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Use a WordPress application password, not the main account password.",
+                    "translation": "Verwenden Sie ein WordPress-Anwendungskennwort, nicht das Hauptkontokennwort.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Views",
+                    "translation": "Ansichten",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "WooCommerce posts have been imported",
+                    "translation": "WooCommerce-Beiträge wurden importiert",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "WordPress REST username",
+                    "translation": "WordPress REST-Benutzername",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "WordPress application password",
+                    "translation": "Passwort für die WordPress-Anwendung",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "WordPress import completed: %created% created post(s), %updated% updated post(s), %categories% category item(s), %tags% tag item(s), %authors% author item(s), %images% image(s), %redirects% redirect(s), %skipped% skipped item(s).",
+                    "translation": "WordPress-Import abgeschlossen: %created% hat Beiträge erstellt, %updated% hat Beiträge aktualisiert, %categories% Kategorieelemente, %tags% Tag-Elemente, %authors% Autorenelemente, %images% Bilder, %redirects% Weiterleitung(en), %skipped% übersprungene Elemente.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "WordPress posts have been imported",
+                    "translation": "WordPress-Beiträge wurden importiert",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "WordPress site URL",
+                    "translation": "URL der WordPress-Website",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "XML sitemaps",
+                    "translation": "XML-Sitemaps",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "bottom_content_%d",
+                    "translation": "bottom_content_%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "bottom_text_%d",
+                    "translation": "bottom_text_%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "content_%d",
+                    "translation": "content_%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "excerpt_%d",
+                    "translation": "außergewöhnlich_%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "link_rewrite_%d",
+                    "translation": "link_rewrite_%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "meta_description_%d",
+                    "translation": "meta_description_%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "meta_title_%d",
+                    "translation": "meta_title_%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "title_%d",
+                    "translation": "betitelt",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "to get latest version of this module",
+                    "translation": "um die neueste Version dieses Moduls zu erhalten",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "top_text_%d",
+                    "translation": "top_text_%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "(page",
+                    "translation": "(Seite",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": ")",
+                    "translation": ")",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "A new comment is pending",
+                    "translation": "Ein neuer Kommentar steht aus",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Associated posts",
+                    "translation": "Verwandte Artikel",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Back to my account",
+                    "translation": "Zurück zu meinem Konto",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Blog",
+                    "translation": "Blog",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "By enabling this option, you agree that your comment may be stored according to our privacy policy.",
+                    "translation": "Durch die Aktivierung dieser Option erklären Sie sich damit einverstanden, dass Ihr Kommentar gemäß unserer Datenschutzerklärung gespeichert wird.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Categories from the blog",
+                    "translation": "Blog-Kategorien",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Category posts",
+                    "translation": "Kategorieartikel",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Close",
+                    "translation": "Schließen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Comments",
+                    "translation": "Kommentare",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Email address",
+                    "translation": "E-Mail-Adresse",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Email address *",
+                    "translation": "E-Mail-Adresse *",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Email has not been sent to admin",
+                    "translation": "E-Mail wurde nicht an den Administrator gesendet",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Enter your email",
+                    "translation": "Geben Sie Ihre E-Mail-Adresse ein",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Enter your name",
+                    "translation": "Geben Sie Ihren Namen ein",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Error : The field \"Email\" is not valid",
+                    "translation": "Fehler: Das Feld „E-Mail“ ist ungültig",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Error : The field \"RGPD\" is not valid",
+                    "translation": "Fehler: Das Feld „DSGVO“ ist ungültig",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Error : The field \"comments\" is not valid",
+                    "translation": "Fehler: Das Feld „Kommentare“ ist ungültig",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Error : The field \"name\" is not valid",
+                    "translation": "Fehler: Das Feld „Name“ ist ungültig",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Featured",
+                    "translation": "Hervorgehoben",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Fields marked with * are required.",
+                    "translation": "Mit * gekennzeichnete Felder sind Pflichtfelder.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Find all your comments on our blog",
+                    "translation": "Finden Sie alle Ihre Kommentare in unserem Blog",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Forgot your password ?",
+                    "translation": "Passwort vergessen?",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "GDPR compliance",
+                    "translation": "DSGVO-Konformität",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Here is a list of all your comments on our blog.",
+                    "translation": "Hier ist die Liste aller Ihrer Kommentare zu unserem Blog.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Image not available",
+                    "translation": "Bild nicht verfügbar",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Image preview",
+                    "translation": "Bildvorschau",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Join the discussion below.",
+                    "translation": "Nehmen Sie an der Diskussion unten teil.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Latest posts from the blog",
+                    "translation": "Neueste Blogbeiträge",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Leave a comment",
+                    "translation": "Hinterlassen Sie einen Kommentar",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Linked products",
+                    "translation": "Verwandte Produkte",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Log in to comment",
+                    "translation": "Melden Sie sich an, um zu kommentieren",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Login",
+                    "translation": "Verbindung",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Most recent",
+                    "translation": "Neueste",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Most viewed",
+                    "translation": "Am häufigsten angesehen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "My blog comments",
+                    "translation": "Meine Blog-Kommentare",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "My comments",
+                    "translation": "Meine Kommentare",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Name *",
+                    "translation": "Name *",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Next",
+                    "translation": "Nachfolgend",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "No category available.",
+                    "translation": "Kategorie nicht verfügbar",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "No featured post.",
+                    "translation": "Keine Artikel hervorgehoben.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "No post for this tag.",
+                    "translation": "Keine Artikel für dieses Label.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "No post found for this search.",
+                    "translation": "Für diese Suche wurden keine Artikel gefunden",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "No post in this category.",
+                    "translation": "Keine Artikel in dieser Kategorie",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "No post to display.",
+                    "translation": "Keine Elemente zum Anzeigen vorhanden",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "No posts match your filters yet.",
+                    "translation": "Derzeit entsprechen keine Artikel Ihren Filtern.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "No selected post.",
+                    "translation": "Keine Elemente ausgewählt.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "No tag available.",
+                    "translation": "Kein Etikett verfügbar.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Our best products",
+                    "translation": "Unsere besten Produkte",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Our blog",
+                    "translation": "Unser Blog",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Page :",
+                    "translation": "Seite:",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Password",
+                    "translation": "Passwort",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Please add a comment.",
+                    "translation": "Bitte fügen Sie einen Kommentar hinzu.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Please enter a valid email address.",
+                    "translation": "Bitte geben Sie eine gültige E-Mail-Adresse an.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Please enter your name.",
+                    "translation": "Bitte geben Sie Ihren Namen ein.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Post author:",
+                    "translation": "Autor des Artikels:",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Posts linked to this tag",
+                    "translation": "Artikel zu diesem Tag",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Previous",
+                    "translation": "Vorherige",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Previous' d='Shop.Theme.Actions'}</span>\n      </button>\n      <button class=\"carousel-control-next\" type=\"button\" data-bs-target=\"#{$blpCarouselId|escape:'htmlall':'UTF-8'}\" data-bs-slide=\"next\">\n        <span class=\"carousel-control-next-icon\" aria-hidden=\"true\"></span>\n        <span class=\"visually-hidden\">{l s='Next' d='Shop.Theme.Actions'}</span>\n      </button>\n      <div class=\"carousel-indicators position-relative mt-3 mx-0\">\n        {foreach from=$ps_products_chunks item=\"slide\" name=\"blpInd\"}\n          <button type=\"button\" data-bs-target=\"#{$blpCarouselId|escape:'htmlall':'UTF-8'}\" data-bs-slide-to=\"{$smarty.foreach.blpInd.index|escape:'htmlall':'UTF-8'}\"{if $smarty.foreach.blpInd.first} class=\"active\" aria-current=\"true\"{/if} aria-label=\"{l s='Slide",
+                    "translation": "Previous' d='Shop.Theme.Actions'</span>\n      </button>\n      <button class=\"carousel-control-next\" type=\"button\" data-bs-target=\"#{$blpCarouselId|escape:'htmlall':'UTF-8'}\" data-bs-slide=\"next\">\n        <span class=\"carousel-control-next-icon\" aria-hidden=\"true\"></span>\n        <span class=\"visually-hidden\">{l s='Next' d='Shop.Theme.Actions'}</span>\n      </button>\n      <div class=\"carousel-indicators position-relative mt-3 mx-0\">\n        {foreach from=$ps_products_chunks item=\"slide\" name=\"blpInd\"}\n          <button type=\"button\" data-bs-target=\"#{$blpCarouselId|escape:'htmlall':'UTF-8'}\" data-bs-slide-to=\"{$smarty.foreach.blpInd.index|escape:'htmlall':'UTF-8'}\"{if $smarty.foreach.blpInd.first} class=\"active\" aria-current=\"true\"{/if} aria-label=\"{l s='Slide",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Publication date:",
+                    "translation": "Erscheinungsdatum:",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "RSS feed",
+                    "translation": "RSS-Feed",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Read more",
+                    "translation": "Erfahren Sie mehr",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Read the article",
+                    "translation": "Lesen Sie den Artikel",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Recover your forgotten password",
+                    "translation": "Stellen Sie Ihr vergessenes Passwort wieder her",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Related posts",
+                    "translation": "Ähnliche Artikel",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Reset",
+                    "translation": "Zurücksetzen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Search",
+                    "translation": "Zur Recherche",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Search by keywords",
+                    "translation": "Stichwortsuche",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Search results",
+                    "translation": "Suchergebnisse",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Search results for",
+                    "translation": "Suchergebnisse für",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Search the blog",
+                    "translation": "Durchsuchen Sie den Blog",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "See all posts from the blog",
+                    "translation": "Alle Blogartikel ansehen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "See post",
+                    "translation": "Artikel ansehen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Share",
+                    "translation": "Aktie",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Share on X",
+                    "translation": "Teilen auf",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Share your thoughts in a constructive way. Maximum 800 characters.",
+                    "translation": "Bringen Sie Ihre Ideen konstruktiv zum Ausdruck. Maximal 800 Zeichen.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Sorry, there is no post, please come back later !",
+                    "translation": "Leider gibt es im Moment keine Beiträge, bitte kommen Sie später noch einmal vorbei!",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Subcategories",
+                    "translation": "Unterkategorien",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Submit",
+                    "translation": "Einreichen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Summarize this post with:",
+                    "translation": "Fassen Sie diesen Artikel zusammen mit:",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Tag posts",
+                    "translation": "Beschriften Sie Elemente",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Tags from the blog",
+                    "translation": "Blog-Tags",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "The oldest",
+                    "translation": "Der Älteste",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "There's no comments on your account. Feel free to comment our posts on our blog !",
+                    "translation": "In Ihrem Konto wurden keine Kommentare gepostet. Kommentieren Sie gerne unsere Blog-Beiträge!",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "This post is password protected",
+                    "translation": "Dieser Beitrag ist passwortgeschützt",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "This will be displayed with your comment.",
+                    "translation": "Dies wird zusammen mit Ihrem Kommentar angezeigt.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Validate",
+                    "translation": "Zur Validierung",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "View category",
+                    "translation": "Kategorie anzeigen",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "View tag",
+                    "translation": "Siehe Etikett",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Views",
+                    "translation": "Ansichten",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "We'll never share your email with anyone else.",
+                    "translation": "Wir werden Ihre E-Mail-Adresse niemals an Dritte weitergeben.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Wow ! What have you done ? You're banned from this blog !",
+                    "translation": "Wow! Was haben Sie getan? Du bist von diesem Blog ausgeschlossen!",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "You can comment whenever on our blog.",
+                    "translation": "Sie können jederzeit einen Kommentar auf unserem Blog hinterlassen.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "You must wait before sending another comment",
+                    "translation": "Sie müssen warten, bevor Sie einen weiteren Kommentar senden",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Your comment",
+                    "translation": "Ihr Kommentar",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Your comment *",
+                    "translation": "Ihr Kommentar *",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Your comment has been submitted",
+                    "translation": "Ihr Kommentar wurde übermittelt",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Your comments",
+                    "translation": "Ihre Kommentare",
+                    "theme": null
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,480 @@
+{
+    "format": "everpsblog-translations-v1",
+    "module": "everpsblog",
+    "exported_at": "2026-04-24T17:07:45+02:00",
+    "translations": {
+        "fr": {
+            "locale": "fr-FR",
+            "items": [
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "(page",
+                    "translation": "(page",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": ")",
+                    "translation": ")",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Associated posts",
+                    "translation": "Articles liés",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Back to my account",
+                    "translation": "Retour à mon compte",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "By enabling this option, you agree that your comment may be stored according to our privacy policy.",
+                    "translation": "En activant cette option, vous acceptez que votre commentaire puisse être enregistré conformément à notre politique de confidentialité.",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Categories from the blog",
+                    "translation": "Catégories du blog",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Category posts",
+                    "translation": "Articles de la catégorie",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Close",
+                    "translation": "Fermer",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Comments",
+                    "translation": "Commentaires",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Email address",
+                    "translation": "Adresse email",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Email address *",
+                    "translation": "Adresse email *",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Enter your email",
+                    "translation": "Saisissez votre adresse e-mail",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Enter your name",
+                    "translation": "Entrez votre nom",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Featured",
+                    "translation": "Mis en avant",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Fields marked with * are required.",
+                    "translation": "Les champs marqués d'un * sont obligatoires.",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Forgot your password ?",
+                    "translation": "Mot de passe oublié ?",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "GDPR compliance",
+                    "translation": "Conformité au RGPD",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Here is a list of all your comments on our blog.",
+                    "translation": "Voici la liste de tous vos commentaires sur notre blog.",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Image not available",
+                    "translation": "Image non disponible",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Image preview",
+                    "translation": "Aperçu de l'image",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Join the discussion below.",
+                    "translation": "Rejoignez la discussion ci-dessous.",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Latest posts from the blog",
+                    "translation": "Derniers articles du blog",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Leave a comment",
+                    "translation": "Laissez un commentaire",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Linked products",
+                    "translation": "Produits liés",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Log in to comment",
+                    "translation": "Connectez-vous pour commenter",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Login",
+                    "translation": "Connexion",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "My comments",
+                    "translation": "Mes commentaires",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Name *",
+                    "translation": "Nom *",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Next",
+                    "translation": "Suivant",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "No category available.",
+                    "translation": "Catégorie non disponible",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "No featured post.",
+                    "translation": "Aucun article mis en avant.",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "No post for this tag.",
+                    "translation": "Aucun article pour cette étiquette.",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "No post found for this search.",
+                    "translation": "Aucun article trouvé pour cette recherche",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "No post in this category.",
+                    "translation": "Aucun article dans cette catégorie",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "No post to display.",
+                    "translation": "Aucun article à afficher",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "No posts match your filters yet.",
+                    "translation": "Aucun article ne correspond à vos filtres pour le moment.",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "No selected post.",
+                    "translation": "Aucun article sélectionné.",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "No tag available.",
+                    "translation": "Aucune étiquette disponible.",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Our best products",
+                    "translation": "Nos meilleurs produits",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Our blog",
+                    "translation": "Notre blog",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Password",
+                    "translation": "Mot de passe",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Please add a comment.",
+                    "translation": "Veuillez ajouter un commentaire.",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Please enter a valid email address.",
+                    "translation": "Merci de mettre une adresse email valide.",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Please enter your name.",
+                    "translation": "Veuillez saisir votre nom.",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Post author:",
+                    "translation": "Auteur de l'article :",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Posts linked to this tag",
+                    "translation": "Articles liés à cette étiquette",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Previous",
+                    "translation": "Précédent",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Publication date:",
+                    "translation": "Date de publication :",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "RSS feed",
+                    "translation": "Flux RSS",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Read more",
+                    "translation": "En savoir plus",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Read the article",
+                    "translation": "Lire l'article",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Recover your forgotten password",
+                    "translation": "Récupérez votre mot de passe oublié",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Related posts",
+                    "translation": "Articles similaires",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Reset",
+                    "translation": "Réinitialiser",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Search",
+                    "translation": "Rechercher",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Search by keywords",
+                    "translation": "Recherche par mots-clés",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Search results for",
+                    "translation": "Résultats de la recherche pour",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Search the blog",
+                    "translation": "Rechercher sur le blog",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "See all posts from the blog",
+                    "translation": "Voir tous les articles du blog",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "See post",
+                    "translation": "Voir l'article",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Share your thoughts in a constructive way. Maximum 800 characters.",
+                    "translation": "Exprimez vos idées de manière constructive. 800 caractères maximum.",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Slide",
+                    "translation": "Slide",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Sorry, there is no post, please come back later !",
+                    "translation": "Désolé, il n'y a pas de publication pour le moment, veuillez revenir plus tard !",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Subcategories",
+                    "translation": "Sous-catégories",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Submit",
+                    "translation": "Soumettre",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Summarize this post with:",
+                    "translation": "Résumez cet article avec :",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Tag posts",
+                    "translation": "Articles de l'étiquette",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Tags from the blog",
+                    "translation": "Étiquettes du blog",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "There's no comments on your account. Feel free to comment our posts on our blog !",
+                    "translation": "Aucun commentaire n'a été publié sur votre compte. N'hésitez pas à commenter nos articles sur notre blog !",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "This will be displayed with your comment.",
+                    "translation": "Ceci s'affichera avec votre commentaire.",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Validate",
+                    "translation": "Valider",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "View category",
+                    "translation": "Voir la catégorie",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "View tag",
+                    "translation": "Voir l'étiquette",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Views",
+                    "translation": "Vues",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "We'll never share your email with anyone else.",
+                    "translation": "Nous ne partagerons jamais votre adresse e-mail avec qui que ce soit d'autre.",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "You can comment whenever on our blog.",
+                    "translation": "Vous pouvez laisser un commentaire à tout moment sur notre blog.",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Your comment",
+                    "translation": "Votre commentaire",
+                    "theme": null
+                },
+                {
+                    "domain": "ModulesEverpsblogShop",
+                    "key": "Your comment *",
+                    "translation": "Votre commentaire *",
+                    "theme": null
+                }
+            ]
+        }
+    }
+}

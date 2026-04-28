@@ -1,0 +1,2016 @@
+{
+    "format": "everpsblog-translations-v1",
+    "module": "everpsblog",
+    "exported_at": "2026-04-24T17:07:45+02:00",
+    "translations": {
+        "uk": {
+            "locale": "uk-UA",
+            "items": [
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "%count% orphan post(s) were reassigned to the default author.",
+                    "translation": "%count% пусті дописи було перепризначено автору за умовчанням.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "%count% post(s) deleted.",
+                    "translation": "Публікації %count% видалено.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "%count% post(s) duplicated.",
+                    "translation": "Публікації %count% дублюються.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "%count% post(s) published.",
+                    "translation": "Публікації %count% опубліковано.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "%s (#%d)",
+                    "translation": "%s (#%d)",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "(%s)",
+                    "translation": "(%s)",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "(language #%d)",
+                    "translation": "(мова #%d)",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "A category cannot be its own parent.",
+                    "translation": "Категорія не може бути батьківською.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Active",
+                    "translation": "Активний",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Adds RSS feed links on blog, category, tag and author pages.",
+                    "translation": "Додає посилання RSS на сторінки блогів, категорій, тегів і авторів.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Adjust the blog behavior and save to apply changes.",
+                    "translation": "Налаштуйте поведінку блогу та збережіть, щоб застосувати зміни.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "All XML sitemaps have been generated",
+                    "translation": "Усі XML-карти сайту створено",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Allow comments",
+                    "translation": "Дозволити коментарі",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Allowed groups",
+                    "translation": "Дозволені групи",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "An error has occured while importing WordPress file",
+                    "translation": "Під час імпортування файлу WordPress сталася помилка",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "An error occured while importing WooCommerce posts",
+                    "translation": "Під час імпорту публікацій WooCommerce сталася помилка",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "An error occured while importing WordPress posts",
+                    "translation": "Під час імпорту публікацій WordPress сталася помилка",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "An upgrade is available for Ever Blog. Please check",
+                    "translation": "Для Ever Blog доступне оновлення. Будь ласка, перевірте",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Approve selected",
+                    "translation": "Затвердити вибране",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Author",
+                    "translation": "Автор",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Author created.",
+                    "translation": "Автор створений.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Author image",
+                    "translation": "Авторський образ",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Author not found (id: %id%).",
+                    "translation": "Автора не знайдено (id: %id%).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Author updated.",
+                    "translation": "Автор оновлений.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Authors",
+                    "translation": "Автори",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Automatic maintenance tasks could not be executed: %error%",
+                    "translation": "Не вдалося виконати завдання автоматичного обслуговування: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Automatic module translation",
+                    "translation": "Модуль автоматичного перекладу",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Back office only",
+                    "translation": "Тільки бек-офіс",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Banner image",
+                    "translation": "Зображення банера",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Blog",
+                    "translation": "Блог",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Blog bottom text",
+                    "translation": "Нижній текст блогу",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Blog header color",
+                    "translation": "Колір заголовка блогу",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Blog header title color",
+                    "translation": "Колір заголовка блогу",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Blog route",
+                    "translation": "Дорожній блог",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Blog top text",
+                    "translation": "Верхній текст блогу",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Bottom content",
+                    "translation": "Знизу щасливий",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Categories",
+                    "translation": "Категорії",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Category #%d",
+                    "translation": "Категорія #%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Category created.",
+                    "translation": "Категорія створена.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Category not found (id: %id%).",
+                    "translation": "Категорію не знайдено (id: %id%).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Category updated.",
+                    "translation": "Категорію оновлено.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Choose a language",
+                    "translation": "Виберіть мову",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Color applied to the main banner on blog, post, category, tag, author and search pages.",
+                    "translation": "Колір, застосований до основного банера на сторінках блогу, публікації, категорії, тегу, автора та пошуку.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Color applied to the titles displayed inside blog, post, category, tag, author and search headers.",
+                    "translation": "Колір, застосований до заголовків, що відображаються в заголовках блогу, публікації, категорії, тегу, автора та пошуку.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Comment",
+                    "translation": "як",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Comment created.",
+                    "translation": "Як створено.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Comment is required.",
+                    "translation": "Коментар обов'язковий.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Comment updated.",
+                    "translation": "Коментар оновлено.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Comments",
+                    "translation": "Коментарі",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Configuration",
+                    "translation": "Конфігурація",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Content",
+                    "translation": "В захваті",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Counter",
+                    "translation": "Лічильник",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Current author image",
+                    "translation": "Актуальне зображення автора",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Current banner image",
+                    "translation": "Поточне зображення банера",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Current image",
+                    "translation": "Поточне зображення",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Default author for orphan posts",
+                    "translation": "Автор за замовчуванням для публікацій-сиріт",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Default category",
+                    "translation": "Категорія за замовчуванням",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Delete current author image",
+                    "translation": "Видалити зображення поточного автора",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Delete current banner image",
+                    "translation": "Видалити поточне зображення банера",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Delete current featured image",
+                    "translation": "Видалити поточне представлене зображення",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Delete selected",
+                    "translation": "Видалити вибране",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Deletion failed for: #%ids%.",
+                    "translation": "Не вдалося видалити: #%ids%.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Destination language",
+                    "translation": "Мова призначення",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Do you really want to uninstall this module ?",
+                    "translation": "Ви справді хочете видалити цей модуль?",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Draft",
+                    "translation": "Чернетка",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Duplicate selected",
+                    "translation": "Вибрано копію",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Duplication failed for: #%ids%.",
+                    "translation": "Помилка копіювання для: #%ids%.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Edit biography with Page Builder",
+                    "translation": "Редагуйте біографію за допомогою Page Builder",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Edit bottom content with Page Builder",
+                    "translation": "Редагуйте нижній вміст за допомогою Page Builder",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Edit content with Page Builder",
+                    "translation": "Редагуйте вміст за допомогою Page Builder",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Edit the bottom blog content with Page Builder",
+                    "translation": "Відредагуйте нижній вміст блогу за допомогою Page Builder",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Edit the top blog content with Page Builder",
+                    "translation": "Редагуйте найкращий вміст блогу за допомогою Page Builder",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Employee #%d",
+                    "translation": "Співробітник #%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Employee not found (id: %id%).",
+                    "translation": "Співробітника не знайдено (id: %id%).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Empty trash after (days)",
+                    "translation": "Очистити кошик через (днів)",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Enable RSS feeds",
+                    "translation": "Увімкнути канали RSS",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Enable imported authors",
+                    "translation": "Увімкнути імпортованих авторів",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Enable imported categories",
+                    "translation": "Увімкнути імпортовані категорії",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Enable imported tags",
+                    "translation": "Увімкнути імпортовані теги",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Enter the WordPress URL before starting the import.",
+                    "translation": "Введіть URL-адресу WordPress перед початком імпорту.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Ever Blog",
+                    "translation": "Коли-небудь Блог",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Ever Blog - Configuration",
+                    "translation": "Ever Blog - конфігурація",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Ever Blog navigation",
+                    "translation": "Навігація в блозі",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Excerpt",
+                    "translation": "За винятком",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Excerpt length",
+                    "translation": "Крім довжини",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Existing translations",
+                    "translation": "Існуючі переклади",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Export the translations customized for this module and import them on another shop.",
+                    "translation": "Експортуйте переклади, налаштовані для цього модуля, та імпортуйте їх в інший магазин.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Export translations",
+                    "translation": "Експорт перекладів",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Facebook",
+                    "translation": "Facebook",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Feature this post",
+                    "translation": "Опублікуйте цю публікацію",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Featured image",
+                    "translation": "Рекомендоване зображення",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Follow",
+                    "translation": "Слідуйте",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Friendly URL",
+                    "translation": "Дружній URL",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Front office + Back office",
+                    "translation": "Фронт-офіс + Бек-офіс",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Front office only",
+                    "translation": "Лише фронт-офіс",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Generate and save translated module wordings for the selected language?",
+                    "translation": "Згенерувати та зберегти перекладені формулювання модулів для вибраної мови?",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Global blog settings: routes, comments, pagination and displayed content.",
+                    "translation": "Глобальні налаштування блогу: маршрути, коментарі, розбивка на сторінки та відображуваний вміст.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Google Translate is used in free mode without an API key. Generated translations are saved in the database so they can be exported afterwards.",
+                    "translation": "Google Translate використовується у безкоштовному режимі без ключа API. Згенеровані переклади зберігаються в базі даних, щоб потім їх можна було експортувати.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Group #%d",
+                    "translation": "Група #%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "ID",
+                    "translation": "ID",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "If the date is in the future and the post is published, it will be planned automatically.",
+                    "translation": "Якщо дата в майбутньому і публікація опублікована, вона буде запланована автоматично.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Image",
+                    "translation": "малюнок",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Import the full WordPress blog",
+                    "translation": "Імпортуйте повний блог WordPress",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Import translations",
+                    "translation": "Імпорт перекладів",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Imported post status",
+                    "translation": "Статус імпортованого повідомлення",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Indexable",
+                    "translation": "Індексується",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Invalid date format.",
+                    "translation": "Недійсний формат дати.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Invalid product selection.",
+                    "translation": "Невірний вибір товару.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Invalid security token.",
+                    "translation": "Недійсний маркер безпеки.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Linked employee",
+                    "translation": "Зв'язаний співробітник",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Linked products",
+                    "translation": "Пов'язані продукти",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "LinkedIn",
+                    "translation": "LinkedIn",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Maximum %limit% characters.",
+                    "translation": "Максимальна кількість символів %limit%.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Meta description",
+                    "translation": "Метаопис",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Meta title",
+                    "translation": "Мета назва",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Moderate comments",
+                    "translation": "Модеруйте коментарі",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Module URLs to submit to Google Search Console.",
+                    "translation": "URL-адреси модулів для надсилання в Google Search Console.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Module settings",
+                    "translation": "Налаштування модуля",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Module translations",
+                    "translation": "Модуль перекладів",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Module translations generated: %saved% saved, %queued% queued, %existing% kept, %unchanged% unchanged, %detected% source string(s) detected.",
+                    "translation": "Згенеровано переклади модулів: %saved% збережено, %queued% поставлено в чергу, %existing% збережено, %unchanged% без змін, %detected% виявлено вихідний рядок(и).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Name is required.",
+                    "translation": "Необхідно вказати ім'я.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Nickname",
+                    "translation": "псевдонім",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Nickname is required.",
+                    "translation": "Введіть псевдонім.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "No Ever Blog sitemap has been generated yet. Save a post, category, tag, author or the configuration to regenerate files.",
+                    "translation": "Карта сайту Ever Blog ще не створена. Збережіть публікацію, категорію, тег, автора або конфігурацію для повторного створення файлів.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "No default author",
+                    "translation": "Немає автора за замовчуванням",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "No linked employee",
+                    "translation": "Немає пов’язаного працівника",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "No post was published.",
+                    "translation": "Жодна публікація не була опублікована.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "No product found.",
+                    "translation": "Продукт не знайдено.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "None",
+                    "translation": "Жодного",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Open preview",
+                    "translation": "Відкрити попередній перегляд",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Optional for public post imports. Required for non-public content.",
+                    "translation": "Необов’язковий для публічного імпорту повідомлень. Необхідно для непублічного вмісту.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Overwrite existing database translations",
+                    "translation": "Перезаписати існуючі переклади бази даних",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Parent category",
+                    "translation": "Батьківська категорія",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Parent category not found (id: %id%).",
+                    "translation": "Батьківську категорію не знайдено (ідентифікатор: %id%).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Password",
+                    "translation": "Пароль",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Please select a translation export file.",
+                    "translation": "Виберіть файл для експорту перекладу.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Please select a valid image file.",
+                    "translation": "Виберіть дійсний файл зображення.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Please select at least one post.",
+                    "translation": "Виберіть принаймні одну публікацію.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Post #%post_id% duplicated successfully (copy #%copy_id%).",
+                    "translation": "Повідомлення #%post_id% успішно продубльовано (копія #%copy_id%).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Post ID",
+                    "translation": "PostID",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Post created.",
+                    "translation": "Публікацію створено.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Post not found (id: %id%).",
+                    "translation": "Повідомлення не знайдено (id: %id%).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Post updated.",
+                    "translation": "Публікацію оновлено.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Posts",
+                    "translation": "Пости",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Posts kept in trash longer than this delay are deleted automatically.",
+                    "translation": "Публікації, які зберігаються в кошику довше цієї затримки, видаляються автоматично.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Posts on homepage",
+                    "translation": "Публікації на головній сторінці",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Posts on product page",
+                    "translation": "Публікації на сторінці товару",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Posts per page",
+                    "translation": "Повідомлень на сторінці",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Product not found (id: %id%).",
+                    "translation": "Товар не знайдено (id: %id%).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Publication",
+                    "translation": "Публікація",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Publication date",
+                    "translation": "Дата публікації",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Publish selected",
+                    "translation": "Опублікувати вибране",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Published",
+                    "translation": "Опубліковано",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Remove",
+                    "translation": "видалити",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Review on pending posts",
+                    "translation": "Перегляд дописів, що очікують на розгляд",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Root and Unclassed categories cannot be deleted.",
+                    "translation": "Кореневі та некласифіковані категорії неможливо видалити.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Root category is managed automatically and cannot be edited from the back office.",
+                    "translation": "Коренева категорія керується автоматично, і її неможливо редагувати з бек-офісу.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "SEO",
+                    "translation": "SEO",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Save",
+                    "translation": "зберегти",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Scope",
+                    "translation": "Область застосування",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Search",
+                    "translation": "Пошук",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Search by product name, reference or ID",
+                    "translation": "Пошук за назвою продукту, посиланням або ідентифікатором",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Search by product name, reference or ID to link products without loading the whole catalogue.",
+                    "translation": "Шукайте за назвою продукту, посиланням або ідентифікатором, щоб зв’язати продукти, не завантажуючи весь каталог.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Searching...",
+                    "translation": "Пошук...",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Select a category",
+                    "translation": "Виберіть категорію",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Select an author",
+                    "translation": "Виберіть автора",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Settings saved.",
+                    "translation": "Налаштування збережено.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Simply a blog",
+                    "translation": "Просто блог",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Sitemaps could not be regenerated: %error%",
+                    "translation": "Карти сайту не вдалося відновити: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Sitemaps were regenerated, but robots.txt could not be updated.",
+                    "translation": "Карти сайту було створено повторно, але файл robots.txt не вдалося оновити.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Slug",
+                    "translation": "Слимак",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Slug is too long (maximum %limit% characters).",
+                    "translation": "Слаг задовгий (максимальна кількість символів: %limit%).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Source language",
+                    "translation": "Мова оригіналу",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Start the full WordPress blog import with the configured REST credentials?",
+                    "translation": "Почати повний імпорт блогу WordPress із налаштованими обліковими даними REST?",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Status",
+                    "translation": "Статус",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Status was changed to \"planned\" because the publication date is in the future.",
+                    "translation": "Статус змінено на «планується», оскільки дата публікації в майбутньому.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Status was changed to \"published\" because the publication date is in the past.",
+                    "translation": "Статус змінено на \"опубліковано\", оскільки дата публікації вже в минулому.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Tag #%d",
+                    "translation": "Тег #%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Tag created.",
+                    "translation": "Тег створено.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Tag not found (id: %id%).",
+                    "translation": "Тег не знайдено (id: %id%).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Tag updated.",
+                    "translation": "Тег оновлено.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Tags",
+                    "translation": "Теги",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Taxonomy",
+                    "translation": "Таксономія",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "The color must use hexadecimal format, for example #0a0f54.",
+                    "translation": "Колір має використовувати шістнадцятковий формат, наприклад #0a0f54.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "The color must use hexadecimal format, for example #ffffff.",
+                    "translation": "Колір має використовувати шістнадцятковий формат, наприклад #ffffff.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "The selected translation file is empty.",
+                    "translation": "Вибраний файл перекладу порожній.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "The slug must contain only letters, numbers and hyphens.",
+                    "translation": "Слаг повинен містити лише літери, цифри та дефіси.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "These URLs are also synchronized in robots.txt with Allow and Sitemap directives.",
+                    "translation": "Ці URL-адреси також синхронізуються в robots.txt за допомогою директив Allow і Sitemap.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "This field is required (default language).",
+                    "translation": "Це поле є обов’язковим (мова за замовчуванням).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "This field is required.",
+                    "translation": "Це поле обов'язкове.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Title",
+                    "translation": "Назва",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Title length",
+                    "translation": "Довжина назви",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Translate only the module wording shown in front office and back office. Blog posts, categories, tags, authors and other admin-entered content are excluded.",
+                    "translation": "Перекладайте лише формулювання модулів, які відображаються у фронт-офісі та бек-офісі. Дописи в блогах, категорії, теги, автори та інший вміст, введений адміністратором, виключаються.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Translate the module",
+                    "translation": "Перекладіть модуль",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Translation export file",
+                    "translation": "Файл експорту перекладу",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Translations imported: %imported% item(s), %skipped% skipped.",
+                    "translation": "Імпортовані переклади: %imported% елемент(и), %skipped% пропущено.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Trash",
+                    "translation": "сміття",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Twitter",
+                    "translation": "Twitter",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Type at least %count% characters.",
+                    "translation": "Введіть принаймні %count% символів.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to create the author image destination directory.",
+                    "translation": "Не вдалося створити цільовий каталог зображення автора.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to create the image destination directory.",
+                    "translation": "Не вдалося створити цільовий каталог зображення.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to duplicate post #%post_id%: %error%",
+                    "translation": "Не вдалося скопіювати публікацію #%post_id%: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to generate module translations: %error%",
+                    "translation": "Не вдалося згенерувати переклади модуля: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to import WordPress content: %error%",
+                    "translation": "Не вдалося імпортувати вміст WordPress: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to import translations: %error%",
+                    "translation": "Не вдалося імпортувати переклади: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to save author: %error%",
+                    "translation": "Не вдалося зберегти автора: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to save category: %error%",
+                    "translation": "Не вдалося зберегти категорію: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to save comment: %error%",
+                    "translation": "Не вдалося зберегти коментар: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to save post: %error%",
+                    "translation": "Не вдалося зберегти публікацію: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to save tag: %error%",
+                    "translation": "Не вдалося зберегти тег: %error%",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to save the author image reference.",
+                    "translation": "Не вдалося зберегти посилання на зображення автора.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to save the image reference.",
+                    "translation": "Неможливо зберегти посилання на зображення.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unable to upload the image.",
+                    "translation": "Не вдалося завантажити зображення.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unclassed",
+                    "translation": "Некласифікований",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unknown bulk action.",
+                    "translation": "Невідома масова дія.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Unsupported image format.",
+                    "translation": "Непідтримуваний формат зображення.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Use a WordPress application password, not the main account password.",
+                    "translation": "Використовуйте пароль програми WordPress, а не основний пароль облікового запису.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "Views",
+                    "translation": "Перегляди",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "WooCommerce posts have been imported",
+                    "translation": "Публікації WooCommerce імпортовано",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "WordPress REST username",
+                    "translation": "Ім’я користувача WordPress REST",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "WordPress application password",
+                    "translation": "Пароль програми WordPress",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "WordPress import completed: %created% created post(s), %updated% updated post(s), %categories% category item(s), %tags% tag item(s), %authors% author item(s), %images% image(s), %redirects% redirect(s), %skipped% skipped item(s).",
+                    "translation": "Імпорт WordPress завершено: створені публікації %created%, оновлені публікації %updated%, елементи категорії %categories%, елементи тегів %tags%, авторські елементи %authors%, зображення %images%, перенаправлення %redirects%, %skipped% пропущений елемент(и).",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "WordPress posts have been imported",
+                    "translation": "Дописи WordPress імпортовано",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "WordPress site URL",
+                    "translation": "URL-адреса веб-сайту WordPress",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "XML sitemaps",
+                    "translation": "Карти сайту XML",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "bottom_content_%d",
+                    "translation": "bottom_content_%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "bottom_text_%d",
+                    "translation": "нижній_текст_%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "content_%d",
+                    "translation": "вміст_%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "excerpt_%d",
+                    "translation": "винятковий_%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "link_rewrite_%d",
+                    "translation": "link_rewrite_%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "meta_description_%d",
+                    "translation": "мета_опис_%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "meta_title_%d",
+                    "translation": "meta_title_%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "title_%d",
+                    "translation": "назва_%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "to get latest version of this module",
+                    "translation": "щоб отримати останню версію цього модуля",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Admin",
+                    "key": "top_text_%d",
+                    "translation": "верхній_текст_%d",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "(page",
+                    "translation": "(стор",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": ")",
+                    "translation": ")",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "A new comment is pending",
+                    "translation": "Очікується новий коментар",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Associated posts",
+                    "translation": "Схожі статті",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Back to my account",
+                    "translation": "Повернутися до мого облікового запису",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Blog",
+                    "translation": "Блог",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "By enabling this option, you agree that your comment may be stored according to our privacy policy.",
+                    "translation": "Активуючи цю опцію, ви погоджуєтесь, що ваш коментар може бути збережено відповідно до нашої політики конфіденційності.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Categories from the blog",
+                    "translation": "Категорії блогу",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Category posts",
+                    "translation": "Категорія статей",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Close",
+                    "translation": "Закрити",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Comments",
+                    "translation": "Коментарі",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Email address",
+                    "translation": "Адреса електронної пошти",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Email address *",
+                    "translation": "адреса електронної пошти *",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Email has not been sent to admin",
+                    "translation": "Електронна пошта не надіслана адміністратору",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Enter your email",
+                    "translation": "Введіть адресу електронної пошти",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Enter your name",
+                    "translation": "Введіть своє ім'я",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Error : The field \"Email\" is not valid",
+                    "translation": "Помилка: поле \"Email\" недійсне",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Error : The field \"RGPD\" is not valid",
+                    "translation": "Помилка: поле \"GDPR\" недійсне",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Error : The field \"comments\" is not valid",
+                    "translation": "Помилка: поле \"коментарі\" недійсне",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Error : The field \"name\" is not valid",
+                    "translation": "Помилка: поле \"ім'я\" недійсне",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Featured",
+                    "translation": "Виділено",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Fields marked with * are required.",
+                    "translation": "Поля, позначені *, обов'язкові для заповнення.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Find all your comments on our blog",
+                    "translation": "Знайдіть усі свої коментарі в нашому блозі",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Forgot your password ?",
+                    "translation": "Забули пароль?",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "GDPR compliance",
+                    "translation": "Відповідність GDPR",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Here is a list of all your comments on our blog.",
+                    "translation": "Ось список усіх ваших коментарів у нашому блозі.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Image not available",
+                    "translation": "Зображення недоступне",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Image preview",
+                    "translation": "Попередній перегляд зображення",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Join the discussion below.",
+                    "translation": "Приєднуйтесь до обговорення нижче.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Latest posts from the blog",
+                    "translation": "Останні публікації в блозі",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Leave a comment",
+                    "translation": "Залиште коментар",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Linked products",
+                    "translation": "Супутні товари",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Log in to comment",
+                    "translation": "Увійдіть, щоб залишити коментар",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Login",
+                    "translation": "Підключення",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Most recent",
+                    "translation": "Остання",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Most viewed",
+                    "translation": "Найпопулярніші",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "My blog comments",
+                    "translation": "Мої коментарі в блозі",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "My comments",
+                    "translation": "Мої коментарі",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Name *",
+                    "translation": "Ім'я *",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Next",
+                    "translation": "Слідую",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "No category available.",
+                    "translation": "Категорія недоступна",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "No featured post.",
+                    "translation": "Статті не виділено.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "No post for this tag.",
+                    "translation": "Немає статей для цієї мітки.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "No post found for this search.",
+                    "translation": "Не знайдено статей для цього пошуку",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "No post in this category.",
+                    "translation": "У цій категорії немає статей",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "No post to display.",
+                    "translation": "Немає елементів для відображення",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "No posts match your filters yet.",
+                    "translation": "На даний момент жодна стаття не відповідає вашим фільтрам.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "No selected post.",
+                    "translation": "Елементи не вибрано.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "No tag available.",
+                    "translation": "Немає мітки.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Our best products",
+                    "translation": "Наші найкращі продукти",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Our blog",
+                    "translation": "Наш блог",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Page :",
+                    "translation": "сторінка:",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Password",
+                    "translation": "Пароль",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Please add a comment.",
+                    "translation": "Будь ласка, додайте коментар.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Please enter a valid email address.",
+                    "translation": "Укажіть дійсну електронну адресу.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Please enter your name.",
+                    "translation": "Будь ласка, введіть своє ім'я.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Post author:",
+                    "translation": "Автор статті:",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Posts linked to this tag",
+                    "translation": "Статті, пов'язані з цим тегом",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Previous",
+                    "translation": "Попередній",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Previous' d='Shop.Theme.Actions'}</span>\n      </button>\n      <button class=\"carousel-control-next\" type=\"button\" data-bs-target=\"#{$blpCarouselId|escape:'htmlall':'UTF-8'}\" data-bs-slide=\"next\">\n        <span class=\"carousel-control-next-icon\" aria-hidden=\"true\"></span>\n        <span class=\"visually-hidden\">{l s='Next' d='Shop.Theme.Actions'}</span>\n      </button>\n      <div class=\"carousel-indicators position-relative mt-3 mx-0\">\n        {foreach from=$ps_products_chunks item=\"slide\" name=\"blpInd\"}\n          <button type=\"button\" data-bs-target=\"#{$blpCarouselId|escape:'htmlall':'UTF-8'}\" data-bs-slide-to=\"{$smarty.foreach.blpInd.index|escape:'htmlall':'UTF-8'}\"{if $smarty.foreach.blpInd.first} class=\"active\" aria-current=\"true\"{/if} aria-label=\"{l s='Slide",
+                    "translation": "Попередній' d='Shop.Theme.Actions'}</span>\n      </button>\n      <button class=\"carousel-control-next\" type=\"button\" data-bs-target=\"#{$blpCarouselId|escape:'htmlall':'UTF-8'}\" data-bs-slide=\"next\">\n        <span class=\"carousel-control-next-icon\" aria-hidden=\"true\"></span>\n        <span class=\"visually-hidden\">{l s='Далі' d='Shop.Theme.Actions'}</span>\n      </button>\n      <div class=\"carousel-indicators position-relative mt-3 mx-0\">\n        {foreach from=$ps_products_chunks item=\"slide\" name=\"blpInd\"}\n          <button type=\"button\" data-bs-target=\"#{$blpCarouselId|escape:'htmlall':'UTF-8'}\" data-bs-slide-to=\"{$smarty.foreach.blpInd.index|escape:'htmlall':'UTF-8'}\"{if $smarty.foreach.blpInd.first} class=\"active\" aria-current=\"true\"{/if} aria-label=\"{l s='Slide",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Publication date:",
+                    "translation": "Дата публікації:",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "RSS feed",
+                    "translation": "RSS канал",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Read more",
+                    "translation": "Дізнайтесь більше",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Read the article",
+                    "translation": "Прочитайте статтю",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Recover your forgotten password",
+                    "translation": "Відновіть забутий пароль",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Related posts",
+                    "translation": "Подібні статті",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Reset",
+                    "translation": "Скинути",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Search",
+                    "translation": "Для дослідження",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Search by keywords",
+                    "translation": "Пошук за ключовими словами",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Search results",
+                    "translation": "Результати пошуку",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Search results for",
+                    "translation": "Результати пошуку для",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Search the blog",
+                    "translation": "Шукайте в блозі",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "See all posts from the blog",
+                    "translation": "Переглянути всі статті блогу",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "See post",
+                    "translation": "Переглянути статтю",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Share",
+                    "translation": "Поділіться",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Share on X",
+                    "translation": "Поділіться далі",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Share your thoughts in a constructive way. Maximum 800 characters.",
+                    "translation": "Висловлюйте свої ідеї конструктивно. максимум 800 символів.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Sorry, there is no post, please come back later !",
+                    "translation": "Вибачте, на даний момент немає публікацій, поверніться пізніше!",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Subcategories",
+                    "translation": "Підкатегорії",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Submit",
+                    "translation": "Надіслати",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Summarize this post with:",
+                    "translation": "Узагальніть цю статтю за допомогою:",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Tag posts",
+                    "translation": "Позначте елементи",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Tags from the blog",
+                    "translation": "Теги блогу",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "The oldest",
+                    "translation": "Найстарший",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "There's no comments on your account. Feel free to comment our posts on our blog !",
+                    "translation": "У вашому обліковому записі не було опубліковано коментарів. Будь ласка, не соромтеся коментувати дописи нашого блогу!",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "This post is password protected",
+                    "translation": "Ця публікація захищена паролем",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "This will be displayed with your comment.",
+                    "translation": "Це відображатиметься разом із вашим коментарем.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Validate",
+                    "translation": "Для підтвердження",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "View category",
+                    "translation": "Переглянути категорію",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "View tag",
+                    "translation": "Дивіться етикетку",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Views",
+                    "translation": "Перегляди",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "We'll never share your email with anyone else.",
+                    "translation": "Ми ніколи нікому не передамо вашу електронну адресу.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Wow ! What have you done ? You're banned from this blog !",
+                    "translation": "Вау! що ти зробив Ви забанені в цьому блозі!",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "You can comment whenever on our blog.",
+                    "translation": "Ви можете будь-коли залишити коментар у нашому блозі.",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "You must wait before sending another comment",
+                    "translation": "Ви повинні зачекати, перш ніж надсилати інший коментар",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Your comment",
+                    "translation": "Ваш коментар",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Your comment *",
+                    "translation": "Ваш коментар *",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Your comment has been submitted",
+                    "translation": "Ваш коментар надіслано",
+                    "theme": null
+                },
+                {
+                    "domain": "Modules.Everpsblog.Shop",
+                    "key": "Your comments",
+                    "translation": "Ваші коментарі",
+                    "theme": null
+                }
+            ]
+        }
+    }
+}
