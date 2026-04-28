@@ -44,6 +44,10 @@ class ConfigurationType extends AbstractType
                 'label' => 'Moderate comments',
                 'required' => false,
             ])
+            ->add('show_ai_summary_banner', CheckboxType::class, [
+                'label' => 'Show AI summary prompt block on post pages',
+                'required' => false,
+            ])
             ->add('rss_enabled', CheckboxType::class, [
                 'label' => 'Enable RSS feeds',
                 'required' => false,

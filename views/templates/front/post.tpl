@@ -125,6 +125,7 @@
                     <p class="postexcerpt mb-0">{$post->excerpt nofilter}</p>
                     {/if}
                 </div>
+                {if isset($show_ai_summary_banner) && $show_ai_summary_banner}
                 <section class="ai-summary-banner mb-3" data-qcd-ai-summary-banner="" data-ai-target-domain="{$shop.name|escape:'htmlall':'UTF-8'}">
                     <div class="ai-summary-heading">
                         <strong>{l s='Summarize this post with:' d='Modules.Everpsblog.Shop'}</strong>
@@ -165,6 +166,7 @@
                         </a>
                     </div>
                 </section>
+                {/if}
             </div>
         </div>
     </div>
