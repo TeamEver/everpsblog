@@ -144,6 +144,7 @@ class AuthorController extends AbstractDomainController
             'currentResource' => 'author',
             'cancelUrl' => $this->generateUrl('everpsblog_admin_author'),
             'createUrl' => $this->generateUrl('everpsblog_admin_author_form'),
+            'previewUrl' => $isEdit ? $this->buildPreviewUrlForResource('author', (int) $authorId) : '',
             'navigationLinks' => $this->getAdminNavigationLinks(),
             'everBlogLanguages' => $this->getEverBlogLanguages(),
             'qcdPageBuilderTargets' => $this->buildQcdPageBuilderTargets('everpsblog_author', $authorId, [

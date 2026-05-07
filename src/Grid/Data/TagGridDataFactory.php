@@ -10,6 +10,7 @@ use Symfony\Component\Routing\RouterInterface;
 final class TagGridDataFactory
 {
     use GridRecordFilterTrait;
+    use FrontPreviewActionTrait;
 
     /** @var TagRepository */
     private $tagRepository;
@@ -75,6 +76,7 @@ final class TagGridDataFactory
                     ? $this->resolveUrl('everpsblog_admin_tag_delete', ['tagId' => $id], 'AdminEverPsBlogTag', ['deletetag' => $id])
                     : $this->routeSigner->sign('AdminEverPsBlogTag', ['deletetag' => $id]),
                 'delete_legacy' => $this->routeSigner->sign('AdminEverPsBlogTag', ['deletetag' => $id]),
+                'preview' => $this->buildTagPreviewUrl($id, $shopId, $langId),
             ];
             $record['_bulk_actions'] = [
                 'delete' => $this->resolveBulkActionUrl('everpsblog_admin_tag_bulk_delete', 'AdminEverPsBlogTag'),

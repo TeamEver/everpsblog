@@ -11,6 +11,7 @@ use Symfony\Component\Routing\RouterInterface;
 final class AuthorGridDataFactory
 {
     use GridRecordFilterTrait;
+    use FrontPreviewActionTrait;
 
     /** @var AuthorRepository */
     private $authorRepository;
@@ -78,6 +79,7 @@ final class AuthorGridDataFactory
                     ? $this->resolveUrl('everpsblog_admin_author_delete', ['authorId' => $id], 'AdminEverPsBlogAuthor', ['deleteauthor' => $id])
                     : $this->routeSigner->sign('AdminEverPsBlogAuthor', ['deleteauthor' => $id]),
                 'delete_legacy' => $this->routeSigner->sign('AdminEverPsBlogAuthor', ['deleteauthor' => $id]),
+                'preview' => $this->buildAuthorPreviewUrl($id, $shopId, $langId),
             ];
             $record['_bulk_actions'] = [
                 'delete' => $this->resolveBulkActionUrl('everpsblog_admin_author_bulk_delete', 'AdminEverPsBlogAuthor'),

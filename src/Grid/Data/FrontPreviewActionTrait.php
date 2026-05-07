@@ -36,6 +36,42 @@ trait FrontPreviewActionTrait
         );
     }
 
+    private function buildCategoryPreviewUrl(int $categoryId, int $shopId, int $langId): string
+    {
+        return $this->buildFrontPreviewUrl(
+            'category',
+            'id_ever_category',
+            $categoryId,
+            $this->resolveLinkRewriteFromDb('ever_blog_category_lang', 'id_ever_category', $categoryId, $langId),
+            $shopId,
+            $langId
+        );
+    }
+
+    private function buildTagPreviewUrl(int $tagId, int $shopId, int $langId): string
+    {
+        return $this->buildFrontPreviewUrl(
+            'tag',
+            'id_ever_tag',
+            $tagId,
+            $this->resolveLinkRewriteFromDb('ever_blog_tag_lang', 'id_ever_tag', $tagId, $langId),
+            $shopId,
+            $langId
+        );
+    }
+
+    private function buildAuthorPreviewUrl(int $authorId, int $shopId, int $langId): string
+    {
+        return $this->buildFrontPreviewUrl(
+            'author',
+            'id_ever_author',
+            $authorId,
+            $this->resolveLinkRewriteFromDb('ever_blog_author_lang', 'id_ever_author', $authorId, $langId),
+            $shopId,
+            $langId
+        );
+    }
+
     private function buildCommentPreviewUrl(int $commentId, int $postId, int $shopId, int $langId): string
     {
         $url = $this->buildPostPreviewUrl($postId, $shopId, $langId);

@@ -151,6 +151,7 @@ class PostController extends AbstractDomainController
             'currentResource' => 'post',
             'cancelUrl' => $this->generateUrl('everpsblog_admin_post'),
             'createUrl' => $this->generateUrl('everpsblog_admin_post_form'),
+            'previewUrl' => $isEdit ? $this->buildPreviewUrlForResource('post', (int) $postId) : '',
             'navigationLinks' => $this->getAdminNavigationLinks(),
             'everBlogLanguages' => $this->getEverBlogLanguages(),
             'qcdPageBuilderTargets' => $this->buildQcdPageBuilderTargets('everpsblog_post', $postId, [

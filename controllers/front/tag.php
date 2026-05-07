@@ -61,7 +61,8 @@ class EverPsBlogtagModuleFrontController extends AbstractFrontController
             $customerGroups = Customer::getGroupsStatic(
                 (int) $this->context->customer->id
             );
-            if (isset($customerGroups)
+            if (!$this->isPreviewRequest()
+                && isset($customerGroups)
                 && !empty($allowedGroups)
                 && !array_intersect($allowedGroups, $customerGroups)
             ) {
@@ -70,10 +71,12 @@ class EverPsBlogtagModuleFrontController extends AbstractFrontController
         }
         parent::init();
         // if inactive tag or unexists, redirect
-        if (empty($this->tag->id) || (bool) $this->tag->active === false) {
+        if (empty($this->tag->id) || (!$this->isPreviewRequest() && (bool) $this->tag->active === false)) {
             Tools::redirect('index.php?controller=404');
         }
-        $this->incrementFrontTaxonomyCount('ever_blog_tag', 'id_ever_tag', (int) $this->tag->id);
+        if (!$this->isPreviewRequest()) {
+            $this->incrementFrontTaxonomyCount('ever_blog_tag', 'id_ever_tag', (int) $this->tag->id);
+        }
     }
 
 

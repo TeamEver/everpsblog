@@ -418,6 +418,12 @@
                     {% endfor %}
                     <td>
                       <div class="everblog-bo-row-actions">
+                        {% if row._actions.preview is defined and row._actions.preview %}
+                          <a class="btn btn-sm btn-outline-secondary everblog-bo-icon-btn" href="{{ row._actions.preview }}" target="_blank" rel="noopener noreferrer" title="{{ 'Preview'|trans({}, 'Modules.Everpsblog.Admin') }}" aria-label="{{ 'Preview'|trans({}, 'Modules.Everpsblog.Admin') }}">
+                            <i class="material-icons">visibility</i>
+                            <span class="sr-only">{{ 'Preview'|trans({}, 'Modules.Everpsblog.Admin') }}</span>
+                          </a>
+                        {% endif %}
                         <a class="btn btn-sm btn-outline-primary everblog-bo-icon-btn" href="{{ row._actions.edit }}" title="{{ 'Edit'|trans({}, 'Modules.Everpsblog.Admin') }}" aria-label="{{ 'Edit'|trans({}, 'Modules.Everpsblog.Admin') }}">
                           <i class="material-icons">edit</i>
                           <span class="sr-only">{{ 'Edit'|trans({}, 'Modules.Everpsblog.Admin') }}</span>

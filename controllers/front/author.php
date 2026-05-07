@@ -63,7 +63,8 @@ class EverPsBlogauthorModuleFrontController extends AbstractFrontController
             } else {
                 $allowedGroups = json_decode($this->author->allowed_groups);
             }
-            if (isset($customerGroups)
+            if (!$this->isPreviewRequest()
+                && isset($customerGroups)
                 && !empty($allowedGroups)
                 && !array_intersect($allowedGroups, $customerGroups)
             ) {
@@ -74,11 +75,13 @@ class EverPsBlogauthorModuleFrontController extends AbstractFrontController
         // if inactive post or unexists, redirect
         if (!(int) Tools::getValue('id_ever_author')
             || empty($this->author->id)
-            || (bool) $this->author->active === false
+            || (!$this->isPreviewRequest() && (bool) $this->author->active === false)
         ) {
             Tools::redirect('index.php?controller=404');
         }
-        $this->incrementFrontTaxonomyCount('ever_blog_author', 'id_ever_author', (int) $this->author->id);
+        if (!$this->isPreviewRequest()) {
+            $this->incrementFrontTaxonomyCount('ever_blog_author', 'id_ever_author', (int) $this->author->id);
+        }
     }
 
 

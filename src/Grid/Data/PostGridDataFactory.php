@@ -11,6 +11,7 @@ use Symfony\Component\Routing\RouterInterface;
 final class PostGridDataFactory
 {
     use GridRecordFilterTrait;
+    use FrontPreviewActionTrait;
 
     /** @var PostRepository */
     private $postRepository;
@@ -92,6 +93,7 @@ final class PostGridDataFactory
                     'AdminEverPsBlogPost',
                     ['duplicatepost' => $id]
                 ),
+                'preview' => $this->buildPostPreviewUrl($id, $shopId, $langId),
             ];
             $record['_bulk_actions'] = [
                 'delete' => $this->resolveBulkActionUrl('everpsblog_admin_post_bulk', 'AdminEverPsBlogPost'),

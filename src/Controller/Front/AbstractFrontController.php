@@ -147,6 +147,11 @@ abstract class AbstractFrontController extends \ModuleFrontController
         return $this->context->getTranslator()->trans($message, $parameters, 'Modules.Everpsblog.Shop');
     }
 
+    protected function isPreviewRequest(): bool
+    {
+        return \Tools::getValue('preview') === \Tools::encrypt('everpsblog/preview');
+    }
+
     /**
      * @return \EverPsBlog|null
      */

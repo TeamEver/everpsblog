@@ -535,6 +535,12 @@
         <i class="material-icons">save_as</i>
         {{ 'Save and stay'|trans({}, 'Modules.Everpsblog.Admin') }}
       </button>
+      {% if previewUrl is defined and previewUrl %}
+        <a class="btn btn-outline-secondary" href="{{ previewUrl }}" target="_blank" rel="noopener noreferrer">
+          <i class="material-icons">visibility</i>
+          {{ 'Preview'|trans({}, 'Modules.Everpsblog.Admin') }}
+        </a>
+      {% endif %}
     </div>
   </div>
 {% endblock %}
@@ -665,6 +671,12 @@
           <i class="material-icons">arrow_back</i>
           {{ 'Back to list'|trans({}, 'Modules.Everpsblog.Admin') }}
         </a>
+        {% if previewUrl is defined and previewUrl %}
+          <a class="btn btn-outline-secondary" href="{{ previewUrl }}" target="_blank" rel="noopener noreferrer">
+            <i class="material-icons">visibility</i>
+            {{ 'Preview'|trans({}, 'Modules.Everpsblog.Admin') }}
+          </a>
+        {% endif %}
         {% if createUrl is defined and createUrl %}
           <a class="btn btn-primary" href="{{ createUrl }}">
             <i class="material-icons">add</i>

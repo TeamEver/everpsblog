@@ -99,7 +99,8 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
             } else {
                 $allowedGroups = json_decode($defaultCategory->allowed_groups);
             }
-            if (isset($customerGroups)
+            if (!$this->isPreviewRequest()
+                && isset($customerGroups)
                 && !empty($allowedGroups)
                 && !array_intersect($allowedGroups, $customerGroups)
             ) {
@@ -113,7 +114,8 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
             } else {
                 $allowedGroups = json_decode($this->post->allowed_groups);
             }
-            if (isset($customerGroups)
+            if (!$this->isPreviewRequest()
+                && isset($customerGroups)
                 && !empty($allowedGroups)
                 && !array_intersect($allowedGroups, $customerGroups)
             ) {
@@ -203,7 +205,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
         if (!Tools::getValue('id_ever_post')) {
             Tools::redirect('index.php?controller=404');
         }
-        if (Tools::getValue('preview') != Tools::encrypt('everpsblog/preview')
+        if (!$this->isPreviewRequest()
             && $this->post->post_status != 'published'
         ) {
             Tools::redirect('index.php?controller=404');

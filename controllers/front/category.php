@@ -67,21 +67,24 @@ class EverPsBlogcategoryModuleFrontController extends AbstractFrontController
             $customerGroups = Customer::getGroupsStatic(
                 (int) $this->context->customer->id
             );
-            if (isset($customerGroups)
+            if (!$this->isPreviewRequest()
+                && isset($customerGroups)
                 && !empty($allowedGroups)
                 && !array_intersect($allowedGroups, $customerGroups)
             ) {
                 Tools::redirect('index.php?controller=404');
             }
         }
-        $this->incrementFrontTaxonomyCount('ever_blog_category', 'id_ever_category', (int) $this->category->id);
+        if (!$this->isPreviewRequest()) {
+            $this->incrementFrontTaxonomyCount('ever_blog_category', 'id_ever_category', (int) $this->category->id);
+        }
         parent::init();
         $this->parent_categories = $this->getBlogTaxonomyService()->getCategoryParentsTaxonomy(
             (int) $this->category->id
         ) ?: [];
         // if inactive category or unexists, redirect
         if (empty($this->category->id)
-            || !$this->category->active
+            || (!$this->isPreviewRequest() && !$this->category->active)
             || $this->category->is_root_category
         ) {
             Tools::redirect('index.php?controller=404');

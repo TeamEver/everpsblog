@@ -11,6 +11,7 @@ use Symfony\Component\Routing\RouterInterface;
 final class CategoryGridDataFactory
 {
     use GridRecordFilterTrait;
+    use FrontPreviewActionTrait;
 
     /** @var CategoryRepository */
     private $categoryRepository;
@@ -82,6 +83,7 @@ final class CategoryGridDataFactory
                     'AdminEverPsBlogCategory',
                     ['updatecategory' => $id]
                 ),
+                'preview' => $this->buildCategoryPreviewUrl($id, $shopId, $langId),
             ];
             if (!empty($record['_is_deletable'])) {
                 $record['_actions']['delete'] = $this->useModernDeleteAction

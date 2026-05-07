@@ -2,6 +2,7 @@
 
 namespace PrestaShop\Module\Everpsblog\Controller\Admin;
 
+use PrestaShop\Module\Everpsblog\Grid\Data\FrontPreviewActionTrait;
 use PrestaShop\Module\Everpsblog\Service\BlogScheduledTaskRunner;
 use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
@@ -9,6 +10,8 @@ use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 
 abstract class AbstractDomainController extends FrameworkBundleAdminController
 {
+    use FrontPreviewActionTrait;
+
     /** @var ContextStateService */
     protected $contextStateService;
     /** @var BlogScheduledTaskRunner|null */
@@ -67,6 +70,30 @@ abstract class AbstractDomainController extends FrameworkBundleAdminController
             ['key' => 'comment', 'label' => 'Comments', 'url' => $this->generateUrl('everpsblog_admin_comment')],
             ['key' => 'configuration', 'label' => 'Configuration', 'url' => $this->generateUrl('everpsblog_admin_dashboard')],
         ];
+    }
+
+    protected function buildPreviewUrlForResource(string $resource, ?int $resourceId): string
+    {
+        $resourceId = (int) $resourceId;
+        if ($resourceId <= 0) {
+            return '';
+        }
+
+        $shopId = $this->getContextShopId();
+        $langId = $this->getContextLangId();
+
+        switch ($resource) {
+            case 'post':
+                return $this->buildPostPreviewUrl($resourceId, $shopId, $langId);
+            case 'category':
+                return $this->buildCategoryPreviewUrl($resourceId, $shopId, $langId);
+            case 'tag':
+                return $this->buildTagPreviewUrl($resourceId, $shopId, $langId);
+            case 'author':
+                return $this->buildAuthorPreviewUrl($resourceId, $shopId, $langId);
+        }
+
+        return '';
     }
 
     /**

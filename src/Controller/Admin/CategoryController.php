@@ -123,6 +123,7 @@ class CategoryController extends AbstractDomainController
             'currentResource' => 'category',
             'cancelUrl' => $this->generateUrl('everpsblog_admin_category'),
             'createUrl' => $this->generateUrl('everpsblog_admin_category_form'),
+            'previewUrl' => $isEdit ? $this->buildPreviewUrlForResource('category', (int) $categoryId) : '',
             'navigationLinks' => $this->getAdminNavigationLinks(),
             'everBlogLanguages' => $this->getEverBlogLanguages(),
             'qcdPageBuilderTargets' => $this->buildQcdPageBuilderTargets('everpsblog_category', $categoryId, [

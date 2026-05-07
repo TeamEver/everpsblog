@@ -111,6 +111,7 @@ class TagController extends AbstractDomainController
             'currentResource' => 'tag',
             'cancelUrl' => $this->generateUrl('everpsblog_admin_tag'),
             'createUrl' => $this->generateUrl('everpsblog_admin_tag_form'),
+            'previewUrl' => $isEdit ? $this->buildPreviewUrlForResource('tag', (int) $tagId) : '',
             'navigationLinks' => $this->getAdminNavigationLinks(),
             'everBlogLanguages' => $this->getEverBlogLanguages(),
             'qcdPageBuilderTargets' => $this->buildQcdPageBuilderTargets('everpsblog_tag', $tagId, [
