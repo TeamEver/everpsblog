@@ -49,7 +49,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '7.0.0';
+        $this->version = '7.0.1';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -1013,6 +1013,206 @@ class EverPsBlog extends Module
         }
     }
 
+    public function hookActionAdminControllerSetMedia($params = null)
+    {
+        $this->registerQcdPageBuilderIntegrationHooks();
+
+        if (!$this->isQcdPageBuilderActiveForContext()) {
+            return;
+        }
+
+        if (!$this->isEverPsBlogBackOfficeController()) {
+            return;
+        }
+
+        $this->context->controller->addJS($this->_path . 'views/js/adminQcdPageBuilder.js');
+    }
+
+    /**
+     * Let QCD Page Builder discover Ever Blog editable fields when it asks
+     * third-party modules for back-office targets.
+     *
+     * @param array<string, mixed> $params
+     *
+     * @return array<string, mixed>
+     */
+    public function hookFilterQcdPageBuilderBackOfficeTargets($params = [])
+    {
+        return [
+            'targets' => $this->getQcdPageBuilderBackOfficeTargets(),
+        ];
+    }
+
+    private function isQcdPageBuilderActiveForContext()
+    {
+        if (!Module::isInstalled('qcdpagebuilder') || !Module::isEnabled('qcdpagebuilder')) {
+            return false;
+        }
+
+        try {
+            $module = Module::getInstanceByName('qcdpagebuilder');
+        } catch (Exception $exception) {
+            return false;
+        }
+
+        if (!$module instanceof Module || !(bool) $module->active) {
+            return false;
+        }
+
+        if (method_exists($module, 'isEnabledForShopContext')) {
+            return (bool) $module->isEnabledForShopContext();
+        }
+
+        return true;
+    }
+
+    private function isEverPsBlogBackOfficeController()
+    {
+        if (!isset($this->context->controller)) {
+            return false;
+        }
+
+        $controllerName = isset($this->context->controller->controller_name)
+            ? strtolower((string) $this->context->controller->controller_name)
+            : '';
+
+        return strpos($controllerName, 'admineverpsblog') === 0;
+    }
+
+    private function registerQcdPageBuilderIntegrationHooks()
+    {
+        if (!Module::isInstalled('qcdpagebuilder') || !Hook::getIdByName('filterQcdPageBuilderBackOfficeTargets')) {
+            return;
+        }
+
+        try {
+            $this->registerHook('filterQcdPageBuilderBackOfficeTargets');
+        } catch (Exception $exception) {
+            PrestaShopLogger::addLog($this->name . ' QCD Page Builder integration hook: ' . $exception->getMessage(), 2);
+        }
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function getQcdPageBuilderBackOfficeTargets()
+    {
+        return [
+            [
+                'target_type' => 'everpsblog_post',
+                'target_field' => 'content',
+                'controllers' => ['admineverpsblogpost'],
+                'selectors' => [
+                    '#ever-modern-form textarea[name*="[content_"]',
+                ],
+                'id_resolver' => $this->getQcdPageBuilderIdResolver('id_ever_post', 'postId'),
+            ],
+            [
+                'target_type' => 'everpsblog_category',
+                'target_field' => 'content',
+                'controllers' => ['admineverpsblogcategory'],
+                'selectors' => [
+                    '#ever-modern-form textarea[name*="[content_"]',
+                ],
+                'id_resolver' => $this->getQcdPageBuilderIdResolver('id_ever_category', 'categoryId'),
+            ],
+            [
+                'target_type' => 'everpsblog_category',
+                'target_field' => 'bottom_content',
+                'controllers' => ['admineverpsblogcategory'],
+                'selectors' => [
+                    '#ever-modern-form textarea[name*="[bottom_content_"]',
+                ],
+                'id_resolver' => $this->getQcdPageBuilderIdResolver('id_ever_category', 'categoryId'),
+            ],
+            [
+                'target_type' => 'everpsblog_tag',
+                'target_field' => 'content',
+                'controllers' => ['admineverpsblogtag'],
+                'selectors' => [
+                    '#ever-modern-form textarea[name*="[content_"]',
+                ],
+                'id_resolver' => $this->getQcdPageBuilderIdResolver('id_ever_tag', 'tagId'),
+            ],
+            [
+                'target_type' => 'everpsblog_tag',
+                'target_field' => 'bottom_content',
+                'controllers' => ['admineverpsblogtag'],
+                'selectors' => [
+                    '#ever-modern-form textarea[name*="[bottom_content_"]',
+                ],
+                'id_resolver' => $this->getQcdPageBuilderIdResolver('id_ever_tag', 'tagId'),
+            ],
+            [
+                'target_type' => 'everpsblog_author',
+                'target_field' => 'content',
+                'controllers' => ['admineverpsblogauthor'],
+                'selectors' => [
+                    '#ever-modern-form textarea[name*="[content_"]',
+                ],
+                'id_resolver' => $this->getQcdPageBuilderIdResolver('id_ever_author', 'authorId'),
+            ],
+            [
+                'target_type' => 'everpsblog_author',
+                'target_field' => 'bottom_content',
+                'controllers' => ['admineverpsblogauthor'],
+                'selectors' => [
+                    '#ever-modern-form textarea[name*="[bottom_content_"]',
+                ],
+                'id_resolver' => $this->getQcdPageBuilderIdResolver('id_ever_author', 'authorId'),
+            ],
+            [
+                'target_type' => 'everpsblog_configuration',
+                'target_field' => 'top_text',
+                'controllers' => ['admineverpsblog'],
+                'selectors' => [
+                    '#ever-config-form textarea[name*="[top_text_"]',
+                ],
+                'id_resolver' => $this->getQcdPageBuilderIdResolver('', ''),
+            ],
+            [
+                'target_type' => 'everpsblog_configuration',
+                'target_field' => 'bottom_text',
+                'controllers' => ['admineverpsblog'],
+                'selectors' => [
+                    '#ever-config-form textarea[name*="[bottom_text_"]',
+                ],
+                'id_resolver' => $this->getQcdPageBuilderIdResolver('', ''),
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function getQcdPageBuilderIdResolver($idInputName, $queryParam)
+    {
+        $queryParams = [];
+        if ($queryParam !== '') {
+            $queryParams[] = (string) $queryParam;
+        }
+
+        $inputSelectors = [];
+        if ($idInputName !== '') {
+            $inputSelectors[] = 'input[name="' . (string) $idInputName . '"]';
+        }
+
+        return [
+            'input_selectors' => $inputSelectors,
+            'data_attributes' => ['data-id-object', 'data-id'],
+            'meta_selectors' => [],
+            'query_params' => $queryParams,
+            'custom_extractors' => ['closest_form_action_query'],
+            'draft_key' => [
+                'enabled' => false,
+                'input_selectors' => [],
+                'data_attributes' => [],
+                'query_params' => [],
+            ],
+            'path_fallback' => true,
+        ];
+    }
+
     public function hookDisplayHeader()
     {
         $this->assignThemeSmartyVariables();
@@ -1725,6 +1925,9 @@ class EverPsBlog extends Module
             $this->registerHook('actionAdminMetaAfterWriteRobotsFile');
             $this->registerHook('actionRegisterBlock');
             $this->registerHook('actionObjectLanguageAddAfter');
+            if (Hook::getIdByName('filterQcdPageBuilderBackOfficeTargets')) {
+                $this->registerHook('filterQcdPageBuilderBackOfficeTargets');
+            }
         } catch (Exception $e) {
             PrestaShopLogger::addLog($this->name . ' : ' . $e->getMessage());
         }
@@ -1739,6 +1942,7 @@ class EverPsBlog extends Module
         try {
             $this->registerHook('moduleRoutes');
             $this->registerHook('actionDispatcherBefore');
+            $this->registerHook('actionAdminControllerSetMedia');
             $this->registerHook('displayBackOfficeHeader');
             $this->registerHook('displayAdminAfterHeader');
             $this->registerHook('actionAdminMetaAfterWriteRobotsFile');
@@ -1754,6 +1958,9 @@ class EverPsBlog extends Module
             $this->registerHook('actionObjectEverPsBlogTagDeleteAfter');
             $this->registerHook('actionObjectAuthorDeleteAfter');
             $this->registerHook('actionObjectProductDeleteAfter');
+            if (Hook::getIdByName('filterQcdPageBuilderBackOfficeTargets')) {
+                $this->registerHook('filterQcdPageBuilderBackOfficeTargets');
+            }
         } catch (Exception $e) {
             PrestaShopLogger::addLog($this->name . ' : ' . $e->getMessage());
         }

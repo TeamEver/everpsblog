@@ -46,6 +46,17 @@
         return field;
     }
 
+    function removeNativeQcdAction(anchor) {
+        var next = anchor ? anchor.nextElementSibling : null;
+        if (!next) {
+            return;
+        }
+
+        if (next.classList.contains('qcdpb-bo-actions') && !next.classList.contains('ever-qcdpb-actions')) {
+            next.parentNode.removeChild(next);
+        }
+    }
+
     function createButton(model) {
         var wrapper = document.createElement('div');
         wrapper.className = 'ever-qcdpb-actions qcdpb-bo-actions';
@@ -81,8 +92,10 @@
             }
 
             field.dataset.everQcdpbInjected = '1';
+            field.dataset.qcdpbBound = '1';
             var anchor = getAnchor(field);
             if (anchor) {
+                removeNativeQcdAction(anchor);
                 anchor.insertAdjacentElement('afterend', createButton(model));
             }
         });
