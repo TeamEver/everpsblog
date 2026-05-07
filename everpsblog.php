@@ -1017,11 +1017,13 @@ class EverPsBlog extends Module
     {
         $this->registerQcdPageBuilderIntegrationHooks();
 
-        if (!$this->isQcdPageBuilderActiveForContext()) {
+        if (!$this->isEverPsBlogBackOfficeController()) {
             return;
         }
 
-        if (!$this->isEverPsBlogBackOfficeController()) {
+        $this->context->controller->addCSS($this->_path . 'views/css/ever.css');
+
+        if (!$this->isQcdPageBuilderActiveForContext()) {
             return;
         }
 

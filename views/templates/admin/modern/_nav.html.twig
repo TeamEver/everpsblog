@@ -1,0 +1,19 @@
+{% set nav_icons = {
+  post: 'article',
+  category: 'category',
+  tag: 'sell',
+  author: 'person',
+  comment: 'forum',
+  configuration: 'settings'
+} %}
+
+<nav class="everblog-bo-nav" aria-label="{{ 'Ever Blog navigation'|trans({}, 'Modules.Everpsblog.Admin') }}">
+  <div class="everblog-bo-nav__links">
+    {% for link in navigationLinks %}
+      <a class="everblog-bo-nav__link {{ currentResource == link.key ? 'is-active' : '' }}" href="{{ link.url }}">
+        <i class="material-icons">{{ nav_icons[link.key]|default('view_list') }}</i>
+        <span>{{ link.label|trans({}, 'Modules.Everpsblog.Admin') }}</span>
+      </a>
+    {% endfor %}
+  </div>
+</nav>

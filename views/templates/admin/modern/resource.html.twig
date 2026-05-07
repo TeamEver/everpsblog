@@ -5,10 +5,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
   <style>
     .ever-admin {
-      --ever-primary: #4f46e5;
-      --ever-primary-600: #4338ca;
-      --ever-primary-50: #eef2ff;
-      --ever-accent: #0ea5e9;
+      --ever-primary: #0f766e;
+      --ever-primary-600: #0f3d3e;
+      --ever-primary-50: #e8f6f3;
+      --ever-accent: #0f766e;
       --ever-success: #16a34a;
       --ever-warning: #f59e0b;
       --ever-danger: #dc2626;
@@ -23,45 +23,6 @@
       border-radius: 16px;
       padding: 1.5rem;
       border: 1px solid var(--ever-border);
-    }
-    .ever-admin .ever-hero {
-      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 60%, #0ea5e9 100%);
-      color: #fff;
-      border-radius: 14px;
-      padding: 1.5rem 1.75rem;
-      box-shadow: 0 20px 55px -30px rgba(79, 70, 229, .55);
-      margin-bottom: 1.25rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .ever-admin .ever-hero h1 {
-      margin: 0;
-      font-size: 1.4rem;
-      font-weight: 700;
-      line-height: 1.2;
-    }
-    .ever-admin .ever-hero p {
-      margin: .35rem 0 0;
-      opacity: .9;
-      font-size: .92rem;
-    }
-    .ever-admin .ever-hero .btn-create {
-      background: #fff;
-      color: var(--ever-primary-600);
-      border: none;
-      border-radius: 999px;
-      padding: .55rem 1.25rem;
-      font-weight: 700;
-      box-shadow: 0 8px 20px -8px rgba(0,0,0,.25);
-      text-decoration: none;
-      transition: transform .15s ease;
-    }
-    .ever-admin .ever-hero .btn-create:hover {
-      transform: translateY(-1px);
-      color: var(--ever-primary-600);
     }
     .ever-admin .ever-tabs {
       display: flex;
@@ -315,87 +276,95 @@
       font-size: .82rem;
       color: var(--ever-muted);
     }
-    @media (max-width: 768px) {
-      .ever-admin .ever-hero { padding: 1.15rem; }
-      .ever-admin .ever-hero h1 { font-size: 1.2rem; }
-    }
   </style>
 {% endblock %}
 
 {% block content %}
 {% set currentOrderBy = app.request.query.get('orderBy')|default('') %}
 {% set currentOrderWay = app.request.query.get('orderWay')|default('DESC')|upper %}
-<div class="ever-admin">
-  <div class="ever-shell">
-    <section class="ever-hero">
+<div class="everblog-bo">
+  {% include '@Modules/everpsblog/views/templates/admin/modern/_nav.html.twig' %}
+
+  <div class="everblog-bo-page-head">
+    <div>
+      <p class="everblog-bo-kicker">{{ 'Manage'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+      <h2 class="everblog-bo-title">{{ definition.title|trans({}, 'Modules.Everpsblog.Admin') }}</h2>
+      <p class="everblog-bo-description mb-0">
+        {{ '%count% result(s)'|trans({'%count%': data.records|length}, 'Modules.Everpsblog.Admin') }}
+      </p>
+    </div>
+    {% if createUrl is defined and createUrl %}
+      <a class="btn btn-primary everblog-bo-page-head__action" href="{{ createUrl }}">
+        <i class="material-icons">add</i>
+        {{ 'Add'|trans({}, 'Modules.Everpsblog.Admin') }}
+      </a>
+    {% endif %}
+  </div>
+
+  {% if definition.filters is not empty %}
+    <form method="get" class="everblog-bo-filterbar">
+      <div class="everblog-bo-filterbar__caption">
+        <i class="material-icons">filter_alt</i>
+        <span>{{ 'Filters'|trans({}, 'Modules.Everpsblog.Admin') }}</span>
+        <span class="everblog-bo-filterbar__count">{{ definition.filters|length }}</span>
+      </div>
+      {% if currentOrderBy %}
+        <input type="hidden" name="orderBy" value="{{ currentOrderBy }}">
+        <input type="hidden" name="orderWay" value="{{ currentOrderWay }}">
+      {% endif %}
+      <div class="everblog-bo-filterbar__fields">
+        {% for id, label in definition.filters %}
+          <div class="everblog-bo-filterbar__field everblog-bo-filterbar__field--{{ id|replace({'_': '-'}) }}">
+            <label class="sr-only" for="filter_{{ id }}">{{ label|trans({}, 'Modules.Everpsblog.Admin') }}</label>
+            <input class="form-control form-control-sm" type="search" id="filter_{{ id }}" name="{{ id }}" value="{{ app.request.get(id) }}" placeholder="{{ label|trans({}, 'Modules.Everpsblog.Admin') }}" title="{{ label|trans({}, 'Modules.Everpsblog.Admin') }}">
+          </div>
+        {% endfor %}
+      </div>
+      <div class="everblog-bo-filterbar__actions">
+        <a href="?" class="btn btn-sm btn-outline-secondary">
+          <i class="material-icons">clear</i>
+          <span>{{ 'Reset'|trans({}, 'Modules.Everpsblog.Admin') }}</span>
+        </a>
+        <button type="submit" class="btn btn-sm btn-primary">
+          <i class="material-icons">search</i>
+          <span>{{ 'Search'|trans({}, 'Modules.Everpsblog.Admin') }}</span>
+        </button>
+      </div>
+    </form>
+  {% endif %}
+
+  <div class="card everblog-bo-card">
+    <div class="card-header everblog-bo-card__header">
       <div>
-        <h1>{{ definition.title|trans({}, 'Modules.Everpsblog.Admin') }}</h1>
-        <p>{{ 'Manage Ever Blog content: search, filters and bulk actions.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+        <strong>{{ definition.title|trans({}, 'Modules.Everpsblog.Admin') }}</strong>
+        <span class="text-muted ml-2">{{ '%count% result(s)'|trans({'%count%': data.records|length}, 'Modules.Everpsblog.Admin') }}</span>
       </div>
-      {% if createUrl is defined and createUrl %}
-        <a class="btn-create" href="{{ createUrl }}">{{ 'Add'|trans({}, 'Modules.Everpsblog.Admin') }}</a>
-      {% endif %}
-    </section>
-
-    <nav class="ever-tabs" aria-label="{{ 'Ever Blog navigation'|trans({}, 'Modules.Everpsblog.Admin') }}">
-      {% for link in navigationLinks %}
-        <a class="{{ currentResource == link.key ? 'active' : '' }}" href="{{ link.url }}">{{ link.label|trans({}, 'Modules.Everpsblog.Admin') }}</a>
-      {% endfor %}
-    </nav>
-
-    <div class="ever-card">
-      <div class="ever-card-head">
-        <h2>{{ 'Records'|trans({}, 'Modules.Everpsblog.Admin') }}</h2>
-        <span class="ever-count">{{ '%count% result(s)'|trans({'%count%': data.records|length}, 'Modules.Everpsblog.Admin') }}</span>
-      </div>
-
-      {% if definition.filters is not empty %}
-      <form method="get" class="ever-filter">
-        {% if currentOrderBy %}
-          <input type="hidden" name="orderBy" value="{{ currentOrderBy }}">
-          <input type="hidden" name="orderWay" value="{{ currentOrderWay }}">
-        {% endif %}
-        <div class="row">
-          {% for id, label in definition.filters %}
-            <div class="col-md-4 mb-2">
-              <label for="filter_{{ id }}">{{ label|trans({}, 'Modules.Everpsblog.Admin') }}</label>
-              <input type="text" id="filter_{{ id }}" name="{{ id }}" value="{{ app.request.get(id) }}" placeholder="{{ 'Search...'|trans({}, 'Modules.Everpsblog.Admin') }}">
-            </div>
-          {% endfor %}
-        </div>
-        <div class="ever-filter-actions">
-          <button type="submit" class="ever-btn ever-btn-primary">{{ 'Filter'|trans({}, 'Modules.Everpsblog.Admin') }}</button>
-          <a href="?" class="ever-btn ever-btn-ghost">{{ 'Reset'|trans({}, 'Modules.Everpsblog.Admin') }}</a>
-        </div>
-      </form>
-      {% endif %}
+    </div>
 
       <form method="post"{% if bulkActionUrl is defined and bulkActionUrl %} action="{{ bulkActionUrl }}"{% endif %} onsubmit="return everpsblogConfirmBulk(this, event);">
         {% if bulkCsrfTokenId is defined and bulkCsrfTokenId %}
           <input type="hidden" name="_token" value="{{ csrf_token(bulkCsrfTokenId) }}">
         {% endif %}
         {% if data.records is empty %}
-          <div class="ever-empty">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75h16.5v16.5H3.75zM3.75 9h16.5M9 9v11.25"/>
-            </svg>
-            <p>{{ 'No data is available yet.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+          <div class="everblog-bo-empty">
+            <i class="material-icons">search_off</i>
+            <span>{{ 'No data is available yet.'|trans({}, 'Modules.Everpsblog.Admin') }}</span>
           </div>
         {% else %}
-          <div class="ever-table-wrap">
-            <table class="ever-table">
+          <div class="everblog-bo-table-wrap table-responsive">
+            <table class="table table-striped table-hover mb-0 everblog-bo-table">
               <thead>
                 <tr>
-                  <th class="ever-col-check"><input type="checkbox" aria-label="{{ 'Select all'|trans({}, 'Modules.Everpsblog.Admin') }}"></th>
+                  <th class="everblog-bo-table__select"><input type="checkbox" aria-label="{{ 'Select all'|trans({}, 'Modules.Everpsblog.Admin') }}"></th>
                   {% for column in definition.columns %}
                     <th>
                       {% if column.sortable is defined and column.sortable %}
                         {% set nextOrderWay = currentOrderBy == column.id and currentOrderWay == 'ASC' ? 'DESC' : 'ASC' %}
                         {% set sortQuery = app.request.query.all()|merge({'orderBy': column.id, 'orderWay': nextOrderWay}) %}
-                        <a class="ever-sort-link" href="?{{ sortQuery|url_encode }}">
+                        <a class="everblog-bo-sort-link" href="?{{ sortQuery|url_encode }}">
                           <span>{{ column.name|trans({}, 'Modules.Everpsblog.Admin') }}</span>
                           {% if currentOrderBy == column.id %}
-                            <span class="ever-sort-state">{{ currentOrderWay == 'ASC' ? 'ASC' : 'DESC' }}</span>
+                            <span class="everblog-bo-sort-state">{{ currentOrderWay == 'ASC' ? 'ASC' : 'DESC' }}</span>
                           {% endif %}
                         </a>
                       {% else %}
@@ -409,8 +378,8 @@
               <tbody>
                 {% for row in data.records %}
                   {% set rowId = attribute(row, definition.columns|first.id) %}
-                  <tr>
-                    <td class="ever-col-check">
+                  <tr class="everblog-bo-table__row">
+                    <td class="everblog-bo-table__select">
                       <input type="checkbox" name="bulk_ids[]" value="{{ rowId }}"{% if row._is_deletable is defined and not row._is_deletable %} disabled{% endif %}>
                     </td>
                     {% for column in definition.columns %}
@@ -418,12 +387,12 @@
                       {% set value = attribute(row, column.id) %}
                       <td>
                         {% if type == 'id' %}
-                          <span class="ever-col-id">#{{ value }}</span>
+                          <span class="everblog-bo-id">#{{ value }}</span>
                         {% elseif type == 'image' %}
                           {% if value %}
-                            <img src="{{ value }}" alt="" class="ever-thumb" loading="lazy">
+                            <img src="{{ value }}" alt="" class="everblog-bo-thumb" loading="lazy">
                           {% else %}
-                            <span class="ever-thumb-empty" aria-label="{{ 'No image'|trans({}, 'Modules.Everpsblog.Admin') }}">-</span>
+                            <span class="everblog-bo-thumb-empty" aria-label="{{ 'No image'|trans({}, 'Modules.Everpsblog.Admin') }}">-</span>
                           {% endif %}
                         {% elseif type == 'status' %}
                           {% set status = value|lower %}
@@ -431,39 +400,50 @@
                           {% set boolMap = {'1': 'published', '0': 'draft', '': 'draft'} %}
                           {% set labelMap = labelMap|merge({'trash': 'Trash'}) %}
                           {% set badgeKey = boolMap[status]|default(status in ['published','draft','planned','trash','protected'] ? status : 'default') %}
-                          <span class="ever-badge ever-badge-{{ badgeKey }}">{{ labelMap[status]|default(value|capitalize)|trans({}, 'Modules.Everpsblog.Admin') }}</span>
+                          <span class="everblog-bo-badge everblog-bo-badge--{{ badgeKey }}">{{ labelMap[status]|default(value|capitalize)|trans({}, 'Modules.Everpsblog.Admin') }}</span>
                         {% elseif type == 'number' %}
-                          <span class="ever-col-id">{{ value }}</span>
+                          <span class="everblog-bo-id">{{ value }}</span>
                         {% elseif type == 'date' %}
                           {% if value %}
-                            <span class="ever-col-id">{{ value|date('d/m/Y') }}</span>
+                            <span class="everblog-bo-id">{{ value|date('d/m/Y') }}</span>
                           {% else %}
-                            <span class="ever-col-id">-</span>
+                            <span class="everblog-bo-id">-</span>
                           {% endif %}
                         {% elseif column.id == 'title' %}
-                          <span class="ever-col-title">{{ value }}</span>
+                          <span class="everblog-bo-title-cell">{{ value }}</span>
                         {% else %}
                           {{ value }}
                         {% endif %}
                       </td>
                     {% endfor %}
                     <td>
-                      <div class="ever-actions">
-                        <a class="ever-btn ever-btn-edit" href="{{ row._actions.edit }}">{{ 'Edit'|trans({}, 'Modules.Everpsblog.Admin') }}</a>
+                      <div class="everblog-bo-row-actions">
+                        <a class="btn btn-sm btn-outline-primary everblog-bo-icon-btn" href="{{ row._actions.edit }}" title="{{ 'Edit'|trans({}, 'Modules.Everpsblog.Admin') }}" aria-label="{{ 'Edit'|trans({}, 'Modules.Everpsblog.Admin') }}">
+                          <i class="material-icons">edit</i>
+                          <span class="sr-only">{{ 'Edit'|trans({}, 'Modules.Everpsblog.Admin') }}</span>
+                        </a>
                         {% if row._actions.duplicate is defined and row._actions.duplicate %}
                           <button
                             type="submit"
-                            class="ever-btn ever-btn-ghost"
+                            class="btn btn-sm btn-outline-secondary everblog-bo-icon-btn"
                             formaction="{{ row._actions.duplicate }}"
                             formmethod="post"
                             name="_csrf_token"
                             value="{{ csrf_token('everpsblog_post_duplicate_' ~ rowId) }}"
                             data-single-action="1"
+                            title="{{ 'Duplicate'|trans({}, 'Modules.Everpsblog.Admin') }}"
+                            aria-label="{{ 'Duplicate'|trans({}, 'Modules.Everpsblog.Admin') }}"
                             onclick="return confirm('{{ 'Duplicate this post?'|trans({}, 'Modules.Everpsblog.Admin')|e('js') }}');"
-                          >{{ 'Duplicate'|trans({}, 'Modules.Everpsblog.Admin') }}</button>
+                          >
+                            <i class="material-icons">content_copy</i>
+                            <span class="sr-only">{{ 'Duplicate'|trans({}, 'Modules.Everpsblog.Admin') }}</span>
+                          </button>
                         {% endif %}
                         {% if row._actions.delete is defined and row._actions.delete %}
-                          <a class="ever-btn ever-btn-delete" href="{{ row._actions.delete }}" onclick="return confirm('{{ 'Confirm deletion?'|trans({}, 'Modules.Everpsblog.Admin')|e('js') }}');">{{ 'Delete'|trans({}, 'Modules.Everpsblog.Admin') }}</a>
+                          <a class="btn btn-sm btn-outline-danger everblog-bo-icon-btn" href="{{ row._actions.delete }}" title="{{ 'Delete'|trans({}, 'Modules.Everpsblog.Admin') }}" aria-label="{{ 'Delete'|trans({}, 'Modules.Everpsblog.Admin') }}" onclick="return confirm('{{ 'Confirm deletion?'|trans({}, 'Modules.Everpsblog.Admin')|e('js') }}');">
+                            <i class="material-icons">delete</i>
+                            <span class="sr-only">{{ 'Delete'|trans({}, 'Modules.Everpsblog.Admin') }}</span>
+                          </a>
                         {% endif %}
                       </div>
                     </td>
@@ -473,26 +453,28 @@
             </table>
           </div>
 
-          <div class="ever-bulk">
+          <div class="everblog-bo-bulk">
             <select name="bulk_action">
               {% for action in definition.bulkActions %}
                 <option value="{{ action.id }}">{{ action.name|trans({}, 'Modules.Everpsblog.Admin') }}</option>
               {% endfor %}
             </select>
-            <button type="submit" class="ever-btn ever-btn-ghost">{{ 'Apply'|trans({}, 'Modules.Everpsblog.Admin') }}</button>
+            <button type="submit" class="btn btn-sm btn-outline-secondary">
+              <i class="material-icons">done</i>
+              <span>{{ 'Apply'|trans({}, 'Modules.Everpsblog.Admin') }}</span>
+            </button>
           </div>
         {% endif %}
       </form>
     </div>
-  </div>
 </div>
 
 <script>
   (function() {
-    var selectAll = document.querySelector('.ever-admin .ever-col-check input[type=checkbox]:not([name])');
+    var selectAll = document.querySelector('.everblog-bo .everblog-bo-table__select input[type=checkbox]:not([name])');
     if (selectAll) {
       selectAll.addEventListener('change', function() {
-        var boxes = document.querySelectorAll('.ever-admin input[name="bulk_ids[]"]');
+        var boxes = document.querySelectorAll('.everblog-bo input[name="bulk_ids[]"]');
         boxes.forEach(function(b){ b.checked = selectAll.checked; });
       });
     }

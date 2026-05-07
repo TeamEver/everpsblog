@@ -149,3 +149,651 @@
 .everpsblog-doc-link .btn {
     margin-top: 10px;
 }
+
+/*
+ * Modern Symfony back-office, aligned with Everblock BO.
+ */
+.everblog-bo {
+    --everblog-accent: #0f766e;
+    --everblog-accent-dark: #0f3d3e;
+    --everblog-accent-soft: #e8f6f3;
+    --everblog-border: #d8dee8;
+    --everblog-border-soft: #e2e8f0;
+    --everblog-bg: #f5f7fa;
+    --everblog-text: #1f2937;
+    --everblog-muted: #64748b;
+    color: var(--everblog-text);
+    margin-bottom: 4rem;
+}
+
+.everblog-bo-nav,
+.everblog-bo-page-head,
+.everblog-bo-card,
+.everblog-bo-filterbar,
+.everblog-bo-form-head,
+.everblog-bo-surface,
+.everblog-bo-tabs,
+.everblog-bo-actionbar {
+    background: #ffffff;
+    border: 1px solid var(--everblog-border);
+    border-radius: 8px;
+    box-shadow: 0 10px 26px rgba(31, 41, 55, 0.08);
+}
+
+.everblog-bo-nav {
+    align-items: center;
+    display: flex;
+    gap: 0.65rem;
+    margin-bottom: 1rem;
+    padding: 0.55rem;
+}
+
+.everblog-bo-nav__links {
+    display: flex;
+    flex: 1 1 auto;
+    gap: 0.35rem;
+    min-width: 0;
+    overflow-x: auto;
+    padding-bottom: 0.05rem;
+}
+
+.everblog-bo-nav__link {
+    align-items: center;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: #334155;
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-weight: 650;
+    gap: 0.35rem;
+    min-height: 34px;
+    padding: 0.4rem 0.65rem;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.everblog-bo-nav__link .material-icons {
+    color: var(--everblog-accent);
+    font-size: 1.05rem;
+}
+
+.everblog-bo-nav__link:hover,
+.everblog-bo-nav__link:focus,
+.everblog-bo-nav__link.is-active {
+    background: var(--everblog-accent-soft);
+    border-color: #c7ece5;
+    color: var(--everblog-accent-dark);
+    text-decoration: none;
+}
+
+.everblog-bo-page-head,
+.everblog-bo-form-head {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding: 1rem 1.25rem;
+}
+
+.everblog-bo-kicker {
+    color: var(--everblog-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin: 0 0 0.25rem;
+    text-transform: uppercase;
+}
+
+.everblog-bo-title {
+    color: var(--everblog-text);
+    font-size: 1.45rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.everblog-bo-description {
+    color: var(--everblog-muted);
+    font-size: 0.88rem;
+    margin: 0.25rem 0 0;
+}
+
+.everblog-bo-page-head__action,
+.everblog-bo-form-head__actions,
+.everblog-bo-card__header .btn,
+.everblog-bo-actionbar .btn {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.35rem;
+    white-space: nowrap;
+}
+
+.everblog-bo-filterbar {
+    align-items: center;
+    display: flex;
+    gap: 0.55rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0.6rem;
+}
+
+.everblog-bo-filterbar__caption {
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid var(--everblog-border-soft);
+    border-radius: 6px;
+    color: #334155;
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: 0.82rem;
+    font-weight: 700;
+    gap: 0.35rem;
+    min-height: 32px;
+    padding: 0.35rem 0.55rem;
+    white-space: nowrap;
+}
+
+.everblog-bo-filterbar__caption .material-icons {
+    color: var(--everblog-accent);
+    font-size: 1rem;
+}
+
+.everblog-bo-filterbar__count {
+    align-items: center;
+    background: var(--everblog-accent);
+    border-radius: 999px;
+    color: #ffffff;
+    display: inline-flex;
+    font-size: 0.72rem;
+    height: 18px;
+    justify-content: center;
+    min-width: 18px;
+    padding: 0 0.3rem;
+}
+
+.everblog-bo-filterbar__fields {
+    display: flex;
+    flex: 1 1 auto;
+    gap: 0.4rem;
+    min-width: 0;
+    overflow-x: auto;
+    padding: 0.05rem 0.05rem 0.2rem;
+    scrollbar-width: thin;
+}
+
+.everblog-bo-filterbar__field {
+    flex: 0 0 160px;
+    min-width: 0;
+}
+
+.everblog-bo-filterbar__field--q,
+.everblog-bo-filterbar__field--title {
+    flex-basis: 220px;
+}
+
+.everblog-bo-filterbar .form-control {
+    border-color: #cbd5e1;
+    border-radius: 6px;
+    color: var(--everblog-text);
+    font-size: 0.82rem;
+    height: 32px;
+    min-height: 32px;
+    padding: 0.25rem 0.5rem;
+}
+
+.everblog-bo-filterbar .form-control:focus,
+.everblog-bo-form .form-control:focus,
+.everblog-bo-form select:focus,
+.everblog-bo-form textarea:focus {
+    border-color: var(--everblog-accent) !important;
+    box-shadow: 0 0 0 0.14rem rgba(15, 118, 110, 0.18) !important;
+}
+
+.everblog-bo-filterbar__actions,
+.everblog-bo-row-actions,
+.everblog-bo-bulk-actions,
+.everblog-bo-actionbar__buttons {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    justify-content: flex-end;
+}
+
+.everblog-bo-filterbar__actions .btn,
+.everblog-bo-row-actions .btn,
+.everblog-bo-bulk-actions .btn,
+.everblog-bo-icon-btn {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.25rem;
+    white-space: nowrap;
+}
+
+.everblog-bo-filterbar__actions .material-icons,
+.everblog-bo-row-actions .material-icons,
+.everblog-bo-bulk-actions .material-icons,
+.everblog-bo-actionbar .material-icons {
+    font-size: 1rem;
+}
+
+.everblog-bo-card {
+    overflow: hidden;
+}
+
+.everblog-bo-card__header {
+    align-items: center;
+    background: #ffffff;
+    border-bottom: 1px solid var(--everblog-border);
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    padding: 0.85rem 1rem;
+}
+
+.everblog-bo-card__body {
+    padding: 1.25rem;
+}
+
+.everblog-bo-table-wrap {
+    overflow-x: auto;
+}
+
+.everblog-bo-table {
+    min-width: 980px;
+}
+
+.everblog-bo-table th {
+    color: #334155;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.everblog-bo-table td {
+    vertical-align: middle;
+}
+
+.everblog-bo-table__select {
+    text-align: center;
+    width: 42px;
+}
+
+.everblog-bo-table__row {
+    transition: background-color 0.15s ease;
+}
+
+.everblog-bo-table__row:hover {
+    background-color: #f1f5fb;
+}
+
+.everblog-bo-sort-link {
+    align-items: center;
+    color: inherit;
+    display: inline-flex;
+    gap: 0.3rem;
+    text-decoration: none;
+}
+
+.everblog-bo-sort-link:hover {
+    color: var(--everblog-accent);
+    text-decoration: none;
+}
+
+.everblog-bo-sort-state {
+    color: var(--everblog-accent);
+    font-size: 0.72rem;
+}
+
+.everblog-bo-id {
+    color: var(--everblog-muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.everblog-bo-title-cell {
+    color: var(--everblog-text);
+    font-weight: 650;
+}
+
+.everblog-bo-thumb,
+.everblog-bo-thumb-empty {
+    border: 1px solid var(--everblog-border-soft);
+    border-radius: 6px;
+    height: 40px;
+    width: 64px;
+}
+
+.everblog-bo-thumb {
+    background: #f8fafc;
+    display: block;
+    object-fit: cover;
+}
+
+.everblog-bo-thumb-empty {
+    align-items: center;
+    background: repeating-linear-gradient(45deg, #f1f5f9, #f1f5f9 5px, #ffffff 5px, #ffffff 10px);
+    color: #94a3b8;
+    display: flex;
+    justify-content: center;
+}
+
+.everblog-bo-badge {
+    align-items: center;
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 0.74rem;
+    font-weight: 700;
+    gap: 0.35rem;
+    padding: 0.22rem 0.6rem;
+}
+
+.everblog-bo-badge::before {
+    background: currentColor;
+    border-radius: 50%;
+    content: "";
+    height: 6px;
+    width: 6px;
+}
+
+.everblog-bo-badge--published { background: #dcfce7; color: #166534; }
+.everblog-bo-badge--draft { background: #f1f5f9; color: #475569; }
+.everblog-bo-badge--planned { background: #eff6ff; color: #1d4ed8; }
+.everblog-bo-badge--protected { background: #fff7ed; color: #9a3412; }
+.everblog-bo-badge--trash { background: #fee2e2; color: #991b1b; }
+.everblog-bo-badge--default { background: #f1f5f9; color: #475569; }
+
+.everblog-bo-icon-btn {
+    height: 30px;
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+    width: 30px;
+}
+
+.everblog-bo-empty {
+    align-items: center;
+    color: var(--everblog-muted);
+    display: flex;
+    font-weight: 650;
+    gap: 0.45rem;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.everblog-bo-empty .material-icons {
+    color: #94a3b8;
+}
+
+.everblog-bo-bulk {
+    align-items: center;
+    background: #f8fafc;
+    border-top: 1px solid var(--everblog-border);
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    padding: 0.75rem 1rem;
+}
+
+.everblog-bo-bulk select {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    min-height: 32px;
+    padding: 0.25rem 0.5rem;
+}
+
+.everblog-bo-workbench {
+    align-items: flex-start;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: minmax(190px, 230px) minmax(0, 1fr);
+}
+
+.everblog-bo-tabs {
+    padding: 0.5rem;
+    position: sticky;
+    top: 74px;
+    z-index: 5;
+}
+
+.everblog-bo-tabs .nav-tabs {
+    border: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.everblog-bo-tabs .nav-item {
+    margin: 0;
+    width: 100%;
+}
+
+.everblog-bo-tabs .nav-link {
+    align-items: center;
+    border: 0 !important;
+    border-radius: 6px !important;
+    color: #374151;
+    display: flex;
+    font-weight: 600;
+    gap: 0.65rem;
+    line-height: 1.2;
+    padding: 0.72rem 0.8rem;
+    width: 100%;
+}
+
+.everblog-bo-tabs .nav-link .material-icons {
+    color: var(--everblog-accent);
+    font-size: 1.1rem;
+}
+
+.everblog-bo-tabs .nav-link.active,
+.everblog-bo-tabs .nav-link:focus,
+.everblog-bo-tabs .nav-link:hover {
+    background: var(--everblog-accent-soft) !important;
+    color: var(--everblog-accent-dark) !important;
+}
+
+.everblog-bo-surface {
+    min-width: 0;
+    padding: 1.25rem;
+}
+
+.everblog-bo-section-heading {
+    align-items: flex-start;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    gap: 0.85rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+}
+
+.everblog-bo-section-icon {
+    align-items: center;
+    background: var(--everblog-accent-soft);
+    border-radius: 8px;
+    color: var(--everblog-accent);
+    display: flex;
+    height: 38px;
+    justify-content: center;
+    width: 38px;
+}
+
+.everblog-bo-section-heading h3 {
+    color: var(--everblog-text);
+    font-size: 1.18rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+}
+
+.everblog-bo-section-heading p {
+    color: var(--everblog-muted);
+    margin: 0;
+}
+
+.everblog-bo-editorial-pane {
+    border: 0;
+    padding: 0;
+}
+
+.everblog-bo-field-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.everblog-bo-field-grid .form-group {
+    background: #ffffff;
+    border: 1px solid var(--everblog-border-soft);
+    border-radius: 8px;
+    margin-bottom: 0;
+    padding: 1rem;
+    transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.everblog-bo-field-grid .form-group:hover,
+.everblog-bo-field-grid .form-group:focus-within {
+    border-color: #b9c7d8;
+    box-shadow: 0 10px 24px rgba(31, 41, 55, 0.08);
+}
+
+.everblog-bo-field-grid .form-group label,
+.everblog-bo-form label,
+.everblog-bo-form .form-control-label {
+    color: #253042;
+    font-weight: 650;
+}
+
+.everblog-bo-field--wide,
+.everblog-bo-seo-field,
+.everblog-bo-field-grid .form-group:has(textarea) {
+    grid-column: 1 / -1;
+}
+
+.everblog-bo-lang-box,
+.everblog-bo-validation-box {
+    background: #f8fafc;
+    border: 1px solid var(--everblog-border-soft);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+}
+
+.everblog-bo-lang-switch.active {
+    background: var(--everblog-accent) !important;
+    border-color: var(--everblog-accent) !important;
+    color: #ffffff !important;
+}
+
+.everblog-bo-seo-field {
+    background: #f8fafc;
+    border: 1px solid var(--everblog-border-soft);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    padding: 1rem;
+}
+
+.everblog-bo-actions {
+    border-top: 1px solid var(--everblog-border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+}
+
+.everblog-bo-actionbar {
+    align-items: center;
+    bottom: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    position: sticky;
+    z-index: 20;
+}
+
+.everblog-bo-sitemap-list {
+    display: grid;
+    gap: 0.55rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.everblog-bo-sitemap-list li {
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid var(--everblog-border-soft);
+    border-radius: 8px;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    padding: 0.65rem 0.75rem;
+}
+
+.everblog-bo-form-grid {
+    display: grid;
+    gap: 1rem 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.everblog-bo-form-grid input[type="text"],
+.everblog-bo-form-grid input[type="number"],
+.everblog-bo-form-grid input[type="password"],
+.everblog-bo-form-grid input[type="url"],
+.everblog-bo-form-grid select,
+.everblog-bo-form-grid textarea,
+.everblog-bo-form input[type="text"],
+.everblog-bo-form input[type="number"],
+.everblog-bo-form input[type="url"],
+.everblog-bo-form input[type="email"],
+.everblog-bo-form input[type="password"],
+.everblog-bo-form input[type="date"],
+.everblog-bo-form input[type="datetime-local"],
+.everblog-bo-form select,
+.everblog-bo-form textarea {
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+}
+
+.ever-featured-image-preview img {
+    border: 1px solid var(--everblog-border-soft);
+    border-radius: 8px;
+}
+
+@media (max-width: 992px) {
+    .everblog-bo-workbench {
+        grid-template-columns: 1fr;
+    }
+
+    .everblog-bo-tabs {
+        position: static;
+    }
+
+    .everblog-bo-tabs .nav-tabs {
+        flex-direction: row;
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .everblog-bo-page-head,
+    .everblog-bo-form-head,
+    .everblog-bo-filterbar,
+    .everblog-bo-actionbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .everblog-bo-filterbar__fields,
+    .everblog-bo-filterbar__field,
+    .everblog-bo-filterbar__actions .btn {
+        width: 100%;
+    }
+
+    .everblog-bo-field-grid {
+        grid-template-columns: 1fr;
+    }
+}

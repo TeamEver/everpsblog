@@ -4,10 +4,10 @@
   {{ parent() }}
   <style>
     .ever-admin {
-      --ever-primary: #4f46e5;
-      --ever-primary-600: #4338ca;
-      --ever-primary-50: #eef2ff;
-      --ever-accent: #0ea5e9;
+      --ever-primary: #0f766e;
+      --ever-primary-600: #0f3d3e;
+      --ever-primary-50: #e8f6f3;
+      --ever-accent: #0f766e;
       --ever-muted: #6b7280;
       --ever-border: #e5e7eb;
       --ever-surface: #ffffff;
@@ -20,16 +20,6 @@
       padding: 1.5rem;
       border: 1px solid var(--ever-border);
     }
-    .ever-admin .ever-hero {
-      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 60%, #0ea5e9 100%);
-      color: #fff;
-      border-radius: 14px;
-      padding: 1.5rem 1.75rem;
-      box-shadow: 0 20px 55px -30px rgba(79, 70, 229, .55);
-      margin-bottom: 1.25rem;
-    }
-    .ever-admin .ever-hero h1 { margin: 0; font-size: 1.4rem; font-weight: 700; }
-    .ever-admin .ever-hero p { margin: .35rem 0 0; opacity: .9; font-size: .92rem; }
     .ever-admin .ever-tabs {
       display: flex;
       gap: .35rem;
@@ -176,71 +166,81 @@
 {% endblock %}
 
 {% block content %}
-<div class="ever-admin">
-  <div class="ever-shell">
-    <section class="ever-hero">
-      <h1>{{ 'Ever Blog - Configuration'|trans({}, 'Modules.Everpsblog.Admin') }}</h1>
-      <p>{{ 'Global blog settings: routes, comments, pagination and displayed content.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
-    </section>
+<div class="everblog-bo">
+  {% include '@Modules/everpsblog/views/templates/admin/modern/_nav.html.twig' %}
 
-    <nav class="ever-tabs" aria-label="{{ 'Ever Blog navigation'|trans({}, 'Modules.Everpsblog.Admin') }}">
-      {% for link in navigationLinks %}
-        <a class="{{ currentResource == link.key ? 'active' : '' }}" href="{{ link.url }}">{{ link.label|trans({}, 'Modules.Everpsblog.Admin') }}</a>
-      {% endfor %}
-    </nav>
+  <div class="everblog-bo-page-head">
+    <div>
+      <p class="everblog-bo-kicker">Ever Blog</p>
+      <h2 class="everblog-bo-title">{{ 'Configuration'|trans({}, 'Modules.Everpsblog.Admin') }}</h2>
+      <p class="everblog-bo-description">{{ 'Routes, comments, pagination and displayed content.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+    </div>
+  </div>
 
-    <div class="ever-card ever-sitemaps-card">
-      <div class="ever-card-head">
-        <h2>{{ 'XML sitemaps'|trans({}, 'Modules.Everpsblog.Admin') }}</h2>
-        <p>{{ 'Module URLs to submit to Google Search Console.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+    <div class="card everblog-bo-card mb-3">
+      <div class="card-header everblog-bo-card__header">
+        <div>
+          <strong>{{ 'XML sitemaps'|trans({}, 'Modules.Everpsblog.Admin') }}</strong>
+          <p class="everblog-bo-description">{{ 'Module URLs to submit to Google Search Console.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+        </div>
       </div>
-      <div class="ever-card-body">
+      <div class="everblog-bo-card__body">
         {% if sitemapUrls is defined and sitemapUrls is not empty %}
-          <ul class="ever-sitemap-list">
+          <ul class="everblog-bo-sitemap-list">
             {% for sitemapUrl in sitemapUrls %}
               <li>
                 <a href="{{ sitemapUrl }}" target="_blank" rel="noopener noreferrer">{{ sitemapUrl }}</a>
               </li>
             {% endfor %}
           </ul>
-          <p class="ever-sitemap-note">{{ 'These URLs are also synchronized in robots.txt with Allow and Sitemap directives.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+          <p class="everblog-bo-description">{{ 'These URLs are also synchronized in robots.txt with Allow and Sitemap directives.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
         {% else %}
-          <p class="ever-sitemap-note">{{ 'No Ever Blog sitemap has been generated yet. Save a post, category, tag, author or the configuration to regenerate files.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+          <p class="everblog-bo-description">{{ 'No Ever Blog sitemap has been generated yet. Save a post, category, tag, author or the configuration to regenerate files.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
         {% endif %}
       </div>
     </div>
 
-    <div class="ever-card ever-sitemaps-card">
-      <div class="ever-card-head">
-        <h2>{{ 'Module translations'|trans({}, 'Modules.Everpsblog.Admin') }}</h2>
-        <p>{{ 'Export the translations customized for this module and import them on another shop.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+    <div class="card everblog-bo-card mb-3">
+      <div class="card-header everblog-bo-card__header">
+        <div>
+          <strong>{{ 'Module translations'|trans({}, 'Modules.Everpsblog.Admin') }}</strong>
+          <p class="everblog-bo-description">{{ 'Export the translations customized for this module and import them on another shop.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+        </div>
       </div>
-      <div class="ever-card-body">
-        <div class="ever-form-grid">
+      <div class="everblog-bo-card__body">
+        <div class="everblog-bo-form-grid">
           <div>
-            <a class="ever-btn ever-btn-primary" href="{{ translationExportUrl }}">{{ 'Export translations'|trans({}, 'Modules.Everpsblog.Admin') }}</a>
+            <a class="btn btn-primary" href="{{ translationExportUrl }}">
+              <i class="material-icons">file_download</i>
+              {{ 'Export translations'|trans({}, 'Modules.Everpsblog.Admin') }}
+            </a>
           </div>
           <form method="post" action="{{ translationImportUrl }}" enctype="multipart/form-data">
             <input type="hidden" name="_token" value="{{ csrf_token('everpsblog_translation_import') }}">
             <label for="everpsblog-translation-file">{{ 'Translation export file'|trans({}, 'Modules.Everpsblog.Admin') }}</label>
             <input id="everpsblog-translation-file" type="file" name="translation_file" accept="application/json,.json" required>
-            <div class="ever-actions" style="padding-left:0;padding-right:0;border-top:none;">
-              <button type="submit" class="ever-btn ever-btn-import">{{ 'Import translations'|trans({}, 'Modules.Everpsblog.Admin') }}</button>
+            <div class="everblog-bo-actions" style="padding-left:0;padding-right:0;border-top:none;">
+              <button type="submit" class="btn btn-outline-secondary">
+                <i class="material-icons">file_upload</i>
+                {{ 'Import translations'|trans({}, 'Modules.Everpsblog.Admin') }}
+              </button>
             </div>
           </form>
         </div>
       </div>
     </div>
 
-    <div class="ever-card ever-sitemaps-card">
-      <div class="ever-card-head">
-        <h2>{{ 'Automatic module translation'|trans({}, 'Modules.Everpsblog.Admin') }}</h2>
-        <p>{{ 'Translate only the module wording shown in front office and back office. Blog posts, categories, tags, authors and other admin-entered content are excluded.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+    <div class="card everblog-bo-card mb-3">
+      <div class="card-header everblog-bo-card__header">
+        <div>
+          <strong>{{ 'Automatic module translation'|trans({}, 'Modules.Everpsblog.Admin') }}</strong>
+          <p class="everblog-bo-description">{{ 'Translate only the module wording shown in front office and back office. Blog posts, categories, tags, authors and other admin-entered content are excluded.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+        </div>
       </div>
-      <div class="ever-card-body">
+      <div class="everblog-bo-card__body">
         <form method="post" action="{{ translationAutoUrl }}">
           <input type="hidden" name="_token" value="{{ csrf_token('everpsblog_translation_auto') }}">
-          <div class="ever-form-grid">
+          <div class="everblog-bo-form-grid">
             <div>
               <label for="everpsblog-translation-source">{{ 'Source language'|trans({}, 'Modules.Everpsblog.Admin') }}</label>
               <select id="everpsblog-translation-source" name="source_language_id" required>
@@ -278,36 +278,46 @@
               </label>
             </div>
           </div>
-          <p class="ever-sitemap-note">{{ 'Google Translate is used in free mode without an API key. Generated translations are saved in the database so they can be exported afterwards.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
-          <div class="ever-actions" style="padding-left:0;padding-right:0;">
+          <p class="everblog-bo-description">{{ 'Google Translate is used in free mode without an API key. Generated translations are saved in the database so they can be exported afterwards.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+          <div class="everblog-bo-actions" style="padding-left:0;padding-right:0;">
             <button
               type="submit"
-              class="ever-btn ever-btn-import"
+              class="btn btn-outline-secondary"
               onclick="return confirm('{{ 'Generate and save translated module wordings for the selected language?'|trans({}, 'Modules.Everpsblog.Admin')|e('js') }}');"
-            >{{ 'Translate the module'|trans({}, 'Modules.Everpsblog.Admin') }}</button>
+            >
+              <i class="material-icons">translate</i>
+              {{ 'Translate the module'|trans({}, 'Modules.Everpsblog.Admin') }}
+            </button>
           </div>
         </form>
       </div>
     </div>
 
-    <div class="ever-card">
+    <div class="card everblog-bo-card">
       {{ form_start(configurationForm, {'attr': {'id': 'ever-config-form'}}) }}
-      <div class="ever-card-head">
-        <h2>{{ 'Module settings'|trans({}, 'Modules.Everpsblog.Admin') }}</h2>
-        <p>{{ 'Adjust the blog behavior and save to apply changes.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+      <div class="card-header everblog-bo-card__header">
+        <div>
+          <strong>{{ 'Module settings'|trans({}, 'Modules.Everpsblog.Admin') }}</strong>
+          <p class="everblog-bo-description">{{ 'Adjust the blog behavior and save to apply changes.'|trans({}, 'Modules.Everpsblog.Admin') }}</p>
+        </div>
       </div>
-      <div class="ever-card-body">
-        <div class="ever-form-grid">
+      <div class="everblog-bo-card__body">
+        <div class="everblog-bo-form-grid">
           {{ form_widget(configurationForm) }}
         </div>
       </div>
-      <div class="ever-actions">
-        <button type="submit" name="import_wordpress_blog" value="1" class="ever-btn ever-btn-import" onclick="return confirm('{{ 'Start the full WordPress blog import with the configured REST credentials?'|trans({}, 'Modules.Everpsblog.Admin')|e('js') }}');">{{ 'Import the full WordPress blog'|trans({}, 'Modules.Everpsblog.Admin') }}</button>
-        <button type="submit" class="ever-btn ever-btn-primary">{{ 'Save'|trans({}, 'Modules.Everpsblog.Admin') }}</button>
+      <div class="everblog-bo-bulk">
+        <button type="submit" name="import_wordpress_blog" value="1" class="btn btn-outline-secondary" onclick="return confirm('{{ 'Start the full WordPress blog import with the configured REST credentials?'|trans({}, 'Modules.Everpsblog.Admin')|e('js') }}');">
+          <i class="material-icons">sync</i>
+          {{ 'Import the full WordPress blog'|trans({}, 'Modules.Everpsblog.Admin') }}
+        </button>
+        <button type="submit" class="btn btn-primary">
+          <i class="material-icons">save</i>
+          {{ 'Save'|trans({}, 'Modules.Everpsblog.Admin') }}
+        </button>
       </div>
       {{ form_end(configurationForm) }}
     </div>
-  </div>
 </div>
 {% endblock %}
 
