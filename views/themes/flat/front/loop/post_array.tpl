@@ -49,16 +49,16 @@
     {assign var='post_link' value=$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $post_id, 'link_rewrite' => $post_rewrite])}
 {/if}
 <article class="flat-post-card everpsblog" id="everpsblog-{$post_id|escape:'htmlall':'UTF-8'}">
-    <a class="flat-post-card__image" href="{$post_link|escape:'htmlall':'UTF-8'}" title="{$post_title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}">
+    <a class="flat-post-card__image" href="{$post_link|escape:'htmlall':'UTF-8'}" title="{$post_title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
         {if isset($show_featured_post) && $show_featured_post && isset($item.featured_thumb) && $item.featured_thumb}
-        <img src="{$item.featured_thumb|escape:'htmlall':'UTF-8'}" width="260" height="190" class="{if $animated}animated flipSideBySide zoomed{/if}" alt="{$post_title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}" title="{$post_title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" loading="lazy" />
+        <img src="{$item.featured_thumb|escape:'htmlall':'UTF-8'}" width="260" height="190" class="{if $animated}animated flipSideBySide zoomed{/if}" alt="{$post_title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" title="{$post_title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}" loading="lazy" />
         {else}
         <span class="flat-post-card__placeholder">{l s='Image not available' d='Modules.Everpsblog.Shop'}</span>
         {/if}
     </a>
     <div class="flat-post-card__body">
         <p class="flat-post-card__title h3" id="everpsblog-post-title-{$post_id|escape:'htmlall':'UTF-8'}">
-            <a href="{$post_link|escape:'htmlall':'UTF-8'}" title="{$post_title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}">
+            <a href="{$post_link|escape:'htmlall':'UTF-8'}" title="{$post_title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
                 {$post_title|escape:'htmlall':'UTF-8'}
             </a>
         </p>
@@ -70,6 +70,6 @@
                 {$post_summary|truncate:$everpsblog_excerpt_length:'...' nofilter}
             </div>
         {/if}
-        <a href="{$post_link|escape:'htmlall':'UTF-8'}" class="flat-post-card__link" title="{$post_title|escape:'htmlall':'UTF-8'} {$shop.name|escape:htmlall:'UTF-8'}">{l s="Lire l'article" d='Modules.Everpsblog.Shop'} &gt;</a>
+        <a href="{$post_link|escape:'htmlall':'UTF-8'}" class="flat-post-card__link" title="{$post_title|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">{l s="Lire l'article" d='Modules.Everpsblog.Shop'} &gt;</a>
     </div>
 </article>

@@ -1557,7 +1557,7 @@ class EverPsBlog extends Module
                 (int) $post_number
             );
             if (!$starredPosts || !count($starredPosts)) {
-                return;
+                return '';
             }
             foreach ($starredPosts as &$post) {
                 $featuredThumb = $this->getBlogImageService()->getBlogThumbUrl(
