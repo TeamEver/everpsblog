@@ -169,6 +169,20 @@ class ConfigurationType extends AbstractType
             $suffix = $isoCode ? sprintf(' (%s)', $isoCode) : sprintf(' (language #%d)', $idLang);
 
             $builder
+                ->add(sprintf('main_title_%d', $idLang), TextType::class, [
+                    'label' => 'Blog main title' . $suffix,
+                    'required' => false,
+                    'constraints' => [
+                        new Length(['max' => 255]),
+                    ],
+                ])
+                ->add(sprintf('hero_subtitle_%d', $idLang), TextType::class, [
+                    'label' => 'Blog hero subtitle' . $suffix,
+                    'required' => false,
+                    'constraints' => [
+                        new Length(['max' => 255]),
+                    ],
+                ])
                 ->add(sprintf('top_text_%d', $idLang), TextareaType::class, [
                     'label' => 'Blog top text' . $suffix,
                     'required' => false,

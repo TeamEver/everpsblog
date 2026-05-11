@@ -104,6 +104,8 @@ class ConfigurationController extends AbstractDomainController
             \Configuration::updateValue('EVERBLOG_DEFAULT_AUTHOR_ID', (int) $formData['default_author_id']);
             \Configuration::updateValue('EVERBLOG_HEADER_BG_COLOR', $this->normalizeHexColor((string) ($formData['header_bg_color'] ?? ''), '#0a0f54'));
             \Configuration::updateValue('EVERBLOG_HEADER_TITLE_COLOR', $this->normalizeHexColor((string) ($formData['header_title_color'] ?? ''), '#ffffff'));
+            \Configuration::updateValue('EVERBLOG_MAIN_TITLE', $this->extractLocalizedFormData($formData, 'main_title'));
+            \Configuration::updateValue('EVERBLOG_HERO_SUBTITLE', $this->extractLocalizedFormData($formData, 'hero_subtitle'));
             \Configuration::updateValue('EVERBLOG_TOP_TEXT', $this->extractLocalizedFormData($formData, 'top_text'), true);
             \Configuration::updateValue('EVERBLOG_BOTTOM_TEXT', $this->extractLocalizedFormData($formData, 'bottom_text'), true);
             \Configuration::updateValue('EVER_WP_API_URL', trim((string) $formData['wordpress_api_url']));
@@ -285,12 +287,16 @@ class ConfigurationController extends AbstractDomainController
 
     private function getLocalizedBlogContentData(): array
     {
+        $mainTitle = $this->getConfigInMultipleLangs('EVERBLOG_MAIN_TITLE');
+        $heroSubtitle = $this->getConfigInMultipleLangs('EVERBLOG_HERO_SUBTITLE');
         $topText = $this->getConfigInMultipleLangs('EVERBLOG_TOP_TEXT');
         $bottomText = $this->getConfigInMultipleLangs('EVERBLOG_BOTTOM_TEXT');
         $data = [];
 
         foreach (\Language::getLanguages(false) as $lang) {
             $idLang = (int) $lang['id_lang'];
+            $data['main_title_' . $idLang] = (string) ($mainTitle[$idLang] ?? '');
+            $data['hero_subtitle_' . $idLang] = (string) ($heroSubtitle[$idLang] ?? '');
             $data['top_text_' . $idLang] = (string) ($topText[$idLang] ?? '');
             $data['bottom_text_' . $idLang] = (string) ($bottomText[$idLang] ?? '');
         }

@@ -78,8 +78,12 @@
 <div class="flat-blog-page">
     <section class="flat-blog-hero">
         <div class="flat-blog-hero__inner">
-            <h1>{l s='Tout savoir sur l’habillement professionnel' d='Modules.Everpsblog.Shop'}</h1>
-            <p>{l s='Actus & conseils' d='Modules.Everpsblog.Shop'}</p>
+            {if isset($blog_page_title) && $blog_page_title}
+            <h1>{$blog_page_title|escape:'htmlall':'UTF-8'}</h1>
+            {/if}
+            {if isset($blog_page_subtitle) && $blog_page_subtitle}
+            <p>{$blog_page_subtitle|escape:'htmlall':'UTF-8'}</p>
+            {/if}
         </div>
     </section>
     <div class="container">

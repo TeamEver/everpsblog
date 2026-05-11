@@ -164,6 +164,13 @@ class EverPsBlog extends Module
                 }
                 return $title;
             })())
+            && Configuration::updateValue('EVERBLOG_HERO_SUBTITLE', (function () {
+                $subtitle = [];
+                foreach (Language::getLanguages(false) as $language) {
+                    $subtitle[$language['id_lang']] = '';
+                }
+                return $subtitle;
+            })())
             && Configuration::updateValue('EVERBLOG_HEADER_BG_COLOR', '#0a0f54')
             && Configuration::updateValue('EVERBLOG_HEADER_TITLE_COLOR', '#ffffff')
             && $translationsInstalled
@@ -187,6 +194,7 @@ class EverPsBlog extends Module
         Configuration::deleteByName('EVERBLOG_SHOW_AI_SUMMARY_BANNER');
         Configuration::deleteByName('EVERBLOG_DEFAULT_AUTHOR_ID');
         Configuration::deleteByName(BlogThemeResolver::CONFIGURATION_KEY);
+        Configuration::deleteByName('EVERBLOG_HERO_SUBTITLE');
         return $translationsRemoved
             && parent::uninstall()
             && $this->uninstallModuleTab('AdminEverPsBlog')
