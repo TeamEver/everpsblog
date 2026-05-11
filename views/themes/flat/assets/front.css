@@ -1,0 +1,560 @@
+/* Flat theme for Ever Ps Blog */
+:root {
+    --ever-flat-text: #161616;
+    --ever-flat-muted: #666;
+    --ever-flat-panel: #f1f1f1;
+    --ever-flat-soft: #f7f7f7;
+    --ever-flat-teal: #8cced2;
+    --ever-flat-orange: #f59b21;
+    --ever-flat-dark: #20252d;
+}
+
+body#module-everpsblog-blog,
+body#module-everpsblog-post,
+body#module-everpsblog-category,
+body#module-everpsblog-tag,
+body#module-everpsblog-author,
+body#module-everpsblog-search {
+    color: var(--ever-flat-text);
+}
+
+body#module-everpsblog-blog #content,
+body#module-everpsblog-post #content,
+body#module-everpsblog-category #content,
+body#module-everpsblog-tag #content,
+body#module-everpsblog-author #content,
+body#module-everpsblog-search #content {
+    box-shadow: none;
+    border: 0;
+    background: transparent;
+}
+
+.flat-blog-page .container,
+.flat-post-page .container,
+body#module-everpsblog-category .container,
+body#module-everpsblog-tag .container,
+body#module-everpsblog-author .container {
+    max-width: 1180px;
+}
+
+.flat-blog-hero {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    min-height: 235px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    background:
+        linear-gradient(rgba(18, 18, 18, .38), rgba(18, 18, 18, .38)),
+        linear-gradient(110deg, #252525 0%, #693127 42%, #b64a32 100%);
+}
+
+.flat-blog-hero::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 38%;
+    background: linear-gradient(0deg, rgba(0, 0, 0, .25), transparent);
+}
+
+.flat-blog-hero__inner {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    padding: 2rem 1rem;
+    text-align: center;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+.flat-blog-hero h1 {
+    max-width: 760px;
+    margin: 0 auto .15rem;
+    color: inherit;
+    font-size: clamp(1.75rem, 4vw, 2.55rem);
+    font-weight: 900;
+    line-height: 1.08;
+    letter-spacing: 0;
+}
+
+.flat-blog-hero p {
+    margin: 0;
+    font-size: clamp(1.15rem, 2.5vw, 1.7rem);
+    font-weight: 900;
+    line-height: 1.1;
+}
+
+.flat-blog-intro {
+    max-width: 820px;
+    margin: 1.8rem auto 1.2rem;
+    text-align: center;
+    color: #202020;
+    line-height: 1.55;
+}
+
+.everpsblog-search-toolbar {
+    max-width: 760px;
+    margin: 1.25rem auto;
+}
+
+.everpsblog-search-toolbar .input-group {
+    display: flex;
+}
+
+.everpsblog-search-toolbar .form-control {
+    border: 1px solid #ddd;
+    border-radius: 4px 0 0 4px;
+}
+
+.everpsblog-search-toolbar .btn {
+    border-radius: 0 4px 4px 0;
+    background: var(--ever-flat-dark);
+    border-color: var(--ever-flat-dark);
+}
+
+.flat-blog-section {
+    margin: 2.2rem 0;
+}
+
+.flat-blog-section > h2,
+#related-posts h2 {
+    display: inline-block;
+    margin: 0 0 1.15rem;
+    padding-bottom: .28rem;
+    border-bottom: 1px solid var(--ever-flat-text);
+    color: var(--ever-flat-text);
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.flat-category-rail {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(170px, 1fr);
+    gap: .55rem;
+    overflow-x: auto;
+    padding-bottom: .35rem;
+    scrollbar-width: thin;
+}
+
+.flat-category-card {
+    min-width: 170px;
+    min-height: 120px;
+    margin: 0;
+}
+
+.flat-category-card a {
+    position: relative;
+    display: flex;
+    min-height: 120px;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 1rem .65rem;
+    overflow: hidden;
+    color: #fff;
+    text-decoration: none;
+    background: #444;
+}
+
+.flat-category-card img,
+.flat-category-card__placeholder {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.flat-category-card__placeholder {
+    display: block;
+    background: linear-gradient(135deg, #5a5a5a, #222);
+}
+
+.flat-category-card a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, .42);
+}
+
+.flat-category-card__title {
+    position: relative;
+    z-index: 1;
+    max-width: 100%;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1.15;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.flat-post-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem 2.1rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.flat-post-card {
+    display: grid;
+    grid-template-columns: minmax(120px, 44%) minmax(0, 1fr);
+    min-height: 160px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--ever-flat-panel);
+}
+
+.flat-post-card__image,
+.flat-post-card__placeholder {
+    display: block;
+    min-height: 160px;
+    background: #d8d8d8;
+}
+
+.flat-post-card__image img {
+    width: 100%;
+    height: 100%;
+    min-height: 160px;
+    object-fit: cover;
+    display: block;
+}
+
+.flat-post-card__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    color: var(--ever-flat-muted);
+    text-align: center;
+}
+
+.flat-post-card__body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 1.05rem 1rem .9rem;
+}
+
+.flat-post-card__title {
+    margin: 0 0 .45rem;
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.flat-post-card__title a,
+.flat-post-card__link,
+.flat-related-card__title a,
+.flat-related-card__link {
+    color: var(--ever-flat-text);
+    text-decoration: none;
+}
+
+.flat-post-card__title a:hover,
+.flat-post-card__title a:focus,
+.flat-post-card__link:hover,
+.flat-post-card__link:focus,
+.flat-related-card__title a:hover,
+.flat-related-card__title a:focus,
+.flat-related-card__link:hover,
+.flat-related-card__link:focus {
+    text-decoration: underline;
+}
+
+.flat-post-card__excerpt {
+    color: #222;
+    font-size: .9rem;
+    line-height: 1.25;
+}
+
+.flat-post-card__link {
+    margin-top: auto;
+    font-size: .82rem;
+    font-weight: 600;
+}
+
+.flat-pagination {
+    display: flex;
+    justify-content: center;
+    margin: 1.5rem 0 2rem;
+}
+
+body#module-everpsblog-post .flat-post-page {
+    width: 100%;
+}
+
+body#module-everpsblog-post .everpsblog-post-header {
+    width: auto;
+    margin: 0;
+}
+
+body#module-everpsblog-post .everpsblog-post-header .card,
+body#module-everpsblog-post .postcontent.card-body,
+body#module-everpsblog-post .flat-post-page > .container > .card {
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent;
+}
+
+body#module-everpsblog-post .everpsblog-post-header .card-body {
+    padding: 0;
+}
+
+body#module-everpsblog-post .everpsblog-post-hero {
+    background: #fff !important;
+}
+
+body#module-everpsblog-post .everpsblog-post-hero-overlay {
+    min-height: 0;
+    max-width: 1100px;
+    padding: 2.25rem 1rem .35rem;
+    gap: .55rem;
+}
+
+body#module-everpsblog-post .flat-post-title {
+    max-width: 1040px;
+    margin: 0 auto;
+    color: var(--ever-flat-teal);
+    font-size: clamp(1.75rem, 3.4vw, 2.45rem);
+    font-weight: 800;
+    line-height: 1.15;
+    text-align: center;
+}
+
+body#module-everpsblog-post .everpsblog-post-banner,
+body#module-everpsblog-post .social-sharing-hero {
+    display: none;
+}
+
+body#module-everpsblog-post .everpsblog-post-intro {
+    max-width: 1040px;
+    margin-bottom: 1.4rem !important;
+    color: var(--ever-flat-text);
+    font-size: 1rem;
+    line-height: 1.45;
+}
+
+body#module-everpsblog-post .everpsblog-post-intro p {
+    margin-bottom: .3rem !important;
+}
+
+body#module-everpsblog-post .everpsblog-post-intro .postexcerpt {
+    font-size: 1.1rem;
+    line-height: 1.35;
+}
+
+.flat-post-more {
+    display: inline-block;
+    color: var(--ever-flat-text);
+    font-weight: 800;
+}
+
+body#module-everpsblog-post .everpsblog-post-intro p:not(.postexcerpt) {
+    display: inline-block;
+    margin: 0 .2rem;
+    font-size: .82rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+body#module-everpsblog-post .ai-summary-banner {
+    max-width: 900px;
+    margin: 0 auto;
+    border-radius: 4px;
+}
+
+body#module-everpsblog-post .postcontent {
+    max-width: 1100px;
+    margin: 0 auto 2rem;
+    padding: 0 !important;
+    color: var(--ever-flat-text);
+    font-size: 1rem;
+    line-height: 1.45;
+}
+
+body#module-everpsblog-post .postcontent h2,
+body#module-everpsblog-post .postcontent h3 {
+    margin: 1.45rem 0 .75rem;
+    color: var(--ever-flat-text);
+    font-weight: 900;
+    line-height: 1.25;
+}
+
+body#module-everpsblog-post .postcontent p {
+    margin-bottom: 1rem;
+}
+
+body#module-everpsblog-post .postcontent img {
+    max-width: 100% !important;
+    height: auto !important;
+    object-fit: cover;
+}
+
+body#module-everpsblog-post .postcontent figure {
+    margin: 0 0 1.2rem;
+}
+
+body#module-everpsblog-post .postcontent ul,
+body#module-everpsblog-post .postcontent ol {
+    padding-left: 1.35rem;
+}
+
+body#module-everpsblog-post .post-tags .badge {
+    border-radius: 4px;
+    background: var(--ever-flat-teal) !important;
+}
+
+body#module-everpsblog-post .social-sharing:not(.social-sharing-hero) {
+    justify-content: flex-start;
+}
+
+body#module-everpsblog-post .everpsblog-post-author-box {
+    max-width: 640px;
+    margin: 1.5rem auto 2rem;
+    text-align: center;
+}
+
+body#module-everpsblog-post .everpsblog-post-author-box .card,
+body#module-everpsblog-post .everpsblog-post-author-box .card-body {
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent;
+}
+
+body#module-everpsblog-post .everpsblog-post-author-box__row {
+    justify-content: center;
+}
+
+body#module-everpsblog-post .everpsblog-post-author-box__image-link {
+    width: 84px;
+    height: 84px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    aspect-ratio: 1;
+}
+
+body#module-everpsblog-post #related-posts {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    padding: 1.8rem max(1rem, calc((100vw - 1180px) / 2));
+    background: #ededed;
+}
+
+.flat-related-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2rem;
+}
+
+.flat-related-card {
+    min-width: 0;
+}
+
+.flat-related-card__image {
+    display: block;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #d6d6d6;
+}
+
+.flat-related-card__image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.flat-related-card__title {
+    min-height: 2.4em;
+    margin: .7rem 0 .25rem;
+    font-size: .95rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.flat-related-card__link {
+    font-size: .82rem;
+    font-weight: 600;
+}
+
+body#module-everpsblog-category .everpsblog-blog-header,
+body#module-everpsblog-tag .everpsblog-blog-header,
+body#module-everpsblog-author .everpsblog-blog-header,
+body#module-everpsblog-search .everpsblog-blog-header {
+    min-height: 180px;
+    background-color: var(--ever-flat-dark) !important;
+}
+
+body#module-everpsblog-category .everpsblog-blog-header__title,
+body#module-everpsblog-tag .everpsblog-blog-header__title,
+body#module-everpsblog-author .everpsblog-blog-header__title,
+body#module-everpsblog-search .everpsblog-blog-header__title {
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.bloghome .article {
+    border: 0 !important;
+}
+
+.bloghome .article-img img {
+    aspect-ratio: 4 / 3;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+@media (max-width: 991.98px) {
+    .flat-post-grid {
+        max-width: 680px;
+        grid-template-columns: 1fr;
+    }
+
+    .flat-related-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 575.98px) {
+    .flat-blog-hero {
+        min-height: 190px;
+    }
+
+    .flat-category-rail {
+        grid-auto-columns: minmax(150px, 72vw);
+    }
+
+    .flat-post-card {
+        grid-template-columns: 42% minmax(0, 1fr);
+        min-height: 145px;
+    }
+
+    .flat-post-card__image,
+    .flat-post-card__image img,
+    .flat-post-card__placeholder {
+        min-height: 145px;
+    }
+
+    .flat-post-card__body {
+        padding: .85rem .8rem .75rem;
+    }
+
+    .flat-post-card__excerpt {
+        font-size: .82rem;
+    }
+
+    body#module-everpsblog-post .everpsblog-post-intro p:not(.postexcerpt) {
+        display: block;
+        margin: .2rem 0;
+    }
+
+    .flat-related-grid {
+        gap: 1.2rem;
+    }
+}

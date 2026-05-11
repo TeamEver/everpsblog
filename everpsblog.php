@@ -1234,6 +1234,14 @@ class EverPsBlog extends Module
                 $this->module_folder . 'everpsblog/views/css/everpsblog.css',
                 'all'
             );
+            $theme = $this->getActiveTheme();
+            $themeCssPath = 'views/themes/' . $theme . '/assets/front.css';
+            if (file_exists(__DIR__ . '/' . $themeCssPath)) {
+                $this->context->controller->addCSS(
+                    $this->_path . $themeCssPath,
+                    'all'
+                );
+            }
             $this->context->controller->addJs(
                 $this->_path . 'views/js/everpsblog.js'
             );
