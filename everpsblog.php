@@ -29,6 +29,7 @@ use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
 use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
 use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 use PrestaShop\Module\Everpsblog\Entity\Post as EverPsBlogPost;
+use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 
 class EverPsBlog extends Module
 {
@@ -582,6 +583,38 @@ class EverPsBlog extends Module
         $excerpt = is_string($excerpt) ? trim($excerpt, '-') : '';
 
         return in_array($excerpt, ['resume', 'resume-de-l-article'], true);
+    }
+
+    private function normalizeFrontPostList(array $posts, int $idShop): array
+    {
+        $normalizedPosts = [];
+
+        foreach ($posts as $post) {
+            $legacyPost = is_object($post) ? clone $post : (object) $post;
+            $postId = (int) ($legacyPost->id_ever_post ?? $legacyPost->id ?? 0);
+            if ($postId <= 0) {
+                continue;
+            }
+
+            $legacyPost->id = (int) ($legacyPost->id ?? $postId);
+            $legacyPost->id_ever_post = $postId;
+            $legacyPost->url = $this->context->link->getModuleLink(
+                $this->name,
+                'post',
+                [
+                    'id_ever_post' => $postId,
+                    'link_rewrite' => (string) ($legacyPost->link_rewrite ?? ''),
+                ],
+                true
+            );
+            $legacyPost->featured_image = $this->getBlogImageService()->getBlogImageUrl($postId, $idShop, 'post');
+            $legacyPost->featured_thumb = $this->getBlogImageService()->getBlogThumbUrl($postId, $idShop, 'post');
+            $legacyPost->cover = $legacyPost->featured_thumb;
+
+            $normalizedPosts[] = PostViewModel::fromLegacy($legacyPost);
+        }
+
+        return $normalizedPosts;
     }
 
     private function getBlogCleanerService()
@@ -1559,18 +1592,7 @@ class EverPsBlog extends Module
             if (!$starredPosts || !count($starredPosts)) {
                 return '';
             }
-            foreach ($starredPosts as &$post) {
-                $featuredThumb = $this->getBlogImageService()->getBlogThumbUrl(
-                    (int) (is_array($post) ? $post['id_ever_post'] : $post->id_ever_post),
-                    (int) $this->context->shop->id,
-                    'post'
-                );
-                if (is_array($post)) {
-                    $post['featured_thumb'] = $featuredThumb;
-                } else {
-                    $post->featured_thumb = $featuredThumb;
-                }
-            }
+            $starredPosts = $this->normalizeFrontPostList($starredPosts, (int) $this->context->shop->id);
             $evercategories = $this->getFrontLocalizedCategories(
                 (int) $this->context->language->id,
                 (int) $this->context->shop->id
@@ -1584,6 +1606,7 @@ class EverPsBlog extends Module
                 'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
                 'blogUrl' => $blogUrl,
                 'everpsblog' => $starredPosts,
+                'posts' => $starredPosts,
                 'evercategory' => $evercategories,
                 'default_lang' => (int) $this->context->language->id,
                 'id_lang' => (int) $this->context->language->id,
@@ -1604,6 +1627,8 @@ class EverPsBlog extends Module
 
             return $this->display(__FILE__, $this->getThemeTemplatePath('hook', 'my-account.tpl'));
         }
+
+        return '';
     }
 
     public function hookDisplayMyAccountBlock($params)
@@ -1615,7 +1640,7 @@ class EverPsBlog extends Module
     {
         $this->assignThemeSmartyVariables();
         if ((bool) Configuration::get('EVERBLOG_RELATED_POST') === false) {
-            return;
+            return '';
         }
         if ((int) Configuration::get('EVERPSBLOG_PRODUCT_NBR')) {
             $post_number = (int) Configuration::get('EVERPSBLOG_PRODUCT_NBR');
@@ -1638,7 +1663,7 @@ class EverPsBlog extends Module
         if (!$posts
             || !count($posts)
         ) {
-            return;
+            return '';
         }
         $evercategories = EverPsBlogCategory::getAllCategories(
             (int) $this->context->language->id,
@@ -1647,12 +1672,13 @@ class EverPsBlog extends Module
         $animate = Configuration::get(
             'EVERBLOG_ANIMATE'
         );
-        $everpsblog = $posts;
+        $everpsblog = $this->normalizeFrontPostList($posts, (int) $this->context->shop->id);
         $siteUrl = Tools::getHttpHost(true) . __PS_BASE_URI__;
         $this->context->smarty->assign([
             'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
             'blogUrl' => $blogUrl,
             'everpsblog' => $everpsblog,
+            'posts' => $everpsblog,
             'evercategory' => $evercategories,
             'default_lang' => (int) $this->context->language->id,
             'id_lang' => (int) $this->context->language->id,
@@ -1677,6 +1703,8 @@ class EverPsBlog extends Module
 
             return $this->display(__FILE__, $this->getThemeTemplatePath('hook', 'footer.tpl'));
         }
+
+        return '';
     }
 
     public function hookActionOutputHTMLBefore($params)
