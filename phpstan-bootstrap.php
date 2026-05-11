@@ -53,3 +53,7 @@ if (!defined('_PS_VERSION_')) {
 if (!defined('_COOKIE_KEY_')) {
     define('_COOKIE_KEY_', 'phpstan-cookie-key');
 }
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}

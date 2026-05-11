@@ -65,6 +65,14 @@ class ConfigurationController extends AbstractDomainController
             'empty_trash_days' => $this->getEmptyTrashDelayDays(),
             'default_author_id' => (int) \Configuration::get('EVERBLOG_DEFAULT_AUTHOR_ID'),
             'header_bg_color' => $this->getHeaderBackgroundColor(),
+            'header_bg_alt_color' => $this->getConfiguredColor('EVERBLOG_HEADER_BG_ALT_COLOR', '#b64a32'),
+            'header_overlay_bg_color' => $this->getConfiguredColor('EVERBLOG_HEADER_OVERLAY_BG_COLOR', '#121212'),
+            'page_bg_color' => $this->getConfiguredColor('EVERBLOG_PAGE_BG_COLOR', '#ffffff'),
+            'surface_bg_color' => $this->getConfiguredColor('EVERBLOG_SURFACE_BG_COLOR', '#ffffff'),
+            'card_bg_color' => $this->getConfiguredColor('EVERBLOG_CARD_BG_COLOR', '#f1f1f1'),
+            'soft_bg_color' => $this->getConfiguredColor('EVERBLOG_SOFT_BG_COLOR', '#ededed'),
+            'placeholder_bg_color' => $this->getConfiguredColor('EVERBLOG_PLACEHOLDER_BG_COLOR', '#d8d8d8'),
+            'accent_bg_color' => $this->getConfiguredColor('EVERBLOG_ACCENT_BG_COLOR', '#8cced2'),
             'header_title_color' => $this->getHeaderTitleColor(),
             'wordpress_api_url' => (string) \Configuration::get('EVER_WP_API_URL'),
             'wordpress_api_user' => (string) \Configuration::get('EVER_WP_API_USER'),
@@ -103,6 +111,14 @@ class ConfigurationController extends AbstractDomainController
             \Configuration::updateValue('EVERBLOG_EMPTY_TRASH', max(0, (int) $formData['empty_trash_days']));
             \Configuration::updateValue('EVERBLOG_DEFAULT_AUTHOR_ID', (int) $formData['default_author_id']);
             \Configuration::updateValue('EVERBLOG_HEADER_BG_COLOR', $this->normalizeHexColor((string) ($formData['header_bg_color'] ?? ''), '#0a0f54'));
+            \Configuration::updateValue('EVERBLOG_HEADER_BG_ALT_COLOR', $this->normalizeHexColor((string) ($formData['header_bg_alt_color'] ?? ''), '#b64a32'));
+            \Configuration::updateValue('EVERBLOG_HEADER_OVERLAY_BG_COLOR', $this->normalizeHexColor((string) ($formData['header_overlay_bg_color'] ?? ''), '#121212'));
+            \Configuration::updateValue('EVERBLOG_PAGE_BG_COLOR', $this->normalizeHexColor((string) ($formData['page_bg_color'] ?? ''), '#ffffff'));
+            \Configuration::updateValue('EVERBLOG_SURFACE_BG_COLOR', $this->normalizeHexColor((string) ($formData['surface_bg_color'] ?? ''), '#ffffff'));
+            \Configuration::updateValue('EVERBLOG_CARD_BG_COLOR', $this->normalizeHexColor((string) ($formData['card_bg_color'] ?? ''), '#f1f1f1'));
+            \Configuration::updateValue('EVERBLOG_SOFT_BG_COLOR', $this->normalizeHexColor((string) ($formData['soft_bg_color'] ?? ''), '#ededed'));
+            \Configuration::updateValue('EVERBLOG_PLACEHOLDER_BG_COLOR', $this->normalizeHexColor((string) ($formData['placeholder_bg_color'] ?? ''), '#d8d8d8'));
+            \Configuration::updateValue('EVERBLOG_ACCENT_BG_COLOR', $this->normalizeHexColor((string) ($formData['accent_bg_color'] ?? ''), '#8cced2'));
             \Configuration::updateValue('EVERBLOG_HEADER_TITLE_COLOR', $this->normalizeHexColor((string) ($formData['header_title_color'] ?? ''), '#ffffff'));
             \Configuration::updateValue('EVERBLOG_MAIN_TITLE', $this->extractLocalizedFormData($formData, 'main_title'));
             \Configuration::updateValue('EVERBLOG_HERO_SUBTITLE', $this->extractLocalizedFormData($formData, 'hero_subtitle'));
@@ -431,7 +447,7 @@ class ConfigurationController extends AbstractDomainController
 
     private function getHeaderBackgroundColor(): string
     {
-        return $this->normalizeHexColor((string) \Configuration::get('EVERBLOG_HEADER_BG_COLOR'), '#0a0f54');
+        return $this->getConfiguredColor('EVERBLOG_HEADER_BG_COLOR', '#0a0f54');
     }
 
     private function getEmptyTrashDelayDays(): int
@@ -446,7 +462,12 @@ class ConfigurationController extends AbstractDomainController
 
     private function getHeaderTitleColor(): string
     {
-        return $this->normalizeHexColor((string) \Configuration::get('EVERBLOG_HEADER_TITLE_COLOR'), '#ffffff');
+        return $this->getConfiguredColor('EVERBLOG_HEADER_TITLE_COLOR', '#ffffff');
+    }
+
+    private function getConfiguredColor(string $key, string $default): string
+    {
+        return $this->normalizeHexColor((string) \Configuration::get($key), $default);
     }
 
     private function normalizeHexColor(string $color, string $default): string

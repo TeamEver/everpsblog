@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace PrestaShop\Module\Everpsblog\ViewModel\Front;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
+
 final class TaxonomyViewModel
 {
     public static function fromLegacy($item, string $type): array

@@ -92,7 +92,7 @@ class ConfigurationType extends AbstractType
             ->add('header_bg_color', TextType::class, [
                 'label' => 'Blog header color',
                 'required' => false,
-                'help' => 'Color applied to the main banner on blog, post, category, tag, author and search pages.',
+                'help' => 'Primary background color applied to blog heroes and banners.',
                 'attr' => [
                     'type' => 'color',
                 ],
@@ -100,6 +100,117 @@ class ConfigurationType extends AbstractType
                     new Regex([
                         'pattern' => '/^#[0-9a-fA-F]{6}$/',
                         'message' => 'The color must use hexadecimal format, for example #0a0f54.',
+                    ]),
+                ],
+            ])
+            ->add('header_bg_alt_color', TextType::class, [
+                'label' => 'Blog header secondary color',
+                'required' => false,
+                'help' => 'Secondary background color used by themes that render a hero gradient.',
+                'attr' => [
+                    'type' => 'color',
+                ],
+                'constraints' => [
+                    new Regex([
+                        'pattern' => '/^#[0-9a-fA-F]{6}$/',
+                        'message' => 'The color must use hexadecimal format, for example #b64a32.',
+                    ]),
+                ],
+            ])
+            ->add('header_overlay_bg_color', TextType::class, [
+                'label' => 'Blog hero overlay color',
+                'required' => false,
+                'help' => 'Background overlay color used above hero images or gradients.',
+                'attr' => [
+                    'type' => 'color',
+                ],
+                'constraints' => [
+                    new Regex([
+                        'pattern' => '/^#[0-9a-fA-F]{6}$/',
+                        'message' => 'The color must use hexadecimal format, for example #121212.',
+                    ]),
+                ],
+            ])
+            ->add('page_bg_color', TextType::class, [
+                'label' => 'Blog page background',
+                'required' => false,
+                'attr' => [
+                    'type' => 'color',
+                ],
+                'constraints' => [
+                    new Regex([
+                        'pattern' => '/^#[0-9a-fA-F]{6}$/',
+                        'message' => 'The color must use hexadecimal format, for example #ffffff.',
+                    ]),
+                ],
+            ])
+            ->add('surface_bg_color', TextType::class, [
+                'label' => 'Blog surface background',
+                'required' => false,
+                'help' => 'Background for content surfaces and form controls.',
+                'attr' => [
+                    'type' => 'color',
+                ],
+                'constraints' => [
+                    new Regex([
+                        'pattern' => '/^#[0-9a-fA-F]{6}$/',
+                        'message' => 'The color must use hexadecimal format, for example #ffffff.',
+                    ]),
+                ],
+            ])
+            ->add('card_bg_color', TextType::class, [
+                'label' => 'Blog card background',
+                'required' => false,
+                'help' => 'Background for post cards and compact blocks.',
+                'attr' => [
+                    'type' => 'color',
+                ],
+                'constraints' => [
+                    new Regex([
+                        'pattern' => '/^#[0-9a-fA-F]{6}$/',
+                        'message' => 'The color must use hexadecimal format, for example #f1f1f1.',
+                    ]),
+                ],
+            ])
+            ->add('soft_bg_color', TextType::class, [
+                'label' => 'Blog soft section background',
+                'required' => false,
+                'help' => 'Background for secondary sections such as related posts.',
+                'attr' => [
+                    'type' => 'color',
+                ],
+                'constraints' => [
+                    new Regex([
+                        'pattern' => '/^#[0-9a-fA-F]{6}$/',
+                        'message' => 'The color must use hexadecimal format, for example #ededed.',
+                    ]),
+                ],
+            ])
+            ->add('placeholder_bg_color', TextType::class, [
+                'label' => 'Blog placeholder background',
+                'required' => false,
+                'help' => 'Background used when an image is missing.',
+                'attr' => [
+                    'type' => 'color',
+                ],
+                'constraints' => [
+                    new Regex([
+                        'pattern' => '/^#[0-9a-fA-F]{6}$/',
+                        'message' => 'The color must use hexadecimal format, for example #d8d8d8.',
+                    ]),
+                ],
+            ])
+            ->add('accent_bg_color', TextType::class, [
+                'label' => 'Blog accent background',
+                'required' => false,
+                'help' => 'Accent background for highlighted blocks and badges.',
+                'attr' => [
+                    'type' => 'color',
+                ],
+                'constraints' => [
+                    new Regex([
+                        'pattern' => '/^#[0-9a-fA-F]{6}$/',
+                        'message' => 'The color must use hexadecimal format, for example #8cced2.',
                     ]),
                 ],
             ])

@@ -1,10 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Form\DataProvider;
 
 use Doctrine\ORM\EntityManagerInterface;
 use PrestaShop\Module\Everpsblog\Repository\PostRepository;
 use Tools;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 final class PostFormDataProvider
 {

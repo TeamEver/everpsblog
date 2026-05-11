@@ -1,6 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Service;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class ModuleTranslationCatalogService
 {

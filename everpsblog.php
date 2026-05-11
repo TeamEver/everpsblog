@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * 2019-2025 Team Ever
  *
@@ -49,7 +52,7 @@ class EverPsBlog extends Module
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '7.0.1';
+        $this->version = '7.0.2';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -172,6 +175,14 @@ class EverPsBlog extends Module
                 return $subtitle;
             })())
             && Configuration::updateValue('EVERBLOG_HEADER_BG_COLOR', '#0a0f54')
+            && Configuration::updateValue('EVERBLOG_HEADER_BG_ALT_COLOR', '#b64a32')
+            && Configuration::updateValue('EVERBLOG_HEADER_OVERLAY_BG_COLOR', '#121212')
+            && Configuration::updateValue('EVERBLOG_PAGE_BG_COLOR', '#ffffff')
+            && Configuration::updateValue('EVERBLOG_SURFACE_BG_COLOR', '#ffffff')
+            && Configuration::updateValue('EVERBLOG_CARD_BG_COLOR', '#f1f1f1')
+            && Configuration::updateValue('EVERBLOG_SOFT_BG_COLOR', '#ededed')
+            && Configuration::updateValue('EVERBLOG_PLACEHOLDER_BG_COLOR', '#d8d8d8')
+            && Configuration::updateValue('EVERBLOG_ACCENT_BG_COLOR', '#8cced2')
             && Configuration::updateValue('EVERBLOG_HEADER_TITLE_COLOR', '#ffffff')
             && $translationsInstalled
             && $this->checkAndFixDatabase()
@@ -195,6 +206,14 @@ class EverPsBlog extends Module
         Configuration::deleteByName('EVERBLOG_DEFAULT_AUTHOR_ID');
         Configuration::deleteByName(BlogThemeResolver::CONFIGURATION_KEY);
         Configuration::deleteByName('EVERBLOG_HERO_SUBTITLE');
+        Configuration::deleteByName('EVERBLOG_HEADER_BG_ALT_COLOR');
+        Configuration::deleteByName('EVERBLOG_HEADER_OVERLAY_BG_COLOR');
+        Configuration::deleteByName('EVERBLOG_PAGE_BG_COLOR');
+        Configuration::deleteByName('EVERBLOG_SURFACE_BG_COLOR');
+        Configuration::deleteByName('EVERBLOG_CARD_BG_COLOR');
+        Configuration::deleteByName('EVERBLOG_SOFT_BG_COLOR');
+        Configuration::deleteByName('EVERBLOG_PLACEHOLDER_BG_COLOR');
+        Configuration::deleteByName('EVERBLOG_ACCENT_BG_COLOR');
         return $translationsRemoved
             && parent::uninstall()
             && $this->uninstallModuleTab('AdminEverPsBlog')
@@ -470,7 +489,12 @@ class EverPsBlog extends Module
         }
 
         $this->context->smarty->assign(
-            $this->getThemeResolver()->buildSmartyContext($this->getActiveTheme())
+            array_merge(
+                $this->getThemeResolver()->buildSmartyContext($this->getActiveTheme()),
+                [
+                    'everpsblog_excerpt_length' => max(1, (int) Configuration::get('EVERPSBLOG_EXCERPT')),
+                ]
+            )
         );
     }
 
@@ -527,10 +551,37 @@ class EverPsBlog extends Module
             } else {
                 $post->default_cat_obj = null;
             }
+            if (!empty($post->excerpt) && $this->isPlaceholderExcerpt((string) $post->excerpt)) {
+                $post->excerpt = '';
+            }
+            if (empty($post->excerpt) && !empty($post->content) && $this->isPlaceholderExcerpt((string) $post->content)) {
+                $post->content = '';
+            }
             $posts[] = $post;
         }
 
         return $posts;
+    }
+
+    private function isPlaceholderExcerpt(string $excerpt): bool
+    {
+        $excerpt = html_entity_decode($excerpt, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $excerpt = trim(strip_tags($excerpt));
+        $excerpt = preg_replace('/\s+/u', ' ', $excerpt);
+        $excerpt = is_string($excerpt) ? trim($excerpt) : '';
+
+        if (function_exists('iconv')) {
+            $asciiExcerpt = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $excerpt);
+            if (is_string($asciiExcerpt)) {
+                $excerpt = $asciiExcerpt;
+            }
+        }
+
+        $excerpt = strtolower($excerpt);
+        $excerpt = preg_replace('/[^a-z0-9]+/', '-', $excerpt);
+        $excerpt = is_string($excerpt) ? trim($excerpt, '-') : '';
+
+        return in_array($excerpt, ['resume', 'resume-de-l-article'], true);
     }
 
     private function getBlogCleanerService()
@@ -1257,6 +1308,14 @@ class EverPsBlog extends Module
             if (!$header_bg_color || !Validate::isColor($header_bg_color)) {
                 $header_bg_color = '#0a0f54';
             }
+            $header_bg_alt_color = $this->getBlogConfigurationColor('EVERBLOG_HEADER_BG_ALT_COLOR', '#b64a32');
+            $header_overlay_bg_color = $this->getBlogConfigurationColor('EVERBLOG_HEADER_OVERLAY_BG_COLOR', '#121212');
+            $page_bg_color = $this->getBlogConfigurationColor('EVERBLOG_PAGE_BG_COLOR', '#ffffff');
+            $surface_bg_color = $this->getBlogConfigurationColor('EVERBLOG_SURFACE_BG_COLOR', '#ffffff');
+            $card_bg_color = $this->getBlogConfigurationColor('EVERBLOG_CARD_BG_COLOR', '#f1f1f1');
+            $soft_bg_color = $this->getBlogConfigurationColor('EVERBLOG_SOFT_BG_COLOR', '#ededed');
+            $placeholder_bg_color = $this->getBlogConfigurationColor('EVERBLOG_PLACEHOLDER_BG_COLOR', '#d8d8d8');
+            $accent_bg_color = $this->getBlogConfigurationColor('EVERBLOG_ACCENT_BG_COLOR', '#8cced2');
             $header_title_color = Configuration::get('EVERBLOG_HEADER_TITLE_COLOR');
             if (!$header_title_color || !Validate::isColor($header_title_color)) {
                 $header_title_color = '#ffffff';
@@ -1264,12 +1323,64 @@ class EverPsBlog extends Module
             $this->context->smarty->assign('everpsblog_header_bg_color', $header_bg_color);
             $this->context->smarty->assign('everpsblog_header_title_color', $header_title_color);
             $dynamic_header_css = '<style>'
+                . 'body#module-everpsblog-blog,'
+                . 'body#module-everpsblog-category,'
+                . 'body#module-everpsblog-tag,'
+                . 'body#module-everpsblog-author,'
+                . 'body#module-everpsblog-search,'
+                . 'body#module-everpsblog-post'
+                . '{--ever-blog-header-bg:' . $header_bg_color . ';'
+                . '--ever-blog-header-bg-alt:' . $header_bg_alt_color . ';'
+                . '--ever-blog-header-overlay-bg:' . $header_overlay_bg_color . ';'
+                . '--ever-blog-page-bg:' . $page_bg_color . ';'
+                . '--ever-blog-surface-bg:' . $surface_bg_color . ';'
+                . '--ever-blog-card-bg:' . $card_bg_color . ';'
+                . '--ever-blog-soft-bg:' . $soft_bg_color . ';'
+                . '--ever-blog-placeholder-bg:' . $placeholder_bg_color . ';'
+                . '--ever-blog-accent-bg:' . $accent_bg_color . ';'
+                . '--ever-blog-header-title-color:' . $header_title_color . ';'
+                . 'background-color:var(--ever-blog-page-bg) !important;}'
                 . '#module-everpsblog-blog .everpsblog-blog-header,'
                 . '#module-everpsblog-category .everpsblog-blog-header,'
                 . '#module-everpsblog-tag .everpsblog-blog-header,'
                 . '#module-everpsblog-author .everpsblog-blog-header,'
                 . '#module-everpsblog-search .everpsblog-blog-header'
                 . '{background-color:' . $header_bg_color . ' !important;}'
+                . '#module-everpsblog-blog .everpsblog-blog-header--has-banner::before,'
+                . '#module-everpsblog-category .everpsblog-blog-header--has-banner::before,'
+                . '#module-everpsblog-tag .everpsblog-blog-header--has-banner::before,'
+                . '#module-everpsblog-author .everpsblog-blog-header--has-banner::before,'
+                . '#module-everpsblog-search .everpsblog-blog-header--has-banner::before'
+                . '{background:linear-gradient(180deg, color-mix(in srgb, var(--ever-blog-header-overlay-bg) 28%, transparent) 0%, color-mix(in srgb, var(--ever-blog-header-overlay-bg) 55%, transparent) 100%) !important;}'
+                . '#module-everpsblog-post .everpsblog-post-hero'
+                . '{background:var(--ever-blog-header-bg) !important;}'
+                . '#module-everpsblog-post .everpsblog-post-author-box__image-link,'
+                . '#module-everpsblog-blog .everpsblog-image-wrapper .bg-light,'
+                . '#module-everpsblog-category .everpsblog-image-wrapper .bg-light,'
+                . '#module-everpsblog-tag .everpsblog-image-wrapper .bg-light,'
+                . '#module-everpsblog-author .everpsblog-image-wrapper .bg-light'
+                . '{background:var(--ever-blog-placeholder-bg) !important;}'
+                . '#module-everpsblog-blog .everpsblog-listing-card,'
+                . '#module-everpsblog-category .everpsblog-listing-card,'
+                . '#module-everpsblog-tag .everpsblog-listing-card,'
+                . '#module-everpsblog-author .everpsblog-listing-card,'
+                . '#module-everpsblog-post .card'
+                . '{background:var(--ever-blog-card-bg) !important;}'
+                . '#module-everpsblog-post .ai-summary-banner,'
+                . '#module-everpsblog-post .post-tags .badge,'
+                . '#module-everpsblog-post .taggedIn a,'
+                . '#module-everpsblog-post .taggedIn a:before'
+                . '{background:var(--ever-blog-accent-bg) !important;}'
+                . '#module-everpsblog-post .taggedIn a:after,'
+                . '#module-everpsblog-post .form-control,'
+                . '#module-everpsblog-post .everpsblog-post-author-box__social,'
+                . '#module-everpsblog-blog .everpsblog-top-category-btn:hover,'
+                . '#module-everpsblog-blog .everpsblog-top-category-btn:focus,'
+                . '#module-everpsblog-blog .everpsblog-top-category-btn.active,'
+                . '#module-everpsblog-category .everpsblog-top-category-btn:hover,'
+                . '#module-everpsblog-category .everpsblog-top-category-btn:focus,'
+                . '#module-everpsblog-category .everpsblog-top-category-btn.active'
+                . '{background:var(--ever-blog-surface-bg) !important;}'
                 . '#module-everpsblog-blog .everpsblog-blog-header__title,'
                 . '#module-everpsblog-category .everpsblog-blog-header__title,'
                 . '#module-everpsblog-tag .everpsblog-blog-header__title,'
@@ -1297,6 +1408,13 @@ class EverPsBlog extends Module
             );
         }
         return $dynamic_header_css;
+    }
+
+    private function getBlogConfigurationColor($key, $default)
+    {
+        $color = Configuration::get((string) $key);
+
+        return $color && Validate::isColor($color) ? (string) $color : (string) $default;
     }
 
     public function hookDisplayLeftColumn($params)
@@ -1385,6 +1503,7 @@ class EverPsBlog extends Module
             'blogUrl' => $blogUrl,
             'tags' => $tags,
             'categories' => $categories,
+            'everpsblog_excerpt_length' => max(1, (int) Configuration::get('EVERPSBLOG_EXCERPT')),
             'animate' => $animate,
             'show_featured_post' => true,
             'blogImg_dir' => $siteUrl . '/modules/everpsblog/views/img/',
@@ -1422,8 +1541,9 @@ class EverPsBlog extends Module
         $post_number = (int) Configuration::get('EVERPSBLOG_HOME_NBR') > 0
             ? (int) Configuration::get('EVERPSBLOG_HOME_NBR')
             : 4;
+        $excerptLength = max(1, (int) Configuration::get('EVERPSBLOG_EXCERPT'));
         $templatePath = $this->getThemeTemplatePath('hook', 'home.tpl');
-        $cacheId = $this->name . '-hookDisplayBanner-' . $theme . '-' . $idLang . '-' . $idShop . '-' . $post_number;
+        $cacheId = $this->name . '-hookDisplayBanner-' . $theme . '-' . $idLang . '-' . $idShop . '-' . $post_number . '-' . $excerptLength;
         if (!$this->isCached($templatePath, $cacheId)) {
             $blogUrl = Context::getContext()->link->getModuleLink(
                 $this->name,
@@ -1471,6 +1591,7 @@ class EverPsBlog extends Module
                 'animated' => $animate,
                 'show_featured_post' => true,
                 'carousel_id' => $carouselId,
+                'everpsblog_excerpt_length' => $excerptLength,
             ]);
         }
         return $this->display(__FILE__, $templatePath, $cacheId);
@@ -2928,7 +3049,7 @@ class EverPsBlog extends Module
             'meta_description' => 'varchar(255) DEFAULT NULL',
             'link_rewrite' => 'varchar(255) DEFAULT NULL',
             'content' => 'text NOT NULL',
-            'excerpt' => 'varchar(255) DEFAULT NULL',
+            'excerpt' => 'text DEFAULT NULL',
             'id_lang' => 'int(10) unsigned NOT NULL',
         ];
         foreach ($columnsToAdd as $columnName => $columnDefinition) {

@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Command;
 
 use PrestaShop\Module\Everpsblog\Service\WordPressRestImporter;
@@ -8,6 +11,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class ImportWordPressCommand extends Command
 {

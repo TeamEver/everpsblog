@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 /*
  * This file is part of Composer.
  *
@@ -11,6 +14,11 @@
  */
 
 namespace Composer\Autoload;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 /**
  * ClassLoader implements a PSR-0, PSR-4 and classmap class loader.

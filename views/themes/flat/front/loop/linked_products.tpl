@@ -21,7 +21,7 @@
   {assign var="blpCarouselId" value="linkedProductsCarousel-"|cat:$linked_products_block_id}
 {/if}
 <section id="linked-products" class="blog-linked-products container mt-4">
-  <h2 class="text-center mb-3">{l s='Linked products' d='Modules.Everpsblog.Shop'}</h2>
+  <p class="h2 text-center mb-3">{l s='Linked products' d='Modules.Everpsblog.Shop'}</p>
   {if $count_products > 4 && isset($ps_products_chunks) && $ps_products_chunks}
     <div id="{$blpCarouselId|escape:'htmlall':'UTF-8'}" class="carousel slide blog-linked-products-carousel position-relative" data-bs-ride="false" data-bs-interval="false">
       <div class="carousel-inner">

@@ -1,8 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandBus;
 
 use RuntimeException;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class InMemoryCommandBus implements CommandBusInterface
 {

@@ -1,10 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Doctrine;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Events;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class TablePrefixSubscriber implements EventSubscriber
 {

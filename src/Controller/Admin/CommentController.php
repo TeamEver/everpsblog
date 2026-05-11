@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Controller\Admin;
 
 use PrestaShop\Module\Everpsblog\Application\Blog\CommentCommandAssembler;
@@ -15,6 +18,11 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class CommentController extends AbstractDomainController
 {

@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace PrestaShop\Module\Everpsblog\Service;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
+
 final class BlogThemeResolver
 {
     public const CONFIGURATION_KEY = 'EVERPSBLOG_THEME';

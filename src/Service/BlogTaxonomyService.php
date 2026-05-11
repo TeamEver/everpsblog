@@ -1,9 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Service;
 
 use PrestaShop\Module\Everpsblog\Service\Cache\BlogCachePoolFactory;
 use Psr\Cache\CacheItemPoolInterface;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class BlogTaxonomyService
 {

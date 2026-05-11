@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace PrestaShop\Module\Everpsblog\ViewModel\Front;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
+
 final class PostViewModel
 {
     public static function fromLegacy($post): array
@@ -16,7 +21,16 @@ final class PostViewModel
         $title = (string) self::value($post, 'title', self::value($post, 'meta_title', ''));
         $content = (string) self::value($post, 'content', '');
         $excerpt = (string) self::value($post, 'excerpt', self::value($post, 'meta_description', ''));
-        $summary = '' !== trim($excerpt) ? $excerpt : self::summaryFromContent($content);
+        $summary = (string) self::value($post, 'summary', '');
+        if ('' === trim($summary)) {
+            $summary = '' !== trim($excerpt) ? $excerpt : self::summaryFromContent($content);
+        }
+        if (self::isPlaceholderSummary($summary)) {
+            $summary = self::summaryFromContent($content);
+        }
+        if (self::isPlaceholderSummary($summary)) {
+            $summary = '';
+        }
 
         return [
             'id' => $id,
@@ -78,5 +92,26 @@ final class PostViewModel
         }
 
         return substr($summary, 0, 300);
+    }
+
+    private static function isPlaceholderSummary(string $summary): bool
+    {
+        $summary = html_entity_decode($summary, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $summary = trim(strip_tags($summary));
+        $summary = preg_replace('/\s+/u', ' ', $summary);
+        $summary = is_string($summary) ? trim($summary) : '';
+
+        if (function_exists('iconv')) {
+            $asciiSummary = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $summary);
+            if (is_string($asciiSummary)) {
+                $summary = $asciiSummary;
+            }
+        }
+
+        $summary = strtolower($summary);
+        $summary = preg_replace('/[^a-z0-9]+/', '-', $summary);
+        $summary = is_string($summary) ? trim($summary, '-') : '';
+
+        return in_array($summary, ['resume', 'resume-de-l-article'], true);
     }
 }

@@ -2,11 +2,11 @@
 :root {
     --ever-flat-text: #161616;
     --ever-flat-muted: #666;
-    --ever-flat-panel: #f1f1f1;
-    --ever-flat-soft: #f7f7f7;
-    --ever-flat-teal: #8cced2;
+    --ever-flat-panel: var(--ever-blog-card-bg);
+    --ever-flat-soft: var(--ever-blog-soft-bg);
+    --ever-flat-teal: var(--ever-blog-accent-bg);
     --ever-flat-orange: #f59b21;
-    --ever-flat-dark: #20252d;
+    --ever-flat-dark: var(--ever-blog-header-bg);
 }
 
 body#module-everpsblog-blog,
@@ -47,8 +47,8 @@ body#module-everpsblog-author .container {
     position: relative;
     overflow: hidden;
     background:
-        linear-gradient(rgba(18, 18, 18, .38), rgba(18, 18, 18, .38)),
-        linear-gradient(110deg, #252525 0%, #693127 42%, #b64a32 100%);
+        linear-gradient(color-mix(in srgb, var(--ever-blog-header-overlay-bg) 38%, transparent), color-mix(in srgb, var(--ever-blog-header-overlay-bg) 38%, transparent)),
+        linear-gradient(110deg, var(--ever-blog-header-bg) 0%, color-mix(in srgb, var(--ever-blog-header-bg) 58%, var(--ever-blog-header-bg-alt)) 42%, var(--ever-blog-header-bg-alt) 100%);
 }
 
 .flat-blog-hero::after {
@@ -56,7 +56,7 @@ body#module-everpsblog-author .container {
     position: absolute;
     inset: auto 0 0;
     height: 38%;
-    background: linear-gradient(0deg, rgba(0, 0, 0, .25), transparent);
+    background: linear-gradient(0deg, color-mix(in srgb, var(--ever-blog-header-overlay-bg) 25%, transparent), transparent);
 }
 
 .flat-blog-hero__inner {
@@ -118,8 +118,8 @@ body#module-everpsblog-author .container {
     margin: 2.2rem 0;
 }
 
-.flat-blog-section > h2,
-#related-posts h2 {
+.flat-blog-section > .h2,
+#related-posts > .h2 {
     display: inline-block;
     margin: 0 0 1.15rem;
     padding-bottom: .28rem;
@@ -156,7 +156,7 @@ body#module-everpsblog-author .container {
     overflow: hidden;
     color: #fff;
     text-decoration: none;
-    background: #444;
+    background: var(--ever-blog-placeholder-bg);
 }
 
 .flat-category-card img,
@@ -170,14 +170,14 @@ body#module-everpsblog-author .container {
 
 .flat-category-card__placeholder {
     display: block;
-    background: linear-gradient(135deg, #5a5a5a, #222);
+    background: linear-gradient(135deg, var(--ever-blog-placeholder-bg), var(--ever-blog-header-bg));
 }
 
 .flat-category-card a::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, .42);
+    background: color-mix(in srgb, var(--ever-blog-header-overlay-bg) 42%, transparent);
 }
 
 .flat-category-card__title {
@@ -213,7 +213,7 @@ body#module-everpsblog-author .container {
 .flat-post-card__placeholder {
     display: block;
     min-height: 160px;
-    background: #d8d8d8;
+    background: var(--ever-blog-placeholder-bg);
 }
 
 .flat-post-card__image img {
@@ -306,7 +306,7 @@ body#module-everpsblog-post .everpsblog-post-header .card-body {
 }
 
 body#module-everpsblog-post .everpsblog-post-hero {
-    background: #fff !important;
+    background: var(--ever-blog-surface-bg) !important;
 }
 
 body#module-everpsblog-post .everpsblog-post-hero-overlay {
@@ -349,7 +349,8 @@ body#module-everpsblog-post .everpsblog-post-intro .postexcerpt {
 }
 
 .flat-post-more {
-    display: inline-block;
+    display: block;
+    margin-top: .25rem;
     color: var(--ever-flat-text);
     font-weight: 800;
 }
@@ -360,6 +361,28 @@ body#module-everpsblog-post .everpsblog-post-intro p:not(.postexcerpt) {
     font-size: .82rem;
     font-weight: 800;
     text-transform: uppercase;
+}
+
+body#module-everpsblog-post .comment-form .form-check {
+    padding: .85rem 1rem;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    background: var(--ever-blog-surface-bg);
+}
+
+body#module-everpsblog-post .comment-form .form-check .d-flex {
+    gap: .55rem;
+}
+
+body#module-everpsblog-post .comment-form .form-check-input {
+    flex: 0 0 auto;
+    margin: 0;
+    position: static;
+}
+
+body#module-everpsblog-post .comment-form .form-check-label {
+    margin: 0;
+    min-width: 0;
 }
 
 body#module-everpsblog-post .ai-summary-banner {
@@ -442,7 +465,7 @@ body#module-everpsblog-post #related-posts {
     width: 100vw;
     margin-left: calc(50% - 50vw);
     padding: 1.8rem max(1rem, calc((100vw - 1180px) / 2));
-    background: #ededed;
+    background: var(--ever-blog-soft-bg);
 }
 
 .flat-related-grid {
@@ -460,7 +483,7 @@ body#module-everpsblog-post #related-posts {
     aspect-ratio: 1 / 1;
     overflow: hidden;
     border-radius: 8px;
-    background: #d6d6d6;
+    background: var(--ever-blog-placeholder-bg);
 }
 
 .flat-related-card__image img {

@@ -1,8 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Controller\Front;
 
 use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheTags;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 trait FrontBlogDataProviderTrait
 {

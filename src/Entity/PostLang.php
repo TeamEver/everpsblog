@@ -1,8 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 /** @ORM\Entity @ORM\Table(name="ever_blog_post_lang") */
 class PostLang
@@ -28,7 +36,7 @@ class PostLang
     /** @ORM\Column(name="content", type="text") */
     private $content = '';
 
-    /** @ORM\Column(name="excerpt", type="string", length=255, nullable=true) */
+    /** @ORM\Column(name="excerpt", type="text", nullable=true) */
     private $excerpt;
 
     public static function create(

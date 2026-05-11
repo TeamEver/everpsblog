@@ -1,6 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Model;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class BlogImageModel extends \ObjectModel
 {

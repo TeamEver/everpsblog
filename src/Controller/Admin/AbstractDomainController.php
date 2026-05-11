@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Controller\Admin;
 
 use PrestaShop\Module\Everpsblog\Grid\Data\FrontPreviewActionTrait;
@@ -7,6 +10,11 @@ use PrestaShop\Module\Everpsblog\Service\BlogScheduledTaskRunner;
 use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 abstract class AbstractDomainController extends FrameworkBundleAdminController
 {

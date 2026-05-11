@@ -1,10 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Application\Blog;
 
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\CreatePostCommand;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\UpdatePostCommand;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler\PostCommandDataBuilder;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class PostCommandAssembler
 {

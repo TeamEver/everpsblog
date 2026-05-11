@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 /*
  * This file is part of Composer.
  *
@@ -14,6 +17,11 @@ namespace Composer;
 
 use Composer\Autoload\ClassLoader;
 use Composer\Semver\VersionParser;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 /**
  * This class is copied in every Composer installed project and available to all

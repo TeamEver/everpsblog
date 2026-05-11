@@ -1,6 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Core\Grid;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 final class GridData
 {

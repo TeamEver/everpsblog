@@ -1,9 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Application\Blog;
 
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\CreateAuthorCommand;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\UpdateAuthorCommand;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class AuthorCommandAssembler
 {

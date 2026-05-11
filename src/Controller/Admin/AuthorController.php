@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Controller\Admin;
 
 use PrestaShop\Module\Everpsblog\Application\Blog\AuthorCommandAssembler;
@@ -21,6 +24,11 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class AuthorController extends AbstractDomainController
 {

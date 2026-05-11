@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Controller\Admin;
 
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
@@ -7,6 +10,11 @@ use PrestaShop\Module\Everpsblog\Service\ImageUploader;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class MediaController extends AbstractDomainController
 {

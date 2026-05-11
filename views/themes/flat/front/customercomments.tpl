@@ -36,7 +36,7 @@
         <div class="col-12 article everpsblog bordered card card-body" id="comment-{$comment.post->id|escape:'htmlall':'UTF-8'}" style="border:1px solid black;">
             <a href="{$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $comment.post->id , 'link_rewrite' => $comment.post->link_rewrite])|escape:'htmlall':'UTF-8'}">
                 <div class="col-12">
-                    <h3>{$comment.post->title|escape:'htmlall':'UTF-8'}</h3>
+                    <p class="h3">{$comment.post->title|escape:'htmlall':'UTF-8'}</p>
                 </div>
                 <div class="col-12">
                     <div class="everpsblogcontent rte" id="everpsblog-post-content-{$comment.comment->id|escape:'htmlall':'UTF-8'}">

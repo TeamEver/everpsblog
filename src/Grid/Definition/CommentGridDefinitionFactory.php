@@ -1,8 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Grid\Definition;
 
 use PrestaShop\Module\Everpsblog\Core\Grid\GridDefinition;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 final class CommentGridDefinitionFactory
 {

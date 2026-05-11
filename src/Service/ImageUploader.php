@@ -1,8 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Service;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class ImageUploader
 {

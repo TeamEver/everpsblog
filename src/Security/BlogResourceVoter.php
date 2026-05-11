@@ -1,10 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Security;
 
 use PrestaShop\Module\Everpsblog\Service\Security\BackOfficePermissionProvider;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class BlogResourceVoter extends Voter
 {

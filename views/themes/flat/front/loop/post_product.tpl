@@ -54,10 +54,10 @@
         <img src="{$item.featured_thumb|escape:'htmlall':'UTF-8'}" width="320" height="180" class="{if $animated}animated flipSideBySide zoomed{/if}" title="{$post_title|escape:'htmlall':'UTF-8'}" alt="{$post_title|escape:'htmlall':'UTF-8'}" loading="lazy" />
         {/if}
     </a>
-    <h3 class="flat-related-card__title product-title" id="everpsblog-post-title-{$post_id|escape:'htmlall':'UTF-8'}">
+    <p class="flat-related-card__title product-title h3" id="everpsblog-post-title-{$post_id|escape:'htmlall':'UTF-8'}">
         <a href="{$post_link|escape:'htmlall':'UTF-8'}" title="{$post_title|escape:'htmlall':'UTF-8'}">
             {$post_title|escape:'htmlall':'UTF-8'}
         </a>
-    </h3>
+    </p>
     <a href="{$post_link|escape:'htmlall':'UTF-8'}" class="flat-related-card__link" title="{$post_title|escape:'htmlall':'UTF-8'}">{l s='Lire l’article' d='Modules.Everpsblog.Shop'} &gt;</a>
 </article>

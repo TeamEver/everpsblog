@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Service\Security;
 
 use Configuration;
@@ -7,6 +10,11 @@ use Context;
 use Profile;
 use PrestaShop\Module\Everpsblog\Security\BlogPermission;
 use Tab;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class BackOfficePermissionProvider
 {

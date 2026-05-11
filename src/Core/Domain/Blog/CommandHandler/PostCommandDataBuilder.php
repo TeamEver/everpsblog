@@ -1,10 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler;
 
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\ValueObject\PostCommandData;
 use PrestaShop\Module\Everpsblog\Service\BlogInstallService;
 use Tools;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class PostCommandDataBuilder
 {

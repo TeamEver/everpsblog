@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -10,6 +13,11 @@ use PrestaShop\Module\Everpsblog\Entity\Post;
 use PrestaShop\Module\Everpsblog\Service\BlogRedirectService;
 use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheInvalidator;
 use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheRelationResolver;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class UpdatePostHandler
 {

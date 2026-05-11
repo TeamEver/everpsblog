@@ -1,8 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 /** @ORM\Entity @ORM\Table(name="ever_blog_post_shop") */
 class PostShop

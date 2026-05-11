@@ -1,10 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use PrestaShop\Module\Everpsblog\Repository\TagRepository;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 /**
  * @ORM\Entity(repositoryClass=TagRepository::class)

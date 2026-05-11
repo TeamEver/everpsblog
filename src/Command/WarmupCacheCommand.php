@@ -11,6 +11,11 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
+
 final class WarmupCacheCommand extends Command
 {
     private const EXIT_SUCCESS = 0;

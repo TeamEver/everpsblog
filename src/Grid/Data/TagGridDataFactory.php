@@ -1,11 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Grid\Data;
 
 use PrestaShop\Module\Everpsblog\Core\Grid\GridData;
 use PrestaShop\Module\Everpsblog\Repository\TagRepository;
 use PrestaShop\Module\Everpsblog\Service\AdminRouteSigner;
 use Symfony\Component\Routing\RouterInterface;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 final class TagGridDataFactory
 {

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * 2019-2025 Team Ever
  *
@@ -75,7 +78,9 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
             $baseTags[] = BlogFrontCacheTags::BLOG_STARRED;
         }
 
-        return $this->frontCacheRemember(__METHOD__, [$idLang, $idShop, $start, $limit, $starred, $sortBy, $sortWay], function () use ($idLang, $idShop, $start, $limit, $starred, $sortBy, $sortWay) {
+        $excerptLength = max(1, (int) Configuration::get('EVERPSBLOG_EXCERPT'));
+
+        return $this->frontCacheRemember(__METHOD__, [$idLang, $idShop, $start, $limit, $starred, $sortBy, $sortWay, $excerptLength], function () use ($idLang, $idShop, $start, $limit, $starred, $sortBy, $sortWay, $excerptLength) {
             $sql = new DbQuery();
             $sql->select('p.id_ever_post, p.id_ever_post AS id, p.id_default_category, p.id_author AS id_ever_author, p.post_status, p.date_add, p.date_upd, p.active, p.starred, p.count, pl.title AS title, pl.link_rewrite AS link_rewrite, pl.meta_title AS meta_title, pl.meta_description AS meta_description, pl.excerpt AS excerpt, pl.content AS content');
             $sql->from('ever_blog_post', 'p');
@@ -110,15 +115,42 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
                     'post'
                 );
                 $row['cover'] = $row['featured_thumb'];
-                $row['summary'] = !empty($row['excerpt'])
-                    ? (string) $row['excerpt']
-                    : Tools::substr(trim(strip_tags((string) $row['content'])), 0, 300);
+                if (!empty($row['excerpt']) && !$this->isPlaceholderExcerpt((string) $row['excerpt'])) {
+                    $row['summary'] = (string) $row['excerpt'];
+                    continue;
+                }
+
+                $contentSummary = trim(strip_tags((string) $row['content']));
+                $row['summary'] = '' !== $contentSummary && !$this->isPlaceholderExcerpt($contentSummary)
+                    ? Tools::substr($contentSummary, 0, $excerptLength)
+                    : '';
             }
 
             return $rows;
         }, $baseTags, function ($rows) {
             return $this->frontExtractEntityTags($rows, 'post', ['id', 'id_ever_post']);
         });
+    }
+
+    private function isPlaceholderExcerpt(string $excerpt): bool
+    {
+        $excerpt = html_entity_decode($excerpt, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $excerpt = trim(strip_tags($excerpt));
+        $excerpt = preg_replace('/\s+/u', ' ', $excerpt);
+        $excerpt = is_string($excerpt) ? trim($excerpt) : '';
+
+        if (function_exists('iconv')) {
+            $asciiExcerpt = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $excerpt);
+            if (is_string($asciiExcerpt)) {
+                $excerpt = $asciiExcerpt;
+            }
+        }
+
+        $excerpt = strtolower($excerpt);
+        $excerpt = preg_replace('/[^a-z0-9]+/', '-', $excerpt);
+        $excerpt = is_string($excerpt) ? trim($excerpt, '-') : '';
+
+        return in_array($excerpt, ['resume', 'resume-de-l-article'], true);
     }
 
     private function getFrontLocalizedCategories($idLang, $idShop)

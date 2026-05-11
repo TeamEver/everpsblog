@@ -121,8 +121,8 @@
                         <strong>{l s='Publication date:' d='Modules.Everpsblog.Shop'}</strong>
                         <span>{$post->date_add|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</span>
                     </p>
-                    {if isset($post->excerpt) && $post->excerpt}
-                    <p class="postexcerpt mb-2">{$post->excerpt nofilter}</p>
+                    {if isset($show_post_intro_excerpt) && $show_post_intro_excerpt && isset($post_intro_excerpt) && $post_intro_excerpt}
+                    <div class="postexcerpt mb-2">{$post_intro_excerpt nofilter}</div>
                     <span class="flat-post-more">{l s='Voir plus' d='Modules.Everpsblog.Shop'}</span>
                     {/if}
                 </div>
@@ -205,11 +205,11 @@
                     {else}
                     <div class="col-12">
                     {/if}
-                        <h2 class="everpsblog-post-author-box__name h4 mb-2">
+                        <p class="everpsblog-post-author-box__name h4 mb-2">
                             <a href="{$author->url|escape:'htmlall':'UTF-8'}" itemprop="url" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} {$shop.name|escape:'htmlall':'UTF-8'}">
                                 <span itemprop="name">{$author->nickhandle|escape:'htmlall':'UTF-8'}</span>
                             </a>
-                        </h2>
+                        </p>
                         {if isset($author_summary) && $author_summary}
                         <p class="everpsblog-post-author-box__summary mb-3" itemprop="description">{$author_summary nofilter}</p>
                         {/if}
@@ -253,7 +253,7 @@
 {if isset($logged) && $logged ==  false && isset($only_logged_comment) && $only_logged_comment == true}
 <div class="card card-body mt-2 shadow-sm border-0">
     <form action="{$link->getPageLink('authentication', true)|escape:'htmlall':'UTF-8'}?back={$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $post->id_ever_post , 'link_rewrite' => $post->link_rewrite])|escape:'htmlall':'UTF-8'}" method="post" id="login-form" class="box">
-        <h3 class="page-subheading">{l s='Log in to comment' d='Modules.Everpsblog.Shop'}</h3>
+        <p class="page-subheading h3">{l s='Log in to comment' d='Modules.Everpsblog.Shop'}</p>
         <div class="form_content clearfix">
             <div class="mb-3">
                 <label>{l s='Email address' d='Modules.Everpsblog.Shop'}</label>
@@ -389,7 +389,7 @@ document.addEventListener('DOMContentLoaded', function () {
 <section class="comments container clearfix mt-4">
     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-3">
         <div class="d-flex align-items-center">
-            <h2 id="commentsTitle" class="h5 mb-0">{l s='Comments' d='Modules.Everpsblog.Shop'}</h2>
+            <p id="commentsTitle" class="h5 mb-0">{l s='Comments' d='Modules.Everpsblog.Shop'}</p>
             <span class="badge bg-secondary text-white ms-2">{$commentsCount|escape:'htmlall':'UTF-8'}</span>
         </div>
         <small class="text-muted">{l s='Join the discussion below.' d='Modules.Everpsblog.Shop'}</small>
@@ -428,7 +428,7 @@ document.addEventListener('DOMContentLoaded', function () {
 {include file="{$everpsblog_theme_front_template_base}/loop/linked_products.tpl" linked_products_block_id=$post->id}
 {if isset($related_posts) && $related_posts}
 <section id="related-posts" class="mt-2">
-  <h2>{l s='Plus d’articles' d='Modules.Everpsblog.Shop'}</h2>
+  <p class="h2">{l s='Plus d’articles' d='Modules.Everpsblog.Shop'}</p>
   <div class="flat-related-grid blogrelated mt-2">
     {foreach from=$related_posts item=item}
       {include file="{$everpsblog_theme_front_template_base}/loop/post_product.tpl"}

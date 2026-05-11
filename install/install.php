@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * 2019-2025 Team Ever
  *
@@ -58,7 +61,7 @@ $sql[] =
         `meta_description` varchar(255) DEFAULT NULL,
         `link_rewrite` varchar(255) DEFAULT NULL,
         `content` text NOT NULL,
-        `excerpt` varchar(255) DEFAULT NULL,
+        `excerpt` text DEFAULT NULL,
         `id_lang` int(10) unsigned NOT NULL,
         PRIMARY KEY (`id_ever_post`, `id_lang`)
     ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8';

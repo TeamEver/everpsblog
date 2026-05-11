@@ -1,8 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Repository;
 
 use Doctrine\ORM\EntityRepository;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class ImageRepository extends EntityRepository
 {

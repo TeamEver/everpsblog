@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Repository;
 
 use Doctrine\ORM\EntityRepository;
@@ -12,6 +15,11 @@ use PrestaShop\Module\Everpsblog\Entity\PostProduct;
 use PrestaShop\Module\Everpsblog\Entity\PostShop;
 use PrestaShop\Module\Everpsblog\Entity\PostTag;
 use PrestaShop\Module\Everpsblog\Entity\Tag;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class PostRepository extends EntityRepository
 {

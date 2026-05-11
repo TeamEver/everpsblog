@@ -102,7 +102,7 @@
             {/if}
             {if isset($evercategory) && $evercategory|count > 0}
             <section class="flat-blog-section flat-blog-categories">
-                <h2>{l s='Catégories de blogs' d='Modules.Everpsblog.Shop'}</h2>
+                <p class="h2">{l s='Catégories de blogs' d='Modules.Everpsblog.Shop'}</p>
                 <div class="flat-category-rail">
                     {foreach from=$evercategory item=item}
                         {if !$item.is_root_category && $item.link_rewrite != 'home' && $item.title|lower != 'home'}
@@ -115,7 +115,7 @@
         {/if}
         {if isset($post_number) && $post_number > 0}
         <section class="flat-blog-section flat-blog-featured">
-            <h2>{l s='Nos blogs à la une' d='Modules.Everpsblog.Shop'}</h2>
+            <p class="h2">{l s='Nos blogs à la une' d='Modules.Everpsblog.Shop'}</p>
             <div class="flat-post-grid" id="everpsblog-posts" data-empty-text="{l s='No posts match your filters yet.' d='Modules.Everpsblog.Shop'}">
                 {hook h="displayBeforeEverLoop"}
                 {foreach from=$posts item=item}
@@ -139,7 +139,7 @@
         {/if}
         {if isset($everhome_products) && $everhome_products}
         <section id="products" class="flat-blog-section">
-            <h2>{l s='Our best products' d='Modules.Everpsblog.Shop'}</h2>
+            <p class="h2">{l s='Our best products' d='Modules.Everpsblog.Shop'}</p>
             <div class="products row">
                 {foreach from=$everhome_products item="product"}
                     {include file="catalog/_partials/miniatures/product.tpl" product=$product productClasses="col-12"}

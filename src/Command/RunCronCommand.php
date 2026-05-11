@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * 2019-2025 Team Ever
  *
@@ -25,6 +28,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class RunCronCommand extends Command
 {

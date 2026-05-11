@@ -1,10 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler;
 
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\UpdateTagCommand;
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository\TagWriteRepository;
 use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheInvalidator;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class UpdateTagHandler
 {

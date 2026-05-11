@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Application\Blog;
 
 use DateTimeImmutable;
@@ -8,6 +11,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use PrestaShop\Module\Everpsblog\Adapter\LegacyLanguageAdapter;
 use Throwable;
 use Tools;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 abstract class AbstractRequestValidator
 {

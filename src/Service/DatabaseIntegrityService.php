@@ -1,6 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Service;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 final class DatabaseIntegrityService
 {
@@ -152,7 +160,7 @@ final class DatabaseIntegrityService
                 'meta_description' => 'varchar(255) DEFAULT NULL',
                 'link_rewrite' => 'varchar(255) DEFAULT NULL',
                 'content' => 'text NOT NULL',
-                'excerpt' => 'varchar(255) DEFAULT NULL',
+                'excerpt' => 'text DEFAULT NULL',
                 'id_lang' => 'int(10) unsigned NOT NULL',
             ],
             'ever_blog_post_shop' => [

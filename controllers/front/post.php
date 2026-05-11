@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * 2019-2025 Team Ever
  *
@@ -536,6 +539,11 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
             if (false === $showAiSummaryBanner) {
                 $showAiSummaryBanner = true;
             }
+            $postIntroExcerpt = (string) ($this->post->excerpt ?? '');
+            $normalizedPostIntroExcerpt = $this->normalizeIntroExcerpt($postIntroExcerpt);
+            $showPostIntroExcerpt = $normalizedPostIntroExcerpt !== ''
+                && !in_array($normalizedPostIntroExcerpt, ['resume', 'resume-de-l-article'], true)
+                && Tools::strlen($normalizedPostIntroExcerpt) >= 60;
             $this->context->smarty->assign([
                 'show_author' => (bool) Configuration::get('EVERBLOG_SHOW_AUTHOR'),
                 'blogcolor' => Configuration::get('EVERBLOG_CSS_FILE'),
@@ -555,6 +563,8 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 'count_products' => $count_products,
                 'post' => $this->post,
                 'post_view' => $postViewModel,
+                'post_intro_excerpt' => $postIntroExcerpt,
+                'show_post_intro_excerpt' => $showPostIntroExcerpt,
                 'tags' => $tags,
                 'ps_products' => $ps_products,
                 'ps_products_chunks' => $ps_products_chunks,
@@ -574,6 +584,30 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
             ]);
             $this->setTemplate($this->getFrontThemeTemplatePath('post.tpl'));
         }
+    }
+
+    private function normalizeIntroExcerpt(string $excerpt): string
+    {
+        $excerpt = html_entity_decode($excerpt, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $excerpt = trim(strip_tags($excerpt));
+        $excerpt = preg_replace('/\s+/u', ' ', $excerpt);
+        $excerpt = is_string($excerpt) ? trim($excerpt) : '';
+        if (function_exists('iconv')) {
+            $asciiExcerpt = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $excerpt);
+            if (is_string($asciiExcerpt)) {
+                $excerpt = $asciiExcerpt;
+            }
+        }
+
+        if (function_exists('mb_strtolower')) {
+            $excerpt = mb_strtolower($excerpt, 'UTF-8');
+        } else {
+            $excerpt = strtolower($excerpt);
+        }
+
+        $excerpt = preg_replace('/[^a-z0-9]+/', '-', $excerpt);
+
+        return is_string($excerpt) ? trim($excerpt, '-') : '';
     }
 
     public function getLayout()

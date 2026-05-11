@@ -1,10 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Entity;
 
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use PrestaShop\Module\Everpsblog\Repository\PostRepository;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 /**
  * @ORM\Entity(repositoryClass=PostRepository::class)

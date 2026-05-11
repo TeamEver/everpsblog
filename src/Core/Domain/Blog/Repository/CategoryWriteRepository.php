@@ -1,9 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Tools;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class CategoryWriteRepository
 {

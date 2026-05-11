@@ -1,10 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Service\Audit;
 
 use Context;
 use PrestaShopLogger;
 use Psr\Log\LoggerInterface;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class SensitiveActionLogger
 {

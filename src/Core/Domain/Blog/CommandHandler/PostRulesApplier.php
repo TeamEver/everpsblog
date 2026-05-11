@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler;
 
 use DateTimeImmutable;
@@ -10,6 +13,11 @@ use PrestaShop\Module\Everpsblog\Entity\PostLang;
 use PrestaShop\Module\Everpsblog\Entity\PostProduct;
 use PrestaShop\Module\Everpsblog\Entity\PostShop;
 use PrestaShop\Module\Everpsblog\Entity\PostTag;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class PostRulesApplier
 {

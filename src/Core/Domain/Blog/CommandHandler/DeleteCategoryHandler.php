@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace PrestaShop\Module\Everpsblog\Core\Domain\Blog\CommandHandler;
 
 use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Command\DeleteCategoryCommand;
@@ -7,6 +10,11 @@ use PrestaShop\Module\Everpsblog\Core\Domain\Blog\Repository\CategoryWriteReposi
 use PrestaShop\Module\Everpsblog\Service\BlogInstallService;
 use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheInvalidator;
 use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheRelationResolver;
+
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 
 class DeleteCategoryHandler
 {
