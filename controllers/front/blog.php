@@ -283,7 +283,7 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
             (int) Configuration::get('EVERPSBLOG_PAGINATION'),
             true,
             $sortSelected && Validate::isOrderBy($sortSelected['order_by']) ? 'p.' . $sortSelected['order_by'] : 'p.date_add',
-            $sortSelected && Validate::isOrderWay($sortSelected['order_way']) ? $sortSelected['order_way'] : null,
+            $sortSelected && Validate::isOrderWay($sortSelected['order_way']) ? $sortSelected['order_way'] : null
         );
         $evercategories = $this->getFrontLocalizedCategories(
             (int) $this->context->language->id,

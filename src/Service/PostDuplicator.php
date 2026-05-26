@@ -75,9 +75,9 @@ final class PostDuplicator
             'id_shop' => $shopId,
             'id_author' => (int) ($source['id_author'] ?? 0),
             'id_default_category' => (int) ($source['id_default_category'] ?? 0),
-            'post_status' => 'draft',
-            'date_add' => $now,
-            'date_upd' => $now,
+            'post_status' => \pSQL('draft'),
+            'date_add' => \pSQL($now),
+            'date_upd' => \pSQL($now),
             'indexable' => (int) ($source['indexable'] ?? 0),
             'follow' => (int) ($source['follow'] ?? 0),
             'sitemap' => (int) ($source['sitemap'] ?? 1),
@@ -132,12 +132,12 @@ final class PostDuplicator
             \Db::getInstance()->insert('ever_blog_post_lang', [
                 'id_ever_post' => $newPostId,
                 'id_lang' => (int) ($translation['id_lang'] ?? 0),
-                'title' => $this->appendCopySuffix($title),
-                'meta_title' => '' !== $metaTitle ? $this->appendCopySuffix($metaTitle) : '',
-                'meta_description' => (string) ($translation['meta_description'] ?? ''),
-                'link_rewrite' => $this->buildCopyLinkRewrite($translation, $newPostId),
-                'content' => (string) ($translation['content'] ?? ''),
-                'excerpt' => (string) ($translation['excerpt'] ?? ''),
+                'title' => \pSQL($this->appendCopySuffix($title)),
+                'meta_title' => '' !== $metaTitle ? \pSQL($this->appendCopySuffix($metaTitle)) : '',
+                'meta_description' => \pSQL((string) ($translation['meta_description'] ?? '')),
+                'link_rewrite' => \pSQL($this->buildCopyLinkRewrite($translation, $newPostId)),
+                'content' => \pSQL((string) ($translation['content'] ?? ''), true),
+                'excerpt' => \pSQL((string) ($translation['excerpt'] ?? ''), true),
             ], false);
         }
     }
@@ -288,6 +288,6 @@ final class PostDuplicator
 
         $value = (string) $value;
 
-        return '' === $value ? null : $value;
+        return '' === $value ? null : \pSQL($value);
     }
 }

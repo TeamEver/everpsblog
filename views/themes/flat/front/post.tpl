@@ -103,7 +103,7 @@
                         <div class="social-sharing social-sharing-hero">
                             <ul>
                             {foreach from=$social_share_links item='social_share_link'}
-                                <li class="{$social_share_link.class|escape:'htmlall':'UTF-8'} icon-gray"><a href="{$social_share_link.url|escape:'htmlall':'UTF-8'}" title="{$social_share_link.label|escape:'htmlall':'UTF-8'}" aria-label="{$social_share_link.label|escape:'htmlall':'UTF-8'}" target="_blank" rel="noopener noreferrer">{$social_share_link.label|escape:'htmlall':'UTF-8'}</a></li>
+                                <li class="{$social_share_link.class|escape:'htmlall':'UTF-8'} icon-gray"><a href="{$social_share_link.url|escape:'htmlall':'UTF-8'}" title="{$social_share_link.label|escape:'htmlall':'UTF-8'}" aria-label="{$social_share_link.label|escape:'htmlall':'UTF-8'}" target="_blank" data-target="_blank" rel="noopener noreferrer">{$social_share_link.label|escape:'htmlall':'UTF-8'}</a></li>
                             {/foreach}
                             </ul>
                         </div>
@@ -216,7 +216,7 @@
                         {if isset($author_social_links) && $author_social_links}
                         <div class="everpsblog-post-author-box__social-list d-flex flex-wrap">
                             {foreach from=$author_social_links item=author_social_link}
-                            <a class="everpsblog-post-author-box__social everpsblog-post-author-box__social--{$author_social_link.network|escape:'htmlall':'UTF-8'}" href="{$author_social_link.url|escape:'htmlall':'UTF-8'}" target="_blank" rel="nofollow noopener noreferrer" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} - {$author_social_link.label|escape:'htmlall':'UTF-8'}">
+                            <a class="everpsblog-post-author-box__social everpsblog-post-author-box__social--{$author_social_link.network|escape:'htmlall':'UTF-8'}" href="{$author_social_link.url|escape:'htmlall':'UTF-8'}" target="_blank" data-target="_blank" rel="nofollow noopener noreferrer" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} - {$author_social_link.label|escape:'htmlall':'UTF-8'}">
                                 {$author_social_link.label|escape:'htmlall':'UTF-8'}
                             </a>
                             {/foreach}

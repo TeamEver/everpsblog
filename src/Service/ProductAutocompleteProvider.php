@@ -22,13 +22,11 @@ final class ProductAutocompleteProvider
             return [];
         }
 
+        $languageJoins = $this->buildLanguageJoins($shopId, $langId);
         $rows = \Db::getInstance()->executeS(
-            'SELECT p.id_product, p.reference, pl.name
+            'SELECT p.id_product, p.reference, ' . $languageJoins['name_select'] . ' AS name
             FROM `' . _DB_PREFIX_ . 'product` p
-            INNER JOIN `' . _DB_PREFIX_ . 'product_shop` ps
-                ON (ps.id_product = p.id_product AND ps.id_shop = ' . (int) $shopId . ')
-            LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl
-                ON (pl.id_product = p.id_product AND pl.id_lang = ' . (int) $langId . ' AND pl.id_shop = ' . (int) $shopId . ')
+            ' . $languageJoins['joins'] . '
             WHERE p.id_product IN (' . implode(',', $ids) . ')'
         ) ?: [];
 
@@ -66,14 +64,16 @@ final class ProductAutocompleteProvider
         $escapedQuery = pSQL($query);
         $escapedLike = $this->escapeLike($query);
         $escapedPrefixLike = $this->escapeLike($query) . '%';
+        $languageJoins = $this->buildLanguageJoins($shopId, $langId);
+        $nameExpression = $languageJoins['name_select'];
         $conditions = [
-            'pl.name LIKE "%' . $escapedLike . '%"',
+            $nameExpression . ' LIKE "%' . $escapedLike . '%"',
             'p.reference LIKE "%' . $escapedLike . '%"',
         ];
         $orderBy = [
             'CASE WHEN p.reference = "' . $escapedQuery . '" THEN 0 ELSE 1 END',
-            'CASE WHEN pl.name LIKE "' . $escapedPrefixLike . '" THEN 0 ELSE 1 END',
-            'pl.name ASC',
+            'CASE WHEN ' . $nameExpression . ' LIKE "' . $escapedPrefixLike . '" THEN 0 ELSE 1 END',
+            $nameExpression . ' ASC',
             'p.id_product DESC',
         ];
 
@@ -86,28 +86,60 @@ final class ProductAutocompleteProvider
         }
 
         $rows = \Db::getInstance()->executeS(
-            'SELECT DISTINCT p.id_product, p.reference, pl.name
+            'SELECT DISTINCT p.id_product, p.reference, ' . $nameExpression . ' AS name
             FROM `' . _DB_PREFIX_ . 'product` p
-            INNER JOIN `' . _DB_PREFIX_ . 'product_shop` ps
-                ON (ps.id_product = p.id_product AND ps.id_shop = ' . (int) $shopId . ')
-            LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl
-                ON (pl.id_product = p.id_product AND pl.id_lang = ' . (int) $langId . ' AND pl.id_shop = ' . (int) $shopId . ')
+            ' . $languageJoins['joins'] . '
             WHERE (' . implode(' OR ', $conditions) . ')
             ORDER BY ' . implode(', ', $orderBy) . '
             LIMIT ' . $limit
         ) ?: [];
 
         $products = [];
+        $seenProductIds = [];
         foreach ($rows as $row) {
             $product = $this->buildProductPayload($row);
             if (null === $product) {
                 continue;
             }
 
+            if (isset($seenProductIds[(int) $product['id']])) {
+                continue;
+            }
+
+            $seenProductIds[(int) $product['id']] = true;
             $products[] = $product;
         }
 
         return $products;
+    }
+
+    /**
+     * @return array{name_select: string, joins: string}
+     */
+    private function buildLanguageJoins(int $shopId, int $langId): array
+    {
+        $fallbackJoin = 'LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl_any
+                ON (pl_any.id_product = p.id_product AND pl_any.id_lang = ' . (int) $langId . '
+                    AND pl_any.id_shop = (
+                        SELECT MIN(pl_pick.id_shop)
+                        FROM `' . _DB_PREFIX_ . 'product_lang` pl_pick
+                        WHERE pl_pick.id_product = p.id_product
+                            AND pl_pick.id_lang = ' . (int) $langId . '
+                    ))';
+
+        if ($shopId > 0) {
+            return [
+                'name_select' => 'COALESCE(pl.name, pl_any.name)',
+                'joins' => 'LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl
+                ON (pl.id_product = p.id_product AND pl.id_lang = ' . (int) $langId . ' AND pl.id_shop = ' . (int) $shopId . ')
+            ' . $fallbackJoin,
+            ];
+        }
+
+        return [
+            'name_select' => 'pl_any.name',
+            'joins' => $fallbackJoin,
+        ];
     }
 
     private function escapeLike(string $value): string

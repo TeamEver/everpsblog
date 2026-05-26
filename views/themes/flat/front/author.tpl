@@ -90,7 +90,7 @@
         </div>
     </div>
     {if isset($show_author_intro) && $show_author_intro}
-    <section class="container mb-4" itemprop="author" itemscope itemtype="https://schema.org/Person">
+    <section class="container mb-4 d-none" itemprop="author" itemscope itemtype="https://schema.org/Person">
         <div class="card shadow-sm border-0">
             <div class="card-body p-4">
                 <div class="row align-items-center">
@@ -109,7 +109,7 @@
                         {if isset($author_social_links) && $author_social_links}
                         <div class="d-flex flex-wrap gap-2">
                             {foreach from=$author_social_links item=author_social_link}
-                            <a class="btn btn-outline-secondary btn-sm" href="{$author_social_link.url|escape:'htmlall':'UTF-8'}" target="_blank" rel="nofollow noopener noreferrer" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} - {$author_social_link.label|escape:'htmlall':'UTF-8'}">
+                            <a class="btn btn-outline-secondary btn-sm" href="{$author_social_link.url|escape:'htmlall':'UTF-8'}" target="_blank" data-target="_blank" rel="nofollow noopener noreferrer" title="{$author->nickhandle|escape:'htmlall':'UTF-8'} - {$author_social_link.label|escape:'htmlall':'UTF-8'}">
                                 {$author_social_link.label|escape:'htmlall':'UTF-8'}
                             </a>
                             {/foreach}
