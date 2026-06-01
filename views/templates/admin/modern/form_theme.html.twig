@@ -12,8 +12,8 @@
 {% endblock %}
 
 {% block ever_product_autocomplete_row %}
-  {% set row_attr = row_attr|merge({class: (row_attr.class|default('') ~ ' form-group')|trim}) %}
-  <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
+  {% set rowClass = (row_attr.class|default('') ~ ' form-group')|trim %}
+  <div class="{{ rowClass }}"{% for attrName, attrValue in row_attr %}{% if attrName != 'class' %} {{ attrName }}="{{ attrValue|e('html_attr') }}"{% endif %}{% endfor %}>
     {{ form_label(form) }}
     {{ form_errors(form) }}
     {{ form_widget(form) }}
@@ -27,8 +27,14 @@
   {% set emptyText = autocomplete_empty_text|trans({}, translation_domain) %}
   {% set minLengthText = autocomplete_min_length_text|trans({'%count%': autocomplete_min_length}, translation_domain) %}
   {% set removeText = autocomplete_remove_text|trans({}, translation_domain) %}
+  {% set hiddenValue = '' %}
+  {% if value is iterable %}
+    {% set hiddenValue = value|join(',') %}
+  {% elseif value is not null %}
+    {% set hiddenValue = value %}
+  {% endif %}
 
-  {{ block('hidden_widget') }}
+  <input type="hidden" id="{{ id }}" name="{{ full_name }}" value="{{ hiddenValue|e('html_attr') }}"{% if disabled %} disabled="disabled"{% endif %}>
 
   <div
     class="ever-product-autocomplete"
