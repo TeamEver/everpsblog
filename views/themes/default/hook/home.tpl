@@ -24,7 +24,7 @@
                 </h2>
             </a>
         </div>
-        {if $everpsblog|@count > 1}
+        {if $everpsblog|@count > 4}
             <div id="{$carousel_id|escape:'htmlall':'UTF-8'}" class="carousel slide" data-bs-ride="false" data-bs-interval="false" data-bs-wrap="true">
                 <div class="carousel-inner">
                     {foreach from=$everpsblog item=item name=homecarousel}
@@ -39,17 +39,17 @@
                         {/if}
                     {/foreach}
                 </div>
-                <a class="carousel-control-prev" role="button" data-bs-target="#{$carousel_id|escape:'htmlall':'UTF-8'}" data-bs-slide="prev">
+                <button class="carousel-control-prev" type="button" data-bs-target="#{$carousel_id|escape:'htmlall':'UTF-8'}" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">{l s='Previous' d='Modules.Everpsblog.Shop'}</span>
-                </a>
-                <a class="carousel-control-next" role="button" data-bs-target="#{$carousel_id|escape:'htmlall':'UTF-8'}" data-bs-slide="next">
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#{$carousel_id|escape:'htmlall':'UTF-8'}" data-bs-slide="next">
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">{l s='Next' d='Modules.Everpsblog.Shop'}</span>
-                </a>
+                </button>
             </div>
         {else}
-            <div class="bloghome Container mt-2 row">
+            <div class="mt-2 row">
                 {foreach from=$everpsblog item=item}
                     {include file="{$everpsblog_theme_front_template_base}/loop/post_product.tpl"}
                 {/foreach}

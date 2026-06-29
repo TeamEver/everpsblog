@@ -1313,116 +1313,114 @@ class EverPsBlog extends Module
         $controller_name = Tools::getValue('controller');
         $module_name = Tools::getValue('module');
         $dynamic_header_css = '';
-        if ($module_name == 'everpsblog') {
+        $this->context->controller->addCSS(
+            $this->module_folder . '/views/css/everpsblog-all.css',
+            'all'
+        );
+        $this->context->controller->addCSS(
+            $this->module_folder . '/views/css/everpsblog.css',
+            'all'
+        );
+        $this->context->controller->addCSS(
+            $this->module_folder . 'everpsblog/views/css/everpsblog.css',
+            'all'
+        );
+        $theme = $this->getActiveTheme();
+        $themeCssPath = 'views/themes/' . $theme . '/assets/front.css';
+        if (file_exists(__DIR__ . '/' . $themeCssPath)) {
             $this->context->controller->addCSS(
-                $this->module_folder . '/views/css/everpsblog-all.css',
+                $this->_path . $themeCssPath,
                 'all'
             );
-            $this->context->controller->addCSS(
-                $this->module_folder . '/views/css/everpsblog.css',
-                'all'
-            );
-            $this->context->controller->addCSS(
-                $this->module_folder . 'everpsblog/views/css/everpsblog.css',
-                'all'
-            );
-            $theme = $this->getActiveTheme();
-            $themeCssPath = 'views/themes/' . $theme . '/assets/front.css';
-            if (file_exists(__DIR__ . '/' . $themeCssPath)) {
-                $this->context->controller->addCSS(
-                    $this->_path . $themeCssPath,
-                    'all'
-                );
-            }
-            $this->context->controller->addJs(
-                $this->_path . 'views/js/everpsblog.js'
-            );
-            $header_bg_color = Configuration::get('EVERBLOG_HEADER_BG_COLOR');
-            if (!$header_bg_color || !Validate::isColor($header_bg_color)) {
-                $header_bg_color = '#0a0f54';
-            }
-            $header_bg_alt_color = $this->getBlogConfigurationColor('EVERBLOG_HEADER_BG_ALT_COLOR', '#b64a32');
-            $header_overlay_bg_color = $this->getBlogConfigurationColor('EVERBLOG_HEADER_OVERLAY_BG_COLOR', '#121212');
-            $page_bg_color = $this->getBlogConfigurationColor('EVERBLOG_PAGE_BG_COLOR', '#ffffff');
-            $surface_bg_color = $this->getBlogConfigurationColor('EVERBLOG_SURFACE_BG_COLOR', '#ffffff');
-            $card_bg_color = $this->getBlogConfigurationColor('EVERBLOG_CARD_BG_COLOR', '#f1f1f1');
-            $soft_bg_color = $this->getBlogConfigurationColor('EVERBLOG_SOFT_BG_COLOR', '#ededed');
-            $placeholder_bg_color = $this->getBlogConfigurationColor('EVERBLOG_PLACEHOLDER_BG_COLOR', '#d8d8d8');
-            $accent_bg_color = $this->getBlogConfigurationColor('EVERBLOG_ACCENT_BG_COLOR', '#8cced2');
-            $header_title_color = Configuration::get('EVERBLOG_HEADER_TITLE_COLOR');
-            if (!$header_title_color || !Validate::isColor($header_title_color)) {
-                $header_title_color = '#ffffff';
-            }
-            $this->context->smarty->assign('everpsblog_header_bg_color', $header_bg_color);
-            $this->context->smarty->assign('everpsblog_header_title_color', $header_title_color);
-            $dynamic_header_css = '<style>'
-                . 'body#module-everpsblog-blog,'
-                . 'body#module-everpsblog-category,'
-                . 'body#module-everpsblog-tag,'
-                . 'body#module-everpsblog-author,'
-                . 'body#module-everpsblog-search,'
-                . 'body#module-everpsblog-post'
-                . '{--ever-blog-header-bg:' . $header_bg_color . ';'
-                . '--ever-blog-header-bg-alt:' . $header_bg_alt_color . ';'
-                . '--ever-blog-header-overlay-bg:' . $header_overlay_bg_color . ';'
-                . '--ever-blog-page-bg:' . $page_bg_color . ';'
-                . '--ever-blog-surface-bg:' . $surface_bg_color . ';'
-                . '--ever-blog-card-bg:' . $card_bg_color . ';'
-                . '--ever-blog-soft-bg:' . $soft_bg_color . ';'
-                . '--ever-blog-placeholder-bg:' . $placeholder_bg_color . ';'
-                . '--ever-blog-accent-bg:' . $accent_bg_color . ';'
-                . '--ever-blog-header-title-color:' . $header_title_color . ';'
-                . 'background-color:var(--ever-blog-page-bg) !important;}'
-                . '#module-everpsblog-blog .everpsblog-blog-header,'
-                . '#module-everpsblog-category .everpsblog-blog-header,'
-                . '#module-everpsblog-tag .everpsblog-blog-header,'
-                . '#module-everpsblog-author .everpsblog-blog-header,'
-                . '#module-everpsblog-search .everpsblog-blog-header'
-                . '{background-color:' . $header_bg_color . ' !important;}'
-                . '#module-everpsblog-blog .everpsblog-blog-header--has-banner::before,'
-                . '#module-everpsblog-category .everpsblog-blog-header--has-banner::before,'
-                . '#module-everpsblog-tag .everpsblog-blog-header--has-banner::before,'
-                . '#module-everpsblog-author .everpsblog-blog-header--has-banner::before,'
-                . '#module-everpsblog-search .everpsblog-blog-header--has-banner::before'
-                . '{background:linear-gradient(180deg, color-mix(in srgb, var(--ever-blog-header-overlay-bg) 28%, transparent) 0%, color-mix(in srgb, var(--ever-blog-header-overlay-bg) 55%, transparent) 100%) !important;}'
-                . '#module-everpsblog-post .everpsblog-post-hero'
-                . '{background:var(--ever-blog-header-bg) !important;}'
-                . '#module-everpsblog-post .everpsblog-post-author-box__image-link,'
-                . '#module-everpsblog-blog .everpsblog-image-wrapper .bg-light,'
-                . '#module-everpsblog-category .everpsblog-image-wrapper .bg-light,'
-                . '#module-everpsblog-tag .everpsblog-image-wrapper .bg-light,'
-                . '#module-everpsblog-author .everpsblog-image-wrapper .bg-light'
-                . '{background:var(--ever-blog-placeholder-bg) !important;}'
-                . '#module-everpsblog-blog .everpsblog-listing-card,'
-                . '#module-everpsblog-category .everpsblog-listing-card,'
-                . '#module-everpsblog-tag .everpsblog-listing-card,'
-                . '#module-everpsblog-author .everpsblog-listing-card,'
-                . '#module-everpsblog-post .card'
-                . '{background:var(--ever-blog-card-bg) !important;}'
-                . '#module-everpsblog-post .ai-summary-banner,'
-                . '#module-everpsblog-post .post-tags .badge,'
-                . '#module-everpsblog-post .taggedIn a,'
-                . '#module-everpsblog-post .taggedIn a:before'
-                . '{background:var(--ever-blog-accent-bg) !important;}'
-                . '#module-everpsblog-post .taggedIn a:after,'
-                . '#module-everpsblog-post .form-control,'
-                . '#module-everpsblog-post .everpsblog-post-author-box__social,'
-                . '#module-everpsblog-blog .everpsblog-top-category-btn:hover,'
-                . '#module-everpsblog-blog .everpsblog-top-category-btn:focus,'
-                . '#module-everpsblog-blog .everpsblog-top-category-btn.active,'
-                . '#module-everpsblog-category .everpsblog-top-category-btn:hover,'
-                . '#module-everpsblog-category .everpsblog-top-category-btn:focus,'
-                . '#module-everpsblog-category .everpsblog-top-category-btn.active'
-                . '{background:var(--ever-blog-surface-bg) !important;}'
-                . '#module-everpsblog-blog .everpsblog-blog-header__title,'
-                . '#module-everpsblog-category .everpsblog-blog-header__title,'
-                . '#module-everpsblog-tag .everpsblog-blog-header__title,'
-                . '#module-everpsblog-author .everpsblog-blog-header__title,'
-                . '#module-everpsblog-search .everpsblog-blog-header__title,'
-                . '#module-everpsblog-post .everpsblog-post-title'
-                . '{color:' . $header_title_color . ' !important;}'
-                . '</style>';
         }
+        $this->context->controller->addJs(
+            $this->_path . 'views/js/everpsblog.js'
+        );
+        $header_bg_color = Configuration::get('EVERBLOG_HEADER_BG_COLOR');
+        if (!$header_bg_color || !Validate::isColor($header_bg_color)) {
+            $header_bg_color = '#0a0f54';
+        }
+        $header_bg_alt_color = $this->getBlogConfigurationColor('EVERBLOG_HEADER_BG_ALT_COLOR', '#b64a32');
+        $header_overlay_bg_color = $this->getBlogConfigurationColor('EVERBLOG_HEADER_OVERLAY_BG_COLOR', '#121212');
+        $page_bg_color = $this->getBlogConfigurationColor('EVERBLOG_PAGE_BG_COLOR', '#ffffff');
+        $surface_bg_color = $this->getBlogConfigurationColor('EVERBLOG_SURFACE_BG_COLOR', '#ffffff');
+        $card_bg_color = $this->getBlogConfigurationColor('EVERBLOG_CARD_BG_COLOR', '#f1f1f1');
+        $soft_bg_color = $this->getBlogConfigurationColor('EVERBLOG_SOFT_BG_COLOR', '#ededed');
+        $placeholder_bg_color = $this->getBlogConfigurationColor('EVERBLOG_PLACEHOLDER_BG_COLOR', '#d8d8d8');
+        $accent_bg_color = $this->getBlogConfigurationColor('EVERBLOG_ACCENT_BG_COLOR', '#8cced2');
+        $header_title_color = Configuration::get('EVERBLOG_HEADER_TITLE_COLOR');
+        if (!$header_title_color || !Validate::isColor($header_title_color)) {
+            $header_title_color = '#ffffff';
+        }
+        $this->context->smarty->assign('everpsblog_header_bg_color', $header_bg_color);
+        $this->context->smarty->assign('everpsblog_header_title_color', $header_title_color);
+        $dynamic_header_css = '<style>'
+            . 'body#module-everpsblog-blog,'
+            . 'body#module-everpsblog-category,'
+            . 'body#module-everpsblog-tag,'
+            . 'body#module-everpsblog-author,'
+            . 'body#module-everpsblog-search,'
+            . 'body#module-everpsblog-post'
+            . '{--ever-blog-header-bg:' . $header_bg_color . ';'
+            . '--ever-blog-header-bg-alt:' . $header_bg_alt_color . ';'
+            . '--ever-blog-header-overlay-bg:' . $header_overlay_bg_color . ';'
+            . '--ever-blog-page-bg:' . $page_bg_color . ';'
+            . '--ever-blog-surface-bg:' . $surface_bg_color . ';'
+            . '--ever-blog-card-bg:' . $card_bg_color . ';'
+            . '--ever-blog-soft-bg:' . $soft_bg_color . ';'
+            . '--ever-blog-placeholder-bg:' . $placeholder_bg_color . ';'
+            . '--ever-blog-accent-bg:' . $accent_bg_color . ';'
+            . '--ever-blog-header-title-color:' . $header_title_color . ';'
+            . 'background-color:var(--ever-blog-page-bg) !important;}'
+            . '#module-everpsblog-blog .everpsblog-blog-header,'
+            . '#module-everpsblog-category .everpsblog-blog-header,'
+            . '#module-everpsblog-tag .everpsblog-blog-header,'
+            . '#module-everpsblog-author .everpsblog-blog-header,'
+            . '#module-everpsblog-search .everpsblog-blog-header'
+            . '{background-color:' . $header_bg_color . ' !important;}'
+            . '#module-everpsblog-blog .everpsblog-blog-header--has-banner::before,'
+            . '#module-everpsblog-category .everpsblog-blog-header--has-banner::before,'
+            . '#module-everpsblog-tag .everpsblog-blog-header--has-banner::before,'
+            . '#module-everpsblog-author .everpsblog-blog-header--has-banner::before,'
+            . '#module-everpsblog-search .everpsblog-blog-header--has-banner::before'
+            . '{background:linear-gradient(180deg, color-mix(in srgb, var(--ever-blog-header-overlay-bg) 28%, transparent) 0%, color-mix(in srgb, var(--ever-blog-header-overlay-bg) 55%, transparent) 100%) !important;}'
+            . '#module-everpsblog-post .everpsblog-post-hero'
+            . '{background:var(--ever-blog-header-bg) !important;}'
+            . '#module-everpsblog-post .everpsblog-post-author-box__image-link,'
+            . '#module-everpsblog-blog .everpsblog-image-wrapper .bg-light,'
+            . '#module-everpsblog-category .everpsblog-image-wrapper .bg-light,'
+            . '#module-everpsblog-tag .everpsblog-image-wrapper .bg-light,'
+            . '#module-everpsblog-author .everpsblog-image-wrapper .bg-light'
+            . '{background:var(--ever-blog-placeholder-bg) !important;}'
+            . '#module-everpsblog-blog .everpsblog-listing-card,'
+            . '#module-everpsblog-category .everpsblog-listing-card,'
+            . '#module-everpsblog-tag .everpsblog-listing-card,'
+            . '#module-everpsblog-author .everpsblog-listing-card,'
+            . '#module-everpsblog-post .everpsblog-post-card'
+            . '{background:var(--ever-blog-card-bg) !important;}'
+            . '#module-everpsblog-post .ai-summary-banner,'
+            . '#module-everpsblog-post .post-tags .badge,'
+            . '#module-everpsblog-post .taggedIn a,'
+            . '#module-everpsblog-post .taggedIn a:before'
+            . '{background:var(--ever-blog-accent-bg) !important;}'
+            . '#module-everpsblog-post .taggedIn a:after,'
+            . '#module-everpsblog-post .form-control,'
+            . '#module-everpsblog-post .everpsblog-post-author-box__social,'
+            . '#module-everpsblog-blog .everpsblog-top-category-btn:hover,'
+            . '#module-everpsblog-blog .everpsblog-top-category-btn:focus,'
+            . '#module-everpsblog-blog .everpsblog-top-category-btn.active,'
+            . '#module-everpsblog-category .everpsblog-top-category-btn:hover,'
+            . '#module-everpsblog-category .everpsblog-top-category-btn:focus,'
+            . '#module-everpsblog-category .everpsblog-top-category-btn.active'
+            . '{background:var(--ever-blog-surface-bg) !important;}'
+            . '#module-everpsblog-blog .everpsblog-blog-header__title,'
+            . '#module-everpsblog-category .everpsblog-blog-header__title,'
+            . '#module-everpsblog-tag .everpsblog-blog-header__title,'
+            . '#module-everpsblog-author .everpsblog-blog-header__title,'
+            . '#module-everpsblog-search .everpsblog-blog-header__title,'
+            . '#module-everpsblog-post .everpsblog-post-title'
+            . '{color:' . $header_title_color . ' !important;}'
+            . '</style>';
         $this->context->controller->addCSS(
             $this->module_folder . '/views/css/everpsblog-columns.css',
             'all'

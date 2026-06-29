@@ -982,6 +982,23 @@
           setResultsContent('', false);
         }
 
+        function buildSearchUrl(query) {
+          if (window.URL) {
+            try {
+              var url = new URL(searchUrl, window.location.href);
+              url.searchParams.set('q', query);
+
+              return url.toString();
+            } catch (error) {
+              // Fall back to a simple separator when URL parsing is not available for this value.
+            }
+          }
+
+          return searchUrl
+            + (searchUrl.indexOf('?') === -1 ? '?' : '&')
+            + 'q=' + encodeURIComponent(query);
+        }
+
         function showMessage(message) {
           if (!message) {
             hideResults();
@@ -1116,7 +1133,7 @@
           currentRequest = ++requestIndex;
           showMessage(loadingText);
 
-          fetch(searchUrl + '?q=' + encodeURIComponent(query), {
+          fetch(buildSearchUrl(query), {
             credentials: 'same-origin',
             headers: {
               'X-Requested-With': 'XMLHttpRequest'

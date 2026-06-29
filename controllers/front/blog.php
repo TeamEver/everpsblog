@@ -253,7 +253,7 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
         $meta_title = $everblog_title[(int) Context::getContext()->language->id];
         $everblog_desc = $this->getModuleConfigInMultipleLangs('EVERBLOG_META_DESC');
         $meta_desc = $everblog_desc[(int) Context::getContext()->language->id];
-        $page = $this->context->controller->getTemplateVarPage();
+        $page = $this->getTemplateVarPage();
         if (Tools::getValue('page')) {
             $meta_title = $this->transShop('Page : ') . Tools::getValue('page') . ' | ' . $meta_title;
             $meta_description = $this->transShop('Page : ') . Tools::getValue('page') . ' | ' . $meta_desc;

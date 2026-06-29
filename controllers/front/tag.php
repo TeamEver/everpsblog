@@ -113,7 +113,7 @@ class EverPsBlogtagModuleFrontController extends AbstractFrontController
             } else {
                 $seo_follow = 'nofollow';
             }
-            $page = $this->context->controller->getTemplateVarPage();
+            $page = $this->getTemplateVarPage();
             if (!Tools::getValue('page')) {
                 $page['meta']['robots'] = $seo_index . ', ' . $seo_follow;
             } else {

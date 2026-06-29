@@ -55,7 +55,7 @@ class EverPsBlogcustomercommentsModuleFrontController extends AbstractFrontContr
             Tools::redirect('index.php');
         }
         parent::initContent();
-        $page = $this->context->controller->getTemplateVarPage();
+        $page = $this->getTemplateVarPage();
         $page['meta']['title'] = $this->transShop('Your comments');
         $page['meta']['description'] = $this->transShop('Find all your comments on our blog');
         $this->context->smarty->assign('page', $page);

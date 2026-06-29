@@ -132,7 +132,7 @@ class EverPsBlogcategoryModuleFrontController extends AbstractFrontController
             } else {
                 $seo_follow = 'nofollow';
             }
-            $page = $this->context->controller->getTemplateVarPage();
+            $page = $this->getTemplateVarPage();
             // SEO opti on pagination; thx FoP ! Awesome channel !
             $page['meta']['robots'] = $seo_index . ', ' . $seo_follow;
             if (Tools::getValue('page')) {

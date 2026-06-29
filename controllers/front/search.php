@@ -63,7 +63,7 @@ class EverPsBlogsearchModuleFrontController extends AbstractFrontController
             (int) Configuration::get('EVERPSBLOG_PAGINATION')
         );
         $postsViewModel = PostViewModel::listFromLegacy($posts);
-        $page = $this->context->controller->getTemplateVarPage();
+        $page = $this->getTemplateVarPage();
         $page['meta']['title'] = $this->transShop('Search results for') . ' ' . $this->query;
         $page['meta']['description'] = $page['meta']['title'];
         $page['meta']['robots'] = 'noindex, follow';

@@ -27,11 +27,37 @@
                 </p>
             </a>
         </div>
-        <div class="flat-post-grid flat-post-grid--home">
-            {foreach from=$everpsblog item=item}
-                {include file="{$everpsblog_theme_front_template_base}/loop/post_array.tpl"}
-            {/foreach}
-        </div>
+        {if $everpsblog|@count > 4}
+            <div id="{$carousel_id|escape:'htmlall':'UTF-8'}" class="carousel slide" data-bs-ride="false" data-bs-interval="false" data-bs-wrap="true">
+                <div class="carousel-inner">
+                    {foreach from=$everpsblog item=item name=homecarousel}
+                        {if $smarty.foreach.homecarousel.index % 4 == 0}
+                            <div class="carousel-item{if $smarty.foreach.homecarousel.first} active{/if}">
+                                <div class="flat-post-grid flat-post-grid--home">
+                        {/if}
+                                    {include file="{$everpsblog_theme_front_template_base}/loop/post_array.tpl"}
+                        {if $smarty.foreach.homecarousel.index % 4 == 3 || $smarty.foreach.homecarousel.last}
+                                </div>
+                            </div>
+                        {/if}
+                    {/foreach}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#{$carousel_id|escape:'htmlall':'UTF-8'}" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">{l s='Previous' d='Modules.Everpsblog.Shop'}</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#{$carousel_id|escape:'htmlall':'UTF-8'}" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">{l s='Next' d='Modules.Everpsblog.Shop'}</span>
+                </button>
+            </div>
+        {else}
+            <div class="flat-post-grid flat-post-grid--home">
+                {foreach from=$everpsblog item=item}
+                    {include file="{$everpsblog_theme_front_template_base}/loop/post_array.tpl"}
+                {/foreach}
+            </div>
+        {/if}
         <div class="text-center">
             <a href="{$blogUrl|escape:'htmlall':'UTF-8'}" title="{l s='See all posts from the blog' d='Modules.Everpsblog.Shop'}" class="btn btn-primary text-white">{l s='See all posts from the blog' d='Modules.Everpsblog.Shop'}</a>
         </div>

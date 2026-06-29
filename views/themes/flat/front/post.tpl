@@ -91,7 +91,7 @@
         {/if}
     </div>
     <div class="everpsblog-post-header container-fluid p-0">
-        <div class="card shadow-sm border-0 mb-4">
+        <div class="card everpsblog-post-card shadow-sm border-0 mb-4">
             <div class="card-body mx-0 px-0 py-0">
                 <div class="everpsblog-post-hero{if isset($has_post_banner) && $has_post_banner} everpsblog-post-hero--has-banner{/if} mb-4"{if isset($everpsblog_header_bg_color) && $everpsblog_header_bg_color} style="background: {$everpsblog_header_bg_color|escape:'htmlall':'UTF-8'};"{/if}>
                     <div class="everpsblog-post-hero-overlay">
@@ -172,7 +172,7 @@
         </div>
     </div>
     <div class="container">
-        <div class="card shadow-sm border-0 mb-4">
+        <div class="card everpsblog-post-card shadow-sm border-0 mb-4">
             <div class="card-body postcontent {if $animated}zoomed{/if}">
                 {if isset($post->password_protected) && $post->password_protected}
                 <div class="alert alert-warning">
@@ -192,7 +192,7 @@
     </div>
     {if isset($show_post_author_box) && $show_post_author_box && isset($author) && isset($author->id) && $author->id}
     <section class="container everpsblog-post-author-box" itemprop="author" itemscope itemtype="https://schema.org/Person">
-        <div class="card shadow-sm border-0 mb-4">
+        <div class="card everpsblog-post-card shadow-sm border-0 mb-4">
             <div class="card-body">
                 <div class="row align-items-center everpsblog-post-author-box__row">
                     {if isset($has_author_image) && $has_author_image && isset($author_cover) && $author_cover}
@@ -251,7 +251,7 @@
 {if isset($allow_comments) && $allow_comments && !isset($post->password_protected)}
 
 {if isset($logged) && $logged ==  false && isset($only_logged_comment) && $only_logged_comment == true}
-<div class="card card-body mt-2 shadow-sm border-0">
+<div class="card everpsblog-post-card card-body mt-2 shadow-sm border-0">
     <form action="{$link->getPageLink('authentication', true)|escape:'htmlall':'UTF-8'}?back={$link->getModuleLink('everpsblog', 'post', ['id_ever_post' => $post->id_ever_post , 'link_rewrite' => $post->link_rewrite])|escape:'htmlall':'UTF-8'}" method="post" id="login-form" class="box">
         <p class="page-subheading h3">{l s='Log in to comment' d='Modules.Everpsblog.Shop'}</p>
         <div class="form_content clearfix">
@@ -280,7 +280,7 @@
 <section class="container clearfix">
     <div class="row mt-2">
         <div class="col-12">
-            <div class="card shadow-sm border-0 mb-3">
+            <div class="card everpsblog-post-card shadow-sm border-0 mb-3">
                 <div class="card-body">
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3">
                         <span id="leaveComment" class="h5 mb-2 mb-md-0">{l s='Leave a comment' d='Modules.Everpsblog.Shop'}</span>
