@@ -72,7 +72,8 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
         $allowedSortBy = ['p.date_add', 'p.id_ever_post', 'pl.title', 'p.count'];
         $allowedSortWay = ['ASC', 'DESC'];
         $sortBy = in_array($sortBy, $allowedSortBy, true) ? $sortBy : 'p.date_add';
-        $sortWay = in_array(strtoupper($sortWay), $allowedSortWay, true) ? strtoupper($sortWay) : 'DESC';
+        $sortWay = is_string($sortWay) ? strtoupper($sortWay) : 'DESC';
+        $sortWay = in_array($sortWay, $allowedSortWay, true) ? $sortWay : 'DESC';
         $baseTags = [BlogFrontCacheTags::BLOG_LISTING];
         if (null !== $starred) {
             $baseTags[] = BlogFrontCacheTags::BLOG_STARRED;
@@ -375,12 +376,16 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
 
     public function getCanonicalURL()
     {
-        if (Tools::getValue('page')) {
-            return;
+        $page = (int) Tools::getValue('page');
+        $params = [];
+        if ($page > 1) {
+            $params['page'] = $page;
         }
+
         return $this->context->link->getModuleLink(
             $this->module->name,
-            'blog'
+            'blog',
+            $params
         );
     }
 

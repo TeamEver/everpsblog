@@ -250,16 +250,19 @@ class EverPsBlogcategoryModuleFrontController extends AbstractFrontController
 
     public function getCanonicalURL()
     {
-        if (Tools::getValue('page')) {
-            return;
+        $page = (int) Tools::getValue('page');
+        $params = [
+            'id_ever_category' => $this->category->id,
+            'link_rewrite' => $this->category->link_rewrite,
+        ];
+        if ($page > 1) {
+            $params['page'] = $page;
         }
+
         return $this->context->link->getModuleLink(
             $this->module->name,
             'category',
-            [
-                'id_ever_category' => $this->category->id,
-                'link_rewrite' => $this->category->link_rewrite,
-            ]
+            $params
         );
     }
 
