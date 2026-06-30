@@ -313,7 +313,7 @@ body#module-everpsblog-author .container {
 }
 
 .flat-post-card__link {
-    margin-top: auto;
+    margin-top: .8rem;
     font-size: .82rem;
     font-weight: 600;
 }
@@ -322,20 +322,6 @@ body#module-everpsblog-author .container {
     display: flex;
     justify-content: center;
     margin: 1.5rem 0 2rem;
-}
-
-.btn.btn-primary {
-    color: #fff !important;
-    background-color: #1f3a5f;
-    border-color: #1f3a5f;
-}
-
-.btn.btn-primary:hover,
-.btn.btn-primary:focus,
-.btn.btn-primary:active {
-    color: #fff !important;
-    background-color: #162b47;
-    border-color: #162b47;
 }
 
 body#module-everpsblog-post .flat-post-page {
@@ -400,6 +386,10 @@ body#module-everpsblog-post .everpsblog-post-intro p {
 body#module-everpsblog-post .everpsblog-post-intro .postexcerpt {
     font-size: 1.1rem;
     line-height: 1.35;
+}
+
+body#module-everpsblog-post .postcontent li {
+    list-style: disc;
 }
 
 .flat-post-more {
@@ -553,6 +543,13 @@ body#module-everpsblog-post #related-posts {
     font-size: .95rem;
     font-weight: 800;
     line-height: 1.2;
+}
+
+.flat-related-card__excerpt {
+    margin-bottom: .35rem;
+    color: #222;
+    font-size: .86rem;
+    line-height: 1.25;
 }
 
 .flat-related-card__link {

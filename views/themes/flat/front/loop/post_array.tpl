@@ -32,10 +32,10 @@
     {assign var='post_rewrite' value=$item.link_rewrite}
 {/if}
 {assign var='post_summary' value=''}
-{if isset($item.summary) && $item.summary}
-    {assign var='post_summary' value=$item.summary}
-{elseif isset($item.excerpt) && $item.excerpt}
+{if isset($item.excerpt) && $item.excerpt}
     {assign var='post_summary' value=$item.excerpt}
+{elseif isset($item.summary) && $item.summary}
+    {assign var='post_summary' value=$item.summary}
 {elseif isset($item.meta_description) && $item.meta_description}
     {assign var='post_summary' value=$item.meta_description}
 {elseif isset($item.content) && $item.content}

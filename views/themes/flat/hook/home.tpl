@@ -20,12 +20,10 @@
         {assign var='everpsblog_excerpt_length' value=300}
     {/if}
     <div class="bloghome container">
-        <div class="row bloghometitle">
-            <a href="{$blogUrl|escape:'htmlall':'UTF-8'}" title="{l s='Latest posts from the blog' d='Modules.Everpsblog.Shop'}">
-                <p class="h2 products-section-title text-uppercase text-center">
-                    {l s='Latest posts from the blog' d='Modules.Everpsblog.Shop'}
-                </p>
-            </a>
+        <div class="row bloghometitle text-underline-blue">
+            <h2 class="h2 products-section-title text-uppercase text-center">
+                {l s='Latest posts from the blog' d='Modules.Everpsblog.Shop'}
+            </h2>
         </div>
         {if $everpsblog|@count > 4}
             <div id="{$carousel_id|escape:'htmlall':'UTF-8'}" class="carousel slide" data-bs-ride="false" data-bs-interval="false" data-bs-wrap="true">

@@ -32,10 +32,10 @@
     {assign var='post_rewrite' value=$item.link_rewrite}
 {/if}
 {assign var='post_summary' value=''}
-{if isset($item.summary) && $item.summary}
-    {assign var='post_summary' value=$item.summary}
-{elseif isset($item.excerpt) && $item.excerpt}
+{if isset($item.excerpt) && $item.excerpt}
     {assign var='post_summary' value=$item.excerpt}
+{elseif isset($item.summary) && $item.summary}
+    {assign var='post_summary' value=$item.summary}
 {elseif isset($item.meta_description) && $item.meta_description}
     {assign var='post_summary' value=$item.meta_description}
 {elseif isset($item.content) && $item.content}
@@ -59,5 +59,13 @@
             {$post_title|escape:'htmlall':'UTF-8'}
         </a>
     </p>
+    {if $post_summary}
+        {if !isset($everpsblog_excerpt_length) || !$everpsblog_excerpt_length}
+            {assign var='everpsblog_excerpt_length' value=300}
+        {/if}
+        <div class="flat-related-card__excerpt everpsblogcontent rte" id="everpsblog-post-content-{$post_id|escape:'htmlall':'UTF-8'}">
+            {$post_summary|truncate:$everpsblog_excerpt_length:'...' nofilter}
+        </div>
+    {/if}
     <a href="{$post_link|escape:'htmlall':'UTF-8'}" class="flat-related-card__link" title="{$post_title|escape:'htmlall':'UTF-8'}">{l s='Lire l’article' d='Modules.Everpsblog.Shop'} &gt;</a>
 </article>
