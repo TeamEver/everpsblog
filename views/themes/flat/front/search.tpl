@@ -27,9 +27,11 @@
 <div class="container my-4">
     {include file="{$everpsblog_theme_front_template_base}/loop/search_form.tpl"}
     {if isset($post_number) && $post_number > 0}
-    <div class="row mt-2">
+    <div class="flat-post-grid flat-post-grid--listing row mt-2">
         {foreach from=$posts item=item}
-            {include file="{$everpsblog_theme_front_template_base}/loop/post_array.tpl"}
+            <div class="flat-post-grid__item col-12 col-md-6">
+                {include file="{$everpsblog_theme_front_template_base}/loop/post_array.tpl"}
+            </div>
         {/foreach}
     </div>
     {if isset($pagination.should_be_displayed) && $pagination.should_be_displayed}
