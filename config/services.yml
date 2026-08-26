@@ -443,6 +443,7 @@ services:
   PrestaShop\Module\Everpsblog\Controller\Admin\:
     resource: '../src/Controller/Admin/*'
     public: true
+    autoconfigure: true
     calls:
       - [setTemplateRenderer, ['@twig']]
       - [setFormFactory, ['@form.factory']]
