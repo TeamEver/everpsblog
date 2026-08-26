@@ -27,11 +27,6 @@ if (!defined('_PS_VERSION_')) {
 use PrestaShop\Module\Everpsblog\Controller\Front\AbstractFrontController;
 use PrestaShop\Module\Everpsblog\Controller\Front\FrontBlogDataProviderTrait;
 
-use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
-use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
-use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
-use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
-
 class EverPsBlogcustomercommentsModuleFrontController extends AbstractFrontController
 {
     use FrontBlogDataProviderTrait;

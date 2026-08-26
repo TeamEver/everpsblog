@@ -25,13 +25,10 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use PrestaShop\Module\Everpsblog\Controller\Front\AbstractFrontController;
+use PrestaShop\Module\Everpsblog\Adapter\LegacyProductListingPresenterAdapter;
+use PrestaShop\Module\Everpsblog\Adapter\LegacyToolsAdapter;
 use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheTags;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
-
-use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
-use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
-use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
-use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 
 class EverPsBlogpostModuleFrontController extends AbstractFrontController
 {
@@ -348,15 +345,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 $assembler = new ProductAssembler($this->context);
                 $presenterFactory = new ProductPresenterFactory($this->context);
                 $presentationSettings = $presenterFactory->getPresentationSettings();
-                $presenter = new ProductListingPresenter(
-                    new ImageRetriever(
-                       $this->context->link
-                    ),
-                    $this->context->link,
-                    new PriceFormatter(),
-                    new ProductColorsRetriever(),
-                   $this->context->getTranslator()
-                );
+                $presenter = LegacyProductListingPresenterAdapter::create($this->context);
                 $presentationSettings->showPrices = $showPrice;
                 foreach ($this->post_products as $productId) {
                     $pproduct = new Product(
@@ -436,7 +425,7 @@ class EverPsBlogpostModuleFrontController extends AbstractFrontController
                 }
             }
             // Password protected
-            $cookieName = $this->context->shop->id . $this->post->id . Tools::encrypt('everpsblog/post-' . $this->post->id);
+            $cookieName = $this->context->shop->id . $this->post->id . LegacyToolsAdapter::encrypt('everpsblog/post-' . $this->post->id);
             if ($this->post->psswd
                 && !empty($this->post->psswd)
                 && !$this->context->cookie->__isset($cookieName)

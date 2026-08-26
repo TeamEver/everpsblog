@@ -443,6 +443,13 @@ services:
   PrestaShop\Module\Everpsblog\Controller\Admin\:
     resource: '../src/Controller/Admin/*'
     public: true
+    calls:
+      - [setTemplateRenderer, ['@twig']]
+      - [setFormFactory, ['@form.factory']]
+      - [setRouter, ['@router']]
+      - [setRequestStack, ['@request_stack']]
+      - [setCsrfTokenManager, ['@security.csrf.token_manager']]
+      - [setTranslator, ['@translator']]
     tags: ['controller.service_arguments']
 
   PrestaShop\Module\Everpsblog\Form\Type\Admin\:

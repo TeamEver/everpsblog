@@ -8,6 +8,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use PrestaShop\Module\Everpsblog\Adapter\LegacyToolsAdapter;
 use PrestaShop\Module\Everpsblog\Service\BlogThemeResolver;
 use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCache;
 use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheInvalidator;
@@ -149,7 +150,7 @@ abstract class AbstractFrontController extends \ModuleFrontController
 
     protected function isPreviewRequest(): bool
     {
-        return \Tools::getValue('preview') === \Tools::encrypt('everpsblog/preview');
+        return \Tools::getValue('preview') === LegacyToolsAdapter::encrypt('everpsblog/preview');
     }
 
     /**

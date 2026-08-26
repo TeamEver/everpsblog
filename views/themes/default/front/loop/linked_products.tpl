@@ -27,13 +27,7 @@
       <div class="carousel-inner">
         {foreach from=$ps_products_chunks item="slide" name="blpSlides"}
           <div class="carousel-item{if $smarty.foreach.blpSlides.first} active{/if}">
-            <div class="row">
-              {foreach from=$slide item="product"}
-                <div class="col-12 col-sm-6 col-lg-3 mb-3 d-flex">
-                  {include file="catalog/_partials/miniatures/product.tpl" product=$product}
-                </div>
-              {/foreach}
-            </div>
+            {include file="catalog/_partials/productlist.tpl" products=$slide}
           </div>
         {/foreach}
       </div>
@@ -52,13 +46,7 @@
       </div>
     </div>
   {else}
-    <div class="row">
-      {foreach from=$ps_products item="product"}
-        <div class="col-12 col-sm-6 col-lg-3 mb-3 d-flex">
-          {include file="catalog/_partials/miniatures/product.tpl" product=$product}
-        </div>
-      {/foreach}
-    </div>
+    {include file="catalog/_partials/productlist.tpl" products=$ps_products}
   {/if}
 </section>
 {/if}

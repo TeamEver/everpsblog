@@ -23,12 +23,11 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 require_once __DIR__ . '/vendor/autoload.php';
+use PrestaShop\Module\Everpsblog\Adapter\LegacyProductListingPresenterAdapter;
 use PrestaShop\Module\Everpsblog\Service\BlogThemeResolver;
-use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
-use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
-use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
-use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 use PrestaShop\Module\Everpsblog\Entity\Post as EverPsBlogPost;
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCache;
+use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheTags;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 
 class EverPsBlog extends Module
@@ -45,15 +44,31 @@ class EverPsBlog extends Module
     private $blogScheduledTaskRunner;
     private $blogRedirectService;
     private $blogFrontCacheInvalidator;
+    private $blogFrontCache;
     private $legacyImportAdapter;
     private $themeResolver;
     public static $route = [];
+
+    /**
+     * Hooks used by the QCD Page Builder integration (back-office targets,
+     * declarative blocks palette, front rendering of those blocks).
+     *
+     * @var string[]
+     */
+    private const QCD_PAGE_BUILDER_HOOKS = [
+        'filterQcdPageBuilderBackOfficeTargets',
+        'filterQcdPageBuilderDeclarativeBlocks',
+        'filterQcdPageBuilderThirdPartyBlockFrontRender',
+    ];
+
+    /** Signature des hooks QCD Page Builder deja enregistres. */
+    private const QCD_PAGE_BUILDER_HOOKS_FLAG = 'EVERPSBLOG_QCDPB_HOOKS';
 
     public function __construct()
     {
         $this->name = 'everpsblog';
         $this->tab = 'front_office_features';
-        $this->version = '7.0.3';
+        $this->version = '7.0.4';
         $this->author = 'Team Ever';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -1137,6 +1152,362 @@ class EverPsBlog extends Module
         ];
     }
 
+    /**
+     * Declare Ever Blog blocks inside the QCD Page Builder palette.
+     *
+     * @param array<string, mixed> $params
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function hookFilterQcdPageBuilderDeclarativeBlocks($params = [])
+    {
+        return [
+            [
+                'name' => $this->transAdmin('Ever Blog - Latest posts'),
+                'description' => $this->transAdmin('Display the latest published blog posts'),
+                'code' => 'everpsblog_latest_posts',
+                'tab' => 'general',
+                'icon_path' => 'modules/' . $this->name . '/logo.png',
+                'need_reload' => true,
+                'templates' => [
+                    'default' => 'views/templates/hook/qcdblocks/latest_posts.tpl',
+                ],
+                'config' => [
+                    'fields' => $this->getQcdLatestPostsBlockFields(),
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Feed the declared Ever Blog blocks with live data right before front rendering.
+     *
+     * @param array<string, mixed> $params
+     *
+     * @return void
+     */
+    public function hookFilterQcdPageBuilderThirdPartyBlockFrontRender($params = [])
+    {
+        if (!isset($params['context']) || !is_array($params['context'])) {
+            return;
+        }
+
+        $context = &$params['context'];
+        if (($context['block_type'] ?? '') !== 'everpsblog_latest_posts') {
+            return;
+        }
+
+        if (!isset($context['normalized']) || !is_array($context['normalized'])) {
+            $context['normalized'] = [];
+        }
+        if (!isset($context['normalized']['attributes']) || !is_array($context['normalized']['attributes'])) {
+            $context['normalized']['attributes'] = [];
+        }
+
+        $settings = &$context['normalized']['attributes'];
+        $limit = (int) ($settings['limit'] ?? 4);
+        $limit = max(1, min(24, $limit));
+        $idCategory = (int) ($settings['id_ever_category'] ?? 0);
+
+        $settings['limit'] = $limit;
+        $settings['id_ever_category'] = $idCategory;
+        $settings['posts'] = $this->getQcdBlockLatestPosts(
+            (int) $this->context->language->id,
+            (int) $this->context->shop->id,
+            $limit,
+            $idCategory
+        );
+        $settings['blog_url'] = $this->context->link->getModuleLink($this->name, 'blog', [], true);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function getQcdLatestPostsBlockFields()
+    {
+        return [
+            [
+                'name' => 'title',
+                'type' => 'text',
+                'label' => $this->transAdmin('Block title'),
+                'default' => '',
+                'help' => $this->transAdmin('Leave empty when the section already has its own heading.'),
+            ],
+            [
+                'name' => 'limit',
+                'type' => 'number',
+                'label' => $this->transAdmin('Number of posts'),
+                'default' => 4,
+                'min' => 1,
+                'max' => 24,
+            ],
+            [
+                'name' => 'id_ever_category',
+                'type' => 'select',
+                'label' => $this->transAdmin('Category'),
+                'default' => 0,
+                'options' => $this->getQcdBlockCategoryOptions(),
+            ],
+            [
+                'name' => 'columns_desktop',
+                'type' => 'number',
+                'label' => $this->transAdmin('Columns (desktop)'),
+                'default' => 2,
+                'min' => 1,
+                'max' => 6,
+            ],
+            [
+                'name' => 'columns_tablet',
+                'type' => 'number',
+                'label' => $this->transAdmin('Columns (tablet)'),
+                'default' => 2,
+                'min' => 1,
+                'max' => 4,
+            ],
+            [
+                'name' => 'columns_mobile',
+                'type' => 'number',
+                'label' => $this->transAdmin('Columns (mobile)'),
+                'default' => 1,
+                'min' => 1,
+                'max' => 2,
+            ],
+            [
+                'name' => 'gap',
+                'type' => 'number',
+                'label' => $this->transAdmin('Gap (px)'),
+                'default' => 20,
+                'min' => 0,
+                'max' => 80,
+            ],
+            [
+                'name' => 'mobile_layout',
+                'type' => 'select',
+                'label' => $this->transAdmin('Mobile layout'),
+                'default' => 'rail',
+                'options' => [
+                    ['value' => 'rail', 'label' => $this->transAdmin('Horizontal rail')],
+                    ['value' => 'grid', 'label' => $this->transAdmin('Grid')],
+                ],
+            ],
+            [
+                'name' => 'show_image',
+                'type' => 'boolean',
+                'input' => 'switch',
+                'label' => $this->transAdmin('Show cover image'),
+                'default' => true,
+            ],
+            [
+                'name' => 'show_excerpt',
+                'type' => 'boolean',
+                'input' => 'switch',
+                'label' => $this->transAdmin('Show excerpt'),
+                'default' => true,
+            ],
+            [
+                'name' => 'excerpt_length',
+                'type' => 'number',
+                'label' => $this->transAdmin('Excerpt length'),
+                'default' => 120,
+                'min' => 40,
+                'max' => 400,
+            ],
+            [
+                'name' => 'show_badge',
+                'type' => 'boolean',
+                'input' => 'switch',
+                'label' => $this->transAdmin('Show category and date'),
+                'default' => true,
+            ],
+            [
+                'name' => 'link_label',
+                'type' => 'text',
+                'label' => $this->transAdmin('Link label'),
+                'default' => '',
+                'help' => $this->transAdmin('Leave empty to use the shop translation.'),
+            ],
+        ];
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function getQcdBlockCategoryOptions()
+    {
+        $options = [
+            ['value' => 0, 'label' => $this->transAdmin('All categories')],
+        ];
+
+        // La palette n'est construite qu'en back-office : inutile de payer
+        // la requete categories sur chaque rendu front.
+        if (!defined('_PS_ADMIN_DIR_')) {
+            return $options;
+        }
+
+        try {
+            $categories = $this->getFrontLocalizedCategories(
+                (int) $this->context->language->id,
+                (int) $this->context->shop->id
+            );
+        } catch (Exception $exception) {
+            return $options;
+        }
+
+        foreach ($categories as $category) {
+            if (!empty($category['is_root_category'])) {
+                continue;
+            }
+
+            $options[] = [
+                'value' => (int) $category['id_ever_category'],
+                'label' => (string) $category['title'],
+            ];
+        }
+
+        return $options;
+    }
+
+    /**
+     * Latest published posts, ready to be consumed by the QCD Page Builder template.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function getQcdBlockLatestPosts($idLang, $idShop, $limit, $idCategory = 0)
+    {
+        $idLang = (int) $idLang;
+        $idShop = (int) $idShop;
+        $limit = (int) $limit;
+        $idCategory = (int) $idCategory;
+
+        $cacheTags = [BlogFrontCacheTags::BLOG_LISTING];
+        if ($idCategory > 0) {
+            $cacheTags[] = BlogFrontCacheTags::category($idCategory);
+        }
+
+        try {
+            return $this->getBlogFrontCacheService()->remember(
+                __METHOD__,
+                [$idLang, $idShop, $limit, $idCategory],
+                function () use ($idLang, $idShop, $limit, $idCategory) {
+                    return $this->buildQcdBlockLatestPosts($idLang, $idShop, $limit, $idCategory);
+                },
+                $cacheTags
+            );
+        } catch (Throwable $throwable) {
+            PrestaShopLogger::addLog($this->name . ' QCD block posts: ' . $throwable->getMessage(), 2);
+
+            return [];
+        }
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function buildQcdBlockLatestPosts(int $idLang, int $idShop, int $limit, int $idCategory): array
+    {
+        $sql = new DbQuery();
+        $sql->select('p.id_ever_post, p.id_ever_post AS id, p.id_default_category, p.id_author AS id_ever_author, p.post_status, p.date_add, p.date_upd, p.active, p.starred, p.count');
+        $sql->select('pl.title, pl.link_rewrite, pl.meta_title, pl.meta_description, pl.excerpt, pl.content');
+        $sql->select('dcl.id_ever_category AS default_category_id, dcl.title AS default_category_title, dcl.link_rewrite AS default_category_link_rewrite');
+        $sql->from('ever_blog_post', 'p');
+        $sql->innerJoin('ever_blog_post_lang', 'pl', 'pl.id_ever_post = p.id_ever_post AND pl.id_lang = ' . $idLang);
+        $sql->innerJoin('ever_blog_post_shop', 'ps', 'ps.id_ever_post = p.id_ever_post AND ps.id_shop = ' . $idShop);
+        $sql->leftJoin('ever_blog_category_lang', 'dcl', 'dcl.id_ever_category = p.id_default_category AND dcl.id_lang = ' . $idLang);
+        if ($idCategory > 0) {
+            $sql->innerJoin('ever_blog_post_category', 'pc', 'pc.id_ever_post = p.id_ever_post AND pc.id_ever_post_category = ' . $idCategory);
+        }
+        $sql->where('p.post_status = "published"');
+        $sql->where('p.active = 1');
+        $sql->orderBy('p.date_add DESC, p.id_ever_post DESC');
+        $sql->limit($limit);
+
+        $rows = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql) ?: [];
+
+        $legacyPosts = [];
+        foreach ($rows as $row) {
+            $post = (object) $row;
+            if (!empty($post->excerpt) && $this->isPlaceholderExcerpt((string) $post->excerpt)) {
+                $post->excerpt = '';
+            }
+            $legacyPosts[] = $post;
+        }
+
+        $rowsByPostId = [];
+        foreach ($rows as $row) {
+            if (is_array($row) && !empty($row['id_ever_post'])) {
+                $rowsByPostId[(int) $row['id_ever_post']] = $row;
+            }
+        }
+
+        $posts = $this->normalizeFrontPostList($legacyPosts, $idShop);
+
+        foreach ($posts as $index => $post) {
+            $postId = (int) ($post['id_ever_post'] ?? 0);
+            $row = isset($rowsByPostId[$postId]) ? $rowsByPostId[$postId] : [];
+            $categoryTitle = isset($row['default_category_title']) ? trim((string) $row['default_category_title']) : '';
+            $dateDisplay = $this->formatQcdBlockDate((string) ($post['date_add'] ?? ''));
+
+            $badgeParts = array_filter([$categoryTitle, $dateDisplay]);
+
+            $posts[$index]['category_title'] = $categoryTitle;
+            $posts[$index]['category_id'] = isset($row['default_category_id']) ? (int) $row['default_category_id'] : 0;
+            $posts[$index]['date_display'] = $dateDisplay;
+            $posts[$index]['badge'] = implode(' · ', $badgeParts);
+            $posts[$index]['thumb'] = (string) ($post['featured_thumb'] ?? '');
+            // Inutile de trainer le contenu complet dans le cache et dans Smarty :
+            // l'extrait est deja calcule par PostViewModel.
+            unset($posts[$index]['content']);
+        }
+
+        return $posts;
+    }
+
+    /**
+     * Localized, human readable publication date (ex: 20 avril 2026).
+     */
+    private function formatQcdBlockDate(string $date): string
+    {
+        $date = trim($date);
+        if ($date === '' || strpos($date, '0000-00-00') === 0) {
+            return '';
+        }
+
+        $timestamp = strtotime($date);
+        if ($timestamp === false) {
+            return '';
+        }
+
+        if (class_exists('IntlDateFormatter')) {
+            try {
+                $locale = isset($this->context->language->locale) && $this->context->language->locale
+                    ? (string) $this->context->language->locale
+                    : 'fr-FR';
+                $formatter = new IntlDateFormatter(
+                    str_replace('-', '_', $locale),
+                    IntlDateFormatter::LONG,
+                    IntlDateFormatter::NONE
+                );
+                $formatted = $formatter->format($timestamp);
+                if (is_string($formatted) && $formatted !== '') {
+                    return $formatted;
+                }
+            } catch (Throwable $throwable) {
+                // On retombe simplement sur le format numerique ci-dessous.
+            }
+        }
+
+        return date('d/m/Y', $timestamp);
+    }
+
+    private function getBlogFrontCacheService(): BlogFrontCache
+    {
+        if (!$this->blogFrontCache) {
+            $this->blogFrontCache = new BlogFrontCache();
+        }
+
+        return $this->blogFrontCache;
+    }
+
     private function isQcdPageBuilderActiveForContext()
     {
         if (!Module::isInstalled('qcdpagebuilder') || !Module::isEnabled('qcdpagebuilder')) {
@@ -1175,14 +1546,36 @@ class EverPsBlog extends Module
 
     private function registerQcdPageBuilderIntegrationHooks()
     {
-        if (!Module::isInstalled('qcdpagebuilder') || !Hook::getIdByName('filterQcdPageBuilderBackOfficeTargets')) {
+        if (!Module::isInstalled('qcdpagebuilder')) {
             return;
         }
 
-        try {
-            $this->registerHook('filterQcdPageBuilderBackOfficeTargets');
-        } catch (Exception $exception) {
-            PrestaShopLogger::addLog($this->name . ' QCD Page Builder integration hook: ' . $exception->getMessage(), 2);
+        // Appele depuis actionAdminControllerSetMedia : on evite de rejouer les
+        // requetes d'enregistrement a chaque page du back-office.
+        $signature = $this->version . '|' . implode(',', self::QCD_PAGE_BUILDER_HOOKS);
+        if ((string) Configuration::getGlobalValue(self::QCD_PAGE_BUILDER_HOOKS_FLAG) === $signature) {
+            return;
+        }
+
+        $allRegistered = true;
+        foreach (self::QCD_PAGE_BUILDER_HOOKS as $hookName) {
+            if (!Hook::getIdByName($hookName)) {
+                // Le hook n'existe pas encore (qcdpagebuilder pas installe a fond) :
+                // on retentera au prochain passage.
+                $allRegistered = false;
+                continue;
+            }
+
+            try {
+                $this->registerHook($hookName);
+            } catch (Exception $exception) {
+                $allRegistered = false;
+                PrestaShopLogger::addLog($this->name . ' QCD Page Builder integration hook (' . $hookName . '): ' . $exception->getMessage(), 2);
+            }
+        }
+
+        if ($allRegistered) {
+            Configuration::updateGlobalValue(self::QCD_PAGE_BUILDER_HOOKS_FLAG, $signature);
         }
     }
 
@@ -1465,13 +1858,7 @@ class EverPsBlog extends Module
                     $assembler = new ProductAssembler($this->context);
                     $presenterFactory = new ProductPresenterFactory($this->context);
                     $presentationSettings = $presenterFactory->getPresentationSettings();
-                    $presenter = new ProductListingPresenter(
-                        new ImageRetriever($this->context->link),
-                        $this->context->link,
-                        new PriceFormatter(),
-                        new ProductColorsRetriever(),
-                        $this->context->getTranslator()
-                    );
+                    $presenter = LegacyProductListingPresenterAdapter::create($this->context);
                     foreach ($post_products as $productId) {
                         $product = new Product(
                             (int) $productId,
@@ -2079,7 +2466,10 @@ class EverPsBlog extends Module
             $this->registerHook('actionDispatcherBefore');
             $this->registerHook('beforeRenderingEverpsblogPostSlider');
             $this->registerHook('actionAdminControllerSetMedia');
-            $this->registerHook('displayHome');
+            // displayHome volontairement non enregistre : le bloc
+            // everpsblog_latest_posts du QCD Page Builder rend les derniers
+            // articles la ou l'integrateur le decide, sans injecter de titre
+            // avant le h1 de la page.
             $this->registerHook('displayFooterProduct');
             $this->registerHook('displayFooter');
             $this->registerHook('displayCustomerAccount');
@@ -2090,9 +2480,7 @@ class EverPsBlog extends Module
             $this->registerHook('actionAdminMetaAfterWriteRobotsFile');
             $this->registerHook('actionRegisterBlock');
             $this->registerHook('actionObjectLanguageAddAfter');
-            if (Hook::getIdByName('filterQcdPageBuilderBackOfficeTargets')) {
-                $this->registerHook('filterQcdPageBuilderBackOfficeTargets');
-            }
+            $this->registerQcdPageBuilderIntegrationHooks();
         } catch (Exception $e) {
             PrestaShopLogger::addLog($this->name . ' : ' . $e->getMessage());
         }
@@ -2123,9 +2511,7 @@ class EverPsBlog extends Module
             $this->registerHook('actionObjectEverPsBlogTagDeleteAfter');
             $this->registerHook('actionObjectAuthorDeleteAfter');
             $this->registerHook('actionObjectProductDeleteAfter');
-            if (Hook::getIdByName('filterQcdPageBuilderBackOfficeTargets')) {
-                $this->registerHook('filterQcdPageBuilderBackOfficeTargets');
-            }
+            $this->registerQcdPageBuilderIntegrationHooks();
         } catch (Exception $e) {
             PrestaShopLogger::addLog($this->name . ' : ' . $e->getMessage());
         }

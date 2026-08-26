@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 namespace PrestaShop\Module\Everpsblog\Controller\Front;
 
+use PrestaShop\Module\Everpsblog\Adapter\LegacyProductListingPresenterAdapter;
 use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheTags;
 
 if (!defined('_PS_VERSION_')) {
@@ -316,13 +317,7 @@ trait FrontBlogDataProviderTrait
         $presentationSettings = $presenterFactory->getPresentationSettings();
         $presentationSettings->showPrices = true;
 
-        $presenter = new \PrestaShop\PrestaShop\Core\Product\ProductListingPresenter(
-            new \PrestaShop\PrestaShop\Adapter\Image\ImageRetriever($this->context->link),
-            $this->context->link,
-            new \PrestaShop\PrestaShop\Adapter\Product\PriceFormatter(),
-            new \PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever(),
-            $this->context->getTranslator()
-        );
+        $presenter = LegacyProductListingPresenterAdapter::create($this->context);
 
         $products = [];
         foreach ($productIds as $productId) {

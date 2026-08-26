@@ -5,6 +5,8 @@ declare(strict_types=1);
 
 namespace PrestaShop\Module\Everpsblog\Grid\Data;
 
+use PrestaShop\Module\Everpsblog\Adapter\LegacyToolsAdapter;
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -129,6 +131,6 @@ trait FrontPreviewActionTrait
 
     private function getPreviewToken(): string
     {
-        return (string) \Tools::encrypt('everpsblog/preview');
+        return LegacyToolsAdapter::encrypt('everpsblog/preview');
     }
 }

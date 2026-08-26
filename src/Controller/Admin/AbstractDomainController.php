@@ -10,6 +10,18 @@ use PrestaShop\Module\Everpsblog\Service\BlogScheduledTaskRunner;
 use PrestaShop\Module\Everpsblog\Service\BlogSitemapService;
 use PrestaShop\Module\Everpsblog\Service\ContextStateService;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -22,12 +34,136 @@ abstract class AbstractDomainController extends FrameworkBundleAdminController
 
     /** @var ContextStateService */
     protected $contextStateService;
+    /** @var Environment|null */
+    private $templateRenderer;
+    /** @var FormFactoryInterface|null */
+    private $formFactory;
+    /** @var RouterInterface|null */
+    private $router;
+    /** @var RequestStack|null */
+    private $requestStack;
+    /** @var CsrfTokenManagerInterface|null */
+    private $csrfTokenManager;
+    /** @var TranslatorInterface|null */
+    private $translator;
     /** @var BlogScheduledTaskRunner|null */
     private $scheduledTaskRunner;
 
     public function __construct(ContextStateService $contextStateService)
     {
         $this->contextStateService = $contextStateService;
+    }
+
+    public function setTemplateRenderer(Environment $templateRenderer): void
+    {
+        $this->templateRenderer = $templateRenderer;
+    }
+
+    public function setFormFactory(FormFactoryInterface $formFactory): void
+    {
+        $this->formFactory = $formFactory;
+    }
+
+    public function setRouter(RouterInterface $router): void
+    {
+        $this->router = $router;
+    }
+
+    public function setRequestStack(RequestStack $requestStack): void
+    {
+        $this->requestStack = $requestStack;
+    }
+
+    public function setCsrfTokenManager(CsrfTokenManagerInterface $csrfTokenManager): void
+    {
+        $this->csrfTokenManager = $csrfTokenManager;
+    }
+
+    public function setTranslator(TranslatorInterface $translator): void
+    {
+        $this->translator = $translator;
+    }
+
+    protected function createForm(string $type, $data = null, array $options = []): FormInterface
+    {
+        if (!$this->formFactory instanceof FormFactoryInterface) {
+            throw new \LogicException('You cannot create the Ever PS Blog admin form because the form factory is not injected.');
+        }
+
+        return $this->formFactory->create($type, $data, $options);
+    }
+
+    protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
+    {
+        if (!$this->router instanceof RouterInterface) {
+            throw new \LogicException('You cannot generate the Ever PS Blog admin URL because the router is not injected.');
+        }
+
+        return $this->router->generate($route, $parameters, $referenceType);
+    }
+
+    protected function redirectToRoute(string $route, array $parameters = [], int $status = 302): RedirectResponse
+    {
+        return new RedirectResponse($this->generateUrl($route, $parameters), $status);
+    }
+
+    protected function addFlash(string $type, $message): void
+    {
+        $session = $this->getSession();
+        if (!method_exists($session, 'getFlashBag')) {
+            throw new \LogicException('You cannot add an Ever PS Blog admin flash message because the session flash bag is not available.');
+        }
+
+        $session->getFlashBag()->add($type, $message);
+    }
+
+    protected function isCsrfTokenValid(string $id, ?string $token): bool
+    {
+        if (!$this->csrfTokenManager instanceof CsrfTokenManagerInterface) {
+            throw new \LogicException('You cannot validate the Ever PS Blog admin CSRF token because the token manager is not injected.');
+        }
+
+        return $this->csrfTokenManager->isTokenValid(new CsrfToken($id, $token));
+    }
+
+    protected function trans($key, $domain, array $parameters = [])
+    {
+        if (!$this->translator instanceof TranslatorInterface) {
+            return strtr((string) $key, $parameters);
+        }
+
+        return $this->translator->trans((string) $key, $parameters, (string) $domain);
+    }
+
+    protected function render(string $view, array $parameters = [], ?Response $response = null): Response
+    {
+        $hasInvalidSubmittedForm = false;
+        foreach ($parameters as $key => $value) {
+            if (!$value instanceof FormInterface) {
+                continue;
+            }
+
+            if ($value->isSubmitted() && !$value->isValid()) {
+                $hasInvalidSubmittedForm = true;
+            }
+
+            $parameters[$key] = $value->createView();
+        }
+
+        if (!$this->templateRenderer instanceof Environment) {
+            throw new \LogicException(
+                'You cannot render the Ever PS Blog admin template because the Twig service is not injected.'
+            );
+        }
+
+        $response = $response ?: new Response();
+        if (Response::HTTP_OK === $response->getStatusCode() && $hasInvalidSubmittedForm) {
+            $response->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $response->setContent((string) $this->templateRenderer->render($view, $parameters));
+
+        return $response;
     }
 
     protected function getContextShopId(): int
@@ -43,6 +179,15 @@ abstract class AbstractDomainController extends FrameworkBundleAdminController
     protected function transAdmin(string $message, array $parameters = []): string
     {
         return $this->trans($message, 'Modules.Everpsblog.Admin', $parameters);
+    }
+
+    private function getSession(): SessionInterface
+    {
+        if (!$this->requestStack instanceof RequestStack) {
+            throw new \LogicException('You cannot access the Ever PS Blog admin session because the request stack is not injected.');
+        }
+
+        return $this->requestStack->getSession();
     }
 
     /**

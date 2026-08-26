@@ -29,11 +29,6 @@ use PrestaShop\Module\Everpsblog\Controller\Front\FrontBlogDataProviderTrait;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\TaxonomyViewModel;
 
-use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
-use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
-use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
-use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
-
 class EverPsBlogcategoryModuleFrontController extends AbstractFrontController
 {
     use FrontBlogDataProviderTrait;

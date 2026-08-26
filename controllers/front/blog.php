@@ -25,13 +25,9 @@ if (!defined('_PS_VERSION_')) {
 }
 
 use PrestaShop\Module\Everpsblog\Controller\Front\AbstractFrontController;
+use PrestaShop\Module\Everpsblog\Adapter\LegacyProductListingPresenterAdapter;
 use PrestaShop\Module\Everpsblog\Service\Cache\BlogFrontCacheTags;
 use PrestaShop\Module\Everpsblog\ViewModel\Front\PostViewModel;
-
-use PrestaShop\PrestaShop\Adapter\Image\ImageRetriever;
-use PrestaShop\PrestaShop\Adapter\Product\PriceFormatter;
-use PrestaShop\PrestaShop\Core\Product\ProductListingPresenter;
-use PrestaShop\PrestaShop\Adapter\Product\ProductColorsRetriever;
 
 class EverPsBlogblogModuleFrontController extends AbstractFrontController
 {
@@ -218,15 +214,7 @@ class EverPsBlogblogModuleFrontController extends AbstractFrontController
             $assembler = new ProductAssembler($this->context);
             $presenterFactory = new ProductPresenterFactory($this->context);
             $presentationSettings = $presenterFactory->getPresentationSettings();
-            $presenter = new ProductListingPresenter(
-                new ImageRetriever(
-                    $this->context->link
-                ),
-                $this->context->link,
-                new PriceFormatter(),
-                new ProductColorsRetriever(),
-                $this->context->getTranslator()
-            );
+            $presenter = LegacyProductListingPresenterAdapter::create($this->context);
             $productsForTemplate = [];
             $presentationSettings->showPrices = $showPrice;
             if (is_array($featured_products)) {
