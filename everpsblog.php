@@ -541,6 +541,47 @@ class EverPsBlog extends Module
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql) ?: [];
     }
 
+    /**
+     * Published posts linked to a product (ever_blog_post_product), for displayFooterProduct.
+     *
+     * @return array<int, object>
+     */
+    private function getPostsByProductForHook($idLang, $idShop, $idProduct, $limit)
+    {
+        if ($idProduct <= 0) {
+            return [];
+        }
+        $sql = new DbQuery();
+        $sql->select('p.id_ever_post, p.id_default_category, pl.title, pl.link_rewrite, pl.excerpt, pl.content, dcl.id_ever_category AS default_category_id, dcl.title AS default_category_title, dcl.link_rewrite AS default_category_link_rewrite');
+        $sql->from('ever_blog_post_product', 'pp');
+        $sql->innerJoin('ever_blog_post', 'p', 'p.id_ever_post = pp.id_ever_post');
+        $sql->innerJoin('ever_blog_post_lang', 'pl', 'pl.id_ever_post = p.id_ever_post AND pl.id_lang = ' . (int) $idLang);
+        $sql->innerJoin('ever_blog_post_shop', 'ps', 'ps.id_ever_post = p.id_ever_post AND ps.id_shop = ' . (int) $idShop);
+        $sql->leftJoin('ever_blog_category_lang', 'dcl', 'dcl.id_ever_category = p.id_default_category AND dcl.id_lang = ' . (int) $idLang);
+        $sql->where('pp.id_ever_post_product = ' . (int) $idProduct);
+        $sql->where('p.post_status = "published"');
+        $sql->where('p.active = 1');
+        $sql->orderBy('p.date_add DESC, p.id_ever_post DESC');
+        $sql->limit((int) $limit);
+
+        $rows = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql) ?: [];
+        $posts = [];
+        foreach ($rows as $row) {
+            $post = (object) $row;
+            $post->default_cat_obj = !empty($row['default_category_id']) ? (object) [
+                'id_ever_category' => (int) $row['default_category_id'],
+                'title' => $row['default_category_title'],
+                'link_rewrite' => $row['default_category_link_rewrite'],
+            ] : null;
+            if (!empty($post->excerpt) && $this->isPlaceholderExcerpt((string) $post->excerpt)) {
+                $post->excerpt = '';
+            }
+            $posts[] = $post;
+        }
+
+        return $posts;
+    }
+
     private function getStarredPostsForHome($idLang, $idShop, $limit)
     {
         $sql = new DbQuery();
@@ -2038,11 +2079,10 @@ class EverPsBlog extends Module
             [],
             true
         );
-        $posts = EverPsBlogPost::getPostsByProduct(
+        $posts = $this->getPostsByProductForHook(
             (int) $this->context->language->id,
             (int) $this->context->shop->id,
             (int) Tools::getValue('id_product'),
-            0,
             (int) $post_number
         );
         if (!$posts
@@ -2050,7 +2090,7 @@ class EverPsBlog extends Module
         ) {
             return '';
         }
-        $evercategories = EverPsBlogCategory::getAllCategories(
+        $evercategories = $this->getFrontLocalizedCategories(
             (int) $this->context->language->id,
             (int) $this->context->shop->id
         );

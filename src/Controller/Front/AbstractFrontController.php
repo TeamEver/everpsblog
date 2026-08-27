@@ -412,7 +412,7 @@ abstract class AbstractFrontController extends \ModuleFrontController
         \Context::getContext()->cookie->disallowWriting();
         header('HTTP/1.0 301 Moved');
         header('Cache-Control: no-cache');
-        \Tools::redirectLink($finalUrl);
+        \Tools::redirect($finalUrl);
     }
 
     /**
