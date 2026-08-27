@@ -83,8 +83,13 @@
         {if !isset($pagination) || $pagination.current_page <= 1}
         <div class="everpsblog-blog-header__categories d-flex flex-wrap justify-content-center gap-2 mt-4">
             {if isset($evercategory) && $evercategory|count > 0}
+                {* Only top-level categories in the header rail: sub-categories are listed on their parent's page *}
+                {assign var='rootCategoryId' value=0}
+                {foreach from=$evercategory item=rootItem}
+                    {if $rootItem.is_root_category}{assign var='rootCategoryId' value=$rootItem.id_ever_category}{/if}
+                {/foreach}
                 {foreach from=$evercategory item=item}
-                    {if !$item.is_root_category && $item.link_rewrite != 'home' && $item.title|lower != 'home'}
+                    {if !$item.is_root_category && $item.link_rewrite != 'home' && $item.title|lower != 'home' && (!$rootCategoryId || !isset($item.id_parent_category) || $item.id_parent_category == $rootCategoryId)}
                         <a class="btn everpsblog-top-category-btn" href="{$link->getModuleLink('everpsblog', 'category', ['id_ever_category' => $item.id_ever_category, 'link_rewrite' => $item.link_rewrite])|escape:'htmlall':'UTF-8'}" title="{$item.title|escape:'htmlall':'UTF-8'}">
                             {$item.title|escape:'htmlall':'UTF-8'}
                         </a>
